@@ -24,9 +24,10 @@ class TtsService {
           contentType: AndroidAudioContentType.speech,
           usage: AndroidAudioUsage.assistanceNavigationGuidance,
         ),
-        androidAudioFocusGainType:
-            AndroidAudioFocusGainType.gainTransientMayDuck,
-        androidWillPauseWhenDucked: true,
+        // A transient focus request makes other media pause temporarily and
+        // sends it AUDIOFOCUS_GAIN when focus is abandoned after speech.
+        androidAudioFocusGainType: AndroidAudioFocusGainType.gainTransient,
+        androidWillPauseWhenDucked: false,
       ),
     );
     await _tts.awaitSpeakCompletion(true);
@@ -49,7 +50,9 @@ class TtsService {
     if (!hasAudioFocus || request != _speechRequest) return;
 
     try {
-      await _tts.speak(text);
+      // AudioSession owns focus so flutter_tts must not acquire a second,
+      // independently managed focus request.
+      await _tts.speak(text, focus: false);
     } finally {
       if (request == _speechRequest) {
         await _releaseAudioFocus();

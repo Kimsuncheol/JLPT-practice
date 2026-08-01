@@ -1,5 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/features/dashboard/home_shell.dart';
+import 'package:jlpt_practice/features/chat/tutor_chat_screen.dart';
 import 'package:jlpt_practice/features/grammar/grammar_detail_screen.dart';
 import 'package:jlpt_practice/features/grammar/grammar_list_screen.dart';
 import 'package:jlpt_practice/features/kana/kana_chart_screen.dart';
@@ -19,6 +20,7 @@ GoRouter createAppRouter({String initialLocation = '/'}) => GoRouter(
     GoRoute(path: '/', builder: (_, _) => const BootstrapScreen()),
     GoRoute(path: '/onboarding', builder: (_, _) => const OnboardingScreen()),
     GoRoute(path: '/home', builder: (_, _) => const HomeShell()),
+    GoRoute(path: '/chat', builder: (_, _) => const TutorChatScreen()),
     GoRoute(
       path: '/settings/languages',
       builder: (_, _) => const LanguagesScreen(),
