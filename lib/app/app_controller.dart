@@ -194,11 +194,6 @@ class AppController extends AsyncNotifier<AppState> {
     unawaited(ref.read(cloudSyncProvider).syncProfile(next));
   }
 
-  Future<void> setDailyGoal(int value) =>
-      _updatePreference('dailyGoal', value, (current) {
-        return current.copyWith(dailyGoal: value);
-      });
-
   Future<void> setShowFurigana(bool value) =>
       _updatePreference('showFurigana', value, (current) {
         return current.copyWith(showFurigana: value);

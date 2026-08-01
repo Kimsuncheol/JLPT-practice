@@ -79,25 +79,6 @@ class SettingsScreen extends ConsumerWidget {
                     trailing: const Icon(Icons.chevron_right_rounded),
                     onTap: () => context.push('/settings/levels'),
                   ),
-                  ListTile(
-                    leading: const Icon(Icons.flag_rounded),
-                    title: Text(strings('dailyGoal')),
-                    trailing: DropdownButton<int>(
-                      value: state.dailyGoal,
-                      underline: const SizedBox.shrink(),
-                      items: [5, 10, 20, 30]
-                          .map(
-                            (goal) => DropdownMenuItem(
-                              value: goal,
-                              child: Text('$goal'),
-                            ),
-                          )
-                          .toList(),
-                      onChanged: (value) {
-                        if (value != null) controller.setDailyGoal(value);
-                      },
-                    ),
-                  ),
                 ],
               ),
               const SizedBox(height: 14),

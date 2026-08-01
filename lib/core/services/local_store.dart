@@ -55,7 +55,7 @@ class LocalStore {
       meaningLanguage:
           _preferences.getString('meaningLanguage') ??
           (deviceLanguage == 'ko' ? 'ko' : 'en'),
-      dailyGoal: _preferences.getInt('dailyGoal') ?? 10,
+      dailyGoal: _preferences.getInt('dailyGoal') ?? 30,
       showFurigana: _preferences.getBool('showFurigana') ?? true,
       autoPlayAudio: _preferences.getBool('autoPlayAudio') ?? false,
       themeMode: ThemeMode.values.firstWhere(
