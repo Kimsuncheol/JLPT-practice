@@ -1,0 +1,41 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jlpt_practice/app/app_controller.dart';
+import 'package:jlpt_practice/app/router.dart';
+import 'package:jlpt_practice/app/theme/app_theme.dart';
+
+class JlptPracticeApp extends ConsumerWidget {
+  const JlptPracticeApp({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final asyncState = ref.watch(appControllerProvider);
+    final locale = asyncState.when<Locale?>(
+      data: (state) =>
+          state.languageCode == 'system' ? null : Locale(state.languageCode),
+      loading: () => null,
+      error: (_, _) => null,
+    );
+    final themeMode = asyncState.when(
+      data: (state) => state.themeMode,
+      loading: () => ThemeMode.system,
+      error: (_, _) => ThemeMode.system,
+    );
+    return MaterialApp.router(
+      title: 'Kotoba Flow',
+      debugShowCheckedModeBanner: false,
+      routerConfig: appRouter,
+      theme: AppTheme.light(),
+      darkTheme: AppTheme.dark(),
+      themeMode: themeMode,
+      locale: locale,
+      supportedLocales: const [Locale('en'), Locale('ko')],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+    );
+  }
+}

@@ -1,0 +1,55 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function owns(userId) {
+      return signedIn() && request.auth.uid == userId;
+    }
+
+    function validLevel(value) {
+      return value in ['N5', 'N4', 'N3', 'N2', 'N1'];
+    }
+
+    match /vocabulary/{vocabularyId} {
+      allow get, list: if signedIn() && resource.data.isActive == true;
+      allow create, update, delete: if false;
+    }
+
+    match /quizQuestions/{questionId} {
+      allow get, list: if signedIn() && resource.data.isActive == true;
+      allow create, update, delete: if false;
+    }
+
+    match /users/{userId} {
+      allow read: if owns(userId);
+      allow create: if owns(userId)
+        && request.resource.data.isAnonymous == true;
+      allow update: if owns(userId)
+        && (!('selectedJlptLevel' in request.resource.data)
+          || validLevel(request.resource.data.selectedJlptLevel))
+        && (!('dailyGoal' in request.resource.data)
+          || request.resource.data.dailyGoal is int
+          && request.resource.data.dailyGoal >= 1
+          && request.resource.data.dailyGoal <= 100);
+      allow delete: if false;
+
+      match /vocabularyProgress/{vocabularyId} {
+        allow read, delete: if owns(userId);
+        allow create, update: if owns(userId)
+          && request.resource.data.vocabularyId == vocabularyId
+          && validLevel(request.resource.data.jlptLevel)
+          && request.resource.data.state in [
+            'newWord', 'learning', 'review', 'relearning', 'mastered', 'suspended'
+          ];
+      }
+
+      match /{document=**} {
+        allow read, write: if owns(userId);
+      }
+    }
+  }
+}

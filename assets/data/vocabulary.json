@@ -1,0 +1,362 @@
+[
+  {
+    "id": "食べる_たべる",
+    "word": "食べる",
+    "reading": "たべる",
+    "furigana": "食[た]べる",
+    "romaji": "taberu",
+    "meanings": {"en": ["to eat"], "ko": ["먹다"]},
+    "partOfSpeech": "verb",
+    "jlptLevel": "N5",
+    "tags": ["food", "daily life"],
+    "example": {
+      "sentence": "毎朝パンを食べます。",
+      "reading": "まいあさ パンを たべます。",
+      "translations": {"en": "I eat bread every morning.", "ko": "저는 매일 아침 빵을 먹습니다."},
+      "quizSentence": "毎朝パンを＿＿＿。",
+      "answer": "食べます"
+    }
+  },
+  {
+    "id": "飲む_のむ",
+    "word": "飲む",
+    "reading": "のむ",
+    "furigana": "飲[の]む",
+    "romaji": "nomu",
+    "meanings": {"en": ["to drink"], "ko": ["마시다"]},
+    "partOfSpeech": "verb",
+    "jlptLevel": "N5",
+    "tags": ["food", "daily life"],
+    "example": {
+      "sentence": "水を飲みます。",
+      "reading": "みずを のみます。",
+      "translations": {"en": "I drink water.", "ko": "물을 마십니다."},
+      "quizSentence": "水を＿＿＿。",
+      "answer": "飲みます"
+    }
+  },
+  {
+    "id": "読む_よむ",
+    "word": "読む",
+    "reading": "よむ",
+    "furigana": "読[よ]む",
+    "romaji": "yomu",
+    "meanings": {"en": ["to read"], "ko": ["읽다"]},
+    "partOfSpeech": "verb",
+    "jlptLevel": "N5",
+    "tags": ["study", "daily life"],
+    "example": {
+      "sentence": "電車で本を読みます。",
+      "reading": "でんしゃで ほんを よみます。",
+      "translations": {"en": "I read a book on the train.", "ko": "전철에서 책을 읽습니다."},
+      "quizSentence": "電車で本を＿＿＿。",
+      "answer": "読みます"
+    }
+  },
+  {
+    "id": "歩く_あるく",
+    "word": "歩く",
+    "reading": "あるく",
+    "furigana": "歩[ある]く",
+    "romaji": "aruku",
+    "meanings": {"en": ["to walk"], "ko": ["걷다"]},
+    "partOfSpeech": "verb",
+    "jlptLevel": "N5",
+    "tags": ["movement"],
+    "example": {
+      "sentence": "駅まで歩きます。",
+      "reading": "えきまで あるきます。",
+      "translations": {"en": "I walk to the station.", "ko": "역까지 걷습니다."},
+      "quizSentence": "駅まで＿＿＿。",
+      "answer": "歩きます"
+    }
+  },
+  {
+    "id": "間に合う_まにあう",
+    "word": "間に合う",
+    "reading": "まにあう",
+    "furigana": "間[ま]に 合[あ]う",
+    "romaji": "maniau",
+    "meanings": {"en": ["to be in time"], "ko": ["시간에 맞다"]},
+    "partOfSpeech": "verb",
+    "jlptLevel": "N4",
+    "tags": ["time"],
+    "example": {
+      "sentence": "急げば電車に間に合います。",
+      "reading": "いそげば でんしゃに まにあいます。",
+      "translations": {"en": "If we hurry, we will catch the train.", "ko": "서두르면 전철 시간에 맞습니다."},
+      "quizSentence": "急げば電車に＿＿＿。",
+      "answer": "間に合います"
+    }
+  },
+  {
+    "id": "続ける_つづける",
+    "word": "続ける",
+    "reading": "つづける",
+    "furigana": "続[つづ]ける",
+    "romaji": "tsuzukeru",
+    "meanings": {"en": ["to continue"], "ko": ["계속하다"]},
+    "partOfSpeech": "verb",
+    "jlptLevel": "N4",
+    "tags": ["action"],
+    "example": {
+      "sentence": "毎日勉強を続けます。",
+      "reading": "まいにち べんきょうを つづけます。",
+      "translations": {"en": "I continue studying every day.", "ko": "매일 공부를 계속합니다."},
+      "quizSentence": "毎日勉強を＿＿＿。",
+      "answer": "続けます"
+    }
+  },
+  {
+    "id": "比べる_くらべる",
+    "word": "比べる",
+    "reading": "くらべる",
+    "furigana": "比[くら]べる",
+    "romaji": "kuraberu",
+    "meanings": {"en": ["to compare"], "ko": ["비교하다"]},
+    "partOfSpeech": "verb",
+    "jlptLevel": "N4",
+    "tags": ["thinking"],
+    "example": {
+      "sentence": "二つの商品を比べます。",
+      "reading": "ふたつの しょうひんを くらべます。",
+      "translations": {"en": "I compare the two products.", "ko": "두 상품을 비교합니다."},
+      "quizSentence": "二つの商品を＿＿＿。",
+      "answer": "比べます"
+    }
+  },
+  {
+    "id": "決める_きめる",
+    "word": "決める",
+    "reading": "きめる",
+    "furigana": "決[き]める",
+    "romaji": "kimeru",
+    "meanings": {"en": ["to decide"], "ko": ["결정하다"]},
+    "partOfSpeech": "verb",
+    "jlptLevel": "N4",
+    "tags": ["thinking"],
+    "example": {
+      "sentence": "旅行の日を決めます。",
+      "reading": "りょこうの ひを きめます。",
+      "translations": {"en": "We decide the travel date.", "ko": "여행 날짜를 정합니다."},
+      "quizSentence": "旅行の日を＿＿＿。",
+      "answer": "決めます"
+    }
+  },
+  {
+    "id": "省く_はぶく",
+    "word": "省く",
+    "reading": "はぶく",
+    "furigana": "省[はぶ]く",
+    "romaji": "habuku",
+    "meanings": {"en": ["to omit", "to save"], "ko": ["생략하다", "절약하다"]},
+    "partOfSpeech": "verb",
+    "jlptLevel": "N3",
+    "tags": ["work"],
+    "example": {
+      "sentence": "無駄な手順を省きます。",
+      "reading": "むだな てじゅんを はぶきます。",
+      "translations": {"en": "We omit unnecessary steps.", "ko": "불필요한 절차를 생략합니다."},
+      "quizSentence": "無駄な手順を＿＿＿。",
+      "answer": "省きます"
+    }
+  },
+  {
+    "id": "確かめる_たしかめる",
+    "word": "確かめる",
+    "reading": "たしかめる",
+    "furigana": "確[たし]かめる",
+    "romaji": "tashikameru",
+    "meanings": {"en": ["to confirm"], "ko": ["확인하다"]},
+    "partOfSpeech": "verb",
+    "jlptLevel": "N3",
+    "tags": ["work"],
+    "example": {
+      "sentence": "もう一度予定を確かめます。",
+      "reading": "もういちど よていを たしかめます。",
+      "translations": {"en": "I confirm the schedule once more.", "ko": "일정을 다시 한번 확인합니다."},
+      "quizSentence": "もう一度予定を＿＿＿。",
+      "answer": "確かめます"
+    }
+  },
+  {
+    "id": "断る_ことわる",
+    "word": "断る",
+    "reading": "ことわる",
+    "furigana": "断[ことわ]る",
+    "romaji": "kotowaru",
+    "meanings": {"en": ["to refuse"], "ko": ["거절하다"]},
+    "partOfSpeech": "verb",
+    "jlptLevel": "N3",
+    "tags": ["communication"],
+    "example": {
+      "sentence": "その誘いを断ります。",
+      "reading": "その さそいを ことわります。",
+      "translations": {"en": "I decline the invitation.", "ko": "그 권유를 거절합니다."},
+      "quizSentence": "その誘いを＿＿＿。",
+      "answer": "断ります"
+    }
+  },
+  {
+    "id": "任せる_まかせる",
+    "word": "任せる",
+    "reading": "まかせる",
+    "furigana": "任[まか]せる",
+    "romaji": "makaseru",
+    "meanings": {"en": ["to entrust"], "ko": ["맡기다"]},
+    "partOfSpeech": "verb",
+    "jlptLevel": "N3",
+    "tags": ["work"],
+    "example": {
+      "sentence": "この仕事は彼に任せます。",
+      "reading": "この しごとは かれに まかせます。",
+      "translations": {"en": "I entrust this job to him.", "ko": "이 일은 그에게 맡깁니다."},
+      "quizSentence": "この仕事は彼に＿＿＿。",
+      "answer": "任せます"
+    }
+  },
+  {
+    "id": "促す_うながす",
+    "word": "促す",
+    "reading": "うながす",
+    "furigana": "促[うなが]す",
+    "romaji": "unagasu",
+    "meanings": {"en": ["to urge", "to prompt"], "ko": ["촉구하다", "재촉하다"]},
+    "partOfSpeech": "verb",
+    "jlptLevel": "N2",
+    "tags": ["formal", "communication"],
+    "example": {
+      "sentence": "政府は企業に改善を促します。",
+      "reading": "せいふは きぎょうに かいぜんを うながします。",
+      "translations": {"en": "The government urges companies to improve.", "ko": "정부는 기업에 개선을 촉구합니다."},
+      "quizSentence": "政府は企業に改善を＿＿＿。",
+      "answer": "促します"
+    }
+  },
+  {
+    "id": "妨げる_さまたげる",
+    "word": "妨げる",
+    "reading": "さまたげる",
+    "furigana": "妨[さまた]げる",
+    "romaji": "samatageru",
+    "meanings": {"en": ["to hinder"], "ko": ["방해하다"]},
+    "partOfSpeech": "verb",
+    "jlptLevel": "N2",
+    "tags": ["formal"],
+    "example": {
+      "sentence": "騒音が集中を妨げます。",
+      "reading": "そうおんが しゅうちゅうを さまたげます。",
+      "translations": {"en": "Noise interferes with concentration.", "ko": "소음이 집중을 방해합니다."},
+      "quizSentence": "騒音が集中を＿＿＿。",
+      "answer": "妨げます"
+    }
+  },
+  {
+    "id": "見直す_みなおす",
+    "word": "見直す",
+    "reading": "みなおす",
+    "furigana": "見[み] 直[なお]す",
+    "romaji": "minaosu",
+    "meanings": {"en": ["to review", "to reconsider"], "ko": ["재검토하다"]},
+    "partOfSpeech": "verb",
+    "jlptLevel": "N2",
+    "tags": ["work"],
+    "example": {
+      "sentence": "計画を見直します。",
+      "reading": "けいかくを みなおします。",
+      "translations": {"en": "We will review the plan.", "ko": "계획을 재검토합니다."},
+      "quizSentence": "計画を＿＿＿。",
+      "answer": "見直します"
+    }
+  },
+  {
+    "id": "備える_そなえる",
+    "word": "備える",
+    "reading": "そなえる",
+    "furigana": "備[そな]える",
+    "romaji": "sonaeru",
+    "meanings": {"en": ["to prepare for", "to equip"], "ko": ["대비하다", "갖추다"]},
+    "partOfSpeech": "verb",
+    "jlptLevel": "N2",
+    "tags": ["preparation"],
+    "example": {
+      "sentence": "災害に備えます。",
+      "reading": "さいがいに そなえます。",
+      "translations": {"en": "We prepare for disasters.", "ko": "재해에 대비합니다."},
+      "quizSentence": "災害に＿＿＿。",
+      "answer": "備えます"
+    }
+  },
+  {
+    "id": "覆す_くつがえす",
+    "word": "覆す",
+    "reading": "くつがえす",
+    "furigana": "覆[くつがえ]す",
+    "romaji": "kutsugaesu",
+    "meanings": {"en": ["to overturn"], "ko": ["뒤집다", "번복하다"]},
+    "partOfSpeech": "verb",
+    "jlptLevel": "N1",
+    "tags": ["formal"],
+    "example": {
+      "sentence": "新しい証拠が判決を覆します。",
+      "reading": "あたらしい しょうこが はんけつを くつがえします。",
+      "translations": {"en": "New evidence overturns the judgment.", "ko": "새로운 증거가 판결을 뒤집습니다."},
+      "quizSentence": "新しい証拠が判決を＿＿＿。",
+      "answer": "覆します"
+    }
+  },
+  {
+    "id": "免れる_まぬかれる",
+    "word": "免れる",
+    "reading": "まぬかれる",
+    "furigana": "免[まぬか]れる",
+    "romaji": "manukareru",
+    "meanings": {"en": ["to escape", "to avoid"], "ko": ["면하다", "피하다"]},
+    "partOfSpeech": "verb",
+    "jlptLevel": "N1",
+    "tags": ["formal"],
+    "example": {
+      "sentence": "彼は責任を免れます。",
+      "reading": "かれは せきにんを まぬかれます。",
+      "translations": {"en": "He escapes responsibility.", "ko": "그는 책임을 면합니다."},
+      "quizSentence": "彼は責任を＿＿＿。",
+      "answer": "免れます"
+    }
+  },
+  {
+    "id": "損なう_そこなう",
+    "word": "損なう",
+    "reading": "そこなう",
+    "furigana": "損[そこ]なう",
+    "romaji": "sokonau",
+    "meanings": {"en": ["to damage", "to impair"], "ko": ["손상하다", "해치다"]},
+    "partOfSpeech": "verb",
+    "jlptLevel": "N1",
+    "tags": ["formal"],
+    "example": {
+      "sentence": "不注意が信頼を損ないます。",
+      "reading": "ふちゅういが しんらいを そこないます。",
+      "translations": {"en": "Carelessness damages trust.", "ko": "부주의가 신뢰를 해칩니다."},
+      "quizSentence": "不注意が信頼を＿＿＿。",
+      "answer": "損ないます"
+    }
+  },
+  {
+    "id": "遂げる_とげる",
+    "word": "遂げる",
+    "reading": "とげる",
+    "furigana": "遂[と]げる",
+    "romaji": "togeru",
+    "meanings": {"en": ["to accomplish"], "ko": ["이루다", "완수하다"]},
+    "partOfSpeech": "verb",
+    "jlptLevel": "N1",
+    "tags": ["achievement"],
+    "example": {
+      "sentence": "チームは大きな成長を遂げます。",
+      "reading": "チームは おおきな せいちょうを とげます。",
+      "translations": {"en": "The team achieves major growth.", "ko": "팀은 큰 성장을 이룹니다."},
+      "quizSentence": "チームは大きな成長を＿＿＿。",
+      "answer": "遂げます"
+    }
+  }
+]

@@ -1,0 +1,40 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "vocabulary",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "jlptLevel", "order": "ASCENDING"},
+        {"fieldPath": "isActive", "order": "ASCENDING"},
+        {"fieldPath": "frequencyRank", "order": "ASCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "vocabulary",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "jlptLevel", "order": "ASCENDING"},
+        {"fieldPath": "partOfSpeech", "order": "ASCENDING"},
+        {"fieldPath": "isActive", "order": "ASCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "vocabularyProgress",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        {"fieldPath": "state", "order": "ASCENDING"},
+        {"fieldPath": "nextReviewAt", "order": "ASCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "quizQuestions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "jlptLevel", "order": "ASCENDING"},
+        {"fieldPath": "type", "order": "ASCENDING"},
+        {"fieldPath": "isActive", "order": "ASCENDING"}
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}
