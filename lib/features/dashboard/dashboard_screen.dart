@@ -145,6 +145,14 @@ class DashboardScreen extends ConsumerWidget {
                       onTap: () => context.push('/study'),
                     ),
                     const SizedBox(height: 10),
+                    _ActionTile(
+                      color: Theme.of(context).colorScheme.tertiaryContainer,
+                      icon: Icons.auto_stories_rounded,
+                      title: strings('studyGrammar'),
+                      subtitle: strings('grammarByRank'),
+                      onTap: () => context.push('/grammar'),
+                    ),
+                    const SizedBox(height: 10),
                     Row(
                       children: [
                         Expanded(

@@ -1,7 +1,7 @@
 # Kotoba Flow
 
-An offline-first Flutter JLPT vocabulary app with English and Korean UI,
-swipe study cards, text-to-speech, fill-in-the-blank quizzes,
+An offline-first Flutter JLPT vocabulary and grammar app with English and
+Korean UI, swipe study cards, text-to-speech, fill-in-the-blank quizzes,
 spaced repetition, statistics, and an optional Firebase/AdMob integration.
 
 ## Run locally
@@ -11,16 +11,17 @@ flutter pub get
 flutter run
 ```
 
-The checked-in catalog contains 7,972 words grouped and ordered by N1–N5 from
-`elzup/jlpt-word-list`. A small enriched subset supplies Korean meanings and
-examples; other entries fall back to their source English meaning. All core
-flows work without cloud credentials. Settings, quiz totals, and
+The checked-in catalogs contain 8,449 words and 828 grammar points grouped and
+ordered by N1–N5 from `tristcoil/hanabira.org`. Every vocabulary record has an
+example sentence, and every one of the 3,310 upstream grammar examples is
+included. All core flows work without cloud credentials. Settings, quiz totals, and
 SRS progress are saved with SharedPreferences.
 
 Refresh the catalog from its upstream rank files with:
 
 ```sh
 dart run tool/import_jlpt_catalog.dart
+dart run tool/import_hanabira_grammar.dart
 ```
 
 ## Configure Firebase

@@ -69,8 +69,11 @@ class Vocabulary {
   factory Vocabulary.fromCatalogJson(Map<String, dynamic> json) {
     final word = json['word'] as String;
     final reading = json['reading'] as String;
+    final level = json['level'] as String;
+    final rank = json['rank'] as int;
+    final exampleJson = json['example'] as Map<String, dynamic>?;
     return Vocabulary(
-      id: '${_safeIdPart(word)}_${_safeIdPart(reading)}',
+      id: '${level}_${rank}_${_safeIdPart(word)}_${_safeIdPart(reading)}',
       word: word,
       reading: reading,
       furigana: reading,
@@ -79,16 +82,18 @@ class Vocabulary {
         'en': [json['meaning'] as String],
       },
       partOfSpeech: 'word',
-      jlptLevel: json['level'] as String,
+      jlptLevel: level,
       tags: const ['JLPT'],
-      example: const VocabularyExample(
-        sentence: '',
-        reading: '',
-        translations: {},
-        quizSentence: '',
-        answer: '',
-      ),
-      rank: json['rank'] as int,
+      example: exampleJson == null
+          ? const VocabularyExample(
+              sentence: '',
+              reading: '',
+              translations: {},
+              quizSentence: '',
+              answer: '',
+            )
+          : VocabularyExample.fromJson(exampleJson),
+      rank: rank,
     );
   }
 
@@ -137,7 +142,7 @@ class Vocabulary {
       partOfSpeech: source.partOfSpeech,
       jlptLevel: jlptLevel,
       tags: {...tags, ...source.tags}.toList(),
-      example: source.example,
+      example: source.hasExample ? source.example : example,
       rank: rank,
       isCommon: source.isCommon,
     );

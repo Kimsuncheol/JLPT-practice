@@ -14,12 +14,12 @@ void main() {
   });
 
   test('catalog contains every upstream rank record', () {
-    expect(catalog, hasLength(7972));
-    expect(_count(catalog, 'N1'), 2699);
-    expect(_count(catalog, 'N2'), 1748);
-    expect(_count(catalog, 'N3'), 2139);
-    expect(_count(catalog, 'N4'), 668);
-    expect(_count(catalog, 'N5'), 718);
+    expect(catalog, hasLength(8449));
+    expect(_count(catalog, 'N1'), 3476);
+    expect(_count(catalog, 'N2'), 1835);
+    expect(_count(catalog, 'N3'), 1835);
+    expect(_count(catalog, 'N4'), 634);
+    expect(_count(catalog, 'N5'), 669);
   });
 
   test('ranks are contiguous within each JLPT level', () {
@@ -37,6 +37,24 @@ void main() {
       expect(word['word'], isNotEmpty);
       expect(word['reading'], isNotEmpty);
       expect(word['meaning'], isNotEmpty);
+    }
+  });
+
+  test('every catalog record has a complete example', () {
+    for (final word in catalog) {
+      final example = word['example'] as Map<String, dynamic>;
+      final sentence = example['sentence'] as String;
+      final quizSentence = example['quizSentence'] as String;
+      final answer = example['answer'] as String;
+      final translations = example['translations'] as Map<String, dynamic>;
+
+      expect(sentence, isNotEmpty, reason: '${word['level']} #${word['rank']}');
+      expect(example['reading'], isNotEmpty);
+      expect(translations['en'], isNotEmpty);
+      expect(translations['ko'], isNotEmpty);
+      expect(answer, isNotEmpty);
+      expect(sentence.contains(answer), isTrue);
+      expect(quizSentence, sentence.replaceFirst(answer, '＿＿＿'));
     }
   });
 }

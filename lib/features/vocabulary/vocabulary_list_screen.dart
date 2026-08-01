@@ -28,12 +28,20 @@ class _VocabularyListScreenState extends ConsumerState<VocabularyListScreen> {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => Center(child: Text(error.toString())),
         data: (state) {
-          final items = state.vocabulary.where((item) {
-            return (_level == 'All' || item.jlptLevel == _level) &&
-                (_partOfSpeech == 'All' ||
-                    item.partOfSpeech == _partOfSpeech) &&
-                item.matches(_query, state.meaningLanguage);
-          }).toList();
+          final items =
+              state.vocabulary.where((item) {
+                return (_level == 'All' || item.jlptLevel == _level) &&
+                    (_partOfSpeech == 'All' ||
+                        item.partOfSpeech == _partOfSpeech) &&
+                    item.matches(_query, state.meaningLanguage);
+              }).toList()..sort((a, b) {
+                final levelComparison = _levelOrder[a.jlptLevel]!.compareTo(
+                  _levelOrder[b.jlptLevel]!,
+                );
+                return levelComparison != 0
+                    ? levelComparison
+                    : a.rank.compareTo(b.rank);
+              });
           final parts = {
             'All',
             ...state.vocabulary.map((item) => item.partOfSpeech),
@@ -140,3 +148,5 @@ class _VocabularyListScreenState extends ConsumerState<VocabularyListScreen> {
     );
   }
 }
+
+const _levelOrder = {'N5': 0, 'N4': 1, 'N3': 2, 'N2': 3, 'N1': 4};
