@@ -1,7 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/features/dashboard/home_shell.dart';
+import 'package:jlpt_practice/features/grammar/grammar_detail_screen.dart';
 import 'package:jlpt_practice/features/grammar/grammar_list_screen.dart';
-import 'package:jlpt_practice/features/grammar/grammar_rank_screen.dart';
 import 'package:jlpt_practice/features/onboarding/onboarding_screen.dart';
 import 'package:jlpt_practice/features/quiz/quiz_result_screen.dart';
 import 'package:jlpt_practice/features/quiz/quiz_screen.dart';
@@ -30,10 +30,11 @@ final appRouter = GoRouter(
         day: int.tryParse(state.pathParameters['day'] ?? '') ?? 1,
       ),
     ),
-    GoRoute(path: '/grammar', builder: (_, _) => const GrammarRankScreen()),
+    GoRoute(path: '/grammar', builder: (_, _) => const GrammarListScreen()),
     GoRoute(
-      path: '/grammar/study',
-      builder: (_, _) => const GrammarListScreen(),
+      path: '/grammar/detail/:id',
+      builder: (_, state) =>
+          GrammarDetailScreen(grammarId: state.pathParameters['id'] ?? ''),
     ),
     GoRoute(path: '/quiz', builder: (_, _) => const QuizScreen()),
     GoRoute(path: '/quiz/result', builder: (_, _) => const QuizResultScreen()),
