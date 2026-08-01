@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "218704881410",
+    "project_id": "jlpt-practice-20a4e",
+    "storage_bucket": "jlpt-practice-20a4e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:218704881410:android:4acab4c0237a9d4120441b",
+        "android_client_info": {
+          "package_name": "com.jlptpractice.jlpt_practice"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD3Tkllvx8r3eSMutU3qSY5BYPocnNGxy0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
