@@ -64,8 +64,11 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                     onToggleFurigana: () {
                       setState(() => _showFurigana = !_showFurigana!);
                     },
-                    onSpeak: () =>
+                    onSpeakWord: () =>
                         ref.read(ttsServiceProvider).speak(word.word),
+                    onSpeakExample: () => ref
+                        .read(ttsServiceProvider)
+                        .speak(word.example.sentence),
                     onReview: () async {
                       await ref
                           .read(appControllerProvider.notifier)
@@ -105,7 +108,8 @@ class _StudyCard extends StatelessWidget {
     required this.language,
     required this.showFurigana,
     required this.onToggleFurigana,
-    required this.onSpeak,
+    required this.onSpeakWord,
+    required this.onSpeakExample,
     required this.onReview,
   });
 
@@ -113,7 +117,8 @@ class _StudyCard extends StatelessWidget {
   final String language;
   final bool showFurigana;
   final VoidCallback onToggleFurigana;
-  final VoidCallback onSpeak;
+  final VoidCallback onSpeakWord;
+  final VoidCallback onSpeakExample;
   final VoidCallback onReview;
 
   @override
@@ -158,13 +163,26 @@ class _StudyCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 6),
-            Text(
-              vocabulary.word,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 56,
-                height: 1.15,
-                fontWeight: FontWeight.w800,
+            Semantics(
+              button: true,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(16),
+                onTap: onSpeakWord,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 4,
+                  ),
+                  child: Text(
+                    vocabulary.word,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 56,
+                      height: 1.15,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: 10),
@@ -191,10 +209,23 @@ class _StudyCard extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    Text(
-                      vocabulary.example.sentence,
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.titleLarge,
+                    Semantics(
+                      button: true,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(12),
+                        onTap: onSpeakExample,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          child: Text(
+                            vocabulary.example.sentence,
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                        ),
+                      ),
                     ),
                     if (showFurigana) ...[
                       const SizedBox(height: 6),
@@ -219,11 +250,6 @@ class _StudyCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _CardAction(
-                  icon: Icons.volume_up_rounded,
-                  label: 'Audio',
-                  onTap: onSpeak,
-                ),
                 _CardAction(
                   icon: showFurigana
                       ? Icons.visibility_off_rounded
