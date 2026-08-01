@@ -41,6 +41,9 @@ void main() {
         'summary',
         'explanation',
         'formation',
+        'summaryKo',
+        'explanationKo',
+        'formationKo',
       ]) {
         expect(
           item[key],
@@ -48,6 +51,9 @@ void main() {
           reason: '${item['level']} #${item['rank']}',
         );
       }
+      expect(item['formationKo'], item['formation']);
+      expect(_hasCleanKorean(item['summaryKo'] as String), isTrue);
+      expect(_hasCleanKorean(item['explanationKo'] as String), isTrue);
       final examples = (item['examples'] as List<dynamic>)
           .cast<Map<String, dynamic>>();
       expect(examples, isNotEmpty);
@@ -56,6 +62,8 @@ void main() {
         expect(example['japanese'], isNotEmpty);
         expect(example['romaji'], isNotEmpty);
         expect(example['english'], isNotEmpty);
+        expect(example['korean'], isNotEmpty);
+        expect(_hasCleanKorean(example['korean'] as String), isTrue);
       }
     }
     expect(exampleCount, 3310);
@@ -64,3 +72,7 @@ void main() {
 
 int _count(List<Map<String, dynamic>> catalog, String level) =>
     catalog.where((item) => item['level'] == level).length;
+
+bool _hasCleanKorean(String value) =>
+    RegExp('[가-힣]').hasMatch(value) &&
+    !RegExp(r'[\u0400-\u04ff\u0600-\u06ff]').hasMatch(value);

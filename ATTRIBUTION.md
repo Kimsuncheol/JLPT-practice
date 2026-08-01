@@ -12,4 +12,6 @@ so ranks in this app reflect the source dataset rather than an official syllabus
 
 The source grammar examples are preserved. Vocabulary examples and Korean
 translations are generated for this app where complete source examples are not
-available. `assets/data/vocabulary.json` retains a small hand-authored subset.
+available. Korean grammar explanations and example meanings are machine
+translated from the source English content. `assets/data/vocabulary.json`
+retains a small hand-authored subset.

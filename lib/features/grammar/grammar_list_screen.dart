@@ -5,9 +5,9 @@ import 'package:jlpt_practice/data/models/grammar_point.dart';
 import 'package:jlpt_practice/features/grammar/grammar_providers.dart';
 
 class GrammarListScreen extends ConsumerStatefulWidget {
-  const GrammarListScreen({required this.level, super.key});
+  const GrammarListScreen({this.level, super.key});
 
-  final String level;
+  final String? level;
 
   @override
   ConsumerState<GrammarListScreen> createState() => _GrammarListScreenState();
@@ -19,9 +19,12 @@ class _GrammarListScreenState extends ConsumerState<GrammarListScreen> {
   @override
   Widget build(BuildContext context) {
     final catalog = ref.watch(grammarCatalogProvider);
+    final language = Localizations.localeOf(context).languageCode;
+    final selectedLevel =
+        widget.level ?? ref.watch(selectedGrammarLevelProvider);
     return Scaffold(
       appBar: AppBar(
-        title: Text('${widget.level} ${context.strings('grammar')}'),
+        title: Text('$selectedLevel ${context.strings('grammar')}'),
       ),
       body: catalog.when(
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -29,7 +32,7 @@ class _GrammarListScreenState extends ConsumerState<GrammarListScreen> {
         data: (items) {
           final grammar = items
               .where(
-                (item) => item.level == widget.level && item.matches(_query),
+                (item) => item.level == selectedLevel && item.matches(_query),
               )
               .toList(growable: false);
           return Column(
@@ -51,8 +54,10 @@ class _GrammarListScreenState extends ConsumerState<GrammarListScreen> {
                         padding: const EdgeInsets.fromLTRB(20, 4, 20, 28),
                         itemCount: grammar.length,
                         separatorBuilder: (_, _) => const SizedBox(height: 10),
-                        itemBuilder: (context, index) =>
-                            _GrammarCard(grammar: grammar[index]),
+                        itemBuilder: (context, index) => _GrammarCard(
+                          grammar: grammar[index],
+                          language: language,
+                        ),
                       ),
               ),
             ],
@@ -64,9 +69,10 @@ class _GrammarListScreenState extends ConsumerState<GrammarListScreen> {
 }
 
 class _GrammarCard extends StatelessWidget {
-  const _GrammarCard({required this.grammar});
+  const _GrammarCard({required this.grammar, required this.language});
 
   final GrammarPoint grammar;
+  final String language;
 
   @override
   Widget build(BuildContext context) => Card(
@@ -85,7 +91,7 @@ class _GrammarCard extends StatelessWidget {
       ),
       subtitle: Padding(
         padding: const EdgeInsets.only(top: 5),
-        child: Text(grammar.summary),
+        child: Text(grammar.localizedSummary(language)),
       ),
       children: [
         Padding(
@@ -96,12 +102,18 @@ class _GrammarCard extends StatelessWidget {
               const Divider(height: 28),
               _Section(
                 title: context.strings('formation'),
-                child: SelectableText(grammar.formation),
+                child: SelectableText(
+                  grammar.localizedFormation(language),
+                  key: PageStorageKey('${grammar.id}-formation'),
+                ),
               ),
               const SizedBox(height: 18),
               _Section(
                 title: context.strings('explanation'),
-                child: SelectableText(grammar.explanation),
+                child: SelectableText(
+                  grammar.localizedExplanation(language),
+                  key: PageStorageKey('${grammar.id}-explanation'),
+                ),
               ),
               const SizedBox(height: 20),
               Text(
@@ -110,8 +122,11 @@ class _GrammarCard extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               ...grammar.examples.indexed.map(
-                (indexed) =>
-                    _ExampleCard(number: indexed.$1 + 1, example: indexed.$2),
+                (indexed) => _ExampleCard(
+                  number: indexed.$1 + 1,
+                  example: indexed.$2,
+                  language: language,
+                ),
               ),
             ],
           ),
@@ -139,10 +154,15 @@ class _Section extends StatelessWidget {
 }
 
 class _ExampleCard extends StatelessWidget {
-  const _ExampleCard({required this.number, required this.example});
+  const _ExampleCard({
+    required this.number,
+    required this.example,
+    required this.language,
+  });
 
   final int number;
   final GrammarExample example;
+  final String language;
 
   @override
   Widget build(BuildContext context) => Container(
@@ -164,7 +184,7 @@ class _ExampleCard extends StatelessWidget {
         Text(example.romaji),
         const SizedBox(height: 6),
         Text(
-          example.english,
+          example.translation(language),
           style: TextStyle(
             color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),

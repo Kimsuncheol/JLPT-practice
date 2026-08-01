@@ -32,9 +32,8 @@ final appRouter = GoRouter(
     ),
     GoRoute(path: '/grammar', builder: (_, _) => const GrammarRankScreen()),
     GoRoute(
-      path: '/grammar/:level',
-      builder: (_, state) =>
-          GrammarListScreen(level: state.pathParameters['level'] ?? 'N5'),
+      path: '/grammar/study',
+      builder: (_, _) => const GrammarListScreen(),
     ),
     GoRoute(path: '/quiz', builder: (_, _) => const QuizScreen()),
     GoRoute(path: '/quiz/result', builder: (_, _) => const QuizResultScreen()),

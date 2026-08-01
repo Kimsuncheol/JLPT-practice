@@ -22,6 +22,7 @@ Refresh the catalog from its upstream rank files with:
 ```sh
 dart run tool/import_jlpt_catalog.dart
 dart run tool/import_hanabira_grammar.dart
+dart run tool/translate_hanabira_grammar_google.dart
 ```
 
 ## Configure Firebase
