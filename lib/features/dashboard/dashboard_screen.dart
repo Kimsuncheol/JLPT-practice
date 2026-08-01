@@ -153,6 +153,14 @@ class DashboardScreen extends ConsumerWidget {
                       onTap: () => context.push('/grammar'),
                     ),
                     const SizedBox(height: 10),
+                    _ActionTile(
+                      color: Theme.of(context).colorScheme.primaryContainer,
+                      icon: Icons.grid_view_rounded,
+                      title: strings('kanaChart'),
+                      subtitle: strings('kanaChartSubtitle'),
+                      onTap: () => context.push('/kana'),
+                    ),
+                    const SizedBox(height: 10),
                     Row(
                       children: [
                         Expanded(

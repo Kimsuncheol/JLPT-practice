@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/features/dashboard/home_shell.dart';
 import 'package:jlpt_practice/features/grammar/grammar_detail_screen.dart';
 import 'package:jlpt_practice/features/grammar/grammar_list_screen.dart';
+import 'package:jlpt_practice/features/kana/kana_chart_screen.dart';
 import 'package:jlpt_practice/features/onboarding/onboarding_screen.dart';
 import 'package:jlpt_practice/features/quiz/quiz_result_screen.dart';
 import 'package:jlpt_practice/features/quiz/quiz_screen.dart';
@@ -12,8 +13,8 @@ import 'package:jlpt_practice/features/vocabulary/day_selection_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/study_screen.dart';
 import 'package:jlpt_practice/shared/bootstrap_screen.dart';
 
-final appRouter = GoRouter(
-  initialLocation: '/',
+GoRouter createAppRouter({String initialLocation = '/'}) => GoRouter(
+  initialLocation: initialLocation,
   routes: [
     GoRoute(path: '/', builder: (_, _) => const BootstrapScreen()),
     GoRoute(path: '/onboarding', builder: (_, _) => const OnboardingScreen()),
@@ -39,5 +40,8 @@ final appRouter = GoRouter(
     GoRoute(path: '/quiz', builder: (_, _) => const QuizScreen()),
     GoRoute(path: '/quiz/result', builder: (_, _) => const QuizResultScreen()),
     GoRoute(path: '/review', builder: (_, _) => const ReviewScreen()),
+    GoRoute(path: '/kana', builder: (_, _) => const KanaChartScreen()),
   ],
 );
+
+final appRouter = createAppRouter();

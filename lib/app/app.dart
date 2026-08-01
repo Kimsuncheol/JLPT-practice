@@ -26,6 +26,8 @@ class JlptPracticeApp extends ConsumerWidget {
       title: 'Kotoba Flow',
       debugShowCheckedModeBanner: false,
       routerConfig: appRouter,
+      builder: (context, child) =>
+          SafeArea(child: child ?? const SizedBox.shrink()),
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
       themeMode: themeMode,

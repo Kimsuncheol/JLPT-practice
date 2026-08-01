@@ -105,6 +105,10 @@ class AppStrings {
         'Ranked vocabulary and grammar are imported from the MIT-licensed tristcoil/hanabira.org dataset. Vocabulary examples include generated content.',
     'offlineMode': 'Works offline',
     'adDevelopment': 'Ad space · development mode',
+    'kanaChart': 'Hiragana & Katakana',
+    'kanaChartSubtitle': 'Review the basic kana chart',
+    'hiragana': 'Hiragana',
+    'katakana': 'Katakana',
   };
 
   static const _ko = <String, String>{
@@ -205,6 +209,10 @@ class AppStrings {
         '급수별 단어와 문법은 MIT 라이선스의 tristcoil/hanabira.org 데이터셋에서 가져왔으며, 단어 예문에는 생성된 콘텐츠가 포함됩니다.',
     'offlineMode': '오프라인 사용 가능',
     'adDevelopment': '광고 영역 · 개발 모드',
+    'kanaChart': '히라가나 & 가타카나',
+    'kanaChartSubtitle': '기본 가나표를 확인하세요',
+    'hiragana': '히라가나',
+    'katakana': '가타카나',
   };
 
   String call(String key) =>
