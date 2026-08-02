@@ -65,7 +65,9 @@ class VocabularyDetails extends ConsumerWidget {
                       ),
                     ),
                     Text(
-                      '${vocabulary.reading}  ·  ${vocabulary.romaji}',
+                      vocabulary.word.compareTo(vocabulary.romaji) == 0
+                          ? vocabulary.reading
+                          : '${vocabulary.reading}  ·  ${vocabulary.romaji}',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),

@@ -167,13 +167,15 @@ class _StudyCard extends StatelessWidget {
                 fontWeight: FontWeight.w800,
               ),
             ),
-            const SizedBox(height: 10),
-            Text(
-              vocabulary.romaji,
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
+            if (vocabulary.word.compareTo(vocabulary.romaji) != 0) ...[
+              const SizedBox(height: 10),
+              Text(
+                vocabulary.romaji,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
-            ),
+            ],
             const SizedBox(height: 28),
             Text(
               vocabulary.meaning(language),
