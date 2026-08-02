@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/ads/ad_service.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
-import 'package:jlpt_practice/shared/adaptive_ad_slot.dart';
+import 'package:jlpt_practice/shared/rewarded_xp_card.dart';
 
 class QuizResultScreen extends ConsumerStatefulWidget {
   const QuizResultScreen({super.key});
@@ -153,7 +153,7 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen> {
                 ),
               ),
             ),
-            const AdaptiveAdSlot(),
+            const RewardedXpCard(),
           ],
         ),
       ),

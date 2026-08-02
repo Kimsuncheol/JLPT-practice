@@ -148,6 +148,9 @@ class AppStrings {
     'kanaChartSubtitle': 'Review the basic kana chart',
     'hiragana': 'Hiragana',
     'katakana': 'Katakana',
+    'totalXp': 'Total XP',
+    'earnBonusXp': 'Earn bonus XP',
+    'xpEarned': 'XP earned',
   };
 
   static const _ko = <String, String>{
@@ -288,6 +291,9 @@ class AppStrings {
     'kanaChartSubtitle': '기본 가나표를 확인하세요',
     'hiragana': '히라가나',
     'katakana': '가타카나',
+    'totalXp': '총 XP',
+    'earnBonusXp': '보너스 XP 받기',
+    'xpEarned': 'XP 획득',
   };
 
   String call(String key) =>

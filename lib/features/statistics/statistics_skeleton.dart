@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:jlpt_practice/shared/adaptive_ad_slot.dart';
 import 'package:jlpt_practice/shared/skeleton.dart';
 
 /// Mirrors [StatisticsScreen]'s layout so nothing jumps once data loads.
@@ -31,6 +30,8 @@ class StatisticsSkeleton extends StatelessWidget {
                   Expanded(child: _StatCardSkeleton()),
                 ],
               ),
+              const SizedBox(height: 10),
+              const _StatCardSkeleton(),
               const SizedBox(height: 26),
               const ShimmerBone(width: 160, height: 22, radius: 6),
               const SizedBox(height: 12),
@@ -98,8 +99,46 @@ class StatisticsSkeleton extends StatelessWidget {
             ],
           ),
         ),
-        const AdaptiveAdSlot(),
+        const _RewardedXpCardSkeleton(),
       ],
+    );
+  }
+}
+
+class _RewardedXpCardSkeleton extends StatelessWidget {
+  const _RewardedXpCardSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 4, 20, 8),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: const Row(
+            children: [
+              ShimmerCircle(size: 24),
+              SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ShimmerBone(width: 120, height: 15, radius: 6),
+                    SizedBox(height: 6),
+                    ShimmerBone(width: 50, height: 12, radius: 6),
+                  ],
+                ),
+              ),
+              ShimmerCircle(size: 20),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

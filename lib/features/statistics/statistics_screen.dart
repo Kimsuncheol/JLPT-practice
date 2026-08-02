@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/features/statistics/statistics_skeleton.dart';
-import 'package:jlpt_practice/shared/adaptive_ad_slot.dart';
+import 'package:jlpt_practice/shared/rewarded_xp_card.dart';
 
 class StatisticsScreen extends ConsumerWidget {
   const StatisticsScreen({super.key});
@@ -66,6 +66,15 @@ class StatisticsScreen extends ConsumerWidget {
                           ),
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      width: double.infinity,
+                      child: _StatCard(
+                        icon: Icons.bolt_rounded,
+                        value: '${state.totalXp}',
+                        label: strings('totalXp'),
+                      ),
                     ),
                     const SizedBox(height: 26),
                     Text(
@@ -202,7 +211,7 @@ class StatisticsScreen extends ConsumerWidget {
                   ],
                 ),
               ),
-              const AdaptiveAdSlot(),
+              const RewardedXpCard(),
             ],
           );
         },

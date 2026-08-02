@@ -22,6 +22,7 @@ class AppState {
     required this.quizCorrect,
     required this.currentStreak,
     required this.longestStreak,
+    this.totalXp = 0,
     this.studySessions = const {},
     this.lastQuizResult,
   });
@@ -42,6 +43,7 @@ class AppState {
   final int quizCorrect;
   final int currentStreak;
   final int longestStreak;
+  final int totalXp;
   final Map<String, StudySession> studySessions;
   final QuizResult? lastQuizResult;
 
@@ -89,6 +91,7 @@ class AppState {
     int? quizCorrect,
     int? currentStreak,
     int? longestStreak,
+    int? totalXp,
     Map<String, StudySession>? studySessions,
     QuizResult? lastQuizResult,
   }) {
@@ -109,6 +112,7 @@ class AppState {
       quizCorrect: quizCorrect ?? this.quizCorrect,
       currentStreak: currentStreak ?? this.currentStreak,
       longestStreak: longestStreak ?? this.longestStreak,
+      totalXp: totalXp ?? this.totalXp,
       studySessions: studySessions ?? this.studySessions,
       lastQuizResult: lastQuizResult ?? this.lastQuizResult,
     );

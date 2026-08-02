@@ -21,6 +21,7 @@ class LocalSettings {
     required this.quizCorrect,
     required this.currentStreak,
     required this.longestStreak,
+    required this.totalXp,
   });
 
   final bool onboardingComplete;
@@ -37,6 +38,7 @@ class LocalSettings {
   final int quizCorrect;
   final int currentStreak;
   final int longestStreak;
+  final int totalXp;
 }
 
 class LocalStore {
@@ -70,6 +72,7 @@ class LocalStore {
       quizCorrect: _preferences.getInt('quizCorrect') ?? 0,
       currentStreak: _preferences.getInt('currentStreak') ?? 0,
       longestStreak: _preferences.getInt('longestStreak') ?? 0,
+      totalXp: _preferences.getInt('totalXp') ?? 0,
     );
   }
 
@@ -143,6 +146,7 @@ class LocalStore {
       _preferences.remove('quizCorrect'),
       _preferences.remove('currentStreak'),
       _preferences.remove('longestStreak'),
+      _preferences.remove('totalXp'),
       _preferences.remove('studySessions'),
     ]);
   }

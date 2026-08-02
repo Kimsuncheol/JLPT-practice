@@ -7,7 +7,7 @@ import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/core/utils/study_batches.dart';
 import 'package:jlpt_practice/data/models/vocabulary.dart';
 import 'package:jlpt_practice/features/dashboard/dashboard_skeleton.dart';
-import 'package:jlpt_practice/shared/adaptive_ad_slot.dart';
+import 'package:jlpt_practice/shared/rewarded_xp_card.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -235,12 +235,20 @@ class DashboardScreen extends ConsumerWidget {
                             icon: Icons.trending_up_rounded,
                           ),
                         ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: _MetricCard(
+                            value: '${state.totalXp}',
+                            label: strings('totalXp'),
+                            icon: Icons.bolt_rounded,
+                          ),
+                        ),
                       ],
                     ),
                   ],
                 ),
               ),
-              const AdaptiveAdSlot(),
+              const RewardedXpCard(),
             ],
           );
         },

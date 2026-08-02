@@ -58,6 +58,7 @@ class AppController extends AsyncNotifier<AppState> {
       quizCorrect: settings.quizCorrect,
       currentStreak: settings.currentStreak,
       longestStreak: settings.longestStreak,
+      totalXp: settings.totalXp,
       studySessions: _store.loadStudySessions(),
     );
   }
@@ -152,6 +153,12 @@ class AppController extends AsyncNotifier<AppState> {
     for (final scheduled in progress.values) {
       unawaited(ref.read(cloudSyncProvider).syncProgress(scheduled));
     }
+  }
+
+  Future<void> addBonusXp(int amount) async {
+    final next = _value.copyWith(totalXp: _value.totalXp + amount);
+    state = AsyncData(next);
+    await _store.setValue('totalXp', next.totalXp);
   }
 
   Future<AppState> _withRecordedActivity(AppState current) async {
@@ -257,6 +264,7 @@ class AppController extends AsyncNotifier<AppState> {
       quizCorrect: 0,
       currentStreak: 0,
       longestStreak: 0,
+      totalXp: 0,
       studySessions: {},
     );
     state = AsyncData(next);
