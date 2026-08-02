@@ -169,7 +169,12 @@ class DashboardScreen extends ConsumerWidget {
                           ? '${strings('day')} ${studySession.day} · ${resumeIndex + 1}/${resumeWords.length}'
                           : '${state.selectedVocabulary.length} ${strings('words').toLowerCase()}',
                       onTap: () => canResume
-                          ? context.push('/study/day/${studySession.day}')
+                          ? _confirmResume(
+                              context,
+                              day: studySession.day,
+                              position: resumeIndex + 1,
+                              wordCount: resumeWords.length,
+                            )
                           : context.push('/study'),
                     ),
                     const SizedBox(height: 10),
@@ -245,6 +250,39 @@ class DashboardScreen extends ConsumerWidget {
         },
       ),
     );
+  }
+
+  Future<void> _confirmResume(
+    BuildContext context, {
+    required int day,
+    required int position,
+    required int wordCount,
+  }) async {
+    final shouldResume = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(dialogContext.strings('resumeConfirmTitle')),
+        content: Text(
+          '${dialogContext.strings('day')} $day · $position/$wordCount\n${dialogContext.strings('resumeConfirmBody')}',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(dialogContext.strings('chooseAnotherDay')),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(dialogContext.strings('continue')),
+          ),
+        ],
+      ),
+    );
+    if (!context.mounted || shouldResume == null) return;
+    if (shouldResume) {
+      context.push('/study/day/$day');
+    } else {
+      context.push('/study');
+    }
   }
 }
 

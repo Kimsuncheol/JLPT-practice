@@ -7,6 +7,7 @@ void main() {
     expect(const AppStrings('ko')('startStudy'), '새 단어 학습');
     expect(const AppStrings('en')('resumeLearning'), 'Resume learning');
     expect(const AppStrings('ko')('resumeLearning'), '이어서 학습');
+    expect(const AppStrings('ko')('resumeConfirmTitle'), '최근 학습을 이어갈까요?');
   });
 
   test('unsupported string locale falls back to English', () {

@@ -171,6 +171,25 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
   }
 
   Future<void> _completeSession(String level) async {
+    final shouldComplete = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(context.strings('finishSessionConfirm')),
+        content: Text(context.strings('finishSessionConfirmBody')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(context.strings('cancel')),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(context.strings('finish')),
+          ),
+        ],
+      ),
+    );
+    if (shouldComplete != true || !mounted) return;
+
     if (_ttsService != null) {
       await _ttsService!.stop();
       _ttsService = null;

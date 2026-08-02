@@ -36,23 +36,65 @@ void main() {
     await tester.pumpWidget(
       UncontrolledProviderScope(
         container: container,
-        child: const MaterialApp(
-          home: Scaffold(body: DashboardScreen()),
-        ),
+        child: const MaterialApp(home: Scaffold(body: DashboardScreen())),
       ),
     );
     await tester.pumpAndSettle();
 
     expect(find.text('Resume learning'), findsOneWidget);
     expect(find.text('Day 1 · 3/5'), findsOneWidget);
+
+    await tester.tap(find.text('Resume learning'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Continue your recent session?'), findsOneWidget);
+    expect(find.text('Choose another day'), findsOneWidget);
+    expect(find.text('Continue'), findsOneWidget);
+  });
+
+  testWidgets('finishing asks for confirmation before clearing the session', (
+    tester,
+  ) async {
+    final container = _createContainer(wordId: 'word_4', indexFallback: 4);
+    addTearDown(container.dispose);
+    await container.read(appControllerProvider.future);
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const MaterialApp(home: StudyScreen(day: 1)),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Finish this session'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Finish this study session?'), findsOneWidget);
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+    expect(find.text('Finish this study session?'), findsNothing);
+    expect(find.text('5 / 5'), findsOneWidget);
   });
 }
 
-ProviderContainer _createContainer() => ProviderContainer(
-  overrides: [appControllerProvider.overrideWith(_ResumeAppController.new)],
+ProviderContainer _createContainer({
+  String wordId = 'word_2',
+  int indexFallback = 2,
+}) => ProviderContainer(
+  overrides: [
+    appControllerProvider.overrideWith(
+      () => _ResumeAppController(wordId, indexFallback),
+    ),
+  ],
 );
 
 class _ResumeAppController extends AppController {
+  _ResumeAppController(this.wordId, this.indexFallback);
+
+  final String wordId;
+  final int indexFallback;
+
   @override
   Future<AppState> build() async {
     return AppState(
@@ -76,8 +118,8 @@ class _ResumeAppController extends AppController {
         'N5': StudySession(
           level: 'N5',
           day: 1,
-          wordId: 'word_2',
-          indexFallback: 2,
+          wordId: wordId,
+          indexFallback: indexFallback,
           dailyGoal: 5,
           updatedAt: DateTime.utc(2026, 8, 2),
         ),
