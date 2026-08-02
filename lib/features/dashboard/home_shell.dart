@@ -4,7 +4,6 @@ import 'package:jlpt_practice/features/chat/tutor_chat_screen.dart';
 import 'package:jlpt_practice/features/dashboard/dashboard_screen.dart';
 import 'package:jlpt_practice/features/settings/settings_screen.dart';
 import 'package:jlpt_practice/features/statistics/statistics_screen.dart';
-import 'package:jlpt_practice/features/vocabulary/vocabulary_list_screen.dart';
 
 class HomeShell extends StatefulWidget {
   const HomeShell({super.key});
@@ -19,7 +18,6 @@ class _HomeShellState extends State<HomeShell> {
   static const _screens = [
     DashboardScreen(),
     TutorChatScreen(),
-    VocabularyListScreen(),
     StatisticsScreen(),
     SettingsScreen(),
   ];
@@ -42,11 +40,6 @@ class _HomeShellState extends State<HomeShell> {
             icon: const Icon(Icons.forum_outlined),
             selectedIcon: const Icon(Icons.forum_rounded),
             label: strings('tutor'),
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.menu_book_outlined),
-            selectedIcon: const Icon(Icons.menu_book_rounded),
-            label: strings('words'),
           ),
           NavigationDestination(
             icon: const Icon(Icons.bar_chart_outlined),

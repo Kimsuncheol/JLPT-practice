@@ -130,9 +130,15 @@ class StatisticsScreen extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(height: 26),
-                    Text(
-                      '${strings('progress')} · JLPT',
-                      style: Theme.of(context).textTheme.titleLarge,
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        '${strings('progress')} · JLPT',
+                        maxLines: 1,
+                        softWrap: false,
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
                     ),
                     const SizedBox(height: 12),
                     Container(
@@ -141,7 +147,14 @@ class StatisticsScreen extends ConsumerWidget {
                         color: Theme.of(context).colorScheme.surface,
                         borderRadius: BorderRadius.circular(24),
                       ),
-                      child: Column(
+                      child: Table(
+                        columnWidths: const {
+                          0: IntrinsicColumnWidth(),
+                          1: FlexColumnWidth(),
+                          2: IntrinsicColumnWidth(),
+                        },
+                        defaultVerticalAlignment:
+                            TableCellVerticalAlignment.middle,
                         children: ['N5', 'N4', 'N3', 'N2', 'N1'].map((level) {
                           final total = state.vocabulary
                               .where((word) => word.jlptLevel == level)
@@ -149,39 +162,39 @@ class StatisticsScreen extends ConsumerWidget {
                           final studied = state.progress.values
                               .where((item) => item.jlptLevel == level)
                               .length;
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 16),
-                            child: Row(
-                              children: [
-                                SizedBox(
-                                  width: 34,
-                                  child: Text(
-                                    level,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w800,
-                                    ),
+                          return TableRow(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 16),
+                                child: Text(
+                                  level,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w800,
                                   ),
                                 ),
-                                Expanded(
-                                  child: LinearProgressIndicator(
-                                    value: total == 0 ? 0 : studied / total,
-                                    minHeight: 10,
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(
+                                  10,
+                                  0,
+                                  10,
+                                  16,
                                 ),
-                                const SizedBox(width: 10),
-                                SizedBox(
-                                  width: 38,
-                                  child: Text(
-                                    '$studied/$total',
-                                    textAlign: TextAlign.end,
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.labelSmall,
-                                  ),
+                                child: LinearProgressIndicator(
+                                  value: total == 0 ? 0 : studied / total,
+                                  minHeight: 10,
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
-                              ],
-                            ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 16),
+                                child: Text(
+                                  '$studied / $total',
+                                  textAlign: TextAlign.start,
+                                  style: Theme.of(context).textTheme.labelSmall,
+                                ),
+                              ),
+                            ],
                           );
                         }).toList(),
                       ),
