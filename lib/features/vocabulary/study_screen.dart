@@ -181,7 +181,7 @@ class _StudyCard extends StatelessWidget {
               style: Theme.of(context).textTheme.headlineMedium,
             ),
             if (vocabulary.hasExample) ...[
-              const SizedBox(height: 34),
+              const SizedBox(height: 18),
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
