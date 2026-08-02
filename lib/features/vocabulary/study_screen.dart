@@ -95,7 +95,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                     onToggleFurigana: () {
                       setState(() => _showFurigana = !_showFurigana!);
                     },
-                    onSpeakWord: () => _speak(word.word),
+                    onSpeakWord: () => _speak(word.reading),
                     onSpeakExample: () => _speak(word.example.sentence),
                     onReview: () async {
                       await ref
@@ -138,7 +138,8 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                     SizedBox(
                       width: double.infinity,
                       child: OutlinedButton.icon(
-                        onPressed: () => context.push('/quiz/day/${widget.day}'),
+                        onPressed: () =>
+                            context.push('/quiz/day/${widget.day}'),
                         icon: const Icon(Icons.quiz_rounded),
                         label: Text(context.strings('startQuiz')),
                       ),
@@ -393,13 +394,8 @@ class _StudyCard extends StatelessWidget {
             ),
             if (vocabulary.hasExample) ...[
               const SizedBox(height: 34),
-              Container(
-                width: double.infinity,
+              Padding(
                 padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  borderRadius: BorderRadius.circular(22),
-                ),
                 child: Column(
                   children: [
                     Semantics(
