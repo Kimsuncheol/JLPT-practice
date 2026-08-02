@@ -318,20 +318,6 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(22, 10, 22, 18),
-              child: FilledButton(
-                onPressed: !_answered ? null : _advance,
-                style: FilledButton.styleFrom(
-                  minimumSize: const Size.fromHeight(56),
-                ),
-                child: Text(
-                  _index == questions.length - 1
-                      ? context.strings('seeResults')
-                      : context.strings('next'),
-                ),
-              ),
-            ),
           ],
         ),
       ),
