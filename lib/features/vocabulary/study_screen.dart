@@ -347,7 +347,10 @@ class _StudyCard extends StatelessWidget {
             ),
             const SizedBox(height: 44),
             AnimatedOpacity(
-              opacity: showFurigana ? 1 : 0,
+              opacity:
+                  showFurigana && vocabulary.reading.compareTo(vocabulary.word) != 0
+                  ? 1
+                  : 0,
               duration: const Duration(milliseconds: 180),
               child: Text(
                 vocabulary.reading,
@@ -423,7 +426,7 @@ class _StudyCard extends StatelessWidget {
                         textAlign: TextAlign.center,
                       ),
                     ],
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 4),
                     Text(
                       vocabulary.example.translation(language),
                       textAlign: TextAlign.center,
