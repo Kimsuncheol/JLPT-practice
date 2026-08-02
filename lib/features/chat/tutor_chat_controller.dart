@@ -18,10 +18,16 @@ final tutorChatControllerProvider =
     );
 
 class TutorChatController extends AsyncNotifier<TutorChatState> {
+  static const _responseIdleTimeout = Duration(seconds: 30);
+
   late TutorChatRepository _repository;
   late TutorAiService _ai;
   late AppState _learner;
   StreamSubscription<String>? _activeSubscription;
+  String? _retryText;
+  String? _retryUserMessageId;
+
+  bool get canRetry => _retryText != null && !_value.isGenerating;
 
   @override
   Future<TutorChatState> build() async {
@@ -45,6 +51,8 @@ class TutorChatController extends AsyncNotifier<TutorChatState> {
   Future<void> sendMessage(String value) async {
     final text = value.trim();
     if (text.isEmpty || _value.isGenerating) return;
+    _retryText = null;
+    _retryUserMessageId = null;
 
     final userMessage = TutorChatMessage(
       id: _id('user'),
@@ -71,6 +79,18 @@ class TutorChatController extends AsyncNotifier<TutorChatState> {
     var responseText = '';
     _activeSubscription = _ai
         .sendMessage(text)
+        .timeout(
+          _responseIdleTimeout,
+          onTimeout: (sink) {
+            sink.addError(
+              TimeoutException(
+                'The tutor response was idle for '
+                '${_responseIdleTimeout.inSeconds} seconds.',
+              ),
+            );
+            sink.close();
+          },
+        )
         .listen(
           (chunk) {
             responseText = chunk.startsWith(responseText)
@@ -84,6 +104,8 @@ class TutorChatController extends AsyncNotifier<TutorChatState> {
               debugPrintStack(stackTrace: stackTrace);
             }
             _activeSubscription = null;
+            _retryText = text;
+            _retryUserMessageId = userMessage.id;
             final messages = _value.messages
                 .where((message) => message.id != tutorMessage.id)
                 .toList(growable: false);
@@ -99,6 +121,8 @@ class TutorChatController extends AsyncNotifier<TutorChatState> {
           onDone: () {
             _activeSubscription = null;
             if (responseText.trim().isEmpty) {
+              _retryText = text;
+              _retryUserMessageId = userMessage.id;
               final messages = _value.messages
                   .where((message) => message.id != tutorMessage.id)
                   .toList(growable: false);
@@ -111,6 +135,8 @@ class TutorChatController extends AsyncNotifier<TutorChatState> {
                 ),
               );
             } else {
+              _retryText = null;
+              _retryUserMessageId = null;
               final completed = tutorMessage.copyWith(
                 text: responseText.trim(),
               );
@@ -122,6 +148,21 @@ class TutorChatController extends AsyncNotifier<TutorChatState> {
           cancelOnError: true,
         );
     await completion.future;
+  }
+
+  Future<void> retryLastMessage() async {
+    final text = _retryText;
+    final userMessageId = _retryUserMessageId;
+    if (text == null || userMessageId == null || _value.isGenerating) return;
+
+    final messages = _value.messages
+        .where((message) => message.id != userMessageId)
+        .toList(growable: false);
+    _retryText = null;
+    _retryUserMessageId = null;
+    state = AsyncData(_value.copyWith(messages: messages, clearError: true));
+    _configure(_value);
+    await sendMessage(text);
   }
 
   Future<void> stopGenerating() async {
@@ -228,8 +269,15 @@ class TutorChatController extends AsyncNotifier<TutorChatState> {
     if (raw.contains('app check') || raw.contains('unauthorized')) {
       return 'App Check could not verify this device. Check its registration and debug token.';
     }
-    if (raw.contains('network') || raw.contains('socket')) {
-      return 'You appear to be offline. Reconnect and try again.';
+    if (error is TimeoutException ||
+        raw.contains('network') ||
+        raw.contains('socket') ||
+        raw.contains('connection') ||
+        raw.contains('clientexception') ||
+        raw.contains('unavailable') ||
+        raw.contains('failed host lookup')) {
+      return 'The connection was interrupted before the tutor answered. '
+          'Check your connection and tap Retry.';
     }
     return 'The tutor could not respond. Please try again.';
   }

@@ -1,6 +1,15 @@
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
+final _furiganaAfterKanji = RegExp(
+  r'([\u3400-\u4DBF\u4E00-\u9FFF々〆ヵヶ])[\u0020\u3000]*(?:（[ぁ-ゖァ-ヺー・]+）|\([ぁ-ゖァ-ヺー・]+\))',
+);
+
+/// Removes kana readings attached to kanji while preserving other parentheses.
+String prepareJapaneseTextForSpeech(String text) {
+  return text.replaceAllMapped(_furiganaAfterKanji, (match) => match.group(1)!);
+}
+
 class TtsService {
   TtsService() {
     _ready = _initialize();
@@ -37,7 +46,8 @@ class TtsService {
   }
 
   Future<void> speak(String text) async {
-    if (text.trim().isEmpty) return;
+    final speechText = prepareJapaneseTextForSpeech(text).trim();
+    if (speechText.isEmpty) return;
 
     final request = ++_speechRequest;
     await _ready;
@@ -52,7 +62,7 @@ class TtsService {
     try {
       // AudioSession owns focus so flutter_tts must not acquire a second,
       // independently managed focus request.
-      await _tts.speak(text, focus: false);
+      await _tts.speak(speechText, focus: false);
     } finally {
       if (request == _speechRequest) {
         await _releaseAudioFocus();

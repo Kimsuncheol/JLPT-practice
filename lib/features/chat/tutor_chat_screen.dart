@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -56,7 +57,24 @@ class _TutorChatScreenState extends ConsumerState<TutorChatScreen> {
     final chat = ref.watch(tutorChatControllerProvider);
     return Scaffold(
       appBar: AppBar(
-        title: Text(context.strings('aiTutor')),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(context.strings('aiTutor')),
+            const SizedBox(width: 8),
+            Consumer(
+              builder: (context, ref, _) {
+                final profile = ref.watch(appControllerProvider).value;
+                return Chip(
+                  avatar: const Icon(Icons.school_outlined, size: 18),
+                  label: Text(profile?.selectedLevel ?? 'JLPT'),
+                  visualDensity: VisualDensity.compact,
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                );
+              },
+            ),
+          ],
+        ),
         actions: [
           IconButton(
             tooltip: context.strings('newConversation'),
@@ -67,6 +85,9 @@ class _TutorChatScreenState extends ConsumerState<TutorChatScreen> {
           ),
         ],
       ),
+      drawer: chat.value != null
+          ? _TutorSettingsDrawer(state: chat.value!)
+          : null,
       body: chat.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (_, _) => _LoadError(
@@ -81,16 +102,26 @@ class _TutorChatScreenState extends ConsumerState<TutorChatScreen> {
     _scheduleInitialSync(chat);
     final materialTheme = Theme.of(context);
     final scheme = materialTheme.colorScheme;
+    final bubbleMaxWidth = math.min(
+      520.0,
+      MediaQuery.sizeOf(context).width * 0.78,
+    );
     final chatTheme = ChatTheme.fromThemeData(
       materialTheme,
     ).copyWith(shape: const BorderRadius.all(Radius.circular(20)));
     return Column(
       children: [
-        _TutorControls(state: chat),
         if (chat.errorMessage != null)
           MaterialBanner(
             content: Text(chat.errorMessage!),
             actions: [
+              if (ref.read(tutorChatControllerProvider.notifier).canRetry)
+                FilledButton.tonal(
+                  onPressed: () => ref
+                      .read(tutorChatControllerProvider.notifier)
+                      .retryLastMessage(),
+                  child: Text(context.strings('retry')),
+                ),
               TextButton(
                 onPressed: () => ref
                     .read(tutorChatControllerProvider.notifier)
@@ -150,7 +181,7 @@ class _TutorChatScreenState extends ConsumerState<TutorChatScreen> {
                       return SimpleTextMessage(
                         message: message,
                         index: index,
-                        constraints: const BoxConstraints(maxWidth: 520),
+                        constraints: BoxConstraints(maxWidth: bubbleMaxWidth),
                         sentBackgroundColor: scheme.primaryContainer,
                         sentTextStyle: materialTheme.textTheme.bodyLarge
                             ?.copyWith(color: scheme.onPrimaryContainer),
@@ -167,6 +198,7 @@ class _TutorChatScreenState extends ConsumerState<TutorChatScreen> {
                     );
                     return _TutorMessageBubble(
                       message: source,
+                      maxWidth: bubbleMaxWidth,
                       isStreaming:
                           message.metadata?['isStreaming'] as bool? ?? false,
                       isTranslating:
@@ -193,13 +225,13 @@ class _TutorChatScreenState extends ConsumerState<TutorChatScreen> {
                     verticalPadding: 7,
                     leadingWidget: isSentByMe
                         ? null
-                        : CircleAvatar(
-                            radius: 17,
-                            backgroundColor: scheme.primaryContainer,
-                            foregroundColor: scheme.onPrimaryContainer,
-                            child: const Text(
-                              '先',
-                              style: TextStyle(fontWeight: FontWeight.w700),
+                        : Padding(
+                            padding: const EdgeInsets.only(right: 10),
+                            child: CircleAvatar(
+                              radius: 17,
+                              backgroundColor: scheme.primaryContainer,
+                              foregroundColor: scheme.onPrimaryContainer,
+                              child: const Icon(Icons.auto_awesome, size: 18),
                             ),
                           ),
                     child: child,
@@ -327,99 +359,77 @@ class _TutorChatScreenState extends ConsumerState<TutorChatScreen> {
   }
 }
 
-class _TutorControls extends ConsumerWidget {
-  const _TutorControls({required this.state});
+class _TutorSettingsDrawer extends ConsumerWidget {
+  const _TutorSettingsDrawer({required this.state});
 
   final TutorChatState state;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final strings = context.strings;
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        border: Border(
-          bottom: BorderSide(color: Theme.of(context).dividerColor),
-        ),
-      ),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.fromLTRB(16, 4, 16, 10),
-        child: Row(
+    final notifier = ref.read(tutorChatControllerProvider.notifier);
+    return Drawer(
+      child: SafeArea(
+        child: ListView(
+          padding: EdgeInsets.zero,
           children: [
-            _ControlMenu<CorrectionMode>(
-              icon: Icons.fact_check_outlined,
-              label: strings(state.correctionMode.name),
-              enabled: !state.isGenerating,
-              values: CorrectionMode.values,
-              valueLabel: (value) => strings(value.name),
-              onSelected: ref
-                  .read(tutorChatControllerProvider.notifier)
-                  .setCorrectionMode,
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+              child: Text(
+                strings('tutorSettings'),
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
             ),
-            const SizedBox(width: 8),
-            _ControlMenu<TutorScenario>(
-              icon: Icons.theater_comedy_outlined,
-              label: strings(state.scenario.name),
-              enabled: !state.isGenerating,
-              values: TutorScenario.values,
-              valueLabel: (value) => strings(value.name),
-              onSelected: ref
-                  .read(tutorChatControllerProvider.notifier)
-                  .setScenario,
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+              child: Text(
+                strings('correctionMode'),
+                style: Theme.of(context).textTheme.labelLarge,
+              ),
             ),
-            const SizedBox(width: 8),
-            Consumer(
-              builder: (context, ref, _) {
-                final profile = ref.watch(appControllerProvider).value;
-                return Chip(
-                  avatar: const Icon(Icons.school_outlined, size: 18),
-                  label: Text(profile?.selectedLevel ?? 'JLPT'),
-                );
+            RadioGroup<CorrectionMode>(
+              groupValue: state.correctionMode,
+              onChanged: (value) {
+                if (value != null) notifier.setCorrectionMode(value);
               },
+              child: Column(
+                children: [
+                  for (final mode in CorrectionMode.values)
+                    RadioListTile<CorrectionMode>(
+                      value: mode,
+                      enabled: !state.isGenerating,
+                      title: Text(strings(mode.name)),
+                    ),
+                ],
+              ),
+            ),
+            const Divider(),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+              child: Text(
+                strings('scenario'),
+                style: Theme.of(context).textTheme.labelLarge,
+              ),
+            ),
+            RadioGroup<TutorScenario>(
+              groupValue: state.scenario,
+              onChanged: (value) {
+                if (value != null) notifier.setScenario(value);
+              },
+              child: Column(
+                children: [
+                  for (final scenario in TutorScenario.values)
+                    RadioListTile<TutorScenario>(
+                      value: scenario,
+                      enabled: !state.isGenerating,
+                      title: Text(strings(scenario.name)),
+                    ),
+                ],
+              ),
             ),
           ],
         ),
       ),
-    );
-  }
-}
-
-class _ControlMenu<T> extends StatelessWidget {
-  const _ControlMenu({
-    required this.icon,
-    required this.label,
-    required this.enabled,
-    required this.values,
-    required this.valueLabel,
-    required this.onSelected,
-  });
-
-  final IconData icon;
-  final String label;
-  final bool enabled;
-  final List<T> values;
-  final String Function(T value) valueLabel;
-  final ValueChanged<T> onSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    return MenuAnchor(
-      builder: (context, controller, child) => ActionChip(
-        avatar: Icon(icon, size: 18),
-        label: Text(label),
-        onPressed: enabled
-            ? () => controller.isOpen ? controller.close() : controller.open()
-            : null,
-      ),
-      menuChildren: values
-          .map(
-            (value) => MenuItemButton(
-              onPressed: () => onSelected(value),
-              child: Text(valueLabel(value)),
-            ),
-          )
-          .toList(growable: false),
     );
   }
 }
@@ -437,7 +447,8 @@ class _TutorWelcome extends StatelessWidget {
         CircleAvatar(
           radius: 38,
           backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-          child: const Text('先生', style: TextStyle(fontSize: 24)),
+          foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
+          child: const Icon(Icons.auto_awesome, size: 36),
         ),
         const SizedBox(height: 20),
         Text(
@@ -487,11 +498,13 @@ extension on _TutorChatScreenState {
 class _TutorMessageBubble extends ConsumerWidget {
   const _TutorMessageBubble({
     required this.message,
+    required this.maxWidth,
     required this.isStreaming,
     required this.isTranslating,
   });
 
   final TutorChatMessage message;
+  final double maxWidth;
   final bool isStreaming;
   final bool isTranslating;
 
@@ -499,7 +512,7 @@ class _TutorMessageBubble extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final scheme = Theme.of(context).colorScheme;
     return Container(
-      constraints: const BoxConstraints(maxWidth: 520),
+      constraints: BoxConstraints(maxWidth: maxWidth),
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
       decoration: BoxDecoration(
         color: scheme.surfaceContainerLow,
@@ -541,9 +554,13 @@ class _TutorMessageBubble extends ConsumerWidget {
           if (message.text.isNotEmpty && !isStreaming) ...[
             const SizedBox(height: 6),
             Wrap(
-              spacing: 2,
+              spacing: 6,
               children: [
                 TextButton.icon(
+                  style: TextButton.styleFrom(
+                    visualDensity: VisualDensity.compact,
+                    padding: const EdgeInsets.symmetric(horizontal: 6),
+                  ),
                   onPressed: message.translation == null && !isTranslating
                       ? () => ref
                             .read(tutorChatControllerProvider.notifier)
@@ -564,12 +581,18 @@ class _TutorMessageBubble extends ConsumerWidget {
                 ),
                 IconButton(
                   tooltip: context.strings('listen'),
+                  visualDensity: VisualDensity.compact,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
                   onPressed: () =>
                       ref.read(ttsServiceProvider).speak(message.text),
                   icon: const Icon(Icons.volume_up_outlined, size: 20),
                 ),
                 IconButton(
                   tooltip: context.strings('copy'),
+                  visualDensity: VisualDensity.compact,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
                   onPressed: () =>
                       Clipboard.setData(ClipboardData(text: message.text)),
                   icon: const Icon(Icons.copy_outlined, size: 19),
