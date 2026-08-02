@@ -14,7 +14,7 @@ class AdIds {
 
   static String get rewarded => Platform.isIOS
       ? 'ca-app-pub-3940256099942544/1712485313'
-      : 'ca-app-pub-3940256099942544/5224354917';
+      : 'ca-app-pub-3041793072447483/7864031777';
 }
 
 class AdService {
