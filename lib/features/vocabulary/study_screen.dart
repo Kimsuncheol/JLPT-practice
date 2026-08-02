@@ -220,6 +220,34 @@ class _StudyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Expanded(child: _buildCard(context)),
+        const SizedBox(height: 14),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _CardAction(
+              icon: showFurigana
+                  ? Icons.visibility_off_rounded
+                  : Icons.visibility_rounded,
+              label: showFurigana
+                  ? context.strings('hideReading')
+                  : context.strings('showReading'),
+              onTap: onToggleFurigana,
+            ),
+            _CardAction(
+              icon: Icons.bookmark_add_outlined,
+              label: context.strings('markReview'),
+              onTap: onReview,
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCard(BuildContext context) {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -289,7 +317,7 @@ class _StudyCard extends StatelessWidget {
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
-            const SizedBox(height: 28),
+            const SizedBox(height: 8),
             Text(
               vocabulary.meaning(language),
               textAlign: TextAlign.center,
@@ -343,26 +371,6 @@ class _StudyCard extends StatelessWidget {
                 ),
               ),
             ],
-            const SizedBox(height: 28),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _CardAction(
-                  icon: showFurigana
-                      ? Icons.visibility_off_rounded
-                      : Icons.visibility_rounded,
-                  label: showFurigana
-                      ? context.strings('hideReading')
-                      : context.strings('showReading'),
-                  onTap: onToggleFurigana,
-                ),
-                _CardAction(
-                  icon: Icons.bookmark_add_outlined,
-                  label: context.strings('markReview'),
-                  onTap: onReview,
-                ),
-              ],
-            ),
           ],
         ),
       ),

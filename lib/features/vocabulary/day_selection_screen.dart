@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/core/utils/study_batches.dart';
+import 'package:jlpt_practice/features/vocabulary/day_selection_skeleton.dart';
 
 class DaySelectionScreen extends ConsumerStatefulWidget {
   const DaySelectionScreen({super.key});
@@ -30,7 +31,7 @@ class _DaySelectionScreenState extends ConsumerState<DaySelectionScreen> {
     return Scaffold(
       appBar: AppBar(title: Text(context.strings('chooseStudyDay'))),
       body: asyncState.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const DaySelectionSkeleton(),
         error: (error, _) => Center(child: Text(error.toString())),
         data: (state) {
           final words = state.selectedVocabulary;

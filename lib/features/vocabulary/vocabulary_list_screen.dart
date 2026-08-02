@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/features/vocabulary/vocabulary_details.dart';
+import 'package:jlpt_practice/features/vocabulary/vocabulary_list_skeleton.dart';
 import 'package:jlpt_practice/features/vocabulary/vocabulary_tile.dart';
 import 'package:jlpt_practice/shared/adaptive_ad_slot.dart';
 import 'package:jlpt_practice/shared/empty_state.dart';
@@ -25,7 +26,7 @@ class _VocabularyListScreenState extends ConsumerState<VocabularyListScreen> {
     final asyncState = ref.watch(appControllerProvider);
     return SafeArea(
       child: asyncState.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const VocabularyListSkeleton(),
         error: (error, _) => Center(child: Text(error.toString())),
         data: (state) {
           final items =

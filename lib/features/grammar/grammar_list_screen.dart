@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/data/models/grammar_point.dart';
+import 'package:jlpt_practice/features/grammar/grammar_list_skeleton.dart';
 import 'package:jlpt_practice/features/grammar/grammar_providers.dart';
 
 class GrammarListScreen extends ConsumerStatefulWidget {
@@ -28,7 +29,7 @@ class _GrammarListScreenState extends ConsumerState<GrammarListScreen> {
         title: Text('$selectedLevel ${context.strings('grammar')}'),
       ),
       body: catalog.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const GrammarListSkeleton(),
         error: (error, _) => Center(child: Text(error.toString())),
         data: (items) {
           final grammar = items

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
+import 'package:jlpt_practice/features/statistics/statistics_skeleton.dart';
 import 'package:jlpt_practice/shared/adaptive_ad_slot.dart';
 
 class StatisticsScreen extends ConsumerWidget {
@@ -12,7 +13,7 @@ class StatisticsScreen extends ConsumerWidget {
     final asyncState = ref.watch(appControllerProvider);
     return SafeArea(
       child: asyncState.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const StatisticsSkeleton(),
         error: (error, _) => Center(child: Text(error.toString())),
         data: (state) {
           final strings = context.strings;

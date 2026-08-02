@@ -6,6 +6,7 @@ import 'package:jlpt_practice/app/theme/app_theme.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/core/utils/study_batches.dart';
 import 'package:jlpt_practice/data/models/vocabulary.dart';
+import 'package:jlpt_practice/features/dashboard/dashboard_skeleton.dart';
 import 'package:jlpt_practice/shared/adaptive_ad_slot.dart';
 
 class DashboardScreen extends ConsumerWidget {
@@ -16,7 +17,7 @@ class DashboardScreen extends ConsumerWidget {
     final asyncState = ref.watch(appControllerProvider);
     return SafeArea(
       child: asyncState.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const DashboardSkeleton(),
         error: (error, _) => Center(child: Text(error.toString())),
         data: (state) {
           final strings = context.strings;
