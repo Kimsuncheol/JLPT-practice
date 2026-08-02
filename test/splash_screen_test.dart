@@ -14,7 +14,7 @@ void main() {
 
     expect(find.text('合格まで、あと一歩！'), findsOneWidget);
     expect(find.text('今日の一歩が、明日の自信に。'), findsOneWidget);
-    expect(find.text('KOTOBA FLOW  •  JLPT'), findsOneWidget);
+    expect(find.text('JLPT'), findsOneWidget);
     expect(find.text('語'), findsOneWidget);
   });
 }

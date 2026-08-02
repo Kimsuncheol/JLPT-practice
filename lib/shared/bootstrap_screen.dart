@@ -169,7 +169,7 @@ class _SplashScreenContentState extends State<SplashScreenContent>
               right: 0,
               bottom: 28,
               child: Text(
-                'KOTOBA FLOW  •  JLPT',
+                'JLPT',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: muted,
