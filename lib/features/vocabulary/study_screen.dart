@@ -26,6 +26,8 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
   bool? _showFurigana;
   PageController? _pageController;
   TtsService? _ttsService;
+  bool _resumeDecisionPending = false;
+  bool _suppressAutoAudio = false;
 
   @override
   void dispose() {
@@ -36,7 +38,17 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(appControllerProvider).requireValue;
+    final asyncState = ref.watch(appControllerProvider);
+    return asyncState.when(
+      loading: () =>
+          const Scaffold(body: Center(child: CircularProgressIndicator())),
+      error: (error, _) =>
+          Scaffold(body: Center(child: Text(error.toString()))),
+      data: (state) => _buildStudyScreen(context, state),
+    );
+  }
+
+  Widget _buildStudyScreen(BuildContext context, AppState state) {
     final words = StudyBatches.wordsForDay(
       state.selectedVocabulary,
       day: widget.day,
@@ -65,10 +77,12 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
               itemCount: words.length,
               onPageChanged: (index) {
                 setState(() => _index = index);
+                if (_resumeDecisionPending) return;
                 unawaited(_savePosition(state, words[index], index));
-                if (state.autoPlayAudio) {
+                if (state.autoPlayAudio && !_suppressAutoAudio) {
                   _speak(words[index].word);
                 }
+                _suppressAutoAudio = false;
               },
               itemBuilder: (context, index) {
                 final word = words[index];
@@ -140,14 +154,59 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
           level: state.selectedLevel,
           dailyGoal: state.dailyGoal,
         );
-    _index = canResume
-        ? session.resolveIndex(words.map((word) => word.id).toList())
-        : 0;
-    _pageController = PageController(initialPage: _index);
+    _index = 0;
+    _pageController = PageController();
+    _resumeDecisionPending = canResume;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      unawaited(_savePosition(state, words[_index], _index));
+      if (canResume) {
+        unawaited(_confirmResume(session, words));
+      } else {
+        unawaited(_savePosition(state, words.first, 0));
+      }
     });
+  }
+
+  Future<void> _confirmResume(
+    StudySession session,
+    List<Vocabulary> words,
+  ) async {
+    final resumeIndex = session.resolveIndex(
+      words.map((word) => word.id).toList(),
+    );
+    final shouldResume = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => PopScope(
+        canPop: false,
+        child: AlertDialog(
+          title: Text(dialogContext.strings('resumeConfirmTitle')),
+          content: Text(
+            '${dialogContext.strings('day')} ${session.day} · ${resumeIndex + 1}/${words.length}\n${dialogContext.strings('resumeConfirmBody')}',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: Text(dialogContext.strings('chooseAnotherDay')),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(dialogContext, true),
+              child: Text(dialogContext.strings('continue')),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (!mounted || shouldResume == null) return;
+    _resumeDecisionPending = false;
+    if (!shouldResume) {
+      context.pushReplacement('/study');
+      return;
+    }
+
+    if (resumeIndex == 0) return;
+    _suppressAutoAudio = true;
+    _pageController!.jumpToPage(resumeIndex);
   }
 
   Future<void> _savePosition(AppState state, Vocabulary word, int index) {
