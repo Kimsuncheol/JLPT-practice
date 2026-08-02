@@ -34,6 +34,12 @@ class VocabularyDetails extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final subtitleParts = [
+      if (vocabulary.word.compareTo(vocabulary.reading) != 0)
+        vocabulary.reading,
+      if (vocabulary.word.compareTo(vocabulary.romaji) != 0)
+        vocabulary.romaji,
+    ];
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
       child: Column(
@@ -64,14 +70,15 @@ class VocabularyDetails extends ConsumerWidget {
                         fontWeight: FontWeight.w800,
                       ),
                     ),
-                    Text(
-                      vocabulary.word.compareTo(vocabulary.romaji) == 0
-                          ? vocabulary.reading
-                          : '${vocabulary.reading}  ·  ${vocabulary.romaji}',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    if (subtitleParts.isNotEmpty)
+                      Text(
+                        subtitleParts.join('  ·  '),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.titleMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
                       ),
-                    ),
                   ],
                 ),
               ),

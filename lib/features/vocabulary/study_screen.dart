@@ -147,17 +147,19 @@ class _StudyCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 44),
-            AnimatedOpacity(
-              opacity: showFurigana ? 1 : 0,
-              duration: const Duration(milliseconds: 180),
-              child: Text(
-                vocabulary.reading,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: Theme.of(context).colorScheme.primary,
+            if (vocabulary.word.compareTo(vocabulary.reading) != 0) ...[
+              AnimatedOpacity(
+                opacity: showFurigana ? 1 : 0,
+                duration: const Duration(milliseconds: 180),
+                child: Text(
+                  vocabulary.reading,
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 6),
+              const SizedBox(height: 6),
+            ],
             Text(
               vocabulary.word,
               textAlign: TextAlign.center,
