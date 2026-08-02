@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/app/theme/app_theme.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
+import 'package:jlpt_practice/core/utils/study_batches.dart';
+import 'package:jlpt_practice/data/models/vocabulary.dart';
 import 'package:jlpt_practice/shared/adaptive_ad_slot.dart';
 
 class DashboardScreen extends ConsumerWidget {
@@ -18,6 +20,25 @@ class DashboardScreen extends ConsumerWidget {
         error: (error, _) => Center(child: Text(error.toString())),
         data: (state) {
           final strings = context.strings;
+          final studySession = state.studySessions[state.selectedLevel];
+          final resumeWords =
+              studySession != null &&
+                  studySession.isCompatible(
+                    level: state.selectedLevel,
+                    dailyGoal: state.dailyGoal,
+                  )
+              ? StudyBatches.wordsForDay(
+                  state.selectedVocabulary,
+                  day: studySession.day,
+                  dailyGoal: state.dailyGoal,
+                )
+              : const <Vocabulary>[];
+          final canResume = studySession != null && resumeWords.isNotEmpty;
+          final resumeIndex = canResume
+              ? studySession.resolveIndex(
+                  resumeWords.map((word) => word.id).toList(),
+                )
+              : 0;
           return Column(
             children: [
               Expanded(
@@ -138,11 +159,18 @@ class DashboardScreen extends ConsumerWidget {
                     const SizedBox(height: 18),
                     _ActionTile(
                       color: Theme.of(context).colorScheme.secondaryContainer,
-                      icon: Icons.style_rounded,
-                      title: strings('startStudy'),
-                      subtitle:
-                          '${state.selectedVocabulary.length} ${strings('words').toLowerCase()}',
-                      onTap: () => context.push('/study'),
+                      icon: canResume
+                          ? Icons.play_circle_fill_rounded
+                          : Icons.style_rounded,
+                      title: canResume
+                          ? strings('resumeLearning')
+                          : strings('startStudy'),
+                      subtitle: canResume
+                          ? '${strings('day')} ${studySession.day} · ${resumeIndex + 1}/${resumeWords.length}'
+                          : '${state.selectedVocabulary.length} ${strings('words').toLowerCase()}',
+                      onTap: () => canResume
+                          ? context.push('/study/day/${studySession.day}')
+                          : context.push('/study'),
                     ),
                     const SizedBox(height: 10),
                     _ActionTile(

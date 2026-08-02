@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jlpt_practice/data/models/quiz.dart';
 import 'package:jlpt_practice/data/models/review_progress.dart';
+import 'package:jlpt_practice/data/models/study_session.dart';
 import 'package:jlpt_practice/data/models/vocabulary.dart';
 
 class AppState {
@@ -21,6 +22,7 @@ class AppState {
     required this.quizCorrect,
     required this.currentStreak,
     required this.longestStreak,
+    this.studySessions = const {},
     this.lastQuizResult,
   });
 
@@ -40,6 +42,7 @@ class AppState {
   final int quizCorrect;
   final int currentStreak;
   final int longestStreak;
+  final Map<String, StudySession> studySessions;
   final QuizResult? lastQuizResult;
 
   List<Vocabulary> get selectedVocabulary =>
@@ -86,6 +89,7 @@ class AppState {
     int? quizCorrect,
     int? currentStreak,
     int? longestStreak,
+    Map<String, StudySession>? studySessions,
     QuizResult? lastQuizResult,
   }) {
     return AppState(
@@ -105,6 +109,7 @@ class AppState {
       quizCorrect: quizCorrect ?? this.quizCorrect,
       currentStreak: currentStreak ?? this.currentStreak,
       longestStreak: longestStreak ?? this.longestStreak,
+      studySessions: studySessions ?? this.studySessions,
       lastQuizResult: lastQuizResult ?? this.lastQuizResult,
     );
   }

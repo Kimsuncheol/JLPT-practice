@@ -1,10 +1,15 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
+import 'package:jlpt_practice/core/services/tts_service.dart';
 import 'package:jlpt_practice/core/utils/study_batches.dart';
+import 'package:jlpt_practice/data/models/app_state.dart';
 import 'package:jlpt_practice/data/models/review_progress.dart';
+import 'package:jlpt_practice/data/models/study_session.dart';
 import 'package:jlpt_practice/data/models/vocabulary.dart';
 
 class StudyScreen extends ConsumerStatefulWidget {
@@ -19,6 +24,15 @@ class StudyScreen extends ConsumerStatefulWidget {
 class _StudyScreenState extends ConsumerState<StudyScreen> {
   int _index = 0;
   bool? _showFurigana;
+  PageController? _pageController;
+  TtsService? _ttsService;
+
+  @override
+  void dispose() {
+    _pageController?.dispose();
+    if (_ttsService != null) unawaited(_ttsService!.stop());
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +49,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
         body: Center(child: Text(context.strings('noResults'))),
       );
     }
+    _initializePage(words, state);
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -46,11 +61,13 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
         children: [
           Expanded(
             child: PageView.builder(
+              controller: _pageController,
               itemCount: words.length,
               onPageChanged: (index) {
                 setState(() => _index = index);
+                unawaited(_savePosition(state, words[index], index));
                 if (state.autoPlayAudio) {
-                  ref.read(ttsServiceProvider).speak(words[index].word);
+                  _speak(words[index].word);
                 }
               },
               itemBuilder: (context, index) {
@@ -64,11 +81,8 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                     onToggleFurigana: () {
                       setState(() => _showFurigana = !_showFurigana!);
                     },
-                    onSpeakWord: () =>
-                        ref.read(ttsServiceProvider).speak(word.word),
-                    onSpeakExample: () => ref
-                        .read(ttsServiceProvider)
-                        .speak(word.example.sentence),
+                    onSpeakWord: () => _speak(word.word),
+                    onSpeakExample: () => _speak(word.example.sentence),
                     onReview: () async {
                       await ref
                           .read(appControllerProvider.notifier)
@@ -90,15 +104,79 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
             top: false,
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 6, 20, 14),
-              child: Text(
-                '${_index + 1} / ${words.length}',
-                style: const TextStyle(fontWeight: FontWeight.w700),
+              child: Column(
+                children: [
+                  Text(
+                    '${_index + 1} / ${words.length}',
+                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                  if (_index == words.length - 1) ...[
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton.icon(
+                        onPressed: () => _completeSession(state.selectedLevel),
+                        icon: const Icon(Icons.check_rounded),
+                        label: Text(context.strings('finishSession')),
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ),
           ),
         ],
       ),
     );
+  }
+
+  void _initializePage(List<Vocabulary> words, AppState state) {
+    if (_pageController != null) return;
+    final session = state.studySessions[state.selectedLevel];
+    final canResume =
+        session != null &&
+        session.day == widget.day &&
+        session.isCompatible(
+          level: state.selectedLevel,
+          dailyGoal: state.dailyGoal,
+        );
+    _index = canResume
+        ? session.resolveIndex(words.map((word) => word.id).toList())
+        : 0;
+    _pageController = PageController(initialPage: _index);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      unawaited(_savePosition(state, words[_index], _index));
+    });
+  }
+
+  Future<void> _savePosition(AppState state, Vocabulary word, int index) {
+    return ref
+        .read(appControllerProvider.notifier)
+        .saveStudySession(
+          StudySession(
+            level: state.selectedLevel,
+            day: widget.day,
+            wordId: word.id,
+            indexFallback: index,
+            dailyGoal: state.dailyGoal,
+            updatedAt: DateTime.now(),
+          ),
+        );
+  }
+
+  void _speak(String text) {
+    _ttsService ??= ref.read(ttsServiceProvider);
+    unawaited(_ttsService!.speak(text));
+  }
+
+  Future<void> _completeSession(String level) async {
+    if (_ttsService != null) {
+      await _ttsService!.stop();
+      _ttsService = null;
+    }
+    await ref.read(appControllerProvider.notifier).completeStudySession(level);
+    if (mounted) context.pop();
   }
 }
 

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:jlpt_practice/data/models/review_progress.dart';
+import 'package:jlpt_practice/data/models/study_session.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalSettings {
@@ -90,10 +91,32 @@ class LocalStore {
     }
   }
 
+  Map<String, StudySession> loadStudySessions() {
+    final raw = _preferences.getString('studySessions');
+    if (raw == null) return {};
+    try {
+      final decoded = jsonDecode(raw) as Map<String, dynamic>;
+      return decoded.map(
+        (key, value) =>
+            MapEntry(key, StudySession.fromJson(value as Map<String, dynamic>)),
+      );
+    } on FormatException {
+      return {};
+    } on TypeError {
+      return {};
+    }
+  }
+
   Future<void> saveProgress(Map<String, ReviewProgress> progress) =>
       _preferences.setString(
         'progress',
         jsonEncode(progress.map((key, value) => MapEntry(key, value.toJson()))),
+      );
+
+  Future<void> saveStudySessions(Map<String, StudySession> sessions) =>
+      _preferences.setString(
+        'studySessions',
+        jsonEncode(sessions.map((key, value) => MapEntry(key, value.toJson()))),
       );
 
   Future<void> setValue(String key, Object value) async {
@@ -120,6 +143,7 @@ class LocalStore {
       _preferences.remove('quizCorrect'),
       _preferences.remove('currentStreak'),
       _preferences.remove('longestStreak'),
+      _preferences.remove('studySessions'),
     ]);
   }
 }

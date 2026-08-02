@@ -11,6 +11,7 @@ import 'package:jlpt_practice/core/services/tts_service.dart';
 import 'package:jlpt_practice/data/models/app_state.dart';
 import 'package:jlpt_practice/data/models/quiz.dart';
 import 'package:jlpt_practice/data/models/review_progress.dart';
+import 'package:jlpt_practice/data/models/study_session.dart';
 import 'package:jlpt_practice/data/repositories/quiz_repository.dart';
 import 'package:jlpt_practice/data/repositories/vocabulary_repository.dart';
 
@@ -32,6 +33,7 @@ final appControllerProvider = AsyncNotifierProvider<AppController, AppState>(
 
 class AppController extends AsyncNotifier<AppState> {
   late LocalStore _store;
+  Future<void> _studySessionWrite = Future.value();
 
   @override
   Future<AppState> build() async {
@@ -56,6 +58,7 @@ class AppController extends AsyncNotifier<AppState> {
       quizCorrect: settings.quizCorrect,
       currentStreak: settings.currentStreak,
       longestStreak: settings.longestStreak,
+      studySessions: _store.loadStudySessions(),
     );
   }
 
@@ -214,6 +217,27 @@ class AppController extends AsyncNotifier<AppState> {
         return current.copyWith(themeMode: value);
       });
 
+  Future<void> saveStudySession(StudySession session) async {
+    final sessions = {..._value.studySessions, session.level: session};
+    state = AsyncData(_value.copyWith(studySessions: sessions));
+    await _persistStudySessions(sessions);
+  }
+
+  Future<void> completeStudySession(String level) async {
+    if (!_value.studySessions.containsKey(level)) return;
+    final sessions = {..._value.studySessions}..remove(level);
+    state = AsyncData(_value.copyWith(studySessions: sessions));
+    await _persistStudySessions(sessions);
+  }
+
+  Future<void> _persistStudySessions(Map<String, StudySession> sessions) {
+    final snapshot = Map<String, StudySession>.unmodifiable(sessions);
+    _studySessionWrite = _studySessionWrite.then(
+      (_) => _store.saveStudySessions(snapshot),
+    );
+    return _studySessionWrite;
+  }
+
   Future<void> _updatePreference(
     String key,
     Object value,
@@ -233,8 +257,10 @@ class AppController extends AsyncNotifier<AppState> {
       quizCorrect: 0,
       currentStreak: 0,
       longestStreak: 0,
+      studySessions: {},
     );
     state = AsyncData(next);
+    await _studySessionWrite;
     await _store.clearLearningData();
   }
 }

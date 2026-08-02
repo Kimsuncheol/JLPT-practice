@@ -60,12 +60,14 @@ class TtsService {
     }
   }
 
-  Future<void> dispose() async {
+  Future<void> stop() async {
     _speechRequest++;
     await _ready;
     await _tts.stop();
     await _releaseAudioFocus();
   }
+
+  Future<void> dispose() => stop();
 
   Future<void> _releaseAudioFocus() => _audioSession.setActive(
     false,

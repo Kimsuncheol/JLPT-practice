@@ -31,7 +31,12 @@ class _TutorChatScreenState extends ConsumerState<TutorChatScreen> {
     ref.listen(tutorChatControllerProvider, (previous, next) {
       final previousCount = previous?.value?.messages.length ?? 0;
       final nextCount = next.value?.messages.length ?? 0;
-      if (nextCount != previousCount || next.value?.isGenerating == true) {
+      final finishedGenerating =
+          previous?.value?.isGenerating == true &&
+          next.value?.isGenerating == false;
+      if (nextCount != previousCount ||
+          next.value?.isGenerating == true ||
+          finishedGenerating) {
         WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToEnd());
       }
     });
