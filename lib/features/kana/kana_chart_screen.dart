@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/features/kana/kana_data.dart';
 
@@ -30,13 +32,13 @@ class KanaChartScreen extends StatelessWidget {
   }
 }
 
-class _KanaGrid extends StatelessWidget {
+class _KanaGrid extends ConsumerWidget {
   const _KanaGrid({required this.script});
 
   final KanaScript script;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final kana = KanaCatalog.forScript(script);
     return GridView.builder(
       padding: const EdgeInsets.fromLTRB(20, 22, 20, 32),
@@ -51,27 +53,35 @@ class _KanaGrid extends StatelessWidget {
         final item = kana[index];
         return Container(
           key: ValueKey('kana-${item.character}'),
+          clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(18),
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                item.character,
-                style: const TextStyle(fontSize: 34, height: 1.1),
+          child: Semantics(
+            button: true,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(18),
+              onTap: () => ref.read(ttsServiceProvider).speak(item.character),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    item.character,
+                    style: const TextStyle(fontSize: 34, height: 1.1),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    item.romaji,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 5),
-              Text(
-                item.romaji,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
+            ),
           ),
         );
       },
