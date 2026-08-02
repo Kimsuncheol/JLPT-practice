@@ -49,17 +49,18 @@ class DashboardSkeleton extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 18),
-              const _ActionTileSkeleton(),
-              const SizedBox(height: 10),
-              const _ActionTileSkeleton(),
-              const SizedBox(height: 10),
-              const _ActionTileSkeleton(),
-              const SizedBox(height: 10),
-              Row(
+              GridView.count(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                crossAxisCount: 2,
+                mainAxisSpacing: 10,
+                crossAxisSpacing: 10,
+                childAspectRatio: 1.05,
                 children: const [
-                  Expanded(child: _SmallActionSkeleton()),
-                  SizedBox(width: 10),
-                  Expanded(child: _SmallActionSkeleton()),
+                  _GridActionTileSkeleton(),
+                  _GridActionTileSkeleton(),
+                  _GridActionTileSkeleton(),
+                  _GridActionTileSkeleton(),
                 ],
               ),
               const SizedBox(height: 24),
@@ -121,8 +122,8 @@ class _RewardedXpCardSkeleton extends StatelessWidget {
   }
 }
 
-class _ActionTileSkeleton extends StatelessWidget {
-  const _ActionTileSkeleton();
+class _GridActionTileSkeleton extends StatelessWidget {
+  const _GridActionTileSkeleton();
 
   @override
   Widget build(BuildContext context) {
@@ -132,49 +133,14 @@ class _ActionTileSkeleton extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
       ),
       padding: const EdgeInsets.all(18),
-      child: const Row(
-        children: [
-          ShimmerBone(width: 52, height: 52, radius: 17),
-          SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ShimmerBone(width: 140, height: 16, radius: 6),
-                SizedBox(height: 8),
-                ShimmerBone(width: 180, height: 13, radius: 6),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SmallActionSkeleton extends StatelessWidget {
-  const _SmallActionSkeleton();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(22),
-      ),
-      padding: const EdgeInsets.all(16),
       child: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              ShimmerBone(width: 24, height: 24, radius: 12),
-              Spacer(),
-              ShimmerBone(width: 30, height: 20, radius: 10),
-            ],
-          ),
-          SizedBox(height: 18),
-          ShimmerBone(width: 90, height: 16, radius: 6),
+          ShimmerBone(width: 46, height: 46, radius: 15),
+          Spacer(),
+          ShimmerBone(width: 100, height: 16, radius: 6),
+          SizedBox(height: 8),
+          ShimmerBone(width: 120, height: 13, radius: 6),
         ],
       ),
     );

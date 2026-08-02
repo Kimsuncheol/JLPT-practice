@@ -40,6 +40,11 @@ GoRouter createAppRouter({String initialLocation = '/'}) => GoRouter(
           GrammarDetailScreen(grammarId: state.pathParameters['id'] ?? ''),
     ),
     GoRoute(path: '/quiz', builder: (_, _) => const QuizScreen()),
+    GoRoute(
+      path: '/quiz/day/:day',
+      builder: (_, state) =>
+          QuizScreen(day: int.tryParse(state.pathParameters['day'] ?? '')),
+    ),
     GoRoute(path: '/quiz/result', builder: (_, _) => const QuizResultScreen()),
     GoRoute(path: '/review', builder: (_, _) => const ReviewScreen()),
     GoRoute(path: '/kana', builder: (_, _) => const KanaChartScreen()),

@@ -23,8 +23,8 @@ class KanaChartScreen extends StatelessWidget {
         ),
         body: const TabBarView(
           children: [
-            _KanaGrid(script: KanaScript.hiragana),
-            _KanaGrid(script: KanaScript.katakana),
+            _KanaSections(script: KanaScript.hiragana),
+            _KanaSections(script: KanaScript.katakana),
           ],
         ),
       ),
@@ -32,25 +32,76 @@ class KanaChartScreen extends StatelessWidget {
   }
 }
 
-class _KanaGrid extends ConsumerWidget {
-  const _KanaGrid({required this.script});
+class _KanaSections extends StatelessWidget {
+  const _KanaSections({required this.script});
 
   final KanaScript script;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final kana = KanaCatalog.forScript(script);
-    return GridView.builder(
+  Widget build(BuildContext context) {
+    final groups = KanaCatalog.groups(script);
+    return ListView.separated(
       padding: const EdgeInsets.fromLTRB(20, 22, 20, 32),
+      itemCount: groups.length,
+      separatorBuilder: (context, index) => const SizedBox(height: 28),
+      itemBuilder: (context, index) => _KanaGroupSection(group: groups[index]),
+    );
+  }
+}
+
+class _KanaGroupSection extends StatelessWidget {
+  const _KanaGroupSection({required this.group});
+
+  final KanaGroup group;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          context.strings(group.titleKey),
+          style: Theme.of(
+            context,
+          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+        ),
+        if (group.noteKey != null) ...[
+          const SizedBox(height: 4),
+          Text(
+            context.strings(group.noteKey!),
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+              fontSize: 13,
+            ),
+          ),
+        ],
+        const SizedBox(height: 12),
+        _KanaGrid(items: group.items),
+      ],
+    );
+  }
+}
+
+class _KanaGrid extends ConsumerWidget {
+  const _KanaGrid({required this.items});
+
+  final List<KanaCharacter> items;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 5,
         mainAxisSpacing: 10,
         crossAxisSpacing: 10,
         childAspectRatio: 0.9,
       ),
-      itemCount: kana.length,
+      itemCount: items.length,
       itemBuilder: (context, index) {
-        final item = kana[index];
+        final item = items[index];
+        final isMultiGlyph = item.character.length > 1;
         return Container(
           key: ValueKey('kana-${item.character}'),
           clipBehavior: Clip.antiAlias,
@@ -68,7 +119,10 @@ class _KanaGrid extends ConsumerWidget {
                 children: [
                   Text(
                     item.character,
-                    style: const TextStyle(fontSize: 34, height: 1.1),
+                    style: TextStyle(
+                      fontSize: isMultiGlyph ? 24 : 34,
+                      height: 1.1,
+                    ),
                   ),
                   const SizedBox(height: 5),
                   Text(

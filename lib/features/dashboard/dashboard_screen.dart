@@ -35,11 +35,6 @@ class DashboardScreen extends ConsumerWidget {
                 )
               : const <Vocabulary>[];
           final canResume = studySession != null && resumeWords.isNotEmpty;
-          final resumeIndex = canResume
-              ? studySession.resolveIndex(
-                  resumeWords.map((word) => word.id).toList(),
-                )
-              : 0;
           return Column(
             children: [
               Expanded(
@@ -158,57 +153,56 @@ class DashboardScreen extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(height: 18),
-                    _ActionTile(
-                      color: Theme.of(context).colorScheme.secondaryContainer,
-                      icon: canResume
-                          ? Icons.play_circle_fill_rounded
-                          : Icons.style_rounded,
-                      title: canResume
-                          ? strings('resumeLearning')
-                          : strings('startStudy'),
-                      subtitle: canResume
-                          ? '${strings('day')} ${studySession.day} · ${resumeIndex + 1}/${resumeWords.length}'
-                          : '${state.selectedVocabulary.length} ${strings('words').toLowerCase()}',
-                      onTap: () => canResume
-                          ? context.push('/study/day/${studySession.day}')
-                          : context.push('/study'),
-                    ),
-                    const SizedBox(height: 10),
-                    _ActionTile(
-                      color: Theme.of(context).colorScheme.tertiaryContainer,
-                      icon: Icons.auto_stories_rounded,
-                      title: strings('studyGrammar'),
-                      subtitle: strings('grammarByRank'),
-                      onTap: () => context.push('/grammar'),
-                    ),
-                    const SizedBox(height: 10),
-                    _ActionTile(
-                      color: Theme.of(context).colorScheme.primaryContainer,
-                      icon: Icons.grid_view_rounded,
-                      title: strings('kanaChart'),
-                      subtitle: strings('kanaChartSubtitle'),
-                      onTap: () => context.push('/kana'),
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
+                    GridView.count(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 10,
+                      crossAxisSpacing: 10,
+                      childAspectRatio: 1,
                       children: [
-                        Expanded(
-                          child: _SmallAction(
-                            icon: Icons.replay_circle_filled_rounded,
-                            title: strings('startReview'),
-                            badge: '${state.dueVocabulary.length}',
-                            onTap: () => context.push('/review'),
-                          ),
+                        _GridActionTile(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.secondaryContainer,
+                          icon: canResume
+                              ? Icons.play_circle_fill_rounded
+                              : Icons.style_rounded,
+                          title: canResume
+                              ? strings('resumeLearning')
+                              : strings('startStudy'),
+                          onTap: () => canResume
+                              ? context.push('/study/day/${studySession.day}')
+                              : context.push('/study'),
                         ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: _SmallAction(
-                            icon: Icons.quiz_rounded,
-                            title: strings('startQuiz'),
-                            badge:
-                                '${state.selectedVocabulary.where((word) => word.hasExample).length}',
-                            onTap: () => context.push('/quiz'),
+                        _GridActionTile(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.tertiaryContainer,
+                          icon: Icons.auto_stories_rounded,
+                          title: strings('studyGrammar'),
+                          onTap: () => context.push('/grammar'),
+                        ),
+                        _GridActionTile(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.primaryContainer,
+                          icon: Icons.grid_view_rounded,
+                          title: strings('kanaChart'),
+                          onTap: () => context.push('/kana'),
+                        ),
+                        _GridActionTile(
+                          color: Color.alphaBlend(
+                            Theme.of(
+                              context,
+                            ).extension<AppColors>()!.warning.withValues(
+                              alpha: 0.35,
+                            ),
+                            Theme.of(context).colorScheme.surface,
                           ),
+                          icon: Icons.replay_circle_filled_rounded,
+                          title: strings('startReview'),
+                          onTap: () => context.push('/review'),
                         ),
                       ],
                     ),
@@ -283,18 +277,16 @@ class _OnPrimaryMetric extends StatelessWidget {
   );
 }
 
-class _ActionTile extends StatelessWidget {
-  const _ActionTile({
+class _GridActionTile extends StatelessWidget {
+  const _GridActionTile({
     required this.color,
     required this.icon,
     required this.title,
-    required this.subtitle,
     required this.onTap,
   });
   final Color color;
   final IconData icon;
   final String title;
-  final String subtitle;
   final VoidCallback onTap;
 
   @override
@@ -305,88 +297,26 @@ class _ActionTile extends StatelessWidget {
       borderRadius: BorderRadius.circular(24),
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.all(18),
-        child: Row(
-          children: [
-            Container(
-              width: 52,
-              height: 52,
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface,
-                borderRadius: BorderRadius.circular(17),
-              ),
-              child: Icon(icon),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title, style: Theme.of(context).textTheme.titleMedium),
-                  const SizedBox(height: 3),
-                  Text(
-                    subtitle,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const Icon(Icons.arrow_forward_rounded),
-          ],
-        ),
-      ),
-    ),
-  );
-}
-
-class _SmallAction extends StatelessWidget {
-  const _SmallAction({
-    required this.icon,
-    required this.title,
-    required this.badge,
-    required this.onTap,
-  });
-  final IconData icon;
-  final String title;
-  final String badge;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) => Material(
-    color: Theme.of(context).colorScheme.surface,
-    borderRadius: BorderRadius.circular(22),
-    child: InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(22),
-      child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Icon(icon, color: Theme.of(context).colorScheme.primary),
-                const Spacer(),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 9,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    badge,
-                    style: const TextStyle(fontWeight: FontWeight.w700),
-                  ),
-                ),
-              ],
+            Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Icon(icon),
             ),
-            const SizedBox(height: 18),
-            Text(title, style: Theme.of(context).textTheme.titleMedium),
+            const Spacer(),
+            Text(
+              title,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
           ],
         ),
       ),

@@ -36,21 +36,7 @@ class _RewardedXpCardState extends ConsumerState<RewardedXpCard> {
   @override
   Widget build(BuildContext context) {
     if (!AdService.enabled) {
-      return Container(
-        height: 36,
-        margin: const EdgeInsets.fromLTRB(20, 4, 20, 8),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.65),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Text(
-          context.strings('adDevelopment'),
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-          ),
-        ),
-      );
+      return const SizedBox.shrink();
     }
     return SafeArea(
       top: false,

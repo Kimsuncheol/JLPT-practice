@@ -134,6 +134,15 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                         label: Text(context.strings('finishSession')),
                       ),
                     ),
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: () => context.push('/quiz/day/${widget.day}'),
+                        icon: const Icon(Icons.quiz_rounded),
+                        label: Text(context.strings('startQuiz')),
+                      ),
+                    ),
                   ],
                 ],
               ),
