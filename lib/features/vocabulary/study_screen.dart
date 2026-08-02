@@ -147,17 +147,19 @@ class _StudyCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 44),
-            AnimatedOpacity(
-              opacity: showFurigana ? 1 : 0,
-              duration: const Duration(milliseconds: 180),
-              child: Text(
-                vocabulary.reading,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: Theme.of(context).colorScheme.primary,
+            if (vocabulary.word.compareTo(vocabulary.reading) != 0) ...[
+              AnimatedOpacity(
+                opacity: showFurigana ? 1 : 0,
+                duration: const Duration(milliseconds: 180),
+                child: Text(
+                  vocabulary.reading,
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 6),
+              const SizedBox(height: 6),
+            ],
             Text(
               vocabulary.word,
               textAlign: TextAlign.center,
@@ -167,13 +169,15 @@ class _StudyCard extends StatelessWidget {
                 fontWeight: FontWeight.w800,
               ),
             ),
-            const SizedBox(height: 10),
-            Text(
-              vocabulary.romaji,
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
+            if (vocabulary.word.compareTo(vocabulary.romaji) != 0) ...[
+              const SizedBox(height: 10),
+              Text(
+                vocabulary.romaji,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
-            ),
+            ],
             const SizedBox(height: 28),
             Text(
               vocabulary.meaning(language),
@@ -181,7 +185,7 @@ class _StudyCard extends StatelessWidget {
               style: Theme.of(context).textTheme.headlineMedium,
             ),
             if (vocabulary.hasExample) ...[
-              const SizedBox(height: 34),
+              const SizedBox(height: 18),
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
