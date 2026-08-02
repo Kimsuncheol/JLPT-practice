@@ -170,20 +170,28 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
                       Align(
                         alignment: Alignment.centerRight,
                         child: TextButton.icon(
-                          onPressed: AdService.enabled
-                              ? () async {
-                                  final earned = await AdService.showRewarded();
-                                  if (earned && mounted) {
-                                    setState(() => _hintRevealed = true);
-                                  }
-                                }
-                              : () => setState(() => _hintRevealed = true),
+                          onPressed: () async {
+                            if (_hintRevealed) {
+                              setState(() => _hintRevealed = false);
+                              return;
+                            }
+                            if (AdService.enabled) {
+                              final earned = await AdService.showRewarded();
+                              if (earned && mounted) {
+                                setState(() => _hintRevealed = true);
+                              }
+                            } else {
+                              setState(() => _hintRevealed = true);
+                            }
+                          },
                           icon: Icon(
-                            AdService.enabled
+                            _hintRevealed
+                                ? Icons.lightbulb_rounded
+                                : AdService.enabled
                                 ? Icons.ondemand_video_rounded
                                 : Icons.lightbulb_outline_rounded,
                           ),
-                          label: const Text('Hint'),
+                          label: Text(_hintRevealed ? 'Hide Hint' : 'Hint'),
                         ),
                       ),
                     if (_hintRevealed && !_answered)
