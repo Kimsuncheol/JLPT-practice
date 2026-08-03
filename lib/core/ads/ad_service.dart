@@ -10,7 +10,7 @@ class AdIds {
 
   static String get interstitial => Platform.isIOS
       ? 'ca-app-pub-3940256099942544/4411468910'
-      : 'ca-app-pub-3940256099942544/1033173712';
+      : 'ca-app-pub-3041793072447483/1064523399';
 
   static String get rewarded => Platform.isIOS
       ? 'ca-app-pub-3940256099942544/1712485313'
