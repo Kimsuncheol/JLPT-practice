@@ -1,4 +1,4 @@
-import 'package:flutter_volume_controller/flutter_volume_controller.dart';
+import 'package:volume_controller/volume_controller.dart';
 
 /// Below this fraction of max volume, speech audio is effectively inaudible.
 const lowVolumeThreshold = 0.05;
@@ -8,10 +8,10 @@ const lowVolumeThreshold = 0.05;
 /// platform, so the check never blocks playback outright.
 Future<bool> isSystemVolumeTooLow() async {
   try {
-    final isMuted = await FlutterVolumeController.getMute();
-    if (isMuted == true) return true;
-    final volume = await FlutterVolumeController.getVolume();
-    return volume != null && volume <= lowVolumeThreshold;
+    final controller = VolumeController.instance;
+    if (await controller.isMuted()) return true;
+    final volume = await controller.getVolume();
+    return volume <= lowVolumeThreshold;
   } catch (_) {
     return false;
   }
