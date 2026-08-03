@@ -14,7 +14,7 @@ class OnboardingScreen extends ConsumerStatefulWidget {
 
 class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   String _level = 'N5';
-  int _goal = 10;
+  final int _goal = 10;
   String? _language;
   bool _autoAudio = false;
   bool _submitting = false;
@@ -79,22 +79,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                             ),
                           )
                           .toList(),
-                    ),
-                    const SizedBox(height: 28),
-                    _Label(strings('dailyGoal')),
-                    const SizedBox(height: 12),
-                    SegmentedButton<int>(
-                      segments: const [
-                        ButtonSegment(value: 5, label: Text('5')),
-                        ButtonSegment(value: 10, label: Text('10')),
-                        ButtonSegment(value: 20, label: Text('20')),
-                        ButtonSegment(value: 30, label: Text('30')),
-                      ],
-                      selected: {_goal},
-                      onSelectionChanged: (value) {
-                        setState(() => _goal = value.first);
-                      },
-                      showSelectedIcon: false,
                     ),
                     const SizedBox(height: 28),
                     _Label(strings('language')),
