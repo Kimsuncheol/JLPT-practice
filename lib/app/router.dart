@@ -10,6 +10,7 @@ import 'package:jlpt_practice/features/quiz/quiz_screen.dart';
 import 'package:jlpt_practice/features/review/review_screen.dart';
 import 'package:jlpt_practice/features/settings/languages_screen.dart';
 import 'package:jlpt_practice/features/settings/levels_screen.dart';
+import 'package:jlpt_practice/features/test/listening_test_screen.dart';
 import 'package:jlpt_practice/features/test/mock_test_result_screen.dart';
 import 'package:jlpt_practice/features/test/mock_test_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/day_selection_screen.dart';
@@ -59,6 +60,10 @@ GoRouter createAppRouter({String initialLocation = '/'}) => GoRouter(
     GoRoute(
       path: '/test/n5/result',
       builder: (_, _) => const MockTestResultScreen(),
+    ),
+    GoRoute(
+      path: '/test/listening',
+      builder: (_, _) => const ListeningTestScreen(),
     ),
     GoRoute(path: '/review', builder: (_, _) => const ReviewScreen()),
     GoRoute(path: '/kana', builder: (_, _) => const KanaChartScreen()),
