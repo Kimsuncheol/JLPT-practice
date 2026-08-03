@@ -9,6 +9,7 @@ import 'package:jlpt_practice/core/services/local_store.dart';
 import 'package:jlpt_practice/core/services/srs_scheduler.dart';
 import 'package:jlpt_practice/core/services/tts_service.dart';
 import 'package:jlpt_practice/data/models/app_state.dart';
+import 'package:jlpt_practice/data/models/mock_test.dart';
 import 'package:jlpt_practice/data/models/quiz.dart';
 import 'package:jlpt_practice/data/models/review_progress.dart';
 import 'package:jlpt_practice/data/models/study_session.dart';
@@ -141,6 +142,48 @@ class AppController extends AsyncNotifier<AppState> {
       quizCorrect: _value.quizCorrect + result.correct,
       studySeconds: _value.studySeconds + result.duration.inSeconds,
       lastQuizResult: result,
+    );
+    next = await _withRecordedActivity(next);
+    state = AsyncData(next);
+    await Future.wait([
+      _store.saveProgress(progress),
+      _store.setValue('quizAnswered', next.quizAnswered),
+      _store.setValue('quizCorrect', next.quizCorrect),
+      _store.setValue('studySeconds', next.studySeconds),
+    ]);
+    for (final scheduled in progress.values) {
+      unawaited(ref.read(cloudSyncProvider).syncProgress(scheduled));
+    }
+  }
+
+  Future<void> recordMockTestResult(
+    MockTestResult result, {
+    required List<QuizQuestion> vocabularyQuestions,
+  }) async {
+    final progress = {..._value.progress};
+    final vocabularySection = result.sectionFor(TestSectionType.vocabulary);
+    if (vocabularySection != null) {
+      for (final question in vocabularyQuestions) {
+        final rating =
+            vocabularySection.incorrectIds.contains(question.vocabulary.id)
+            ? ReviewRating.again
+            : ReviewRating.good;
+        progress[question.vocabulary.id] = ref
+            .read(srsSchedulerProvider)
+            .schedule(
+              vocabularyId: question.vocabulary.id,
+              jlptLevel: question.vocabulary.jlptLevel,
+              rating: rating,
+              current: progress[question.vocabulary.id],
+            );
+      }
+    }
+    var next = _value.copyWith(
+      progress: progress,
+      quizAnswered: _value.quizAnswered + result.total,
+      quizCorrect: _value.quizCorrect + result.correct,
+      studySeconds: _value.studySeconds + result.duration.inSeconds,
+      lastMockTestResult: result,
     );
     next = await _withRecordedActivity(next);
     state = AsyncData(next);

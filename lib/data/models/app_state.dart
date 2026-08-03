@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jlpt_practice/data/models/mock_test.dart';
 import 'package:jlpt_practice/data/models/quiz.dart';
 import 'package:jlpt_practice/data/models/review_progress.dart';
 import 'package:jlpt_practice/data/models/study_session.dart';
@@ -25,6 +26,7 @@ class AppState {
     this.totalXp = 0,
     this.studySessions = const {},
     this.lastQuizResult,
+    this.lastMockTestResult,
   });
 
   final List<Vocabulary> vocabulary;
@@ -46,6 +48,7 @@ class AppState {
   final int totalXp;
   final Map<String, StudySession> studySessions;
   final QuizResult? lastQuizResult;
+  final MockTestResult? lastMockTestResult;
 
   List<Vocabulary> get selectedVocabulary =>
       vocabulary
@@ -94,6 +97,7 @@ class AppState {
     int? totalXp,
     Map<String, StudySession>? studySessions,
     QuizResult? lastQuizResult,
+    MockTestResult? lastMockTestResult,
   }) {
     return AppState(
       vocabulary: vocabulary ?? this.vocabulary,
@@ -115,6 +119,7 @@ class AppState {
       totalXp: totalXp ?? this.totalXp,
       studySessions: studySessions ?? this.studySessions,
       lastQuizResult: lastQuizResult ?? this.lastQuizResult,
+      lastMockTestResult: lastMockTestResult ?? this.lastMockTestResult,
     );
   }
 }

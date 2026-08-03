@@ -204,6 +204,13 @@ class DashboardScreen extends ConsumerWidget {
                           title: strings('startReview'),
                           onTap: () => context.push('/review'),
                         ),
+                        _GridActionTile(
+                          color: Theme.of(context).colorScheme.surfaceTint
+                              .withValues(alpha: 0.16),
+                          icon: Icons.fact_check_rounded,
+                          title: strings('n5MockTest'),
+                          onTap: () => context.push('/test/n5'),
+                        ),
                       ],
                     ),
                     const SizedBox(height: 24),

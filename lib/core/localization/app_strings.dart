@@ -158,6 +158,14 @@ class AppStrings {
     'totalXp': 'Total XP',
     'earnBonusXp': 'Earn bonus XP',
     'xpEarned': 'XP earned',
+    'n5MockTest': 'N5 Mock Test',
+    'n5MockTestSubtitle': 'Vocabulary & grammar practice test',
+    'n5Test': 'N5 Test',
+    'sectionVocabulary': 'Vocabulary',
+    'grammarQuizInstruction':
+        'Choose the meaning that matches the grammar point.',
+    'mockTestComplete': 'Test complete',
+    'sectionResults': 'Section results',
   };
 
   static const _ko = <String, String>{
@@ -308,6 +316,13 @@ class AppStrings {
     'totalXp': '총 XP',
     'earnBonusXp': '보너스 XP 받기',
     'xpEarned': 'XP 획득',
+    'n5MockTest': 'N5 모의고사',
+    'n5MockTestSubtitle': '어휘 & 문법 연습 테스트',
+    'n5Test': 'N5 테스트',
+    'sectionVocabulary': '어휘',
+    'grammarQuizInstruction': '문법 항목에 맞는 뜻을 고르세요.',
+    'mockTestComplete': '테스트 완료',
+    'sectionResults': '섹션별 결과',
   };
 
   String call(String key) =>
