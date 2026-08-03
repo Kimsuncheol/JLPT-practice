@@ -168,6 +168,9 @@ class AppStrings {
         'Choose the meaning that matches the grammar point.',
     'mockTestComplete': 'Test complete',
     'sectionResults': 'Section results',
+    'lowVolumeTitle': 'Volume is too low',
+    'lowVolumeBody':
+        'Turn up your device volume or unmute it to hear the pronunciation.',
   };
 
   static const _ko = <String, String>{
@@ -327,6 +330,8 @@ class AppStrings {
     'grammarQuizInstruction': '문법 항목에 맞는 뜻을 고르세요.',
     'mockTestComplete': '테스트 완료',
     'sectionResults': '섹션별 결과',
+    'lowVolumeTitle': '볼륨이 너무 낮습니다',
+    'lowVolumeBody': '발음을 들으려면 기기 볼륨을 높이거나 음소거를 해제하세요.',
   };
 
   String call(String key) =>

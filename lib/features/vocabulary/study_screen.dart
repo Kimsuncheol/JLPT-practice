@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/core/services/tts_service.dart';
+import 'package:jlpt_practice/core/services/volume_service.dart';
 import 'package:jlpt_practice/core/utils/study_batches.dart';
 import 'package:jlpt_practice/data/models/app_state.dart';
 import 'package:jlpt_practice/data/models/review_progress.dart';
@@ -100,8 +101,9 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                     onToggleFurigana: () {
                       setState(() => _showFurigana = !_showFurigana!);
                     },
-                    onSpeakWord: () => _speak(word.reading),
-                    onSpeakExample: () => _speak(word.example.sentence),
+                    onSpeakWord: () => _speakIfAudible(word.reading),
+                    onSpeakExample: () =>
+                        _speakIfAudible(word.example.sentence),
                     onReview: () async {
                       await ref
                           .read(appControllerProvider.notifier)
@@ -217,6 +219,27 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
   void _speak(String text) {
     _ttsService ??= ref.read(ttsServiceProvider);
     unawaited(_ttsService!.speak(text));
+  }
+
+  Future<void> _speakIfAudible(String text) async {
+    if (await isSystemVolumeTooLow()) {
+      if (!mounted) return;
+      await showDialog<void>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: Text(dialogContext.strings('lowVolumeTitle')),
+          content: Text(dialogContext.strings('lowVolumeBody')),
+          actions: [
+            FilledButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(dialogContext.strings('continue')),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+    _speak(text);
   }
 
   Future<void> _finishStudying() async {
