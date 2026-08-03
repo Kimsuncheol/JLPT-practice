@@ -13,6 +13,7 @@ import 'package:jlpt_practice/features/settings/levels_screen.dart';
 import 'package:jlpt_practice/features/test/mock_test_result_screen.dart';
 import 'package:jlpt_practice/features/test/mock_test_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/day_selection_screen.dart';
+import 'package:jlpt_practice/features/vocabulary/study_finish_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/study_screen.dart';
 import 'package:jlpt_practice/shared/bootstrap_screen.dart';
 
@@ -32,6 +33,12 @@ GoRouter createAppRouter({String initialLocation = '/'}) => GoRouter(
     GoRoute(
       path: '/study/day/:day',
       builder: (_, state) => StudyScreen(
+        day: int.tryParse(state.pathParameters['day'] ?? '') ?? 1,
+      ),
+    ),
+    GoRoute(
+      path: '/study/day/:day/finish',
+      builder: (_, state) => StudyFinishScreen(
         day: int.tryParse(state.pathParameters['day'] ?? '') ?? 1,
       ),
     ),

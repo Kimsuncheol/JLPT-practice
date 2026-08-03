@@ -74,8 +74,12 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
           Expanded(
             child: PageView.builder(
               controller: _pageController,
-              itemCount: words.length,
+              itemCount: words.length + 1,
               onPageChanged: (index) {
+                if (index == words.length) {
+                  unawaited(_finishStudying());
+                  return;
+                }
                 setState(() => _index = index);
                 if (_resumeDecisionPending) return;
                 unawaited(_savePosition(state, words[index], index));
@@ -85,6 +89,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                 _suppressAutoAudio = false;
               },
               itemBuilder: (context, index) {
+                if (index == words.length) return const SizedBox.shrink();
                 final word = words[index];
                 return Padding(
                   padding: const EdgeInsets.fromLTRB(20, 8, 20, 14),
@@ -118,34 +123,9 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
             top: false,
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 6, 20, 14),
-              child: Column(
-                children: [
-                  Text(
-                    '${_index + 1} / ${words.length}',
-                    style: const TextStyle(fontWeight: FontWeight.w700),
-                  ),
-                  if (_index == words.length - 1) ...[
-                    const SizedBox(height: 10),
-                    SizedBox(
-                      width: double.infinity,
-                      child: FilledButton.icon(
-                        onPressed: () => _completeSession(state.selectedLevel),
-                        icon: const Icon(Icons.check_rounded),
-                        label: Text(context.strings('finishSession')),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton.icon(
-                        onPressed: () =>
-                            context.push('/quiz/day/${widget.day}'),
-                        icon: const Icon(Icons.quiz_rounded),
-                        label: Text(context.strings('startQuiz')),
-                      ),
-                    ),
-                  ],
-                ],
+              child: Text(
+                '${_index + 1} / ${words.length}',
+                style: const TextStyle(fontWeight: FontWeight.w700),
               ),
             ),
           ),
@@ -239,32 +219,14 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
     unawaited(_ttsService!.speak(text));
   }
 
-  Future<void> _completeSession(String level) async {
-    final shouldComplete = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(context.strings('finishSessionConfirm')),
-        content: Text(context.strings('finishSessionConfirmBody')),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child: Text(context.strings('cancel')),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            child: Text(context.strings('finish')),
-          ),
-        ],
-      ),
-    );
-    if (shouldComplete != true || !mounted) return;
-
+  Future<void> _finishStudying() async {
     if (_ttsService != null) {
       await _ttsService!.stop();
       _ttsService = null;
     }
-    await ref.read(appControllerProvider.notifier).completeStudySession(level);
-    if (mounted) context.pop();
+    if (mounted) {
+      context.pushReplacement('/study/day/${widget.day}/finish');
+    }
   }
 }
 

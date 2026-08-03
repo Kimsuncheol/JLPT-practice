@@ -8,6 +8,7 @@ import 'package:jlpt_practice/data/models/app_state.dart';
 import 'package:jlpt_practice/data/models/study_session.dart';
 import 'package:jlpt_practice/data/models/vocabulary.dart';
 import 'package:jlpt_practice/features/dashboard/dashboard_screen.dart';
+import 'package:jlpt_practice/features/vocabulary/study_finish_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/study_screen.dart';
 
 void main() {
@@ -141,17 +142,28 @@ void main() {
     final container = _createContainer(wordId: 'word_4', indexFallback: 4);
     addTearDown(container.dispose);
     await container.read(appControllerProvider.future);
+    final router = _createRouter(initialLocation: '/study/day/1');
+    addTearDown(router.dispose);
 
     await tester.pumpWidget(
       UncontrolledProviderScope(
         container: container,
-        child: const MaterialApp(home: StudyScreen(day: 1)),
+        child: MaterialApp.router(
+          theme: AppTheme.light(),
+          routerConfig: router,
+        ),
       ),
     );
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('Continue'));
     await tester.pumpAndSettle();
+    expect(find.text('5 / 5'), findsOneWidget);
+
+    await tester.drag(find.byType(PageView), const Offset(-400, 0));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Great work!'), findsOneWidget);
     await tester.tap(find.text('Finish this session'));
     await tester.pumpAndSettle();
 
@@ -159,7 +171,7 @@ void main() {
     await tester.tap(find.text('Cancel'));
     await tester.pumpAndSettle();
     expect(find.text('Finish this study session?'), findsNothing);
-    expect(find.text('5 / 5'), findsOneWidget);
+    expect(find.text('Great work!'), findsOneWidget);
   });
 }
 
@@ -178,6 +190,11 @@ GoRouter _createRouter({String initialLocation = '/'}) => GoRouter(
       path: '/study/day/:day',
       builder: (_, state) =>
           StudyScreen(day: int.parse(state.pathParameters['day']!)),
+    ),
+    GoRoute(
+      path: '/study/day/:day/finish',
+      builder: (_, state) =>
+          StudyFinishScreen(day: int.parse(state.pathParameters['day']!)),
     ),
   ],
 );

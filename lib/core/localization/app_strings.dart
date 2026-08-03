@@ -77,6 +77,8 @@ class AppStrings {
     'finishSessionConfirmBody':
         'Your saved position for this session will be cleared.',
     'finish': 'Finish',
+    'studyComplete': 'Great work!',
+    'studyCompleteBody': 'You’ve gone through today’s words.',
     'studyGrammar': 'Study grammar',
     'grammarByRank': 'Browse every grammar point by JLPT rank',
     'grammar': 'Grammar',
@@ -237,6 +239,8 @@ class AppStrings {
     'finishSessionConfirm': '이번 학습을 마칠까요?',
     'finishSessionConfirmBody': '저장된 학습 위치가 삭제됩니다.',
     'finish': '마치기',
+    'studyComplete': '수고하셨어요!',
+    'studyCompleteBody': '오늘의 단어를 모두 학습했어요.',
     'studyGrammar': '문법 학습',
     'grammarByRank': 'JLPT 급수별 전체 문법 보기',
     'grammar': '문법',
