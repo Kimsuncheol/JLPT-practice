@@ -377,7 +377,9 @@ class _TutorSettingsDrawer extends ConsumerWidget {
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
               child: Text(
                 strings('tutorSettings'),
-                style: Theme.of(context).textTheme.headlineSmall,
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             Padding(
