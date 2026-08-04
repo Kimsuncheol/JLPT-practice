@@ -170,11 +170,15 @@ class AppStrings {
     'lowVolumeBody':
         'Turn up your device volume or unmute it to hear the pronunciation.',
     'sectionReading': 'Reading',
-    'practiceTest': 'Practice test',
+    'practiceTest': 'Practice',
     'readingQuizInstruction': 'Read the passage, then choose the best answer.',
     'showExplanation': 'Show explanation',
     'hideExplanation': 'Hide explanation',
     'chooseQuestionType': 'Choose a question type',
+    'languageKnowledgeVocabulary': 'Language Knowledge · Characters & Vocabulary',
+    'languageKnowledgeGrammar': 'Language Knowledge · Grammar',
+    'readingComprehension': 'Reading Comprehension',
+    'listeningComprehension': 'Listening Comprehension',
   };
 
   static const _ko = <String, String>{
@@ -335,11 +339,15 @@ class AppStrings {
     'lowVolumeTitle': '볼륨이 너무 낮습니다',
     'lowVolumeBody': '발음을 들으려면 기기 볼륨을 높이거나 음소거를 해제하세요.',
     'sectionReading': '독해',
-    'practiceTest': '실전 연습 테스트',
+    'practiceTest': '연습',
     'readingQuizInstruction': '지문을 읽고 가장 알맞은 답을 고르세요.',
     'showExplanation': '해설 보기',
     'hideExplanation': '해설 숨기기',
     'chooseQuestionType': '문제 유형 선택',
+    'languageKnowledgeVocabulary': '언어지식 · 문자·어휘',
+    'languageKnowledgeGrammar': '언어지식 · 문법',
+    'readingComprehension': '독해',
+    'listeningComprehension': '청해',
   };
 
   String call(String key) =>

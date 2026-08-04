@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
-import 'package:jlpt_practice/data/models/jlpt_test_schedule.dart';
 import 'package:jlpt_practice/data/models/mock_test.dart';
 import 'package:jlpt_practice/data/models/mock_test_problem.dart';
 import 'package:jlpt_practice/data/models/quiz.dart';
@@ -120,21 +119,6 @@ class _PracticeTestScreenState extends ConsumerState<PracticeTestScreen> {
         scheduleId: widget.scheduleId,
       )),
     );
-    final schedules = ref
-        .watch(jlptTestSchedulesForLevelProvider(widget.level))
-        .value;
-    JlptTestSchedule? schedule;
-    if (schedules != null) {
-      for (final candidate in schedules) {
-        if (candidate.id == widget.scheduleId) {
-          schedule = candidate;
-          break;
-        }
-      }
-    }
-    final examTitle =
-        schedule?.displayName ??
-        '${widget.level} ${context.strings('practiceTest')}';
     return practiceSetAsync.when(
       loading: () =>
           const Scaffold(body: Center(child: CircularProgressIndicator())),
@@ -163,7 +147,9 @@ class _PracticeTestScreenState extends ConsumerState<PracticeTestScreen> {
               onPressed: context.pop,
               icon: const Icon(Icons.close_rounded),
             ),
-            title: Text('$examTitle · ${_sectionLabel(context, item.section)}'),
+            title: Text(
+              '${widget.level} · ${_sectionLabel(context, item.section)}',
+            ),
           ),
           body: SafeArea(
             top: false,

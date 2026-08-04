@@ -29,7 +29,9 @@ class QuestionTypeScreen extends ConsumerWidget {
         }
       }
     }
-    final title = schedule?.displayName ?? '$level ${strings('practiceTest')}';
+    final title = schedule != null
+        ? '${schedule.level} · ${schedule.session} ${schedule.year}'
+        : '$level ${strings('practiceTest')}';
     final basePath = '/test/practice/$level/$scheduleId';
 
     return Scaffold(
@@ -49,6 +51,7 @@ class QuestionTypeScreen extends ConsumerWidget {
                 _QuestionTypeTile(
                   icon: Icons.fact_check_rounded,
                   title: strings('sectionVocabulary'),
+                  subtitle: strings('languageKnowledgeVocabulary'),
                   onTap: () => context.push(
                     '$basePath/${sectionPathSegment(ProblemSection.vocabulary)}',
                   ),
@@ -56,6 +59,7 @@ class QuestionTypeScreen extends ConsumerWidget {
                 _QuestionTypeTile(
                   icon: Icons.spellcheck_rounded,
                   title: strings('grammar'),
+                  subtitle: strings('languageKnowledgeGrammar'),
                   onTap: () => context.push(
                     '$basePath/${sectionPathSegment(ProblemSection.grammar)}',
                   ),
@@ -63,6 +67,7 @@ class QuestionTypeScreen extends ConsumerWidget {
                 _QuestionTypeTile(
                   icon: Icons.menu_book_rounded,
                   title: strings('sectionReading'),
+                  subtitle: strings('readingComprehension'),
                   onTap: () => context.push(
                     '$basePath/${sectionPathSegment(ProblemSection.reading)}',
                   ),
@@ -105,11 +110,13 @@ class _QuestionTypeTile extends StatelessWidget {
   const _QuestionTypeTile({
     required this.icon,
     required this.title,
+    required this.subtitle,
     required this.onTap,
   });
 
   final IconData icon;
   final String title;
+  final String subtitle;
   final VoidCallback onTap;
 
   @override
@@ -126,6 +133,7 @@ class _QuestionTypeTile extends StatelessWidget {
       child: Icon(icon),
     ),
     title: Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
+    subtitle: Text(subtitle),
     trailing: const Icon(Icons.chevron_right_rounded),
     onTap: onTap,
   );

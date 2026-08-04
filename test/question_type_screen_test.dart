@@ -50,7 +50,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('JLPT N5 · July 2025'), findsOneWidget);
+      expect(find.text('N5 · July 2025'), findsOneWidget);
       expect(find.text('Vocabulary'), findsOneWidget);
       expect(find.text('Grammar'), findsOneWidget);
       expect(find.text('Reading'), findsOneWidget);
