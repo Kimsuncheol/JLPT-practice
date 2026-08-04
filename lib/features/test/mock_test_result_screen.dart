@@ -8,7 +8,9 @@ import 'package:jlpt_practice/data/models/mock_test.dart';
 import 'package:jlpt_practice/shared/rewarded_xp_card.dart';
 
 class MockTestResultScreen extends ConsumerStatefulWidget {
-  const MockTestResultScreen({super.key});
+  const MockTestResultScreen({super.key, required this.retryPath});
+
+  final String retryPath;
 
   @override
   ConsumerState<MockTestResultScreen> createState() =>
@@ -19,9 +21,11 @@ class _MockTestResultScreenState extends ConsumerState<MockTestResultScreen> {
   bool _sessionRecorded = false;
 
   String _sectionLabel(BuildContext context, TestSectionType type) =>
-      type == TestSectionType.vocabulary
-      ? context.strings('sectionVocabulary')
-      : context.strings('grammar');
+      switch (type) {
+        TestSectionType.vocabulary => context.strings('sectionVocabulary'),
+        TestSectionType.grammar => context.strings('grammar'),
+        TestSectionType.reading => context.strings('sectionReading'),
+      };
 
   @override
   Widget build(BuildContext context) {
@@ -159,7 +163,7 @@ class _MockTestResultScreenState extends ConsumerState<MockTestResultScreen> {
                     ),
                     const SizedBox(height: 26),
                     FilledButton.icon(
-                      onPressed: () => context.go('/test/n5'),
+                      onPressed: () => context.go(widget.retryPath),
                       icon: const Icon(Icons.replay_rounded),
                       label: Text(context.strings('retry')),
                       style: FilledButton.styleFrom(

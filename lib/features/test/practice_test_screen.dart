@@ -4,59 +4,44 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
-import 'package:jlpt_practice/core/ads/ad_service.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
-import 'package:jlpt_practice/data/models/app_state.dart';
-import 'package:jlpt_practice/data/models/grammar_point.dart';
+import 'package:jlpt_practice/data/models/jlpt_test_schedule.dart';
 import 'package:jlpt_practice/data/models/mock_test.dart';
+import 'package:jlpt_practice/data/models/mock_test_problem.dart';
 import 'package:jlpt_practice/data/models/quiz.dart';
-import 'package:jlpt_practice/features/grammar/grammar_providers.dart';
 import 'package:jlpt_practice/features/test/mock_test_providers.dart';
 
-const _kN5Level = 'N5';
-const _kSectionCount = 10;
+TestSectionType _sectionType(ProblemSection section) => switch (section) {
+  ProblemSection.vocabulary => TestSectionType.vocabulary,
+  ProblemSection.grammar => TestSectionType.grammar,
+  ProblemSection.reading => TestSectionType.reading,
+};
 
-class _TestItem {
-  const _TestItem({
-    required this.type,
-    required this.id,
-    required this.prompt,
-    required this.subPrompt,
-    required this.choices,
-    required this.correctAnswer,
-    required this.hint,
-    required this.feedbackLine,
-    required this.feedbackDetail,
+class PracticeTestScreen extends ConsumerStatefulWidget {
+  const PracticeTestScreen({
+    super.key,
+    required this.level,
+    required this.scheduleId,
+    required this.section,
   });
 
-  final TestSectionType type;
-  final String id;
-  final String prompt;
-  final String subPrompt;
-  final List<String> choices;
-  final String correctAnswer;
-  final String hint;
-  final String feedbackLine;
-  final String feedbackDetail;
-}
-
-class MockTestScreen extends ConsumerStatefulWidget {
-  const MockTestScreen({super.key});
+  final String level;
+  final String scheduleId;
+  final ProblemSection section;
 
   @override
-  ConsumerState<MockTestScreen> createState() => _MockTestScreenState();
+  ConsumerState<PracticeTestScreen> createState() =>
+      _PracticeTestScreenState();
 }
 
-class _MockTestScreenState extends ConsumerState<MockTestScreen> {
-  List<QuizQuestion>? _vocabularyQuestions;
-  List<_TestItem>? _items;
+class _PracticeTestScreenState extends ConsumerState<PracticeTestScreen> {
   int _index = 0;
   String? _selected;
   bool _answered = false;
-  bool _hintRevealed = false;
   final List<String> _incorrectIds = [];
   late final DateTime _startedAt = DateTime.now();
   Timer? _autoAdvanceTimer;
+  List<QuizQuestion> _vocabularyQuestions = const [];
 
   @override
   void dispose() {
@@ -64,79 +49,21 @@ class _MockTestScreenState extends ConsumerState<MockTestScreen> {
     super.dispose();
   }
 
-  void _buildItems(AppState state, List<GrammarPoint> grammarPoints) {
-    if (_items != null) return;
-    final repository = ref.read(mockTestRepositoryProvider);
-    _vocabularyQuestions = repository.buildVocabularySection(
-      state.vocabulary,
-      level: _kN5Level,
-      count: _kSectionCount,
-    );
-    final grammarQuestions = repository.buildGrammarSection(
-      grammarPoints,
-      level: _kN5Level,
-      language: state.meaningLanguage,
-      count: _kSectionCount,
-    );
-    _items = [
-      ..._vocabularyQuestions!.map(
-        (question) => _TestItem(
-          type: TestSectionType.vocabulary,
-          id: question.vocabulary.id,
-          prompt: question.vocabulary.example.quizSentence,
-          subPrompt: question.vocabulary.example.translation(
-            state.meaningLanguage,
-          ),
-          choices: question.choices,
-          correctAnswer: question.correctAnswer,
-          hint:
-              '${question.vocabulary.reading} · ${question.vocabulary.meaning(state.meaningLanguage)}',
-          feedbackLine:
-              '${question.vocabulary.reading} · ${question.vocabulary.meaning(state.meaningLanguage)}',
-          feedbackDetail: question.vocabulary.example.sentence,
-        ),
-      ),
-      ...grammarQuestions.map(
-        (question) => _TestItem(
-          type: TestSectionType.grammar,
-          id: question.grammarPoint.id,
-          prompt: question.grammarPoint.title,
-          subPrompt: question.grammarPoint.localizedFormation(
-            state.meaningLanguage,
-          ),
-          choices: question.choices,
-          correctAnswer: question.correctAnswer,
-          hint: question.grammarPoint.examples.isNotEmpty
-              ? question.grammarPoint.examples.first.japanese
-              : question.grammarPoint.localizedFormation(
-                  state.meaningLanguage,
-                ),
-          feedbackLine: question.grammarPoint.localizedFormation(
-            state.meaningLanguage,
-          ),
-          feedbackDetail: question.grammarPoint.localizedExplanation(
-            state.meaningLanguage,
-          ),
-        ),
-      ),
-    ];
-  }
-
-  Future<void> _advance() async {
+  Future<void> _advance(List<MockTestProblem> items) async {
     _autoAdvanceTimer?.cancel();
-    final items = _items!;
     if (_index < items.length - 1) {
       setState(() {
         _index++;
         _selected = null;
         _answered = false;
-        _hintRevealed = false;
       });
       return;
     }
     final sections = <MockTestSectionResult>[];
     for (final type in TestSectionType.values) {
-      final typeItems = items.where((item) => item.type == type).toList();
+      final typeItems = items
+          .where((item) => _sectionType(item.section) == type)
+          .toList();
       if (typeItems.isEmpty) continue;
       final ids = typeItems.map((item) => item.id).toSet();
       final sectionIncorrect = _incorrectIds
@@ -160,44 +87,83 @@ class _MockTestScreenState extends ConsumerState<MockTestScreen> {
         .read(appControllerProvider.notifier)
         .recordMockTestResult(
           result,
-          vocabularyQuestions: _vocabularyQuestions!,
+          vocabularyQuestions: _vocabularyQuestions,
         );
-    if (mounted) context.go('/test/n5/result');
+    if (mounted) {
+      context.go(
+        '/test/practice/${widget.level}/${widget.scheduleId}/'
+        '${sectionPathSegment(widget.section)}/result',
+      );
+    }
   }
+
+  String _sectionLabel(BuildContext context, ProblemSection section) =>
+      switch (section) {
+        ProblemSection.vocabulary => context.strings('sectionVocabulary'),
+        ProblemSection.grammar => context.strings('grammar'),
+        ProblemSection.reading => context.strings('sectionReading'),
+      };
+
+  String _instruction(BuildContext context, ProblemSection section) =>
+      switch (section) {
+        ProblemSection.vocabulary => context.strings('quizInstruction'),
+        ProblemSection.grammar => context.strings('grammarQuizInstruction'),
+        ProblemSection.reading => context.strings('readingQuizInstruction'),
+      };
 
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(appControllerProvider).requireValue;
-    final grammarAsync = ref.watch(grammarCatalogProvider);
-    return grammarAsync.when(
-      loading: () => const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      ),
+    final practiceSetAsync = ref.watch(
+      generatedPracticeSetProvider((
+        level: widget.level,
+        scheduleId: widget.scheduleId,
+      )),
+    );
+    final schedules = ref
+        .watch(jlptTestSchedulesForLevelProvider(widget.level))
+        .value;
+    JlptTestSchedule? schedule;
+    if (schedules != null) {
+      for (final candidate in schedules) {
+        if (candidate.id == widget.scheduleId) {
+          schedule = candidate;
+          break;
+        }
+      }
+    }
+    final examTitle =
+        schedule?.displayName ??
+        '${widget.level} ${context.strings('practiceTest')}';
+    return practiceSetAsync.when(
+      loading: () =>
+          const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (error, _) => Scaffold(
         appBar: AppBar(),
         body: Center(child: Text(error.toString())),
       ),
-      data: (grammarPoints) {
-        _buildItems(state, grammarPoints);
-        final items = _items!;
+      data: (practiceSet) {
+        final items = practiceSet.items
+            .where((item) => item.section == widget.section)
+            .toList(growable: false);
         if (items.isEmpty) {
           return Scaffold(
             appBar: AppBar(),
             body: Center(child: Text(context.strings('noResults'))),
           );
         }
+        _vocabularyQuestions = widget.section == ProblemSection.vocabulary
+            ? practiceSet.vocabularyQuestions
+            : const [];
         final item = items[_index];
         final isCorrect = _selected == item.correctAnswer;
-        final sectionLabel = item.type == TestSectionType.vocabulary
-            ? context.strings('sectionVocabulary')
-            : context.strings('grammar');
         return Scaffold(
           appBar: AppBar(
             leading: IconButton(
               onPressed: context.pop,
               icon: const Icon(Icons.close_rounded),
             ),
-            title: Text('${context.strings('n5Test')} · $sectionLabel'),
+            title: Text('$examTitle · ${_sectionLabel(context, item.section)}'),
           ),
           body: SafeArea(
             top: false,
@@ -229,9 +195,7 @@ class _MockTestScreenState extends ConsumerState<MockTestScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          item.type == TestSectionType.vocabulary
-                              ? context.strings('quizInstruction')
-                              : context.strings('grammarQuizInstruction'),
+                          _instruction(context, item.section),
                           style: TextStyle(
                             color: Theme.of(
                               context,
@@ -239,6 +203,22 @@ class _MockTestScreenState extends ConsumerState<MockTestScreen> {
                           ),
                         ),
                         const SizedBox(height: 20),
+                        if (item.passage.isNotEmpty)
+                          Container(
+                            width: double.infinity,
+                            margin: const EdgeInsets.only(bottom: 16),
+                            padding: const EdgeInsets.all(18),
+                            decoration: BoxDecoration(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.surfaceContainerHighest,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              item.passage,
+                              style: const TextStyle(height: 1.7),
+                            ),
+                          ),
                         Container(
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(
@@ -249,71 +229,35 @@ class _MockTestScreenState extends ConsumerState<MockTestScreen> {
                             color: Theme.of(context).colorScheme.surface,
                             borderRadius: BorderRadius.circular(28),
                           ),
-                          child: Column(
-                            children: [
-                              Text(
-                                item.prompt,
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  fontSize: 25,
-                                  height: 1.6,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              const SizedBox(height: 14),
-                              Text(
-                                item.subPrompt,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onSurfaceVariant,
-                                ),
-                              ),
-                            ],
+                          child: Text(
+                            item.question,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 22,
+                              height: 1.6,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 24),
-                        if (!_answered)
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: TextButton.icon(
-                              onPressed: () async {
-                                if (_hintRevealed) {
-                                  setState(() => _hintRevealed = false);
-                                  return;
-                                }
-                                if (AdService.enabled) {
-                                  final earned = await AdService.showRewarded();
-                                  if (earned && mounted) {
-                                    setState(() => _hintRevealed = true);
-                                  }
-                                } else {
-                                  setState(() => _hintRevealed = true);
-                                }
-                              },
-                              icon: Icon(
-                                _hintRevealed
-                                    ? Icons.lightbulb_rounded
-                                    : AdService.enabled
-                                    ? Icons.ondemand_video_rounded
-                                    : Icons.lightbulb_outline_rounded,
-                              ),
-                              label: Text(_hintRevealed ? 'Hide Hint' : 'Hint'),
-                            ),
-                          ),
-                        if (_hintRevealed && !_answered)
+                        if (_answered)
                           Container(
                             width: double.infinity,
                             margin: const EdgeInsets.only(bottom: 12),
                             padding: const EdgeInsets.all(14),
                             decoration: BoxDecoration(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.secondaryContainer,
+                              color: isCorrect
+                                  ? Theme.of(
+                                      context,
+                                    ).colorScheme.primaryContainer
+                                  : Theme.of(
+                                      context,
+                                    ).colorScheme.errorContainer,
                               borderRadius: BorderRadius.circular(16),
                             ),
-                            child: Text(item.hint),
+                            child: Text(
+                              item.localizedExplanation(state.meaningLanguage),
+                            ),
                           ),
                         ...item.choices.asMap().entries.map((entry) {
                           final choice = entry.value;
@@ -343,7 +287,7 @@ class _MockTestScreenState extends ConsumerState<MockTestScreen> {
                                       : Theme.of(context).colorScheme.surface),
                               borderRadius: BorderRadius.circular(19),
                               child: InkWell(
-                                key: ValueKey('mock_test_choice_${entry.key}'),
+                                key: ValueKey('practice_test_choice_${entry.key}'),
                                 onTap: _answered
                                     ? null
                                     : () {
@@ -356,8 +300,8 @@ class _MockTestScreenState extends ConsumerState<MockTestScreen> {
                                         });
                                         _autoAdvanceTimer?.cancel();
                                         _autoAdvanceTimer = Timer(
-                                          const Duration(milliseconds: 1400),
-                                          _advance,
+                                          const Duration(milliseconds: 2200),
+                                          () => _advance(items),
                                         );
                                       },
                                 borderRadius: BorderRadius.circular(19),
@@ -400,37 +344,6 @@ class _MockTestScreenState extends ConsumerState<MockTestScreen> {
                             ),
                           );
                         }),
-                        if (_answered)
-                          Container(
-                            width: double.infinity,
-                            margin: const EdgeInsets.only(top: 6),
-                            padding: const EdgeInsets.all(18),
-                            decoration: BoxDecoration(
-                              color: isCorrect
-                                  ? Theme.of(
-                                      context,
-                                    ).colorScheme.primaryContainer
-                                  : Theme.of(
-                                      context,
-                                    ).colorScheme.errorContainer,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  isCorrect
-                                      ? context.strings('correct')
-                                      : context.strings('incorrect'),
-                                  style: Theme.of(context).textTheme.titleMedium,
-                                ),
-                                const SizedBox(height: 6),
-                                Text(item.feedbackLine),
-                                const SizedBox(height: 6),
-                                Text(item.feedbackDetail),
-                              ],
-                            ),
-                          ),
                       ],
                     ),
                   ),

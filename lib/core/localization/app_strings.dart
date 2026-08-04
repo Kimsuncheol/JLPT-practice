@@ -160,8 +160,6 @@ class AppStrings {
     'totalXp': 'Total XP',
     'earnBonusXp': 'Earn bonus XP',
     'xpEarned': 'XP earned',
-    'n5MockTest': 'N5 Mock Test',
-    'n5MockTestSubtitle': 'Vocabulary & grammar practice test',
     'n5Test': 'Test',
     'sectionVocabulary': 'Vocabulary',
     'grammarQuizInstruction':
@@ -171,12 +169,12 @@ class AppStrings {
     'lowVolumeTitle': 'Volume is too low',
     'lowVolumeBody':
         'Turn up your device volume or unmute it to hear the pronunciation.',
-    'chooseExam': 'Choose an exam',
-    'vocabularyTest': 'Vocabulary test',
-    'listeningTest': 'Listening test',
-    'listeningTestSubtitle': 'Practice understanding spoken Japanese',
-    'listeningInstruction': 'Listen to the audio, then choose its meaning.',
-    'tapToListen': 'Tap to listen',
+    'sectionReading': 'Reading',
+    'practiceTest': 'Practice test',
+    'readingQuizInstruction': 'Read the passage, then choose the best answer.',
+    'showExplanation': 'Show explanation',
+    'hideExplanation': 'Hide explanation',
+    'chooseQuestionType': 'Choose a question type',
   };
 
   static const _ko = <String, String>{
@@ -329,8 +327,6 @@ class AppStrings {
     'totalXp': '총 XP',
     'earnBonusXp': '보너스 XP 받기',
     'xpEarned': 'XP 획득',
-    'n5MockTest': 'N5 모의고사',
-    'n5MockTestSubtitle': '어휘 & 문법 연습 테스트',
     'n5Test': '테스트',
     'sectionVocabulary': '어휘',
     'grammarQuizInstruction': '문법 항목에 맞는 뜻을 고르세요.',
@@ -338,12 +334,12 @@ class AppStrings {
     'sectionResults': '섹션별 결과',
     'lowVolumeTitle': '볼륨이 너무 낮습니다',
     'lowVolumeBody': '발음을 들으려면 기기 볼륨을 높이거나 음소거를 해제하세요.',
-    'chooseExam': '시험 선택',
-    'vocabularyTest': '어휘 테스트',
-    'listeningTest': '듣기 테스트',
-    'listeningTestSubtitle': '일본어 듣기 연습',
-    'listeningInstruction': '오디오를 듣고 뜻을 고르세요.',
-    'tapToListen': '눌러서 듣기',
+    'sectionReading': '독해',
+    'practiceTest': '실전 연습 테스트',
+    'readingQuizInstruction': '지문을 읽고 가장 알맞은 답을 고르세요.',
+    'showExplanation': '해설 보기',
+    'hideExplanation': '해설 숨기기',
+    'chooseQuestionType': '문제 유형 선택',
   };
 
   String call(String key) =>

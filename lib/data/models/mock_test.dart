@@ -1,6 +1,6 @@
 import 'package:jlpt_practice/data/models/grammar_point.dart';
 
-enum TestSectionType { vocabulary, grammar }
+enum TestSectionType { vocabulary, grammar, reading }
 
 class GrammarQuestion {
   const GrammarQuestion({
