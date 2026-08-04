@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/features/chat/tutor_chat_screen.dart';
 import 'package:jlpt_practice/features/dashboard/dashboard_screen.dart';
 import 'package:jlpt_practice/features/settings/settings_screen.dart';
 import 'package:jlpt_practice/features/statistics/statistics_screen.dart';
-import 'package:jlpt_practice/features/test/level_practice_test_screen.dart';
 
 class HomeShell extends StatefulWidget {
   const HomeShell({super.key});
@@ -21,7 +18,6 @@ class _HomeShellState extends State<HomeShell> {
   static const _screens = [
     DashboardScreen(),
     TutorChatScreen(),
-    _TestTab(),
     StatisticsScreen(),
     SettingsScreen(),
   ];
@@ -46,11 +42,6 @@ class _HomeShellState extends State<HomeShell> {
             label: strings('tutor'),
           ),
           NavigationDestination(
-            icon: const Icon(Icons.fact_check_outlined),
-            selectedIcon: const Icon(Icons.fact_check_rounded),
-            label: strings('n5Test'),
-          ),
-          NavigationDestination(
             icon: const Icon(Icons.bar_chart_outlined),
             selectedIcon: const Icon(Icons.bar_chart_rounded),
             label: strings('progress'),
@@ -62,16 +53,5 @@ class _HomeShellState extends State<HomeShell> {
         ],
       ),
     );
-  }
-}
-
-class _TestTab extends ConsumerWidget {
-  const _TestTab();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final level =
-        ref.watch(appControllerProvider).value?.selectedLevel ?? 'N5';
-    return LevelPracticeTestScreen(level: level);
   }
 }

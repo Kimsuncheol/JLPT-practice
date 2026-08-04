@@ -4,8 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/app/theme/app_theme.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
-import 'package:jlpt_practice/core/utils/study_batches.dart';
-import 'package:jlpt_practice/data/models/vocabulary.dart';
 import 'package:jlpt_practice/features/dashboard/dashboard_skeleton.dart';
 import 'package:jlpt_practice/shared/rewarded_xp_card.dart';
 
@@ -21,20 +19,6 @@ class DashboardScreen extends ConsumerWidget {
         error: (error, _) => Center(child: Text(error.toString())),
         data: (state) {
           final strings = context.strings;
-          final studySession = state.studySessions[state.selectedLevel];
-          final resumeWords =
-              studySession != null &&
-                  studySession.isCompatible(
-                    level: state.selectedLevel,
-                    dailyGoal: state.dailyGoal,
-                  )
-              ? StudyBatches.wordsForDay(
-                  state.selectedVocabulary,
-                  day: studySession.day,
-                  dailyGoal: state.dailyGoal,
-                )
-              : const <Vocabulary>[];
-          final canResume = studySession != null && resumeWords.isNotEmpty;
           return Column(
             children: [
               Expanded(
@@ -165,39 +149,32 @@ class DashboardScreen extends ConsumerWidget {
                           color: Theme.of(
                             context,
                           ).colorScheme.secondaryContainer,
-                          icon: canResume
-                              ? Icons.play_circle_fill_rounded
-                              : Icons.style_rounded,
-                          title: canResume
-                              ? strings('resumeLearning')
-                              : strings('startStudy'),
-                          onTap: () => canResume
-                              ? context.push('/study/day/${studySession.day}')
-                              : context.push('/study'),
+                          icon: Icons.menu_book_rounded,
+                          title: strings('study'),
+                          onTap: () => context.push('/study/choose'),
                         ),
                         _GridActionTile(
                           color: Theme.of(
                             context,
                           ).colorScheme.tertiaryContainer,
-                          icon: Icons.auto_stories_rounded,
-                          title: strings('studyGrammar'),
-                          onTap: () => context.push('/grammar'),
+                          icon: Icons.fact_check_rounded,
+                          title: strings('n5Test'),
+                          onTap: () => context.push(
+                            '/test/practice/${state.selectedLevel}',
+                          ),
                         ),
                         _GridActionTile(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.primaryContainer,
+                          color: Theme.of(context).colorScheme.primaryContainer,
                           icon: Icons.grid_view_rounded,
                           title: strings('kanaChart'),
                           onTap: () => context.push('/kana'),
                         ),
                         _GridActionTile(
                           color: Color.alphaBlend(
-                            Theme.of(
-                              context,
-                            ).extension<AppColors>()!.warning.withValues(
-                              alpha: 0.35,
-                            ),
+                            Theme.of(context)
+                                .extension<AppColors>()!
+                                .warning
+                                .withValues(alpha: 0.35),
                             Theme.of(context).colorScheme.surface,
                           ),
                           icon: Icons.replay_circle_filled_rounded,

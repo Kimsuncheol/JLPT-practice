@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:jlpt_practice/features/dashboard/choose_study_screen.dart';
 import 'package:jlpt_practice/features/dashboard/home_shell.dart';
 import 'package:jlpt_practice/features/chat/tutor_chat_screen.dart';
 import 'package:jlpt_practice/features/grammar/grammar_detail_screen.dart';
@@ -32,6 +33,10 @@ GoRouter createAppRouter({String initialLocation = '/'}) => GoRouter(
       builder: (_, _) => const LanguagesScreen(),
     ),
     GoRoute(path: '/settings/levels', builder: (_, _) => const LevelsScreen()),
+    GoRoute(
+      path: '/study/choose',
+      builder: (_, _) => const ChooseStudyScreen(),
+    ),
     GoRoute(path: '/study', builder: (_, _) => const DaySelectionScreen()),
     GoRoute(
       path: '/study/day/:day',
@@ -60,9 +65,8 @@ GoRouter createAppRouter({String initialLocation = '/'}) => GoRouter(
     GoRoute(path: '/quiz/result', builder: (_, _) => const QuizResultScreen()),
     GoRoute(
       path: '/test/practice/:level',
-      builder: (_, state) => LevelPracticeTestScreen(
-        level: state.pathParameters['level'] ?? 'N5',
-      ),
+      builder: (_, state) =>
+          LevelPracticeTestScreen(level: state.pathParameters['level'] ?? 'N5'),
     ),
     GoRoute(
       path: '/test/practice/:level/:scheduleId',

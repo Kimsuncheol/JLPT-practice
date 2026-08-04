@@ -7,6 +7,7 @@ import 'package:jlpt_practice/app/theme/app_theme.dart';
 import 'package:jlpt_practice/data/models/app_state.dart';
 import 'package:jlpt_practice/data/models/study_session.dart';
 import 'package:jlpt_practice/data/models/vocabulary.dart';
+import 'package:jlpt_practice/features/dashboard/choose_study_screen.dart';
 import 'package:jlpt_practice/features/dashboard/dashboard_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/study_finish_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/study_screen.dart';
@@ -91,10 +92,12 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Resume learning'), findsOneWidget);
-
       await tester.drag(find.byType(ListView), const Offset(0, -300));
       await tester.pumpAndSettle();
+      await tester.tap(find.text('Study'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Resume learning'), findsOneWidget);
       await tester.tap(find.text('Resume learning'));
       await tester.pumpAndSettle();
 
@@ -181,6 +184,10 @@ GoRouter _createRouter({String initialLocation = '/'}) => GoRouter(
     GoRoute(
       path: '/',
       builder: (_, _) => const Scaffold(body: DashboardScreen()),
+    ),
+    GoRoute(
+      path: '/study/choose',
+      builder: (_, _) => const ChooseStudyScreen(),
     ),
     GoRoute(
       path: '/study',
