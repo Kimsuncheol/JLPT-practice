@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
-import 'package:jlpt_practice/features/chat/tutor_chat_screen.dart';
 import 'package:jlpt_practice/features/dashboard/dashboard_screen.dart';
+import 'package:jlpt_practice/features/review/review_screen.dart';
 import 'package:jlpt_practice/features/settings/settings_screen.dart';
 import 'package:jlpt_practice/features/statistics/statistics_screen.dart';
 
@@ -17,7 +17,7 @@ class _HomeShellState extends State<HomeShell> {
 
   static const _screens = [
     DashboardScreen(),
-    TutorChatScreen(),
+    ReviewScreen(),
     StatisticsScreen(),
     SettingsScreen(),
   ];
@@ -37,9 +37,9 @@ class _HomeShellState extends State<HomeShell> {
             label: strings('home'),
           ),
           NavigationDestination(
-            icon: const Icon(Icons.forum_outlined),
-            selectedIcon: const Icon(Icons.forum_rounded),
-            label: strings('tutor'),
+            icon: const Icon(Icons.replay_circle_filled_outlined),
+            selectedIcon: const Icon(Icons.replay_circle_filled_rounded),
+            label: strings('review'),
           ),
           NavigationDestination(
             icon: const Icon(Icons.bar_chart_outlined),
