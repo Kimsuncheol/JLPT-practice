@@ -18,6 +18,9 @@ class AppState {
     required this.autoPlayAudio,
     required this.themeMode,
     required this.notificationsEnabled,
+    this.reminderHour = 20,
+    this.reminderMinute = 0,
+    this.timeZone = 'UTC',
     required this.studySeconds,
     required this.quizAnswered,
     required this.quizCorrect,
@@ -40,6 +43,9 @@ class AppState {
   final bool autoPlayAudio;
   final ThemeMode themeMode;
   final bool notificationsEnabled;
+  final int reminderHour;
+  final int reminderMinute;
+  final String timeZone;
   final int studySeconds;
   final int quizAnswered;
   final int quizCorrect;
@@ -89,6 +95,9 @@ class AppState {
     bool? autoPlayAudio,
     ThemeMode? themeMode,
     bool? notificationsEnabled,
+    int? reminderHour,
+    int? reminderMinute,
+    String? timeZone,
     int? studySeconds,
     int? quizAnswered,
     int? quizCorrect,
@@ -111,6 +120,9 @@ class AppState {
       autoPlayAudio: autoPlayAudio ?? this.autoPlayAudio,
       themeMode: themeMode ?? this.themeMode,
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
+      reminderHour: reminderHour ?? this.reminderHour,
+      reminderMinute: reminderMinute ?? this.reminderMinute,
+      timeZone: timeZone ?? this.timeZone,
       studySeconds: studySeconds ?? this.studySeconds,
       quizAnswered: quizAnswered ?? this.quizAnswered,
       quizCorrect: quizCorrect ?? this.quizCorrect,

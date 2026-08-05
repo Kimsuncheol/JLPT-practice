@@ -134,6 +134,9 @@ class AppStrings {
     'dark': 'Dark',
     'showFurigana': 'Show furigana',
     'notifications': 'Daily reminder',
+    'reminderTime': 'Reminder time',
+    'notificationPermissionDenied':
+        'Notifications are disabled. Allow them in system settings to use reminders.',
     'privacy': 'Privacy & consent',
     'attribution': 'Data attribution',
     'resetProgress': 'Reset learning progress',
@@ -311,6 +314,8 @@ class AppStrings {
     'dark': '다크',
     'showFurigana': '후리가나 표시',
     'notifications': '매일 알림',
+    'reminderTime': '알림 시간',
+    'notificationPermissionDenied': '알림이 허용되지 않았습니다. 기기 설정에서 알림을 허용해 주세요.',
     'privacy': '개인정보 및 동의',
     'attribution': '데이터 출처',
     'resetProgress': '학습 기록 초기화',

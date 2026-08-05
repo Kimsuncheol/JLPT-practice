@@ -30,6 +30,10 @@ class CloudSyncService {
       'autoPlayAudio': state.autoPlayAudio,
       'themeMode': state.themeMode.name,
       'notificationsEnabled': state.notificationsEnabled,
+      'reminderHour': state.reminderHour,
+      'reminderMinute': state.reminderMinute,
+      'timezone': state.timeZone,
+      'locale': state.meaningLanguage,
       'updatedAt': FieldValue.serverTimestamp(),
     }, SetOptions(merge: true));
   }

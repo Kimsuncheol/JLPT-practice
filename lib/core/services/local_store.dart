@@ -16,6 +16,8 @@ class LocalSettings {
     required this.autoPlayAudio,
     required this.themeMode,
     required this.notificationsEnabled,
+    required this.reminderHour,
+    required this.reminderMinute,
     required this.studySeconds,
     required this.quizAnswered,
     required this.quizCorrect,
@@ -33,6 +35,8 @@ class LocalSettings {
   final bool autoPlayAudio;
   final ThemeMode themeMode;
   final bool notificationsEnabled;
+  final int reminderHour;
+  final int reminderMinute;
   final int studySeconds;
   final int quizAnswered;
   final int quizCorrect;
@@ -66,7 +70,9 @@ class LocalStore {
         orElse: () => ThemeMode.system,
       ),
       notificationsEnabled:
-          _preferences.getBool('notificationsEnabled') ?? true,
+          _preferences.getBool('notificationsEnabled') ?? false,
+      reminderHour: _preferences.getInt('reminderHour') ?? 20,
+      reminderMinute: _preferences.getInt('reminderMinute') ?? 0,
       studySeconds: _preferences.getInt('studySeconds') ?? 0,
       quizAnswered: _preferences.getInt('quizAnswered') ?? 0,
       quizCorrect: _preferences.getInt('quizCorrect') ?? 0,

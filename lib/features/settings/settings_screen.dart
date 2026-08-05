@@ -99,8 +99,50 @@ class SettingsScreen extends ConsumerWidget {
                   SwitchListTile(
                     secondary: const Icon(Icons.notifications_active_outlined),
                     title: Text(strings('notifications')),
+                    subtitle: Text(
+                      TimeOfDay(
+                        hour: state.reminderHour,
+                        minute: state.reminderMinute,
+                      ).format(context),
+                    ),
                     value: state.notificationsEnabled,
-                    onChanged: controller.setNotifications,
+                    onChanged: (value) async {
+                      final enabled = await controller.setNotifications(value);
+                      if (context.mounted && value && !enabled) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              strings('notificationPermissionDenied'),
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                  ListTile(
+                    enabled: state.notificationsEnabled,
+                    leading: const Icon(Icons.schedule_rounded),
+                    title: Text(strings('reminderTime')),
+                    trailing: Text(
+                      TimeOfDay(
+                        hour: state.reminderHour,
+                        minute: state.reminderMinute,
+                      ).format(context),
+                    ),
+                    onTap: state.notificationsEnabled
+                        ? () async {
+                            final selected = await showTimePicker(
+                              context: context,
+                              initialTime: TimeOfDay(
+                                hour: state.reminderHour,
+                                minute: state.reminderMinute,
+                              ),
+                            );
+                            if (selected != null) {
+                              await controller.setReminderTime(selected);
+                            }
+                          }
+                        : null,
                   ),
                 ],
               ),

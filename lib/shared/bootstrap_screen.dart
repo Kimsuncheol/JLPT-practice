@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/app/theme/app_theme.dart';
+import 'package:jlpt_practice/core/services/notification_service.dart';
 
 class BootstrapScreen extends ConsumerStatefulWidget {
   const BootstrapScreen({super.key});
@@ -39,7 +40,8 @@ class _BootstrapScreenState extends ConsumerState<BootstrapScreen> {
   void _continueIfReady() {
     final onboardingComplete = _onboardingComplete;
     if (!mounted || !_minimumTimeElapsed || onboardingComplete == null) return;
-    context.go(onboardingComplete ? '/home' : '/onboarding');
+    final initialRoute = NotificationService.instance.takeInitialRoute();
+    context.go(onboardingComplete ? initialRoute ?? '/home' : '/onboarding');
   }
 
   @override

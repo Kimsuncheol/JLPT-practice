@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:jlpt_practice/core/services/cloud_sync_service.dart';
 import 'package:jlpt_practice/core/services/local_store.dart';
+import 'package:jlpt_practice/core/services/notification_service.dart';
 import 'package:jlpt_practice/core/services/srs_scheduler.dart';
 import 'package:jlpt_practice/core/services/tts_service.dart';
 import 'package:jlpt_practice/data/models/app_state.dart';
@@ -42,6 +43,20 @@ class AppController extends AsyncNotifier<AppState> {
     final language = ui.PlatformDispatcher.instance.locale.languageCode;
     final settings = _store.loadSettings(language);
     final vocabulary = await ref.read(vocabularyRepositoryProvider).load();
+    var notificationsEnabled = settings.notificationsEnabled;
+    if (notificationsEnabled) {
+      notificationsEnabled = await NotificationService.instance.hasPermission();
+      if (notificationsEnabled) {
+        await NotificationService.instance.scheduleDailyReminder(
+          hour: settings.reminderHour,
+          minute: settings.reminderMinute,
+          languageCode: settings.meaningLanguage,
+        );
+        unawaited(NotificationService.instance.setRemoteEnabled(true));
+      } else {
+        await _store.setValue('notificationsEnabled', false);
+      }
+    }
     return AppState(
       vocabulary: vocabulary,
       progress: _store.loadProgress(),
@@ -53,7 +68,10 @@ class AppController extends AsyncNotifier<AppState> {
       showFurigana: settings.showFurigana,
       autoPlayAudio: settings.autoPlayAudio,
       themeMode: settings.themeMode,
-      notificationsEnabled: settings.notificationsEnabled,
+      notificationsEnabled: notificationsEnabled,
+      reminderHour: settings.reminderHour,
+      reminderMinute: settings.reminderMinute,
+      timeZone: NotificationService.instance.timeZoneId,
       studySeconds: settings.studySeconds,
       quizAnswered: settings.quizAnswered,
       quizCorrect: settings.quizCorrect,
@@ -244,6 +262,13 @@ class AppController extends AsyncNotifier<AppState> {
       _store.setValue('languageCode', value),
       _store.setValue('meaningLanguage', resolved),
     ]);
+    if (next.notificationsEnabled) {
+      await NotificationService.instance.scheduleDailyReminder(
+        hour: next.reminderHour,
+        minute: next.reminderMinute,
+        languageCode: resolved,
+      );
+    }
     unawaited(ref.read(cloudSyncProvider).syncProfile(next));
   }
 
@@ -257,10 +282,42 @@ class AppController extends AsyncNotifier<AppState> {
         return current.copyWith(autoPlayAudio: value);
       });
 
-  Future<void> setNotifications(bool value) =>
-      _updatePreference('notificationsEnabled', value, (current) {
-        return current.copyWith(notificationsEnabled: value);
-      });
+  Future<bool> setNotifications(bool value) async {
+    var enabled = value;
+    if (value) {
+      enabled = await NotificationService.instance.enableDailyReminder(
+        hour: _value.reminderHour,
+        minute: _value.reminderMinute,
+        languageCode: _value.meaningLanguage,
+      );
+    } else {
+      await NotificationService.instance.disableNotifications();
+    }
+    await _updatePreference('notificationsEnabled', enabled, (current) {
+      return current.copyWith(notificationsEnabled: enabled);
+    });
+    return enabled;
+  }
+
+  Future<void> setReminderTime(TimeOfDay value) async {
+    final next = _value.copyWith(
+      reminderHour: value.hour,
+      reminderMinute: value.minute,
+    );
+    state = AsyncData(next);
+    await Future.wait([
+      _store.setValue('reminderHour', value.hour),
+      _store.setValue('reminderMinute', value.minute),
+    ]);
+    if (next.notificationsEnabled) {
+      await NotificationService.instance.scheduleDailyReminder(
+        hour: value.hour,
+        minute: value.minute,
+        languageCode: next.meaningLanguage,
+      );
+    }
+    unawaited(ref.read(cloudSyncProvider).syncProfile(next));
+  }
 
   Future<void> setThemeMode(ThemeMode value) =>
       _updatePreference('themeMode', value.name, (current) {
