@@ -166,7 +166,7 @@ class DashboardScreen extends ConsumerWidget {
                         _GridActionTile(
                           color: Theme.of(context).colorScheme.primaryContainer,
                           icon: Icons.grid_view_rounded,
-                          title: strings('kanaChart'),
+                          title: strings('kanaChartTile'),
                           onTap: () => context.push('/kana'),
                         ),
                         _GridActionTile(
