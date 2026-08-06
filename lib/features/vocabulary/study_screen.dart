@@ -224,18 +224,8 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
   Future<void> _speakIfAudible(String text) async {
     if (await isSystemVolumeTooLow()) {
       if (!mounted) return;
-      await showDialog<void>(
-        context: context,
-        builder: (dialogContext) => AlertDialog(
-          title: Text(dialogContext.strings('lowVolumeTitle')),
-          content: Text(dialogContext.strings('lowVolumeBody')),
-          actions: [
-            FilledButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: Text(dialogContext.strings('continue')),
-            ),
-          ],
-        ),
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.strings('lowVolumeBody'))),
       );
       return;
     }
