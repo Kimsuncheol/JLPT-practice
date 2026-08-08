@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:jlpt_practice/data/models/grammar_progress.dart';
 import 'package:jlpt_practice/data/models/review_progress.dart';
 import 'package:jlpt_practice/data/models/study_session.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -116,6 +117,24 @@ class LocalStore {
     }
   }
 
+  Map<String, GrammarProgress> loadGrammarProgress() {
+    final raw = _preferences.getString('grammarProgress');
+    if (raw == null) return {};
+    try {
+      final decoded = jsonDecode(raw) as Map<String, dynamic>;
+      return decoded.map(
+        (key, value) => MapEntry(
+          key,
+          GrammarProgress.fromJson(value as Map<String, dynamic>),
+        ),
+      );
+    } on FormatException {
+      return {};
+    } on TypeError {
+      return {};
+    }
+  }
+
   Future<void> saveProgress(Map<String, ReviewProgress> progress) =>
       _preferences.setString(
         'progress',
@@ -126,6 +145,12 @@ class LocalStore {
       _preferences.setString(
         'studySessions',
         jsonEncode(sessions.map((key, value) => MapEntry(key, value.toJson()))),
+      );
+
+  Future<void> saveGrammarProgress(Map<String, GrammarProgress> progress) =>
+      _preferences.setString(
+        'grammarProgress',
+        jsonEncode(progress.map((key, value) => MapEntry(key, value.toJson()))),
       );
 
   Future<void> setValue(String key, Object value) async {
@@ -154,6 +179,7 @@ class LocalStore {
       _preferences.remove('longestStreak'),
       _preferences.remove('totalXp'),
       _preferences.remove('studySessions'),
+      _preferences.remove('grammarProgress'),
     ]);
   }
 }

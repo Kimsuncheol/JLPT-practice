@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/data/models/grammar_point.dart';
 import 'package:jlpt_practice/features/grammar/grammar_providers.dart';
@@ -56,6 +57,12 @@ class _GrammarDetails extends StatelessWidget {
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
+          ),
+          const SizedBox(height: 18),
+          FilledButton.icon(
+            onPressed: () => context.push('/grammar/tutor/${grammar.id}'),
+            icon: const Icon(Icons.auto_awesome),
+            label: Text(context.strings('practiceWithAi')),
           ),
           const SizedBox(height: 24),
           _DetailSection(

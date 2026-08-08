@@ -4,6 +4,8 @@ import 'package:jlpt_practice/features/dashboard/home_shell.dart';
 import 'package:jlpt_practice/features/chat/tutor_chat_screen.dart';
 import 'package:jlpt_practice/features/grammar/grammar_detail_screen.dart';
 import 'package:jlpt_practice/features/grammar/grammar_list_screen.dart';
+import 'package:jlpt_practice/features/grammar/grammar_part_tutor_screen.dart';
+import 'package:jlpt_practice/features/grammar/grammar_tutor_screen.dart';
 import 'package:jlpt_practice/features/kana/kana_chart_screen.dart';
 import 'package:jlpt_practice/features/onboarding/onboarding_screen.dart';
 import 'package:jlpt_practice/features/quiz/quiz_result_screen.dart';
@@ -55,6 +57,18 @@ GoRouter createAppRouter({String initialLocation = '/'}) => GoRouter(
       path: '/grammar/detail/:id',
       builder: (_, state) =>
           GrammarDetailScreen(grammarId: state.pathParameters['id'] ?? ''),
+    ),
+    GoRoute(
+      path: '/grammar/tutor/:id',
+      builder: (_, state) =>
+          GrammarTutorScreen(grammarId: state.pathParameters['id'] ?? ''),
+    ),
+    GoRoute(
+      path: '/grammar/part/:level/:part',
+      builder: (_, state) => GrammarPartTutorScreen(
+        level: state.pathParameters['level'] ?? 'N5',
+        part: int.tryParse(state.pathParameters['part'] ?? '') ?? 1,
+      ),
     ),
     GoRoute(path: '/quiz', builder: (_, _) => const QuizScreen()),
     GoRoute(

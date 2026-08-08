@@ -56,14 +56,19 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.byType(ExpansionTile), findsNothing);
-    expect(find.byIcon(Icons.expand_more), findsNothing);
+    expect(find.byType(ExpansionTile), findsOneWidget);
+    expect(find.textContaining('Part 1'), findsOneWidget);
     await tester.tap(find.text(_n5.title));
     await tester.pumpAndSettle();
 
     expect(find.text(_n5.explanation), findsOneWidget);
     expect(find.text(_n5.formation), findsOneWidget);
     for (final example in _n5.examples) {
+      await tester.scrollUntilVisible(
+        find.textContaining(example.japanese),
+        200,
+        scrollable: find.byType(Scrollable).last,
+      );
       expect(find.textContaining(example.japanese), findsOneWidget);
       expect(find.text(example.english), findsOneWidget);
     }
@@ -94,6 +99,11 @@ void main() {
     expect(find.text(_n5.explanationKo), findsOneWidget);
     expect(find.text(_n5.formationKo), findsOneWidget);
     for (final example in _n5.examples) {
+      await tester.scrollUntilVisible(
+        find.text(example.korean),
+        200,
+        scrollable: find.byType(Scrollable).last,
+      );
       expect(find.text(example.korean), findsOneWidget);
     }
     expect(find.text(_n5.explanation), findsNothing);

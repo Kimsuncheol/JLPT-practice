@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jlpt_practice/core/services/local_store.dart';
 import 'package:jlpt_practice/data/models/study_session.dart';
+import 'package:jlpt_practice/data/models/grammar_progress.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -52,4 +53,31 @@ void main() {
 
     expect(store.loadStudySessions(), isEmpty);
   });
+
+  test(
+    'persists grammar mastery separately from vocabulary progress',
+    () async {
+      SharedPreferences.setMockInitialValues({});
+      final store = await LocalStore.create();
+      final now = DateTime.utc(2026, 8, 8);
+      final progress = GrammarProgress(
+        grammarId: 'N5_1',
+        attempts: 3,
+        correctAnswers: 2,
+        productionScore: 1,
+        lastMistake: 'Particle choice',
+        lastPractisedAt: now,
+        nextReviewAt: now.add(const Duration(days: 3)),
+      );
+
+      await store.saveGrammarProgress({'N5_1': progress});
+      final restored = (await LocalStore.create())
+          .loadGrammarProgress()['N5_1'];
+
+      expect(restored, isNotNull);
+      expect(restored!.correctAnswers, 2);
+      expect(restored.productionScore, 1);
+      expect(restored.lastMistake, 'Particle choice');
+    },
+  );
 }
