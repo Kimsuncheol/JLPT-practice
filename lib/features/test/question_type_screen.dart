@@ -1,41 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
-import 'package:jlpt_practice/data/models/jlpt_test_schedule.dart';
 import 'package:jlpt_practice/data/models/mock_test_problem.dart';
-import 'package:jlpt_practice/features/test/mock_test_providers.dart';
 
-class QuestionTypeScreen extends ConsumerWidget {
-  const QuestionTypeScreen({
-    super.key,
-    required this.level,
-    required this.scheduleId,
-  });
+class QuestionTypeScreen extends StatelessWidget {
+  const QuestionTypeScreen({super.key, required this.level});
 
   final String level;
-  final String scheduleId;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final strings = context.strings;
-    final schedules = ref.watch(jlptTestSchedulesForLevelProvider(level)).value;
-    JlptTestSchedule? schedule;
-    if (schedules != null) {
-      for (final candidate in schedules) {
-        if (candidate.id == scheduleId) {
-          schedule = candidate;
-          break;
-        }
-      }
-    }
-    final title = schedule != null
-        ? '${schedule.level} · ${schedule.session} ${schedule.year}'
-        : '$level ${strings('practiceTest')}';
-    final basePath = '/test/practice/$level/$scheduleId';
+    final basePath = '/test/practice/$level';
 
     return Scaffold(
-      appBar: AppBar(title: Text(title)),
+      appBar: AppBar(title: Text('$level ${strings('practiceTest')}')),
       body: SafeArea(
         top: false,
         child: ListView(
@@ -48,22 +27,6 @@ class QuestionTypeScreen extends ConsumerWidget {
             const SizedBox(height: 14),
             _QuestionTypeGroup(
               children: [
-                _QuestionTypeTile(
-                  icon: Icons.fact_check_rounded,
-                  title: strings('sectionVocabulary'),
-                  subtitle: strings('languageKnowledgeVocabulary'),
-                  onTap: () => context.push(
-                    '$basePath/${sectionPathSegment(ProblemSection.vocabulary)}',
-                  ),
-                ),
-                _QuestionTypeTile(
-                  icon: Icons.spellcheck_rounded,
-                  title: strings('grammar'),
-                  subtitle: strings('languageKnowledgeGrammar'),
-                  onTap: () => context.push(
-                    '$basePath/${sectionPathSegment(ProblemSection.grammar)}',
-                  ),
-                ),
                 _QuestionTypeTile(
                   icon: Icons.menu_book_rounded,
                   title: strings('sectionReading'),
@@ -78,6 +41,22 @@ class QuestionTypeScreen extends ConsumerWidget {
                   subtitle: strings('listeningComprehension'),
                   onTap: () => context.push(
                     '$basePath/${sectionPathSegment(ProblemSection.listening)}',
+                  ),
+                ),
+                _QuestionTypeTile(
+                  icon: Icons.spellcheck_rounded,
+                  title: strings('grammar'),
+                  subtitle: strings('languageKnowledgeGrammar'),
+                  onTap: () => context.push(
+                    '$basePath/${sectionPathSegment(ProblemSection.grammar)}',
+                  ),
+                ),
+                _QuestionTypeTile(
+                  icon: Icons.fact_check_rounded,
+                  title: strings('sectionVocabulary'),
+                  subtitle: strings('languageKnowledgeVocabulary'),
+                  onTap: () => context.push(
+                    '$basePath/${sectionPathSegment(ProblemSection.vocabulary)}',
                   ),
                 ),
               ],

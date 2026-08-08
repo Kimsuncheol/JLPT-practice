@@ -130,10 +130,7 @@ void main() {
       expect(result.correct, 14);
       expect(result.incorrect, 6);
       expect(result.accuracy, closeTo(0.7, 0.0001));
-      expect(
-        result.sectionFor(TestSectionType.vocabulary)!.correct,
-        8,
-      );
+      expect(result.sectionFor(TestSectionType.vocabulary)!.correct, 8);
       expect(result.sectionFor(TestSectionType.grammar)!.incorrect, 4);
     });
 

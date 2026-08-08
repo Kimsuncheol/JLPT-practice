@@ -11,6 +11,7 @@ import 'package:jlpt_practice/data/models/mock_test.dart';
 import 'package:jlpt_practice/data/models/mock_test_problem.dart';
 import 'package:jlpt_practice/data/models/quiz.dart';
 import 'package:jlpt_practice/features/test/mock_test_providers.dart';
+import 'package:jlpt_practice/features/test/practice_test_generator.dart';
 
 TestSectionType _sectionType(ProblemSection section) => switch (section) {
   ProblemSection.vocabulary => TestSectionType.vocabulary,
@@ -23,17 +24,16 @@ class PracticeTestScreen extends ConsumerStatefulWidget {
   const PracticeTestScreen({
     super.key,
     required this.level,
-    required this.scheduleId,
     required this.section,
+    required this.practiceNumber,
   });
 
   final String level;
-  final String scheduleId;
   final ProblemSection section;
+  final int practiceNumber;
 
   @override
-  ConsumerState<PracticeTestScreen> createState() =>
-      _PracticeTestScreenState();
+  ConsumerState<PracticeTestScreen> createState() => _PracticeTestScreenState();
 }
 
 class _PracticeTestScreenState extends ConsumerState<PracticeTestScreen> {
@@ -56,9 +56,9 @@ class _PracticeTestScreenState extends ConsumerState<PracticeTestScreen> {
   Future<void> _playDialogue(String passage) async {
     if (await isSystemVolumeTooLow()) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.strings('lowVolumeBody'))),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(context.strings('lowVolumeBody'))));
       return;
     }
     _ttsService ??= ref.read(ttsServiceProvider);
@@ -108,8 +108,8 @@ class _PracticeTestScreenState extends ConsumerState<PracticeTestScreen> {
         );
     if (mounted) {
       context.go(
-        '/test/practice/${widget.level}/${widget.scheduleId}/'
-        '${sectionPathSegment(widget.section)}/result',
+        '/test/practice/${widget.level}/${sectionPathSegment(widget.section)}/'
+        '${practiceSetId(widget.practiceNumber)}/result',
       );
     }
   }
@@ -127,9 +127,7 @@ class _PracticeTestScreenState extends ConsumerState<PracticeTestScreen> {
         ProblemSection.vocabulary => context.strings('quizInstruction'),
         ProblemSection.grammar => context.strings('grammarQuizInstruction'),
         ProblemSection.reading => context.strings('readingQuizInstruction'),
-        ProblemSection.listening => context.strings(
-          'listeningQuizInstruction',
-        ),
+        ProblemSection.listening => context.strings('listeningQuizInstruction'),
       };
 
   @override
@@ -138,7 +136,7 @@ class _PracticeTestScreenState extends ConsumerState<PracticeTestScreen> {
     final practiceSetAsync = ref.watch(
       generatedPracticeSetProvider((
         level: widget.level,
-        scheduleId: widget.scheduleId,
+        practiceNumber: widget.practiceNumber,
       )),
     );
     return practiceSetAsync.when(
@@ -227,18 +225,12 @@ class _PracticeTestScreenState extends ConsumerState<PracticeTestScreen> {
                               children: [
                                 if (item.section == ProblemSection.listening)
                                   Padding(
-                                    padding: const EdgeInsets.only(
-                                      bottom: 12,
-                                    ),
+                                    padding: const EdgeInsets.only(bottom: 12),
                                     child: OutlinedButton.icon(
                                       onPressed: () =>
                                           _playDialogue(item.passage),
-                                      icon: const Icon(
-                                        Icons.volume_up_rounded,
-                                      ),
-                                      label: Text(
-                                        context.strings('playAudio'),
-                                      ),
+                                      icon: const Icon(Icons.volume_up_rounded),
+                                      label: Text(context.strings('playAudio')),
                                     ),
                                   ),
                                 Text(
@@ -316,7 +308,9 @@ class _PracticeTestScreenState extends ConsumerState<PracticeTestScreen> {
                                       : Theme.of(context).colorScheme.surface),
                               borderRadius: BorderRadius.circular(19),
                               child: InkWell(
-                                key: ValueKey('practice_test_choice_${entry.key}'),
+                                key: ValueKey(
+                                  'practice_test_choice_${entry.key}',
+                                ),
                                 onTap: _answered
                                     ? null
                                     : () {
@@ -344,9 +338,9 @@ class _PracticeTestScreenState extends ConsumerState<PracticeTestScreen> {
                                         alignment: Alignment.center,
                                         decoration: BoxDecoration(
                                           shape: BoxShape.circle,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .surfaceContainerHighest,
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.surfaceContainerHighest,
                                         ),
                                         child: Text(
                                           String.fromCharCode(65 + entry.key),

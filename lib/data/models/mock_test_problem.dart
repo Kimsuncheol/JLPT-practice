@@ -28,6 +28,10 @@ class MockTestProblem {
     required this.correctAnswer,
     required this.explanationEn,
     required this.explanationKo,
+    this.part = 0,
+    this.rank = 0,
+    this.itemType = '',
+    this.source = 'app_authored',
   });
 
   final String id;
@@ -39,6 +43,10 @@ class MockTestProblem {
   final String correctAnswer;
   final String explanationEn;
   final String explanationKo;
+  final int part;
+  final int rank;
+  final String itemType;
+  final String source;
 
   String localizedExplanation(String language) =>
       language == 'ko' && explanationKo.isNotEmpty
@@ -46,11 +54,9 @@ class MockTestProblem {
       : explanationEn;
 }
 
-/// A practice test assembled for one JLPT level and one scheduled sitting:
-/// vocabulary and grammar problems are generated from the app's own word and
-/// grammar-point catalogs (seeded per sitting so each date gets a different
-/// selection), while reading and listening problems come from the static
-/// problem bank.
+/// A practice test assembled for one JLPT level and practice number.
+/// Catalog-generated vocabulary/grammar and ranked reading/listening variants
+/// all carry official item-type metadata and are combined into ten practices.
 class GeneratedPracticeSet {
   const GeneratedPracticeSet({
     required this.items,

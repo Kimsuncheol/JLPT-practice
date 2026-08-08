@@ -42,9 +42,10 @@ class DaySelectionSkeleton extends StatelessWidget {
             child: LayoutBuilder(
               builder: (context, constraints) {
                 const spacing = 12.0;
-                final columns = (constraints.maxWidth / 120)
-                    .floor()
-                    .clamp(4, 6);
+                final columns = (constraints.maxWidth / 120).floor().clamp(
+                  4,
+                  6,
+                );
                 return GridView.builder(
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: columns,
@@ -52,8 +53,11 @@ class DaySelectionSkeleton extends StatelessWidget {
                     mainAxisSpacing: spacing,
                   ),
                   itemCount: columns * 4,
-                  itemBuilder: (context, _) =>
-                      const ShimmerBone(width: double.infinity, height: double.infinity, radius: 24),
+                  itemBuilder: (context, _) => const ShimmerBone(
+                    width: double.infinity,
+                    height: double.infinity,
+                    radius: 24,
+                  ),
                 );
               },
             ),

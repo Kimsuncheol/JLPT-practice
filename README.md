@@ -25,6 +25,19 @@ dart run tool/import_hanabira_grammar.dart
 dart run tool/translate_hanabira_grammar_google.dart
 ```
 
+Rebuild the ranked mock-exam bank from the retained legacy reference bank with:
+
+```sh
+dart run tool/build_ranked_mock_bank.dart
+dart run tool/validate_ranked_mock_bank.dart
+```
+
+The app combines historical source dates into item-type pools. For every level,
+Reading, Listening, Grammar, and Vocabulary each offer Practice 1–10 while
+covering every published JLPT item type. The original
+`jlpt_test_problems_2021_2025.csv` is preserved and is not loaded by the live
+mock-test flow.
+
 ## Configure Firebase
 
 1. Create Android and iOS apps in a Firebase project.

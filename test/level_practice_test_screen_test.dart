@@ -1,38 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
-import 'package:jlpt_practice/data/models/jlpt_test_schedule.dart';
+import 'package:jlpt_practice/data/models/mock_test_problem.dart';
 import 'package:jlpt_practice/features/test/level_practice_test_screen.dart';
-import 'package:jlpt_practice/features/test/mock_test_providers.dart';
 
 void main() {
   testWidgets(
-    'lists exam dates for the level and navigates to the test screen on tap',
+    'lists Practice 1 through 10 and navigates to the selected practice',
     (tester) async {
-      final container = ProviderContainer(
-        overrides: [
-          jlptTestSchedulesForLevelProvider(
-            'N5',
-          ).overrideWith((ref) async => _schedules),
-        ],
-      );
-      addTearDown(container.dispose);
-
-      String? pushedLevel;
-      String? pushedScheduleId;
+      String? pushedPracticeId;
       final router = GoRouter(
-        initialLocation: '/test/practice/N5',
+        initialLocation: '/test/practice/N5/reading',
         routes: [
           GoRoute(
-            path: '/test/practice/N5',
-            builder: (_, _) => const LevelPracticeTestScreen(level: 'N5'),
+            path: '/test/practice/N5/reading',
+            builder: (_, _) => const LevelPracticeTestScreen(
+              level: 'N5',
+              section: ProblemSection.reading,
+            ),
           ),
           GoRoute(
-            path: '/test/practice/N5/:scheduleId',
+            path: '/test/practice/N5/reading/:practiceId',
             builder: (_, state) {
-              pushedLevel = 'N5';
-              pushedScheduleId = state.pathParameters['scheduleId'];
+              pushedPracticeId = state.pathParameters['practiceId'];
               return const Scaffold(body: Text('Test screen'));
             },
           ),
@@ -40,42 +30,22 @@ void main() {
       );
       addTearDown(router.dispose);
 
-      await tester.pumpWidget(
-        UncontrolledProviderScope(
-          container: container,
-          child: MaterialApp.router(routerConfig: router),
-        ),
-      );
+      await tester.pumpWidget(MaterialApp.router(routerConfig: router));
       await tester.pumpAndSettle();
 
-      expect(find.text('JLPT N5 · December 2025'), findsOneWidget);
-      expect(find.text('JLPT N5 · July 2021'), findsOneWidget);
+      expect(find.text('Practice 1'), findsOneWidget);
+      await tester.scrollUntilVisible(
+        find.text('Practice 10'),
+        300,
+        scrollable: find.byType(Scrollable),
+      );
+      expect(find.text('Practice 10'), findsOneWidget);
 
-      await tester.tap(find.text('JLPT N5 · December 2025'));
+      await tester.tap(find.text('Practice 10'));
       await tester.pumpAndSettle();
 
       expect(find.text('Test screen'), findsOneWidget);
-      expect(pushedLevel, 'N5');
-      expect(pushedScheduleId, '2025-december-n5');
+      expect(pushedPracticeId, 'practice-10');
     },
   );
 }
-
-final _schedules = [
-  JlptTestSchedule(
-    id: '2025-december-n5',
-    year: 2025,
-    session: 'December',
-    examDate: DateTime(2025, 12, 7),
-    level: 'N5',
-    displayName: 'JLPT N5 · December 2025',
-  ),
-  JlptTestSchedule(
-    id: '2021-july-n5',
-    year: 2021,
-    session: 'July',
-    examDate: DateTime(2021, 7, 4),
-    level: 'N5',
-    displayName: 'JLPT N5 · July 2021',
-  ),
-];

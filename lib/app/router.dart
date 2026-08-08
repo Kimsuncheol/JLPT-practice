@@ -16,6 +16,7 @@ import 'package:jlpt_practice/data/models/mock_test_problem.dart';
 import 'package:jlpt_practice/features/test/level_practice_test_screen.dart';
 import 'package:jlpt_practice/features/test/mock_test_result_screen.dart';
 import 'package:jlpt_practice/features/test/practice_test_screen.dart';
+import 'package:jlpt_practice/features/test/practice_test_generator.dart';
 import 'package:jlpt_practice/features/test/question_type_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/day_selection_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/study_finish_screen.dart';
@@ -78,33 +79,37 @@ GoRouter createAppRouter({String initialLocation = '/'}) => GoRouter(
     GoRoute(
       path: '/test/practice/:level',
       builder: (_, state) =>
-          LevelPracticeTestScreen(level: state.pathParameters['level'] ?? 'N5'),
+          QuestionTypeScreen(level: state.pathParameters['level'] ?? 'N5'),
     ),
     GoRoute(
-      path: '/test/practice/:level/:scheduleId',
-      builder: (_, state) => QuestionTypeScreen(
+      path: '/test/practice/:level/:section',
+      builder: (_, state) => LevelPracticeTestScreen(
         level: state.pathParameters['level'] ?? 'N5',
-        scheduleId: state.pathParameters['scheduleId'] ?? '',
+        section:
+            sectionFromPathSegment(state.pathParameters['section'] ?? '') ??
+            ProblemSection.reading,
       ),
     ),
     GoRoute(
-      path: '/test/practice/:level/:scheduleId/:section',
+      path: '/test/practice/:level/:section/:practiceId',
       builder: (_, state) => PracticeTestScreen(
         level: state.pathParameters['level'] ?? 'N5',
-        scheduleId: state.pathParameters['scheduleId'] ?? '',
         section:
             sectionFromPathSegment(state.pathParameters['section'] ?? '') ??
             ProblemSection.vocabulary,
+        practiceNumber: practiceSetNumber(
+          state.pathParameters['practiceId'] ?? '',
+        ),
       ),
     ),
     GoRoute(
-      path: '/test/practice/:level/:scheduleId/:section/result',
+      path: '/test/practice/:level/:section/:practiceId/result',
       builder: (_, state) {
         final level = state.pathParameters['level'] ?? 'N5';
-        final scheduleId = state.pathParameters['scheduleId'] ?? '';
         final section = state.pathParameters['section'] ?? '';
+        final practiceId = state.pathParameters['practiceId'] ?? '';
         return MockTestResultScreen(
-          retryPath: '/test/practice/$level/$scheduleId/$section',
+          retryPath: '/test/practice/$level/$section/$practiceId',
         );
       },
     ),

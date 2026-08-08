@@ -65,14 +65,16 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
   Widget build(BuildContext context) {
     final state = ref.watch(appControllerProvider).requireValue;
     _questions ??= widget.day != null
-        ? ref.read(quizRepositoryProvider).buildQuestions(
-            StudyBatches.wordsForDay(
-              state.selectedVocabulary,
-              day: widget.day!,
-              dailyGoal: state.dailyGoal,
-            ),
-            count: state.dailyGoal,
-          )
+        ? ref
+              .read(quizRepositoryProvider)
+              .buildQuestions(
+                StudyBatches.wordsForDay(
+                  state.selectedVocabulary,
+                  day: widget.day!,
+                  dailyGoal: state.dailyGoal,
+                ),
+                count: state.dailyGoal,
+              )
         : ref
               .read(quizRepositoryProvider)
               .buildQuestions(state.vocabulary, level: state.selectedLevel);

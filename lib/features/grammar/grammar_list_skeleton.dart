@@ -48,7 +48,11 @@ class _GrammarCardSkeleton extends StatelessWidget {
               children: [
                 const ShimmerBone(width: 140, height: 18, radius: 6),
                 const SizedBox(height: 8),
-                const ShimmerBone(width: double.infinity, height: 14, radius: 6),
+                const ShimmerBone(
+                  width: double.infinity,
+                  height: 14,
+                  radius: 6,
+                ),
               ],
             ),
           ),

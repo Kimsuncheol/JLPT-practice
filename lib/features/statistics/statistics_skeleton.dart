@@ -45,7 +45,15 @@ class StatisticsSkeleton extends StatelessWidget {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: List.generate(7, (index) {
-                    final heights = [70.0, 110.0, 90.0, 130.0, 60.0, 100.0, 145.0];
+                    final heights = [
+                      70.0,
+                      110.0,
+                      90.0,
+                      130.0,
+                      60.0,
+                      100.0,
+                      145.0,
+                    ];
                     return Expanded(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 4),

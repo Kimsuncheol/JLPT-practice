@@ -51,9 +51,7 @@ void main() {
     });
 
     test('narrates untagged scene-setting lines at neutral pitch', () {
-      final turns = parseDialogueScript(
-        '家族三人がペットについて話している\nM：犬を飼いたいんだ。',
-      );
+      final turns = parseDialogueScript('家族三人がペットについて話している\nM：犬を飼いたいんだ。');
       expect(turns[0].pitch, 1);
       expect(turns[0].text, '家族三人がペットについて話している');
     });

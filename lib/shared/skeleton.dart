@@ -39,7 +39,10 @@ class ShimmerCircle extends StatelessWidget {
       height: size,
       baseColor: scheme.surfaceContainerHighest,
       highlightColor: scheme.surface,
-      decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        shape: BoxShape.circle,
+      ),
     );
   }
 }

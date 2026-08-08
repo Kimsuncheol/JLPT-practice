@@ -4,7 +4,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/data/models/app_state.dart';
-import 'package:jlpt_practice/data/models/jlpt_test_schedule.dart';
 import 'package:jlpt_practice/data/models/mock_test.dart';
 import 'package:jlpt_practice/data/models/mock_test_problem.dart';
 import 'package:jlpt_practice/features/test/mock_test_providers.dart';
@@ -22,36 +21,33 @@ void main() {
             appControllerProvider.overrideWith(_FakeAppController.new),
             generatedPracticeSetProvider((
               level: 'N5',
-              scheduleId: '2025-july-n5',
+              practiceNumber: 1,
             )).overrideWith(
               (ref) async => GeneratedPracticeSet(
                 items: _problems.where((p) => p.section == section).toList(),
                 vocabularyQuestions: const [],
               ),
             ),
-            jlptTestSchedulesForLevelProvider(
-              'N5',
-            ).overrideWith((ref) async => _schedules),
           ],
         );
         addTearDown(container.dispose);
         await container.read(appControllerProvider.future);
 
         final router = GoRouter(
-          initialLocation: '/test/practice/N5/2025-july-n5/$segment',
+          initialLocation: '/test/practice/N5/$segment/practice-1',
           routes: [
             GoRoute(
-              path: '/test/practice/N5/2025-july-n5/$segment',
+              path: '/test/practice/N5/$segment/practice-1',
               builder: (_, _) => PracticeTestScreen(
                 level: 'N5',
-                scheduleId: '2025-july-n5',
                 section: section,
+                practiceNumber: 1,
               ),
             ),
             GoRoute(
-              path: '/test/practice/N5/2025-july-n5/$segment/result',
+              path: '/test/practice/N5/$segment/practice-1/result',
               builder: (_, _) => MockTestResultScreen(
-                retryPath: '/test/practice/N5/2025-july-n5/$segment',
+                retryPath: '/test/practice/N5/$segment/practice-1',
               ),
             ),
             GoRoute(
@@ -127,17 +123,6 @@ class _FakeAppController extends AppController {
     state = AsyncData(state.requireValue.copyWith(lastMockTestResult: result));
   }
 }
-
-final _schedules = [
-  JlptTestSchedule(
-    id: '2025-july-n5',
-    year: 2025,
-    session: 'July',
-    examDate: DateTime(2025, 7, 6),
-    level: 'N5',
-    displayName: 'JLPT N5 · July 2025',
-  ),
-];
 
 const _problems = [
   MockTestProblem(

@@ -137,9 +137,7 @@ class _MockTestResultScreenState extends ConsumerState<MockTestResultScreen> {
                           const SizedBox(height: 12),
                           for (final section in result.sections)
                             Padding(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 6,
-                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 6),
                               child: Row(
                                 children: [
                                   Expanded(

@@ -26,9 +26,8 @@ class MockTestRepository {
     required String language,
     int count = 10,
   }) {
-    final available =
-        source.where((item) => item.level == level).toList()
-          ..shuffle(_random);
+    final available = source.where((item) => item.level == level).toList()
+      ..shuffle(_random);
     return available
         .take(count)
         .map((point) {
@@ -44,7 +43,9 @@ class MockTestRepository {
                 ..shuffle(_random);
           final choices = <String>[
             correctAnswer,
-            ...distractors.take(3).map((item) => item.localizedSummary(language)),
+            ...distractors
+                .take(3)
+                .map((item) => item.localizedSummary(language)),
           ]..shuffle(_random);
           return GrammarQuestion(
             grammarPoint: point,

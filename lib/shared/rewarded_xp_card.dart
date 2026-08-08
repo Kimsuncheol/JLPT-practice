@@ -49,10 +49,7 @@ class _RewardedXpCardState extends ConsumerState<RewardedXpCard> {
             borderRadius: BorderRadius.circular(16),
             onTap: _loading ? null : _watchAd,
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 12,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Row(
                 children: [
                   const Icon(Icons.bolt_rounded),

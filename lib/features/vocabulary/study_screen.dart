@@ -224,9 +224,9 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
   Future<void> _speakIfAudible(String text) async {
     if (await isSystemVolumeTooLow()) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.strings('lowVolumeBody'))),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(context.strings('lowVolumeBody'))));
       return;
     }
     _speak(text);
@@ -323,7 +323,8 @@ class _StudyCard extends StatelessWidget {
             const SizedBox(height: 44),
             AnimatedOpacity(
               opacity:
-                  showFurigana && vocabulary.reading.compareTo(vocabulary.word) != 0
+                  showFurigana &&
+                      vocabulary.reading.compareTo(vocabulary.word) != 0
                   ? 1
                   : 0,
               duration: const Duration(milliseconds: 180),

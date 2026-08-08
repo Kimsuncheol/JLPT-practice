@@ -37,8 +37,7 @@ class MockTestResult {
   final Duration duration;
 
   int get total => sections.fold(0, (sum, section) => sum + section.total);
-  int get correct =>
-      sections.fold(0, (sum, section) => sum + section.correct);
+  int get correct => sections.fold(0, (sum, section) => sum + section.correct);
   int get incorrect => total - correct;
   double get accuracy => total == 0 ? 0 : correct / total;
 
