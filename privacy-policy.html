@@ -36,9 +36,9 @@
   <td>Core app functionality — saving your learning progress, both locally on-device and synced to our database (Firestore) under your anonymous ID.</td>
 </tr>
 <tr>
-  <td>AI tutor chat messages</td>
-  <td>Text you type to the "Kotoba Sensei" AI tutor feature, plus your current study level/context.</td>
-  <td>Sent to Google's Gemini API to generate a tutoring response. Used only to power that feature.</td>
+  <td>AI grammar-practice submissions</td>
+  <td>Japanese sentences you submit for grammar feedback, plus the selected grammar point.</td>
+  <td>Sent to Google's Gemini API to evaluate that practice sentence. Used only when you request AI feedback.</td>
 </tr>
 <tr>
   <td>Advertising identifier</td>
@@ -59,7 +59,7 @@
 <ul>
   <li><strong>Google Firebase</strong> (Authentication, Firestore database, Crashlytics, Remote Config, App Check) — <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google Privacy Policy</a></li>
   <li><strong>Google Mobile Ads (AdMob)</strong> — used to display ads. See <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener">how Google uses information from apps that use its services</a>.</li>
-  <li><strong>Google Gemini API</strong> — powers the in-app AI tutor chat feature. Messages you send to the tutor are processed by this service.</li>
+  <li><strong>Google Gemini API</strong> — evaluates sentences submitted through grammar practice. Those sentences are processed by this service.</li>
 </ul>
 
 <h2>Data Sharing</h2>

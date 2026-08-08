@@ -4,7 +4,6 @@ import 'package:firebase_ai/firebase_ai.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jlpt_practice/data/models/grammar_point.dart';
-import 'package:jlpt_practice/features/chat/tutor_ai_service.dart';
 import 'package:jlpt_practice/features/grammar/grammar_tutor_models.dart';
 
 final grammarTutorEvaluatorProvider = FutureProvider<GrammarTutorEvaluator>(
@@ -22,15 +21,15 @@ abstract class GrammarTutorEvaluator {
 class FirebaseGrammarTutorEvaluator implements GrammarTutorEvaluator {
   FirebaseGrammarTutorEvaluator._(this._model);
 
+  static const _fallbackModel = 'gemini-3.6-flash';
+
   final GenerativeModel _model;
 
   static Future<FirebaseGrammarTutorEvaluator> create() async {
-    var modelName = TutorAiService.fallbackModel;
+    var modelName = _fallbackModel;
     try {
       final config = FirebaseRemoteConfig.instance;
-      await config.setDefaults(const {
-        'ai_chat_model': TutorAiService.fallbackModel,
-      });
+      await config.setDefaults(const {'ai_chat_model': _fallbackModel});
       await config.fetchAndActivate();
       final configured = config.getString('ai_chat_model').trim();
       if (configured.isNotEmpty) modelName = configured;
