@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
+import 'package:jlpt_practice/core/services/tts_service.dart';
+import 'package:jlpt_practice/core/services/volume_service.dart';
 import 'package:jlpt_practice/data/models/mock_test.dart';
 import 'package:jlpt_practice/data/models/mock_test_problem.dart';
 import 'package:jlpt_practice/data/models/quiz.dart';
@@ -42,15 +44,30 @@ class _PracticeTestScreenState extends ConsumerState<PracticeTestScreen> {
   late final DateTime _startedAt = DateTime.now();
   Timer? _autoAdvanceTimer;
   List<QuizQuestion> _vocabularyQuestions = const [];
+  TtsService? _ttsService;
 
   @override
   void dispose() {
     _autoAdvanceTimer?.cancel();
+    if (_ttsService != null) unawaited(_ttsService!.stop());
     super.dispose();
+  }
+
+  Future<void> _playDialogue(String passage) async {
+    if (await isSystemVolumeTooLow()) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.strings('lowVolumeBody'))),
+      );
+      return;
+    }
+    _ttsService ??= ref.read(ttsServiceProvider);
+    unawaited(_ttsService!.speakDialogue(parseDialogueScript(passage)));
   }
 
   Future<void> _advance(List<MockTestProblem> items) async {
     _autoAdvanceTimer?.cancel();
+    if (_ttsService != null) unawaited(_ttsService!.stop());
     if (_index < items.length - 1) {
       setState(() {
         _index++;
@@ -205,9 +222,30 @@ class _PracticeTestScreenState extends ConsumerState<PracticeTestScreen> {
                               ).colorScheme.surfaceContainerHighest,
                               borderRadius: BorderRadius.circular(20),
                             ),
-                            child: Text(
-                              item.passage,
-                              style: const TextStyle(height: 1.7),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (item.section == ProblemSection.listening)
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                      bottom: 12,
+                                    ),
+                                    child: OutlinedButton.icon(
+                                      onPressed: () =>
+                                          _playDialogue(item.passage),
+                                      icon: const Icon(
+                                        Icons.volume_up_rounded,
+                                      ),
+                                      label: Text(
+                                        context.strings('playAudio'),
+                                      ),
+                                    ),
+                                  ),
+                                Text(
+                                  item.passage,
+                                  style: const TextStyle(height: 1.7),
+                                ),
+                              ],
                             ),
                           ),
                         Container(
