@@ -169,6 +169,18 @@ class DashboardScreen extends ConsumerWidget {
                           title: strings('kanaChartTile'),
                           onTap: () => context.push('/kana'),
                         ),
+                        _GridActionTile(
+                          color: Color.alphaBlend(
+                            Theme.of(context)
+                                .extension<AppColors>()!
+                                .warning
+                                .withValues(alpha: 0.35),
+                            Theme.of(context).colorScheme.surface,
+                          ),
+                          icon: Icons.replay_circle_filled_rounded,
+                          title: strings('review'),
+                          onTap: () => context.push('/review'),
+                        ),
                       ],
                     ),
                     const SizedBox(height: 24),
