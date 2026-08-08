@@ -72,6 +72,14 @@ class QuestionTypeScreen extends ConsumerWidget {
                     '$basePath/${sectionPathSegment(ProblemSection.reading)}',
                   ),
                 ),
+                _QuestionTypeTile(
+                  icon: Icons.headphones_rounded,
+                  title: strings('sectionListening'),
+                  subtitle: strings('listeningComprehension'),
+                  onTap: () => context.push(
+                    '$basePath/${sectionPathSegment(ProblemSection.listening)}',
+                  ),
+                ),
               ],
             ),
           ],

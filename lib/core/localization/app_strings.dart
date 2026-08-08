@@ -191,6 +191,9 @@ class AppStrings {
     'languageKnowledgeGrammar': 'Language Knowledge · Grammar',
     'readingComprehension': 'Reading Comprehension',
     'listeningComprehension': 'Listening Comprehension',
+    'sectionListening': 'Listening',
+    'listeningQuizInstruction':
+        'Read the conversation script, then choose the best answer. (No audio playback yet — practice by reading the transcript.)',
   };
 
   static const _ko = <String, String>{
@@ -371,6 +374,9 @@ class AppStrings {
     'languageKnowledgeGrammar': '언어지식 · 문법',
     'readingComprehension': '독해',
     'listeningComprehension': '청해',
+    'sectionListening': '청해',
+    'listeningQuizInstruction':
+        '대화 스크립트를 읽고 가장 알맞은 답을 고르세요. (아직 음성 재생은 지원하지 않습니다 — 대본을 읽으며 연습하세요.)',
   };
 
   String call(String key) =>

@@ -14,6 +14,7 @@ TestSectionType _sectionType(ProblemSection section) => switch (section) {
   ProblemSection.vocabulary => TestSectionType.vocabulary,
   ProblemSection.grammar => TestSectionType.grammar,
   ProblemSection.reading => TestSectionType.reading,
+  ProblemSection.listening => TestSectionType.listening,
 };
 
 class PracticeTestScreen extends ConsumerStatefulWidget {
@@ -101,6 +102,7 @@ class _PracticeTestScreenState extends ConsumerState<PracticeTestScreen> {
         ProblemSection.vocabulary => context.strings('sectionVocabulary'),
         ProblemSection.grammar => context.strings('grammar'),
         ProblemSection.reading => context.strings('sectionReading'),
+        ProblemSection.listening => context.strings('sectionListening'),
       };
 
   String _instruction(BuildContext context, ProblemSection section) =>
@@ -108,6 +110,9 @@ class _PracticeTestScreenState extends ConsumerState<PracticeTestScreen> {
         ProblemSection.vocabulary => context.strings('quizInstruction'),
         ProblemSection.grammar => context.strings('grammarQuizInstruction'),
         ProblemSection.reading => context.strings('readingQuizInstruction'),
+        ProblemSection.listening => context.strings(
+          'listeningQuizInstruction',
+        ),
       };
 
   @override

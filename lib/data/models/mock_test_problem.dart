@@ -1,17 +1,19 @@
 import 'package:jlpt_practice/data/models/quiz.dart';
 
-enum ProblemSection { vocabulary, grammar, reading }
+enum ProblemSection { vocabulary, grammar, reading, listening }
 
 String sectionPathSegment(ProblemSection section) => switch (section) {
   ProblemSection.vocabulary => 'vocabulary',
   ProblemSection.grammar => 'grammar',
   ProblemSection.reading => 'reading',
+  ProblemSection.listening => 'listening',
 };
 
 ProblemSection? sectionFromPathSegment(String value) => switch (value) {
   'vocabulary' => ProblemSection.vocabulary,
   'grammar' => ProblemSection.grammar,
   'reading' => ProblemSection.reading,
+  'listening' => ProblemSection.listening,
   _ => null,
 };
 
@@ -47,7 +49,8 @@ class MockTestProblem {
 /// A practice test assembled for one JLPT level and one scheduled sitting:
 /// vocabulary and grammar problems are generated from the app's own word and
 /// grammar-point catalogs (seeded per sitting so each date gets a different
-/// selection), while reading passages come from the static problem bank.
+/// selection), while reading and listening problems come from the static
+/// problem bank.
 class GeneratedPracticeSet {
   const GeneratedPracticeSet({
     required this.items,

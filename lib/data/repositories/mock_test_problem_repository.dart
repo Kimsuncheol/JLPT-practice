@@ -5,6 +5,7 @@ import 'package:jlpt_practice/data/repositories/csv_utils.dart';
 ProblemSection _sectionFromString(String value) => switch (value) {
   'grammar' => ProblemSection.grammar,
   'reading' => ProblemSection.reading,
+  'listening' => ProblemSection.listening,
   _ => ProblemSection.vocabulary,
 };
 

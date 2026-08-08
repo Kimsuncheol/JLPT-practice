@@ -25,6 +25,7 @@ class _MockTestResultScreenState extends ConsumerState<MockTestResultScreen> {
         TestSectionType.vocabulary => context.strings('sectionVocabulary'),
         TestSectionType.grammar => context.strings('grammar'),
         TestSectionType.reading => context.strings('sectionReading'),
+        TestSectionType.listening => context.strings('sectionListening'),
       };
 
   @override
