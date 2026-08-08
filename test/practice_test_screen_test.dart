@@ -173,4 +173,15 @@ const _problems = [
     explanationEn: 'The passage says 7 o\'clock.',
     explanationKo: '본문에 7시라고 나와 있습니다.',
   ),
+  MockTestProblem(
+    id: 'n5-listening-a-1',
+    level: 'N5',
+    section: ProblemSection.listening,
+    passage: 'M：コーヒーとお茶、どちらがいいですか。\nF：お茶をお願いします。',
+    question: '女の人は何を頼みましたか。',
+    choices: ['コーヒー', 'お茶', '水', 'ジュース'],
+    correctAnswer: 'お茶',
+    explanationEn: 'The woman asks for tea (お茶).',
+    explanationKo: '여자는 차(お茶)를 부탁했습니다.',
+  ),
 ];
