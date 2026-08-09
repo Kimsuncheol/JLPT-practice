@@ -198,6 +198,22 @@ class AppStrings {
     'listeningQuizInstruction':
         'Listen to the conversation, then choose the best answer.',
     'playAudio': 'Play audio',
+    'askAiTutor': 'Ask AI Tutor',
+    'askingAiTutor': 'Asking AI Tutor…',
+    'aiTutor': 'AI Tutor',
+    'aiGeneratedNotice': 'AI-generated guidance may contain mistakes.',
+    'whyCorrect': 'Why this answer is correct',
+    'whyWrong': 'Why your answer was incorrect',
+    'keyEvidence': 'Key evidence',
+    'learningPoints': 'Key learning points',
+    'explainChoices': 'Explain the choices',
+    'showEvidence': 'Show the key evidence',
+    'giveExample': 'Give me a similar example',
+    'aiTutorUnavailable':
+        'AI Tutor is unavailable right now. The stored explanation is still available.',
+    'tryAgain': 'Try again',
+    'wasHelpful': 'Was this helpful?',
+    'thanksFeedback': 'Thanks for your feedback.',
   };
 
   static const _ko = <String, String>{
@@ -384,6 +400,21 @@ class AppStrings {
     'sectionListening': '청해',
     'listeningQuizInstruction': '대화를 듣고 가장 알맞은 답을 고르세요.',
     'playAudio': '음성 재생',
+    'askAiTutor': 'AI 튜터에게 질문',
+    'askingAiTutor': 'AI 튜터에게 묻는 중…',
+    'aiTutor': 'AI 튜터',
+    'aiGeneratedNotice': 'AI가 생성한 안내에는 오류가 있을 수 있습니다.',
+    'whyCorrect': '이 답이 정답인 이유',
+    'whyWrong': '선택한 답이 틀린 이유',
+    'keyEvidence': '핵심 근거',
+    'learningPoints': '핵심 학습 포인트',
+    'explainChoices': '선택지 설명',
+    'showEvidence': '핵심 근거 보기',
+    'giveExample': '비슷한 예문 보기',
+    'aiTutorUnavailable': '현재 AI 튜터를 사용할 수 없습니다. 기존 해설은 계속 확인할 수 있습니다.',
+    'tryAgain': '다시 시도',
+    'wasHelpful': '도움이 되었나요?',
+    'thanksFeedback': '의견을 보내 주셔서 감사합니다.',
   };
 
   String call(String key) =>

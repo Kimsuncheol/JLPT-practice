@@ -11,6 +11,7 @@ import 'package:jlpt_practice/data/models/mock_test.dart';
 import 'package:jlpt_practice/data/models/mock_test_problem.dart';
 import 'package:jlpt_practice/data/models/quiz.dart';
 import 'package:jlpt_practice/features/test/mock_test_providers.dart';
+import 'package:jlpt_practice/features/test/practice_ai_tutor_sheet.dart';
 import 'package:jlpt_practice/features/test/practice_test_generator.dart';
 
 TestSectionType _sectionType(ProblemSection section) => switch (section) {
@@ -42,13 +43,11 @@ class _PracticeTestScreenState extends ConsumerState<PracticeTestScreen> {
   bool _answered = false;
   final List<String> _incorrectIds = [];
   late final DateTime _startedAt = DateTime.now();
-  Timer? _autoAdvanceTimer;
   List<QuizQuestion> _vocabularyQuestions = const [];
   TtsService? _ttsService;
 
   @override
   void dispose() {
-    _autoAdvanceTimer?.cancel();
     if (_ttsService != null) unawaited(_ttsService!.stop());
     super.dispose();
   }
@@ -66,7 +65,6 @@ class _PracticeTestScreenState extends ConsumerState<PracticeTestScreen> {
   }
 
   Future<void> _advance(List<MockTestProblem> items) async {
-    _autoAdvanceTimer?.cancel();
     if (_ttsService != null) unawaited(_ttsService!.stop());
     if (_index < items.length - 1) {
       setState(() {
@@ -276,8 +274,32 @@ class _PracticeTestScreenState extends ConsumerState<PracticeTestScreen> {
                                     ).colorScheme.errorContainer,
                               borderRadius: BorderRadius.circular(16),
                             ),
-                            child: Text(
-                              item.localizedExplanation(state.meaningLanguage),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Text(
+                                  item.localizedExplanation(
+                                    state.meaningLanguage,
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                FilledButton.tonalIcon(
+                                  key: const ValueKey('practice_ask_ai_tutor'),
+                                  onPressed: () => showPracticeAiTutorSheet(
+                                    context: context,
+                                    problem: item,
+                                    selectedAnswer: _selected!,
+                                    explanationLanguage:
+                                        state.meaningLanguage == 'ko'
+                                        ? 'Korean'
+                                        : 'English',
+                                    onContinue: () =>
+                                        unawaited(_advance(items)),
+                                  ),
+                                  icon: const Icon(Icons.auto_awesome_rounded),
+                                  label: Text(context.strings('askAiTutor')),
+                                ),
+                              ],
                             ),
                           ),
                         ...item.choices.asMap().entries.map((entry) {
@@ -321,11 +343,6 @@ class _PracticeTestScreenState extends ConsumerState<PracticeTestScreen> {
                                             _incorrectIds.add(item.id);
                                           }
                                         });
-                                        _autoAdvanceTimer?.cancel();
-                                        _autoAdvanceTimer = Timer(
-                                          const Duration(milliseconds: 2200),
-                                          () => _advance(items),
-                                        );
                                       },
                                 borderRadius: BorderRadius.circular(19),
                                 child: Padding(
@@ -367,6 +384,21 @@ class _PracticeTestScreenState extends ConsumerState<PracticeTestScreen> {
                             ),
                           );
                         }),
+                        if (_answered) ...[
+                          const SizedBox(height: 8),
+                          FilledButton(
+                            key: const ValueKey('practice_continue'),
+                            onPressed: () => _advance(items),
+                            style: FilledButton.styleFrom(
+                              minimumSize: const Size.fromHeight(54),
+                            ),
+                            child: Text(
+                              _index == items.length - 1
+                                  ? context.strings('seeResults')
+                                  : context.strings('continue'),
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ),

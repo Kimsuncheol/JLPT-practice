@@ -8,6 +8,7 @@ import 'package:jlpt_practice/data/models/mock_test.dart';
 import 'package:jlpt_practice/data/models/mock_test_problem.dart';
 import 'package:jlpt_practice/features/test/mock_test_providers.dart';
 import 'package:jlpt_practice/features/test/mock_test_result_screen.dart';
+import 'package:jlpt_practice/features/test/practice_ai_tutor_service.dart';
 import 'package:jlpt_practice/features/test/practice_test_screen.dart';
 
 void main() {
@@ -74,7 +75,16 @@ void main() {
         for (var i = 0; i < expectedCount; i++) {
           expect(find.byKey(firstChoiceKey), findsOneWidget);
           await tester.tap(find.byKey(firstChoiceKey));
-          await tester.pump(const Duration(milliseconds: 2300));
+          await tester.pumpAndSettle();
+          expect(
+            find.byKey(const ValueKey('practice_ask_ai_tutor')),
+            findsOneWidget,
+          );
+          final continueButton = find.byKey(
+            const ValueKey('practice_continue'),
+          );
+          await tester.ensureVisible(continueButton);
+          await tester.tap(continueButton);
           await tester.pumpAndSettle();
         }
         await tester.pump(const Duration(seconds: 1));
@@ -90,6 +100,75 @@ void main() {
       },
     );
   }
+
+  testWidgets('AI Tutor preserves the stored explanation and opens guidance', (
+    tester,
+  ) async {
+    final container = ProviderContainer(
+      overrides: [
+        appControllerProvider.overrideWith(_FakeAppController.new),
+        generatedPracticeSetProvider((
+          level: 'N5',
+          practiceNumber: 1,
+        )).overrideWith(
+          (ref) async => GeneratedPracticeSet(
+            items: [_problems[2]],
+            vocabularyQuestions: const [],
+          ),
+        ),
+        practiceAiTutorProvider.overrideWith(
+          (ref) async => const _FakePracticeAiTutorEvaluator(),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container.read(appControllerProvider.future);
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const MaterialApp(
+          home: PracticeTestScreen(
+            level: 'N5',
+            section: ProblemSection.reading,
+            practiceNumber: 1,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('practice_test_choice_0')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('The passage says 7 o\'clock.'), findsOneWidget);
+    expect(find.byKey(const ValueKey('practice_continue')), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('practice_ask_ai_tutor')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('AI Tutor'), findsOneWidget);
+    expect(find.text('The passage explicitly gives the time.'), findsOneWidget);
+    expect(find.text('“7じ”'), findsOneWidget);
+    expect(find.byKey(const ValueKey('practice_ai_continue')), findsOneWidget);
+  });
+}
+
+class _FakePracticeAiTutorEvaluator implements PracticeAiTutorEvaluator {
+  const _FakePracticeAiTutorEvaluator();
+
+  @override
+  Future<PracticeTutorFeedback> explain({
+    required MockTestProblem problem,
+    required String selectedAnswer,
+    required String explanationLanguage,
+    PracticeTutorFocus focus = PracticeTutorFocus.overview,
+  }) async => const PracticeTutorFeedback(
+    summary: 'The passage explicitly gives the time.',
+    whyCorrect: 'The person wakes at 7.',
+    whySelectedIsWrong: 'The selected time is not in the passage.',
+    keyEvidence: ['7じ'],
+    learningPoints: ['Look for time expressions.'],
+  );
 }
 
 class _FakeAppController extends AppController {
