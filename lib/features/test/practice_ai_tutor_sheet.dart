@@ -1,3 +1,5 @@
+import 'package:firebase_ai/firebase_ai.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
@@ -85,7 +87,12 @@ class _PracticeAiTutorSheetState extends ConsumerState<PracticeAiTutorSheet> {
       );
       if (!mounted) return;
       setState(() => _feedback = feedback);
-    } catch (error) {
+    } catch (error, stackTrace) {
+      if (kDebugMode) {
+        debugPrint('Practice AI Tutor error type: ${error.runtimeType}');
+        debugPrint('Practice AI Tutor failed: $error');
+        debugPrintStack(stackTrace: stackTrace);
+      }
       if (!mounted) return;
       setState(() => _error = error);
     } finally {
@@ -235,7 +242,11 @@ class _PracticeAiTutorSheetState extends ConsumerState<PracticeAiTutorSheet> {
               const Icon(Icons.cloud_off_rounded, size: 44),
               const SizedBox(height: 14),
               Text(
-                context.strings('aiTutorUnavailable'),
+                context.strings(
+                  _error is QuotaExceeded
+                      ? 'aiTutorBusy'
+                      : 'aiTutorUnavailable',
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 14),

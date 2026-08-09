@@ -211,6 +211,8 @@ class AppStrings {
     'giveExample': 'Give me a similar example',
     'aiTutorUnavailable':
         'AI Tutor is unavailable right now. The stored explanation is still available.',
+    'aiTutorBusy':
+        'AI Tutor has reached its temporary request limit. Wait about a minute, then try again. The stored explanation is still available.',
     'tryAgain': 'Try again',
     'wasHelpful': 'Was this helpful?',
     'thanksFeedback': 'Thanks for your feedback.',
@@ -418,6 +420,8 @@ class AppStrings {
     'showEvidence': '핵심 근거 보기',
     'giveExample': '비슷한 예문 보기',
     'aiTutorUnavailable': '현재 AI 튜터를 사용할 수 없습니다. 기존 해설은 계속 확인할 수 있습니다.',
+    'aiTutorBusy':
+        'AI 튜터가 일시적인 요청 한도에 도달했습니다. 1분 정도 기다린 후 다시 시도해 주세요. 기존 해설은 계속 확인할 수 있습니다.',
     'tryAgain': '다시 시도',
     'wasHelpful': '도움이 되었나요?',
     'thanksFeedback': '의견을 보내 주셔서 감사합니다.',
