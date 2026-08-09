@@ -32,32 +32,34 @@ class _GrammarPartTutorScreenState extends ConsumerState<GrammarPartTutorScreen>
   @override
   Widget build(BuildContext context) {
     final catalog = ref.watch(grammarCatalogProvider);
-    return catalog.when(
-      loading: () =>
-          const Scaffold(body: Center(child: CircularProgressIndicator())),
-      error: (error, _) => Scaffold(body: Center(child: Text('$error'))),
-      data: (allItems) {
-        final start = (widget.part - 1) * 10 + 1;
-        final end = widget.part * 10;
-        final partItems =
-            allItems
-                .where(
-                  (item) =>
-                      item.level == widget.level &&
-                      item.rank >= start &&
-                      item.rank <= end,
-                )
-                .toList()
-              ..sort((a, b) => a.rank.compareTo(b.rank));
-        if (partItems.isEmpty) {
-          return Scaffold(
-            appBar: AppBar(),
-            body: Center(child: Text(context.strings('noGrammarResults'))),
-          );
-        }
-        final questions = _selectQuestions(partItems);
-        return _buildCheckpoint(questions, partItems);
-      },
+    return wrapImmersive(
+      catalog.when(
+        loading: () =>
+            const Scaffold(body: Center(child: CircularProgressIndicator())),
+        error: (error, _) => Scaffold(body: Center(child: Text('$error'))),
+        data: (allItems) {
+          final start = (widget.part - 1) * 10 + 1;
+          final end = widget.part * 10;
+          final partItems =
+              allItems
+                  .where(
+                    (item) =>
+                        item.level == widget.level &&
+                        item.rank >= start &&
+                        item.rank <= end,
+                  )
+                  .toList()
+                ..sort((a, b) => a.rank.compareTo(b.rank));
+          if (partItems.isEmpty) {
+            return Scaffold(
+              appBar: AppBar(),
+              body: Center(child: Text(context.strings('noGrammarResults'))),
+            );
+          }
+          final questions = _selectQuestions(partItems);
+          return _buildCheckpoint(questions, partItems);
+        },
+      ),
     );
   }
 

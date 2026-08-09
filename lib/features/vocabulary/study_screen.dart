@@ -42,12 +42,14 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   @override
   Widget build(BuildContext context) {
     final asyncState = ref.watch(appControllerProvider);
-    return asyncState.when(
-      loading: () =>
-          const Scaffold(body: Center(child: CircularProgressIndicator())),
-      error: (error, _) =>
-          Scaffold(body: Center(child: Text(error.toString()))),
-      data: (state) => _buildStudyScreen(context, state),
+    return wrapImmersive(
+      asyncState.when(
+        loading: () =>
+            const Scaffold(body: Center(child: CircularProgressIndicator())),
+        error: (error, _) =>
+            Scaffold(body: Center(child: Text(error.toString()))),
+        data: (state) => _buildStudyScreen(context, state),
+      ),
     );
   }
 

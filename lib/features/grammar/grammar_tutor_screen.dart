@@ -38,20 +38,22 @@ class _GrammarTutorScreenState extends ConsumerState<GrammarTutorScreen>
   @override
   Widget build(BuildContext context) {
     final catalog = ref.watch(grammarCatalogProvider);
-    return catalog.when(
-      loading: () =>
-          const Scaffold(body: Center(child: CircularProgressIndicator())),
-      error: (error, _) => Scaffold(body: Center(child: Text('$error'))),
-      data: (items) {
-        final grammar = items.where((item) => item.id == widget.grammarId);
-        if (grammar.isEmpty) {
-          return Scaffold(
-            appBar: AppBar(),
-            body: Center(child: Text(context.strings('noGrammarResults'))),
-          );
-        }
-        return _buildLesson(grammar.first, items);
-      },
+    return wrapImmersive(
+      catalog.when(
+        loading: () =>
+            const Scaffold(body: Center(child: CircularProgressIndicator())),
+        error: (error, _) => Scaffold(body: Center(child: Text('$error'))),
+        data: (items) {
+          final grammar = items.where((item) => item.id == widget.grammarId);
+          if (grammar.isEmpty) {
+            return Scaffold(
+              appBar: AppBar(),
+              body: Center(child: Text(context.strings('noGrammarResults'))),
+            );
+          }
+          return _buildLesson(grammar.first, items);
+        },
+      ),
     );
   }
 
