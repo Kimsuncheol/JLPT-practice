@@ -76,6 +76,16 @@ void main() {
           expect(find.byKey(firstChoiceKey), findsOneWidget);
           await tester.tap(find.byKey(firstChoiceKey));
           await tester.pumpAndSettle();
+          for (var choiceIndex = 0; choiceIndex < 4; choiceIndex++) {
+            expect(
+              find.byKey(ValueKey('practice_test_choice_$choiceIndex')),
+              findsNothing,
+            );
+          }
+          expect(
+            find.byKey(const ValueKey('practice_feedback')),
+            findsOneWidget,
+          );
           expect(
             find.byKey(const ValueKey('practice_ask_ai_tutor')),
             findsOneWidget,

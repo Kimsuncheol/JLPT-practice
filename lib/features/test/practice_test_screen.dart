@@ -261,6 +261,7 @@ class _PracticeTestScreenState extends ConsumerState<PracticeTestScreen> {
                         const SizedBox(height: 24),
                         if (_answered)
                           Container(
+                            key: const ValueKey('practice_feedback'),
                             width: double.infinity,
                             margin: const EdgeInsets.only(bottom: 12),
                             padding: const EdgeInsets.all(14),
@@ -302,88 +303,91 @@ class _PracticeTestScreenState extends ConsumerState<PracticeTestScreen> {
                               ],
                             ),
                           ),
-                        ...item.choices.asMap().entries.map((entry) {
-                          final choice = entry.value;
-                          final selected = _selected == choice;
-                          Color? color;
-                          IconData? trailing;
-                          if (_answered && choice == item.correctAnswer) {
-                            color = Theme.of(
-                              context,
-                            ).colorScheme.primaryContainer;
-                            trailing = Icons.check_circle_rounded;
-                          } else if (_answered && selected) {
-                            color = Theme.of(
-                              context,
-                            ).colorScheme.errorContainer;
-                            trailing = Icons.cancel_rounded;
-                          }
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 10),
-                            child: Material(
-                              color:
-                                  color ??
-                                  (selected
-                                      ? Theme.of(
-                                          context,
-                                        ).colorScheme.secondaryContainer
-                                      : Theme.of(context).colorScheme.surface),
-                              borderRadius: BorderRadius.circular(19),
-                              child: InkWell(
-                                key: ValueKey(
-                                  'practice_test_choice_${entry.key}',
-                                ),
-                                onTap: _answered
-                                    ? null
-                                    : () {
-                                        setState(() {
-                                          _selected = choice;
-                                          _answered = true;
-                                          if (choice != item.correctAnswer) {
-                                            _incorrectIds.add(item.id);
-                                          }
-                                        });
-                                      },
-                                borderRadius: BorderRadius.circular(19),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(17),
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        width: 30,
-                                        height: 30,
-                                        alignment: Alignment.center,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: Theme.of(
+                        if (!_answered)
+                          ...item.choices.asMap().entries.map((entry) {
+                            final choice = entry.value;
+                            final selected = _selected == choice;
+                            Color? color;
+                            IconData? trailing;
+                            if (_answered && choice == item.correctAnswer) {
+                              color = Theme.of(
+                                context,
+                              ).colorScheme.primaryContainer;
+                              trailing = Icons.check_circle_rounded;
+                            } else if (_answered && selected) {
+                              color = Theme.of(
+                                context,
+                              ).colorScheme.errorContainer;
+                              trailing = Icons.cancel_rounded;
+                            }
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 10),
+                              child: Material(
+                                color:
+                                    color ??
+                                    (selected
+                                        ? Theme.of(
                                             context,
-                                          ).colorScheme.surfaceContainerHighest,
-                                        ),
-                                        child: Text(
-                                          String.fromCharCode(65 + entry.key),
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.w800,
+                                          ).colorScheme.secondaryContainer
+                                        : Theme.of(
+                                            context,
+                                          ).colorScheme.surface),
+                                borderRadius: BorderRadius.circular(19),
+                                child: InkWell(
+                                  key: ValueKey(
+                                    'practice_test_choice_${entry.key}',
+                                  ),
+                                  onTap: _answered
+                                      ? null
+                                      : () {
+                                          setState(() {
+                                            _selected = choice;
+                                            _answered = true;
+                                            if (choice != item.correctAnswer) {
+                                              _incorrectIds.add(item.id);
+                                            }
+                                          });
+                                        },
+                                  borderRadius: BorderRadius.circular(19),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(17),
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          width: 30,
+                                          height: 30,
+                                          alignment: Alignment.center,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .surfaceContainerHighest,
+                                          ),
+                                          child: Text(
+                                            String.fromCharCode(65 + entry.key),
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w800,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      const SizedBox(width: 14),
-                                      Expanded(
-                                        child: Text(
-                                          choice,
-                                          style: const TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w600,
+                                        const SizedBox(width: 14),
+                                        Expanded(
+                                          child: Text(
+                                            choice,
+                                            style: const TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.w600,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      if (trailing != null) Icon(trailing),
-                                    ],
+                                        if (trailing != null) Icon(trailing),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          );
-                        }),
+                            );
+                          }),
                         if (_answered) ...[
                           const SizedBox(height: 8),
                           FilledButton(
