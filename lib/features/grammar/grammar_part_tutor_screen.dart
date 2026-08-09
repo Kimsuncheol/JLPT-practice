@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
+import 'package:jlpt_practice/core/utils/immersive_study_mode.dart';
 import 'package:jlpt_practice/data/models/grammar_point.dart';
 import 'package:jlpt_practice/features/grammar/grammar_providers.dart';
 import 'package:jlpt_practice/features/grammar/grammar_tutor_providers.dart';
@@ -21,8 +22,8 @@ class GrammarPartTutorScreen extends ConsumerStatefulWidget {
       _GrammarPartTutorScreenState();
 }
 
-class _GrammarPartTutorScreenState
-    extends ConsumerState<GrammarPartTutorScreen> {
+class _GrammarPartTutorScreenState extends ConsumerState<GrammarPartTutorScreen>
+    with ImmersiveStudyMode<GrammarPartTutorScreen> {
   int _index = 0;
   String? _selected;
   final Map<String, bool> _results = {};

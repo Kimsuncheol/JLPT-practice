@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/app/router.dart';
 import 'package:jlpt_practice/app/theme/app_theme.dart';
+import 'package:jlpt_practice/core/utils/system_bar_metrics.dart';
 
 class JlptPracticeApp extends ConsumerWidget {
   const JlptPracticeApp({super.key});
@@ -26,8 +27,28 @@ class JlptPracticeApp extends ConsumerWidget {
       title: 'Kotoba Flow',
       debugShowCheckedModeBanner: false,
       routerConfig: appRouter,
-      builder: (context, child) =>
-          SafeArea(child: child ?? const SizedBox.shrink()),
+      builder: (context, child) {
+        final mediaQuery = MediaQuery.of(context);
+        final liveBottom = mediaQuery.padding.bottom;
+        if (liveBottom > 0) {
+          SystemBarMetrics.bottomInset = liveBottom;
+        }
+        final stableMediaQuery = mediaQuery.copyWith(
+          padding: mediaQuery.padding.copyWith(
+            bottom: SystemBarMetrics.bottomInset,
+          ),
+          viewPadding: mediaQuery.viewPadding.copyWith(
+            bottom: SystemBarMetrics.bottomInset,
+          ),
+        );
+        return MediaQuery(
+          data: stableMediaQuery,
+          child: ColoredBox(
+            color: Theme.of(context).scaffoldBackgroundColor,
+            child: SafeArea(child: child ?? const SizedBox.shrink()),
+          ),
+        );
+      },
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
       themeMode: themeMode,

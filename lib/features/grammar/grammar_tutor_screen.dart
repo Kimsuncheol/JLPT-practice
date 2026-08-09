@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
+import 'package:jlpt_practice/core/utils/immersive_study_mode.dart';
 import 'package:jlpt_practice/data/models/grammar_point.dart';
 import 'package:jlpt_practice/features/grammar/grammar_providers.dart';
 import 'package:jlpt_practice/features/grammar/grammar_tutor_ai_service.dart';
@@ -17,7 +18,8 @@ class GrammarTutorScreen extends ConsumerStatefulWidget {
   ConsumerState<GrammarTutorScreen> createState() => _GrammarTutorScreenState();
 }
 
-class _GrammarTutorScreenState extends ConsumerState<GrammarTutorScreen> {
+class _GrammarTutorScreenState extends ConsumerState<GrammarTutorScreen>
+    with ImmersiveStudyMode<GrammarTutorScreen> {
   final _sentenceController = TextEditingController();
   int _step = 0;
   int _correct = 0;
