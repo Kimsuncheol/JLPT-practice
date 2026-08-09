@@ -34,15 +34,17 @@ Future<void> main() async {
         final id = 'N${number}_${index + 1}';
         final previous = previousTranslations[id];
         final previousExamples =
-            (previous?['examples'] as Map<String, String>?) ?? const {};
+            (previous?['examples'] as Map<String, Map<String, String>>?) ??
+            const {};
         final examples = (source['examples'] as List<dynamic>)
             .cast<Map<String, dynamic>>()
             .map(
               (example) => {
                 'japanese': example['jp'] as String,
+                'reading': previousExamples[example['jp']]?['reading'],
                 'romaji': example['romaji'] as String,
                 'english': example['en'] as String,
-                'korean': previousExamples[example['jp']],
+                'korean': previousExamples[example['jp']]?['korean'],
               },
             )
             .toList(growable: false);
@@ -87,8 +89,10 @@ Map<String, Map<String, Object?>> _loadPreviousTranslations(File file) {
         'examples': {
           for (final example
               in (record['examples'] as List).cast<Map<String, dynamic>>())
-            if ((example['korean'] as String? ?? '').isNotEmpty)
-              example['japanese'] as String: example['korean'] as String,
+            example['japanese'] as String: {
+              'reading': example['reading'] as String? ?? '',
+              'korean': example['korean'] as String? ?? '',
+            },
         },
       },
   };

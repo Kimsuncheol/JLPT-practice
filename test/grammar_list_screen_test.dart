@@ -70,6 +70,7 @@ void main() {
         scrollable: find.byType(Scrollable).last,
       );
       expect(find.textContaining(example.japanese), findsOneWidget);
+      expect(find.text(example.reading), findsOneWidget);
       expect(find.text(example.english), findsOneWidget);
     }
     expect(tester.takeException(), isNull);
@@ -126,12 +127,14 @@ const _n5 = GrammarPoint(
   examples: [
     GrammarExample(
       japanese: '寿司が一番好きです。',
+      reading: 'すしがいちばんすきです。',
       romaji: 'Sushi ga ichiban suki desu.',
       english: 'I like sushi the most.',
       korean: '저는 초밥을 가장 좋아합니다.',
     ),
     GrammarExample(
       japanese: '彼女はクラスで一番速く泳げます。',
+      reading: 'かのじょはクラスでいちばんはやくおよげます。',
       romaji: 'Kanojo wa kurasu de ichiban hayaku oyogemasu.',
       english: 'She can swim the fastest in the class.',
       korean: '그녀는 반에서 가장 빨리 수영할 수 있습니다.',

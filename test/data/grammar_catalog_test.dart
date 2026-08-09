@@ -60,6 +60,8 @@ void main() {
       exampleCount += examples.length;
       for (final example in examples) {
         expect(example['japanese'], isNotEmpty);
+        expect(example['reading'], isNotEmpty);
+        expect(_containsKanji(example['reading'] as String), isFalse);
         expect(example['romaji'], isNotEmpty);
         expect(example['english'], isNotEmpty);
         expect(example['korean'], isNotEmpty);
@@ -76,3 +78,6 @@ int _count(List<Map<String, dynamic>> catalog, String level) =>
 bool _hasCleanKorean(String value) =>
     RegExp('[가-힣]').hasMatch(value) &&
     !RegExp(r'[\u0400-\u04ff\u0600-\u06ff]').hasMatch(value);
+
+bool _containsKanji(String value) =>
+    RegExp(r'[\u3400-\u4DBF\u4E00-\u9FFF々〆ヵヶ]').hasMatch(value);

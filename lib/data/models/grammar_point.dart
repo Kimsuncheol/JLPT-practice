@@ -1,6 +1,7 @@
 class GrammarExample {
   const GrammarExample({
     required this.japanese,
+    required this.reading,
     required this.romaji,
     required this.english,
     this.korean = '',
@@ -8,12 +9,14 @@ class GrammarExample {
 
   factory GrammarExample.fromJson(Map<String, dynamic> json) => GrammarExample(
     japanese: json['japanese'] as String,
+    reading: json['reading'] as String,
     romaji: json['romaji'] as String,
     english: json['english'] as String,
     korean: json['korean'] as String? ?? '',
   );
 
   final String japanese;
+  final String reading;
   final String romaji;
   final String english;
   final String korean;

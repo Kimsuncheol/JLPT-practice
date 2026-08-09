@@ -151,6 +151,11 @@ class _ExampleCard extends StatelessWidget {
           '$number. ${example.japanese}',
           style: Theme.of(context).textTheme.titleMedium,
         ),
+        const SizedBox(height: 5),
+        Text(
+          example.reading,
+          style: TextStyle(color: Theme.of(context).colorScheme.primary),
+        ),
         const SizedBox(height: 7),
         Text(example.romaji),
         const SizedBox(height: 7),
