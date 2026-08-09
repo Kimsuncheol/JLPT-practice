@@ -222,6 +222,10 @@ class AppStrings {
     'temporaryChatNotice': 'This conversation is deleted when you close it.',
     'aiReplyError': 'The tutor could not reply. Please try again.',
     'conversationLimit': 'You have reached the limit for this conversation.',
+    'unlockDaysTitle': 'Unlock the next days',
+    'unlockDaysBody':
+        'Watch a short ad to unlock Days {start}–{end}.',
+    'watchAd': 'Watch ad',
   };
 
   static const _ko = <String, String>{
@@ -431,6 +435,9 @@ class AppStrings {
     'temporaryChatNotice': '이 대화는 창을 닫으면 삭제됩니다.',
     'aiReplyError': 'AI 튜터가 답변하지 못했습니다. 다시 시도해 주세요.',
     'conversationLimit': '이번 대화의 질문 한도에 도달했습니다.',
+    'unlockDaysTitle': '다음 학습일 잠금 해제',
+    'unlockDaysBody': '짧은 광고를 시청하면 {start}~{end}일차가 잠금 해제됩니다.',
+    'watchAd': '광고 시청',
   };
 
   String call(String key) =>

@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
+import 'package:jlpt_practice/core/ads/ad_service.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
+import 'package:jlpt_practice/core/services/day_block_access.dart';
 import 'package:jlpt_practice/core/utils/study_batches.dart';
 import 'package:jlpt_practice/features/vocabulary/day_selection_skeleton.dart';
 
@@ -18,11 +20,65 @@ class DaySelectionScreen extends ConsumerStatefulWidget {
 class _DaySelectionScreenState extends ConsumerState<DaySelectionScreen> {
   final ScrollController _scrollController = ScrollController();
   String? _lastFocusSignature;
+  String? _unlockedLevel;
+  Set<int> _unlockedBlocks = const {1};
 
   @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
+  }
+
+  void _ensureUnlockedBlocksLoaded(String level) {
+    if (_unlockedLevel == level) return;
+    _unlockedLevel = level;
+    DayBlockAccess.unlockedBlocks(level).then((blocks) {
+      if (!mounted || _unlockedLevel != level) return;
+      setState(() => _unlockedBlocks = blocks);
+    });
+  }
+
+  Future<void> _handleDayTap(String level, int day) async {
+    final block = DayBlockAccess.blockForDay(day);
+    if (_unlockedBlocks.contains(block)) {
+      if (mounted) context.push('/study/day/$day');
+      return;
+    }
+
+    final strings = context.strings;
+    final startDay = DayBlockAccess.blockStartDay(block);
+    final endDay = DayBlockAccess.blockEndDay(block);
+    final proceed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(strings('unlockDaysTitle')),
+        content: Text(
+          strings('unlockDaysBody')
+              .replaceAll('{start}', '$startDay')
+              .replaceAll('{end}', '$endDay'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(strings('cancel')),
+          ),
+          FilledButton.icon(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            icon: const Icon(Icons.ondemand_video_rounded),
+            label: Text(strings('watchAd')),
+          ),
+        ],
+      ),
+    );
+    if (proceed != true || !mounted) return;
+
+    final earned = AdService.enabled ? await AdService.showRewarded() : true;
+    if (!earned || !mounted) return;
+
+    await DayBlockAccess.unlock(level, block);
+    if (!mounted) return;
+    setState(() => _unlockedBlocks = {..._unlockedBlocks, block});
+    context.push('/study/day/$day');
   }
 
   @override
@@ -34,6 +90,7 @@ class _DaySelectionScreenState extends ConsumerState<DaySelectionScreen> {
         loading: () => const DaySelectionSkeleton(),
         error: (error, _) => Center(child: Text(error.toString())),
         data: (state) {
+          _ensureUnlockedBlocksLoaded(state.selectedLevel);
           final words = state.selectedVocabulary;
           final dayCount = StudyBatches.count(words.length, state.dailyGoal);
           final completedByDay = List.generate(dayCount, (index) {
@@ -152,8 +209,13 @@ class _DaySelectionScreenState extends ConsumerState<DaySelectionScreen> {
                           final isComplete =
                               completedByDay[index] == batchLength;
                           final isNext = index == nextIndex;
+                          final isLocked = !_unlockedBlocks.contains(
+                            DayBlockAccess.blockForDay(day),
+                          );
                           final foreground = isNext
                               ? Theme.of(context).colorScheme.onPrimary
+                              : isLocked
+                              ? Theme.of(context).colorScheme.onSurfaceVariant
                               : Theme.of(context).colorScheme.onSurface;
                           return Material(
                             color: isNext
@@ -164,19 +226,31 @@ class _DaySelectionScreenState extends ConsumerState<DaySelectionScreen> {
                             borderRadius: BorderRadius.circular(24),
                             child: InkWell(
                               borderRadius: BorderRadius.circular(24),
-                              onTap: () => context.push('/study/day/$day'),
+                              onTap: () =>
+                                  _handleDayTap(state.selectedLevel, day),
                               child: Padding(
                                 padding: const EdgeInsets.all(8),
                                 child: Center(
                                   child: FittedBox(
                                     fit: BoxFit.scaleDown,
-                                    child: Text(
-                                      '${context.strings('day')} $day',
-                                      maxLines: 1,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium
-                                          ?.copyWith(color: foreground),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          '${context.strings('day')} $day',
+                                          maxLines: 1,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleMedium
+                                              ?.copyWith(color: foreground),
+                                        ),
+                                        if (isLocked)
+                                          Icon(
+                                            Icons.lock_outline_rounded,
+                                            size: 16,
+                                            color: foreground,
+                                          ),
+                                      ],
                                     ),
                                   ),
                                 ),
