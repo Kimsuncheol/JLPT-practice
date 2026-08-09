@@ -20,7 +20,8 @@ class DayBlockAccess {
   static Future<Set<int>> unlockedBlocks(String level) async {
     final preferences = await SharedPreferences.getInstance();
     final raw =
-        preferences.getStringList('unlockedDayBlocks_$level') ?? const [];
+        preferences.getStringList('unlockedDayBlocks_$level') ??
+        const <String>[];
     return {1, ...raw.map(int.parse)};
   }
 
@@ -28,8 +29,8 @@ class DayBlockAccess {
     if (block <= 1) return;
     final preferences = await SharedPreferences.getInstance();
     final key = 'unlockedDayBlocks_$level';
-    final unlocked = {
-      ...(preferences.getStringList(key) ?? const []),
+    final unlocked = <String>{
+      ...(preferences.getStringList(key) ?? const <String>[]),
       block.toString(),
     };
     await preferences.setStringList(key, unlocked.toList());
