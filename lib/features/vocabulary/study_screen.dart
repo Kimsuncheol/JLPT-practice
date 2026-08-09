@@ -193,6 +193,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
         ),
       ),
     );
+    if (mounted) reassertImmersiveMode();
     if (!mounted || shouldResume == null) return;
     _resumeDecisionPending = false;
     if (!shouldResume) {
