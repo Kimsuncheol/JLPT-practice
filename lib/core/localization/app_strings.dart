@@ -214,6 +214,12 @@ class AppStrings {
     'tryAgain': 'Try again',
     'wasHelpful': 'Was this helpful?',
     'thanksFeedback': 'Thanks for your feedback.',
+    'askFollowUp': 'Ask a follow-up question',
+    'typeYourQuestion': 'Type your question…',
+    'sendMessage': 'Send',
+    'temporaryChatNotice': 'This conversation is deleted when you close it.',
+    'aiReplyError': 'The tutor could not reply. Please try again.',
+    'conversationLimit': 'You have reached the limit for this conversation.',
   };
 
   static const _ko = <String, String>{
@@ -415,6 +421,12 @@ class AppStrings {
     'tryAgain': '다시 시도',
     'wasHelpful': '도움이 되었나요?',
     'thanksFeedback': '의견을 보내 주셔서 감사합니다.',
+    'askFollowUp': '추가 질문하기',
+    'typeYourQuestion': '질문을 입력하세요…',
+    'sendMessage': '보내기',
+    'temporaryChatNotice': '이 대화는 창을 닫으면 삭제됩니다.',
+    'aiReplyError': 'AI 튜터가 답변하지 못했습니다. 다시 시도해 주세요.',
+    'conversationLimit': '이번 대화의 질문 한도에 도달했습니다.',
   };
 
   String call(String key) =>

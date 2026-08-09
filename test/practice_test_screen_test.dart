@@ -104,6 +104,7 @@ void main() {
   testWidgets('AI Tutor preserves the stored explanation and opens guidance', (
     tester,
   ) async {
+    final tutor = _FakePracticeAiTutorEvaluator();
     final container = ProviderContainer(
       overrides: [
         appControllerProvider.overrideWith(_FakeAppController.new),
@@ -116,9 +117,7 @@ void main() {
             vocabularyQuestions: const [],
           ),
         ),
-        practiceAiTutorProvider.overrideWith(
-          (ref) async => const _FakePracticeAiTutorEvaluator(),
-        ),
+        practiceAiTutorProvider.overrideWith((ref) async => tutor),
       ],
     );
     addTearDown(container.dispose);
@@ -150,11 +149,52 @@ void main() {
     expect(find.text('The passage explicitly gives the time.'), findsOneWidget);
     expect(find.text('“7じ”'), findsOneWidget);
     expect(find.byKey(const ValueKey('practice_ai_continue')), findsOneWidget);
+
+    const question = 'Can you explain that more simply?';
+    await tester.enterText(
+      find.byKey(const ValueKey('practice_ai_chat_input')),
+      question,
+    );
+    await tester.tap(find.byKey(const ValueKey('practice_ai_chat_send')));
+    await tester.pumpAndSettle();
+
+    expect(find.text(question), findsOneWidget);
+    expect(find.text('Here is a simpler chat reply.'), findsOneWidget);
+    expect(tutor.histories.single, isEmpty);
+
+    const secondQuestion = 'What should I notice first?';
+    await tester.enterText(
+      find.byKey(const ValueKey('practice_ai_chat_input')),
+      secondQuestion,
+    );
+    await tester.tap(find.byKey(const ValueKey('practice_ai_chat_send')));
+    await tester.pumpAndSettle();
+
+    expect(tutor.histories, hasLength(2));
+    expect(tutor.histories.last, hasLength(2));
+    expect(tutor.histories.last.first.text, question);
+    expect(tutor.histories.last.last.text, 'Here is a simpler chat reply.');
+
+    await tester.tap(find.byKey(const ValueKey('practice_ai_close')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('practice_ask_ai_tutor')));
+    await tester.pumpAndSettle();
+
+    expect(find.text(question), findsNothing);
+    expect(find.text(secondQuestion), findsNothing);
+    expect(
+      find.byKey(const ValueKey('practice_ai_chat_input')),
+      findsOneWidget,
+    );
+    expect(
+      find.text('This conversation is deleted when you close it.'),
+      findsOneWidget,
+    );
   });
 }
 
 class _FakePracticeAiTutorEvaluator implements PracticeAiTutorEvaluator {
-  const _FakePracticeAiTutorEvaluator();
+  final List<List<PracticeTutorMessage>> histories = [];
 
   @override
   Future<PracticeTutorFeedback> explain({
@@ -169,6 +209,18 @@ class _FakePracticeAiTutorEvaluator implements PracticeAiTutorEvaluator {
     keyEvidence: ['7じ'],
     learningPoints: ['Look for time expressions.'],
   );
+
+  @override
+  Future<String> ask({
+    required MockTestProblem problem,
+    required String selectedAnswer,
+    required String explanationLanguage,
+    required List<PracticeTutorMessage> history,
+    required String question,
+  }) async {
+    histories.add(List<PracticeTutorMessage>.of(history));
+    return 'Here is a simpler chat reply.';
+  }
 }
 
 class _FakeAppController extends AppController {
