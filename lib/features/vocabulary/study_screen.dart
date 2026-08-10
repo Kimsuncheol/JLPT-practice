@@ -25,11 +25,14 @@ class StudyScreen extends ConsumerStatefulWidget {
 
 class _StudyScreenState extends ConsumerState<StudyScreen>
     with ImmersiveStudyMode<StudyScreen> {
+  static const _resumeDialogBarrierColor = Colors.black54;
+
   int _index = 0;
   bool? _showFurigana;
   PageController? _pageController;
   TtsService? _ttsService;
   bool _resumeDecisionPending = false;
+  bool _resumeDialogVisible = false;
   bool _suppressAutoAudio = false;
 
   @override
@@ -42,6 +45,10 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   @override
   Widget build(BuildContext context) {
     final asyncState = ref.watch(appControllerProvider);
+    final scaffoldBackgroundColor = Theme.of(context).scaffoldBackgroundColor;
+    final systemBarColor = _resumeDialogVisible
+        ? Color.alphaBlend(_resumeDialogBarrierColor, scaffoldBackgroundColor)
+        : scaffoldBackgroundColor;
     return wrapImmersive(
       asyncState.when(
         loading: () =>
@@ -50,6 +57,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
             Scaffold(body: Center(child: Text(error.toString()))),
         data: (state) => _buildStudyScreen(context, state),
       ),
+      systemBarColor: systemBarColor,
     );
   }
 
@@ -170,30 +178,49 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
     final resumeIndex = session.resolveIndex(
       words.map((word) => word.id).toList(),
     );
-    final shouldResume = await showDialog<bool>(
-      context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) => PopScope(
-        canPop: false,
-        child: AlertDialog(
-          title: Text(dialogContext.strings('resumeConfirmTitle')),
-          content: Text(
-            '${dialogContext.strings('day')} ${session.day} · ${resumeIndex + 1}/${words.length}\n${dialogContext.strings('resumeConfirmBody')}',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext, false),
-              child: Text(dialogContext.strings('chooseAnotherDay')),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.pop(dialogContext, true),
-              child: Text(dialogContext.strings('continue')),
-            ),
-          ],
-        ),
+    setImmersiveOuterBackgroundColor(
+      Color.alphaBlend(
+        _resumeDialogBarrierColor,
+        Theme.of(context).scaffoldBackgroundColor,
       ),
     );
-    if (mounted) reassertImmersiveMode();
+    setState(() => _resumeDialogVisible = true);
+    bool? shouldResume;
+    try {
+      final dialogResult = showDialog<bool>(
+        context: context,
+        barrierColor: _resumeDialogBarrierColor,
+        barrierDismissible: false,
+        builder: (dialogContext) => PopScope(
+          canPop: false,
+          child: AlertDialog(
+            title: Text(dialogContext.strings('resumeConfirmTitle')),
+            content: Text(
+              '${dialogContext.strings('day')} ${session.day} · ${resumeIndex + 1}/${words.length}\n${dialogContext.strings('resumeConfirmBody')}',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext, false),
+                child: Text(dialogContext.strings('chooseAnotherDay')),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(dialogContext, true),
+                child: Text(dialogContext.strings('continue')),
+              ),
+            ],
+          ),
+        ),
+      );
+      _applySystemBarColorAfterFrame(modalVisible: true);
+      shouldResume = await dialogResult;
+    } finally {
+      if (mounted) {
+        setImmersiveOuterBackgroundColor(null);
+        setState(() => _resumeDialogVisible = false);
+        reassertImmersiveMode();
+        _applySystemBarColorAfterFrame(modalVisible: false);
+      }
+    }
     if (!mounted || shouldResume == null) return;
     _resumeDecisionPending = false;
     if (!shouldResume) {
@@ -204,6 +231,17 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
     if (resumeIndex == 0) return;
     _suppressAutoAudio = true;
     _pageController!.jumpToPage(resumeIndex);
+  }
+
+  void _applySystemBarColorAfterFrame({required bool modalVisible}) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _resumeDialogVisible != modalVisible) return;
+      final scaffoldBackgroundColor = Theme.of(context).scaffoldBackgroundColor;
+      final color = modalVisible
+          ? Color.alphaBlend(_resumeDialogBarrierColor, scaffoldBackgroundColor)
+          : scaffoldBackgroundColor;
+      applyImmersiveSystemBarColor(color);
+    });
   }
 
   Future<void> _savePosition(AppState state, Vocabulary word, int index) {

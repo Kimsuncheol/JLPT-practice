@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/app/theme/app_theme.dart';
+import 'package:jlpt_practice/core/utils/system_bar_metrics.dart';
 import 'package:jlpt_practice/data/models/app_state.dart';
 import 'package:jlpt_practice/data/models/study_session.dart';
 import 'package:jlpt_practice/data/models/vocabulary.dart';
@@ -13,6 +15,56 @@ import 'package:jlpt_practice/features/vocabulary/study_finish_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/study_screen.dart';
 
 void main() {
+  for (final theme in {
+    'light': AppTheme.light(),
+    'dark': AppTheme.dark(),
+  }.entries) {
+    testWidgets(
+      'resume modal matches ${theme.key} system bars to its backdrop',
+      (tester) async {
+        final container = _createContainer();
+        addTearDown(container.dispose);
+        addTearDown(() => SystemBarMetrics.outerBackgroundColor.value = null);
+        await container.read(appControllerProvider.future);
+
+        await tester.pumpWidget(
+          UncontrolledProviderScope(
+            container: container,
+            child: MaterialApp(
+              theme: theme.value,
+              home: const StudyScreen(day: 1),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final backgroundColor = theme.value.scaffoldBackgroundColor;
+        final dimmedBackground = Color.alphaBlend(
+          Colors.black54,
+          backgroundColor,
+        );
+        var overlayStyle = _studyOverlayStyle(tester);
+        expect(overlayStyle.statusBarColor, dimmedBackground);
+        expect(overlayStyle.systemStatusBarContrastEnforced, isFalse);
+        expect(overlayStyle.systemNavigationBarColor, dimmedBackground);
+        expect(overlayStyle.systemNavigationBarDividerColor, dimmedBackground);
+        expect(overlayStyle.systemNavigationBarContrastEnforced, isFalse);
+        expect(SystemBarMetrics.outerBackgroundColor.value, dimmedBackground);
+
+        await tester.tap(find.text('Continue'));
+        await tester.pumpAndSettle();
+
+        overlayStyle = _studyOverlayStyle(tester);
+        expect(overlayStyle.statusBarColor, backgroundColor);
+        expect(overlayStyle.systemStatusBarContrastEnforced, isFalse);
+        expect(overlayStyle.systemNavigationBarColor, backgroundColor);
+        expect(overlayStyle.systemNavigationBarDividerColor, backgroundColor);
+        expect(overlayStyle.systemNavigationBarContrastEnforced, isFalse);
+        expect(SystemBarMetrics.outerBackgroundColor.value, isNull);
+      },
+    );
+  }
+
   testWidgets('direct study-day route waits for state before prompting', (
     tester,
   ) async {
@@ -176,6 +228,15 @@ void main() {
     expect(find.text('Finish this study session?'), findsNothing);
     expect(find.text('Great work!'), findsOneWidget);
   });
+}
+
+SystemUiOverlayStyle _studyOverlayStyle(WidgetTester tester) {
+  return tester
+      .widgetList<AnnotatedRegion<SystemUiOverlayStyle>>(
+        find.byType(AnnotatedRegion<SystemUiOverlayStyle>),
+      )
+      .singleWhere((region) => region.value.systemNavigationBarColor != null)
+      .value;
 }
 
 GoRouter _createRouter({String initialLocation = '/'}) => GoRouter(

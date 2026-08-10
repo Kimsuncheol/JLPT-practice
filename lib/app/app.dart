@@ -43,9 +43,15 @@ class JlptPracticeApp extends ConsumerWidget {
         );
         return MediaQuery(
           data: stableMediaQuery,
-          child: ColoredBox(
-            color: Theme.of(context).scaffoldBackgroundColor,
-            child: SafeArea(child: child ?? const SizedBox.shrink()),
+          child: ValueListenableBuilder<Color?>(
+            valueListenable: SystemBarMetrics.outerBackgroundColor,
+            builder: (context, outerBackgroundColor, appChild) => ColoredBox(
+              color:
+                  outerBackgroundColor ??
+                  Theme.of(context).scaffoldBackgroundColor,
+              child: SafeArea(child: appChild ?? const SizedBox.shrink()),
+            ),
+            child: child ?? const SizedBox.shrink(),
           ),
         );
       },
