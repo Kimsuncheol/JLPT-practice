@@ -312,7 +312,7 @@ class _StudyCard extends StatelessWidget {
     return Column(
       children: [
         Expanded(child: _buildCard(context)),
-        const SizedBox(height: 14),
+        const SizedBox(height: 15),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -337,19 +337,8 @@ class _StudyCard extends StatelessWidget {
   }
 
   Widget _buildCard(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: double.infinity,
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(32),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
-            blurRadius: 28,
-            offset: const Offset(0, 12),
-          ),
-        ],
-      ),
       child: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(24, 26, 24, 24),
         child: Column(
