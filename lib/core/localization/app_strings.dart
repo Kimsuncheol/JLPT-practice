@@ -158,6 +158,10 @@ class AppStrings {
     'attributionBody':
         'Ranked vocabulary and grammar are imported from the MIT-licensed tristcoil/hanabira.org dataset. Vocabulary examples include generated content.',
     'offlineMode': 'Works offline',
+    'networkDisconnectedTitle': 'No internet connection',
+    'networkDisconnectedBody':
+        'Check your Wi-Fi or mobile data connection and try again.',
+    'networkRetry': 'Try again',
     'kanaChart': 'Hiragana & Katakana',
     'kanaChartTile': 'Hiragana\nKatakana',
     'kanaChartSubtitle': 'Review the basic kana chart',
@@ -223,8 +227,7 @@ class AppStrings {
     'aiReplyError': 'The tutor could not reply. Please try again.',
     'conversationLimit': 'You have reached the limit for this conversation.',
     'unlockDaysTitle': 'Unlock the next days',
-    'unlockDaysBody':
-        'Watch a short ad to unlock Days {start}–{end}.',
+    'unlockDaysBody': 'Watch a short ad to unlock Days {start}–{end}.',
     'watchAd': 'Watch ad',
   };
 
@@ -376,6 +379,9 @@ class AppStrings {
     'attributionBody':
         '급수별 단어와 문법은 MIT 라이선스의 tristcoil/hanabira.org 데이터셋에서 가져왔으며, 단어 예문에는 생성된 콘텐츠가 포함됩니다.',
     'offlineMode': '오프라인 사용 가능',
+    'networkDisconnectedTitle': '인터넷에 연결되어 있지 않아요',
+    'networkDisconnectedBody': 'Wi-Fi 또는 모바일 데이터 연결을 확인한 후 다시 시도해 주세요.',
+    'networkRetry': '다시 시도',
     'kanaChart': '히라가나 & 가타카나',
     'kanaChartTile': '히라가나\n가타카나',
     'kanaChartSubtitle': '기본 가나표를 확인하세요',

@@ -5,6 +5,7 @@ import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/app/router.dart';
 import 'package:jlpt_practice/app/theme/app_theme.dart';
 import 'package:jlpt_practice/core/utils/system_bar_metrics.dart';
+import 'package:jlpt_practice/shared/network_status_screen.dart';
 
 class JlptPracticeApp extends ConsumerWidget {
   const JlptPracticeApp({super.key});
@@ -43,15 +44,17 @@ class JlptPracticeApp extends ConsumerWidget {
         );
         return MediaQuery(
           data: stableMediaQuery,
-          child: ValueListenableBuilder<Color?>(
-            valueListenable: SystemBarMetrics.outerBackgroundColor,
-            builder: (context, outerBackgroundColor, appChild) => ColoredBox(
-              color:
-                  outerBackgroundColor ??
-                  Theme.of(context).scaffoldBackgroundColor,
-              child: SafeArea(child: appChild ?? const SizedBox.shrink()),
+          child: NetworkStatusGate(
+            child: ValueListenableBuilder<Color?>(
+              valueListenable: SystemBarMetrics.outerBackgroundColor,
+              builder: (context, outerBackgroundColor, appChild) => ColoredBox(
+                color:
+                    outerBackgroundColor ??
+                    Theme.of(context).scaffoldBackgroundColor,
+                child: SafeArea(child: appChild ?? const SizedBox.shrink()),
+              ),
+              child: child ?? const SizedBox.shrink(),
             ),
-            child: child ?? const SizedBox.shrink(),
           ),
         );
       },
