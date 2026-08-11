@@ -22,6 +22,7 @@ import 'package:jlpt_practice/features/vocabulary/day_selection_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/study_finish_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/study_screen.dart';
 import 'package:jlpt_practice/shared/bootstrap_screen.dart';
+import 'package:jlpt_practice/shared/keep_screen_on.dart';
 
 GoRouter createAppRouter({String initialLocation = '/'}) => GoRouter(
   initialLocation: initialLocation,
@@ -41,8 +42,10 @@ GoRouter createAppRouter({String initialLocation = '/'}) => GoRouter(
     GoRoute(path: '/study', builder: (_, _) => const DaySelectionScreen()),
     GoRoute(
       path: '/study/day/:day',
-      builder: (_, state) => StudyScreen(
-        day: int.tryParse(state.pathParameters['day'] ?? '') ?? 1,
+      builder: (_, state) => KeepScreenOn(
+        child: StudyScreen(
+          day: int.tryParse(state.pathParameters['day'] ?? '') ?? 1,
+        ),
       ),
     ),
     GoRoute(
@@ -51,22 +54,29 @@ GoRouter createAppRouter({String initialLocation = '/'}) => GoRouter(
         day: int.tryParse(state.pathParameters['day'] ?? '') ?? 1,
       ),
     ),
-    GoRoute(path: '/grammar', builder: (_, _) => const GrammarListScreen()),
+    GoRoute(
+      path: '/grammar',
+      builder: (_, _) => const KeepScreenOn(child: GrammarListScreen()),
+    ),
     GoRoute(
       path: '/grammar/detail/:id',
-      builder: (_, state) =>
-          GrammarDetailScreen(grammarId: state.pathParameters['id'] ?? ''),
+      builder: (_, state) => KeepScreenOn(
+        child: GrammarDetailScreen(grammarId: state.pathParameters['id'] ?? ''),
+      ),
     ),
     GoRoute(
       path: '/grammar/tutor/:id',
-      builder: (_, state) =>
-          GrammarTutorScreen(grammarId: state.pathParameters['id'] ?? ''),
+      builder: (_, state) => KeepScreenOn(
+        child: GrammarTutorScreen(grammarId: state.pathParameters['id'] ?? ''),
+      ),
     ),
     GoRoute(
       path: '/grammar/part/:level/:part',
-      builder: (_, state) => GrammarPartTutorScreen(
-        level: state.pathParameters['level'] ?? 'N5',
-        part: int.tryParse(state.pathParameters['part'] ?? '') ?? 1,
+      builder: (_, state) => KeepScreenOn(
+        child: GrammarPartTutorScreen(
+          level: state.pathParameters['level'] ?? 'N5',
+          part: int.tryParse(state.pathParameters['part'] ?? '') ?? 1,
+        ),
       ),
     ),
     GoRoute(path: '/quiz', builder: (_, _) => const QuizScreen()),
@@ -78,27 +88,32 @@ GoRouter createAppRouter({String initialLocation = '/'}) => GoRouter(
     GoRoute(path: '/quiz/result', builder: (_, _) => const QuizResultScreen()),
     GoRoute(
       path: '/test/practice/:level',
-      builder: (_, state) =>
-          QuestionTypeScreen(level: state.pathParameters['level'] ?? 'N5'),
+      builder: (_, state) => KeepScreenOn(
+        child: QuestionTypeScreen(level: state.pathParameters['level'] ?? 'N5'),
+      ),
     ),
     GoRoute(
       path: '/test/practice/:level/:section',
-      builder: (_, state) => LevelPracticeTestScreen(
-        level: state.pathParameters['level'] ?? 'N5',
-        section:
-            sectionFromPathSegment(state.pathParameters['section'] ?? '') ??
-            ProblemSection.reading,
+      builder: (_, state) => KeepScreenOn(
+        child: LevelPracticeTestScreen(
+          level: state.pathParameters['level'] ?? 'N5',
+          section:
+              sectionFromPathSegment(state.pathParameters['section'] ?? '') ??
+              ProblemSection.reading,
+        ),
       ),
     ),
     GoRoute(
       path: '/test/practice/:level/:section/:practiceId',
-      builder: (_, state) => PracticeTestScreen(
-        level: state.pathParameters['level'] ?? 'N5',
-        section:
-            sectionFromPathSegment(state.pathParameters['section'] ?? '') ??
-            ProblemSection.vocabulary,
-        practiceNumber: practiceSetNumber(
-          state.pathParameters['practiceId'] ?? '',
+      builder: (_, state) => KeepScreenOn(
+        child: PracticeTestScreen(
+          level: state.pathParameters['level'] ?? 'N5',
+          section:
+              sectionFromPathSegment(state.pathParameters['section'] ?? '') ??
+              ProblemSection.vocabulary,
+          practiceNumber: practiceSetNumber(
+            state.pathParameters['practiceId'] ?? '',
+          ),
         ),
       ),
     ),
@@ -108,12 +123,17 @@ GoRouter createAppRouter({String initialLocation = '/'}) => GoRouter(
         final level = state.pathParameters['level'] ?? 'N5';
         final section = state.pathParameters['section'] ?? '';
         final practiceId = state.pathParameters['practiceId'] ?? '';
-        return MockTestResultScreen(
-          retryPath: '/test/practice/$level/$section/$practiceId',
+        return KeepScreenOn(
+          child: MockTestResultScreen(
+            retryPath: '/test/practice/$level/$section/$practiceId',
+          ),
         );
       },
     ),
-    GoRoute(path: '/review', builder: (_, _) => const ReviewScreen()),
+    GoRoute(
+      path: '/review',
+      builder: (_, _) => const KeepScreenOn(child: ReviewScreen()),
+    ),
     GoRoute(path: '/kana', builder: (_, _) => const KanaChartScreen()),
   ],
 );
