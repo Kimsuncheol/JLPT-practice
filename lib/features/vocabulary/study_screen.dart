@@ -191,23 +191,25 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
         context: context,
         barrierColor: _resumeDialogBarrierColor,
         barrierDismissible: false,
-        builder: (dialogContext) => PopScope(
-          canPop: false,
-          child: AlertDialog(
-            title: Text(dialogContext.strings('resumeConfirmTitle')),
-            content: Text(
-              '${dialogContext.strings('day')} ${session.day} · ${resumeIndex + 1}/${words.length}\n${dialogContext.strings('resumeConfirmBody')}',
+        builder: (dialogContext) => wrapImmersiveSystemBarGesture(
+          PopScope(
+            canPop: false,
+            child: AlertDialog(
+              title: Text(dialogContext.strings('resumeConfirmTitle')),
+              content: Text(
+                '${dialogContext.strings('day')} ${session.day} · ${resumeIndex + 1}/${words.length}\n${dialogContext.strings('resumeConfirmBody')}',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext, false),
+                  child: Text(dialogContext.strings('chooseAnotherDay')),
+                ),
+                FilledButton(
+                  onPressed: () => Navigator.pop(dialogContext, true),
+                  child: Text(dialogContext.strings('continue')),
+                ),
+              ],
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(dialogContext, false),
-                child: Text(dialogContext.strings('chooseAnotherDay')),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.pop(dialogContext, true),
-                child: Text(dialogContext.strings('continue')),
-              ),
-            ],
           ),
         ),
       );

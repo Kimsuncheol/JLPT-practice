@@ -70,15 +70,23 @@ mixin ImmersiveStudyMode<T extends StatefulWidget> on State<T> {
         systemBarColor ?? Theme.of(context).scaffoldBackgroundColor;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: _systemBarStyle(backgroundColor),
-      child: GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onVerticalDragUpdate: (details) {
-          if (_systemNavBarVisible && details.delta.dy > 0) {
-            _hideSystemNavBar();
-          }
-        },
-        child: child,
-      ),
+      child: wrapImmersiveSystemBarGesture(child),
+    );
+  }
+
+  /// Adds the immersive-mode drag behavior to content presented above the
+  /// screen's route, such as a dialog. Overlay routes receive pointer events
+  /// before [wrapImmersive], so they need their own gesture detector.
+  Widget wrapImmersiveSystemBarGesture(Widget child) {
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onVerticalDragUpdate: (details) {
+        if (_systemNavBarVisible && details.delta.dy > 0) {
+          _systemNavBarVisible = false;
+          _hideSystemNavBar();
+        }
+      },
+      child: child,
     );
   }
 
