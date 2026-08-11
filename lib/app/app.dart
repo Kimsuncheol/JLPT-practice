@@ -61,6 +61,7 @@ class JlptPracticeApp extends ConsumerWidget {
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
       themeMode: themeMode,
+      themeAnimationDuration: Duration.zero,
       locale: locale,
       supportedLocales: const [Locale('en'), Locale('ko')],
       localizationsDelegates: const [

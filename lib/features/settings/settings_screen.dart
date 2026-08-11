@@ -119,21 +119,9 @@ class SettingsScreen extends ConsumerWidget {
                   ListTile(
                     leading: const Icon(Icons.brightness_6_rounded),
                     title: Text(strings('appearance')),
-                    trailing: DropdownButton<ThemeMode>(
-                      value: state.themeMode,
-                      underline: const SizedBox.shrink(),
-                      items: ThemeMode.values
-                          .map(
-                            (mode) => DropdownMenuItem(
-                              value: mode,
-                              child: Text(strings(mode.name)),
-                            ),
-                          )
-                          .toList(),
-                      onChanged: (value) {
-                        if (value != null) controller.setThemeMode(value);
-                      },
-                    ),
+                    subtitle: Text(strings(state.themeMode.name)),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => context.push('/settings/appearance'),
                   ),
                 ],
               ),
