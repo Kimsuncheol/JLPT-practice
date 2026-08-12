@@ -91,7 +91,9 @@ class StudyFinishScreen extends ConsumerWidget {
     if (shouldComplete != true || !context.mounted) return;
 
     final level = ref.read(appControllerProvider).requireValue.selectedLevel;
-    await ref.read(appControllerProvider.notifier).completeStudySession(level);
+    await ref
+        .read(appControllerProvider.notifier)
+        .completeStudySession(level, day);
     if (context.mounted) context.pop();
   }
 }

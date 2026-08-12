@@ -54,6 +54,32 @@ void main() {
     expect(store.loadStudySessions(), isEmpty);
   });
 
+  test('persists completed study days by JLPT level', () async {
+    SharedPreferences.setMockInitialValues({});
+    final store = await LocalStore.create();
+
+    await store.saveCompletedStudyDays({
+      'N5': {1, 2, 3},
+      'N4': {1},
+    });
+
+    final restored = (await LocalStore.create()).loadCompletedStudyDays();
+    expect(restored['N5'], {1, 2, 3});
+    expect(restored['N4'], {1});
+  });
+
+  test('learning-data reset removes completed study days', () async {
+    SharedPreferences.setMockInitialValues({});
+    final store = await LocalStore.create();
+    await store.saveCompletedStudyDays({
+      'N5': {1, 2},
+    });
+
+    await store.clearLearningData();
+
+    expect(store.loadCompletedStudyDays(), isEmpty);
+  });
+
   test(
     'persists grammar mastery separately from vocabulary progress',
     () async {

@@ -28,6 +28,7 @@ class AppState {
     required this.longestStreak,
     this.totalXp = 0,
     this.studySessions = const {},
+    this.completedStudyDays = const {},
     this.lastQuizResult,
     this.lastMockTestResult,
   });
@@ -53,6 +54,7 @@ class AppState {
   final int longestStreak;
   final int totalXp;
   final Map<String, StudySession> studySessions;
+  final Map<String, Set<int>> completedStudyDays;
   final QuizResult? lastQuizResult;
   final MockTestResult? lastMockTestResult;
 
@@ -105,6 +107,7 @@ class AppState {
     int? longestStreak,
     int? totalXp,
     Map<String, StudySession>? studySessions,
+    Map<String, Set<int>>? completedStudyDays,
     QuizResult? lastQuizResult,
     MockTestResult? lastMockTestResult,
   }) {
@@ -130,6 +133,7 @@ class AppState {
       longestStreak: longestStreak ?? this.longestStreak,
       totalXp: totalXp ?? this.totalXp,
       studySessions: studySessions ?? this.studySessions,
+      completedStudyDays: completedStudyDays ?? this.completedStudyDays,
       lastQuizResult: lastQuizResult ?? this.lastQuizResult,
       lastMockTestResult: lastMockTestResult ?? this.lastMockTestResult,
     );

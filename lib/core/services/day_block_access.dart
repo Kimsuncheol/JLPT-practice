@@ -7,9 +7,35 @@ class DayBlockAccess {
 
   static int blockForDay(int day) => ((day - 1) ~/ blockSize) + 1;
 
+  static int stageForDay(int day) => blockForDay(day);
+
   static int blockStartDay(int block) => (block - 1) * blockSize + 1;
 
+  static int stageStartDay(int stage) => blockStartDay(stage);
+
   static int blockEndDay(int block) => block * blockSize;
+
+  static int stageEndDay(int stage) => blockEndDay(stage);
+
+  static bool requiresRewardedAd(int day) => day > 0 && day % blockSize == 0;
+
+  static bool prerequisitesComplete(int day, Set<int> completedDays) {
+    if (day <= 1) return true;
+    for (var previousDay = 1; previousDay < day; previousDay++) {
+      if (!completedDays.contains(previousDay)) return false;
+    }
+    return true;
+  }
+
+  static bool canStudy({
+    required int day,
+    required Set<int> completedDays,
+    required Set<int> rewardedDays,
+  }) {
+    if (completedDays.contains(day)) return true;
+    if (!prerequisitesComplete(day, completedDays)) return false;
+    return !requiresRewardedAd(day) || rewardedDays.contains(day);
+  }
 
   static Future<bool> isUnlocked(String level, int block) async {
     if (block <= 1) return true;
@@ -34,5 +60,32 @@ class DayBlockAccess {
       block.toString(),
     };
     await preferences.setStringList(key, unlocked.toList());
+  }
+
+  static Future<Set<int>> rewardedDays(String level) async {
+    final preferences = await SharedPreferences.getInstance();
+    final raw =
+        preferences.getStringList('rewardedStudyDays_$level') ??
+        const <String>[];
+    return raw.map(int.parse).toSet();
+  }
+
+  static Future<void> unlockRewardedDay(String level, int day) async {
+    if (!requiresRewardedAd(day)) return;
+    final preferences = await SharedPreferences.getInstance();
+    final key = 'rewardedStudyDays_$level';
+    final unlocked = <String>{
+      ...(preferences.getStringList(key) ?? const <String>[]),
+      day.toString(),
+    };
+    await preferences.setStringList(key, unlocked.toList());
+  }
+
+  static Future<void> clearRewardedDays() async {
+    final preferences = await SharedPreferences.getInstance();
+    final keys = preferences.getKeys().where(
+      (key) => key.startsWith('rewardedStudyDays_'),
+    );
+    await Future.wait(keys.map(preferences.remove));
   }
 }

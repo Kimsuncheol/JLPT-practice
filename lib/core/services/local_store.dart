@@ -117,6 +117,24 @@ class LocalStore {
     }
   }
 
+  Map<String, Set<int>> loadCompletedStudyDays() {
+    final raw = _preferences.getString('completedStudyDays');
+    if (raw == null) return {};
+    try {
+      final decoded = jsonDecode(raw) as Map<String, dynamic>;
+      return decoded.map(
+        (level, days) => MapEntry(
+          level,
+          (days as List<dynamic>).map((day) => day as int).toSet(),
+        ),
+      );
+    } on FormatException {
+      return {};
+    } on TypeError {
+      return {};
+    }
+  }
+
   Map<String, GrammarProgress> loadGrammarProgress() {
     final raw = _preferences.getString('grammarProgress');
     if (raw == null) return {};
@@ -145,6 +163,16 @@ class LocalStore {
       _preferences.setString(
         'studySessions',
         jsonEncode(sessions.map((key, value) => MapEntry(key, value.toJson()))),
+      );
+
+  Future<void> saveCompletedStudyDays(Map<String, Set<int>> completedDays) =>
+      _preferences.setString(
+        'completedStudyDays',
+        jsonEncode(
+          completedDays.map(
+            (level, days) => MapEntry(level, days.toList()..sort()),
+          ),
+        ),
       );
 
   Future<void> saveGrammarProgress(Map<String, GrammarProgress> progress) =>
@@ -179,6 +207,7 @@ class LocalStore {
       _preferences.remove('longestStreak'),
       _preferences.remove('totalXp'),
       _preferences.remove('studySessions'),
+      _preferences.remove('completedStudyDays'),
       _preferences.remove('grammarProgress'),
     ]);
   }

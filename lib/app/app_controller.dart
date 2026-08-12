@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:jlpt_practice/core/services/cloud_sync_service.dart';
+import 'package:jlpt_practice/core/services/day_block_access.dart';
 import 'package:jlpt_practice/core/services/local_store.dart';
 import 'package:jlpt_practice/core/services/notification_service.dart';
 import 'package:jlpt_practice/core/services/srs_scheduler.dart';
@@ -79,6 +80,7 @@ class AppController extends AsyncNotifier<AppState> {
       longestStreak: settings.longestStreak,
       totalXp: settings.totalXp,
       studySessions: _store.loadStudySessions(),
+      completedStudyDays: _store.loadCompletedStudyDays(),
     );
   }
 
@@ -330,11 +332,22 @@ class AppController extends AsyncNotifier<AppState> {
     await _persistStudySessions(sessions);
   }
 
-  Future<void> completeStudySession(String level) async {
-    if (!_value.studySessions.containsKey(level)) return;
+  Future<void> completeStudySession(String level, int day) async {
     final sessions = {..._value.studySessions}..remove(level);
-    state = AsyncData(_value.copyWith(studySessions: sessions));
-    await _persistStudySessions(sessions);
+    final completedStudyDays = {
+      ..._value.completedStudyDays,
+      level: {...?_value.completedStudyDays[level], day},
+    };
+    state = AsyncData(
+      _value.copyWith(
+        studySessions: sessions,
+        completedStudyDays: completedStudyDays,
+      ),
+    );
+    await Future.wait([
+      _persistStudySessions(sessions),
+      _store.saveCompletedStudyDays(completedStudyDays),
+    ]);
   }
 
   Future<void> _persistStudySessions(Map<String, StudySession> sessions) {
@@ -366,9 +379,11 @@ class AppController extends AsyncNotifier<AppState> {
       longestStreak: 0,
       totalXp: 0,
       studySessions: {},
+      completedStudyDays: {},
     );
     state = AsyncData(next);
     await _studySessionWrite;
     await _store.clearLearningData();
+    await DayBlockAccess.clearRewardedDays();
   }
 }

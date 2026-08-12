@@ -226,8 +226,11 @@ class AppStrings {
     'temporaryChatNotice': 'This conversation is deleted when you close it.',
     'aiReplyError': 'The tutor could not reply. Please try again.',
     'conversationLimit': 'You have reached the limit for this conversation.',
-    'unlockDaysTitle': 'Unlock the next days',
-    'unlockDaysBody': 'Watch a short ad to unlock Days {start}–{end}.',
+    'unlockDaysTitle': 'Unlock Day {day}',
+    'unlockDaysBody': 'Watch a short ad to study Day {day}.',
+    'finishPreviousDaysTitle': 'Finish earlier days first',
+    'finishPreviousDaysBody':
+        'Complete Days 1–{day} before starting this study day.',
     'watchAd': 'Watch ad',
   };
 
@@ -441,8 +444,10 @@ class AppStrings {
     'temporaryChatNotice': '이 대화는 창을 닫으면 삭제됩니다.',
     'aiReplyError': 'AI 튜터가 답변하지 못했습니다. 다시 시도해 주세요.',
     'conversationLimit': '이번 대화의 질문 한도에 도달했습니다.',
-    'unlockDaysTitle': '다음 학습일 잠금 해제',
-    'unlockDaysBody': '짧은 광고를 시청하면 {start}~{end}일차가 잠금 해제됩니다.',
+    'unlockDaysTitle': 'Day {day} 잠금 해제',
+    'unlockDaysBody': '짧은 광고를 시청하면 Day {day} 학습을 시작할 수 있습니다.',
+    'finishPreviousDaysTitle': '이전 학습일을 먼저 완료해 주세요',
+    'finishPreviousDaysBody': '이 학습일을 시작하려면 Day 1~{day} 학습을 완료해야 합니다.',
     'watchAd': '광고 시청',
   };
 
