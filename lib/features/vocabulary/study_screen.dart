@@ -374,6 +374,8 @@ class _StudyCard extends StatelessWidget {
               button: true,
               child: InkWell(
                 borderRadius: BorderRadius.circular(16),
+                splashFactory: NoSplash.splashFactory,
+                overlayColor: const WidgetStatePropertyAll(Colors.transparent),
                 onTap: onSpeakWord,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
@@ -415,6 +417,10 @@ class _StudyCard extends StatelessWidget {
                       button: true,
                       child: InkWell(
                         borderRadius: BorderRadius.circular(12),
+                        splashFactory: NoSplash.splashFactory,
+                        overlayColor: const WidgetStatePropertyAll(
+                          Colors.transparent,
+                        ),
                         onTap: onSpeakExample,
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
