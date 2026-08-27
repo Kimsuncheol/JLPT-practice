@@ -116,6 +116,8 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
                     onSpeakWord: () => _speakIfAudible(word.reading),
                     onSpeakExample: () =>
                         _speakIfAudible(word.example.sentence),
+                    onSpeakRolePlay: () =>
+                        _speakIfAudible(word.example.completedQuizSentence),
                     onReview: () async {
                       await ref
                           .read(appControllerProvider.notifier)
@@ -296,6 +298,7 @@ class _StudyCard extends StatelessWidget {
     required this.onToggleFurigana,
     required this.onSpeakWord,
     required this.onSpeakExample,
+    required this.onSpeakRolePlay,
     required this.onReview,
   });
 
@@ -305,6 +308,7 @@ class _StudyCard extends StatelessWidget {
   final VoidCallback onToggleFurigana;
   final VoidCallback onSpeakWord;
   final VoidCallback onSpeakExample;
+  final VoidCallback onSpeakRolePlay;
   final VoidCallback onReview;
 
   @override
@@ -453,8 +457,155 @@ class _StudyCard extends StatelessWidget {
                   ],
                 ),
               ),
+              if (vocabulary.example.hasRolePlay) ...[
+                const SizedBox(height: 14),
+                _RolePlayCard(
+                  example: vocabulary.example,
+                  onSpeak: onSpeakRolePlay,
+                ),
+              ],
             ],
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _RolePlayCard extends StatefulWidget {
+  const _RolePlayCard({required this.example, required this.onSpeak});
+
+  final VocabularyExample example;
+  final VoidCallback onSpeak;
+
+  @override
+  State<_RolePlayCard> createState() => _RolePlayCardState();
+}
+
+class _RolePlayCardState extends State<_RolePlayCard> {
+  bool _showResponse = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final turns = widget.example.rolePlayTurns;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: colors.secondaryContainer.withValues(alpha: 0.55),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: colors.secondary.withValues(alpha: 0.28)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            context.strings('rolePlayPrompt'),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: colors.onSecondaryContainer,
+            ),
+          ),
+          const SizedBox(height: 18),
+          for (var index = 0; index < turns.length; index++) ...[
+            _RolePlayBubble(
+              speaker: turns[index].isLearnerTurn
+                  ? context.strings('yourTurn')
+                  : turns[index].speaker,
+              text: _showResponse && turns[index].isLearnerTurn
+                  ? turns[index].text.replaceFirst(
+                      RegExp(r'＿+'),
+                      widget.example.answer,
+                    )
+                  : turns[index].text,
+              isLearner: turns[index].isLearnerTurn,
+            ),
+            if (index < turns.length - 1) const SizedBox(height: 10),
+          ],
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => setState(() => _showResponse = !_showResponse),
+                  icon: Icon(
+                    _showResponse
+                        ? Icons.visibility_off_rounded
+                        : Icons.visibility_rounded,
+                  ),
+                  label: Text(
+                    context.strings(
+                      _showResponse ? 'hideResponse' : 'revealResponse',
+                    ),
+                  ),
+                ),
+              ),
+              if (_showResponse) ...[
+                const SizedBox(width: 8),
+                IconButton.filledTonal(
+                  tooltip: context.strings('listenResponse'),
+                  onPressed: widget.onSpeak,
+                  icon: const Icon(Icons.volume_up_rounded),
+                ),
+              ],
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RolePlayBubble extends StatelessWidget {
+  const _RolePlayBubble({
+    required this.speaker,
+    required this.text,
+    required this.isLearner,
+  });
+
+  final String speaker;
+  final String text;
+  final bool isLearner;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Align(
+      alignment: isLearner ? Alignment.centerRight : Alignment.centerLeft,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 420),
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
+          decoration: BoxDecoration(
+            color: isLearner ? colors.surface : colors.primaryContainer,
+            borderRadius: BorderRadius.only(
+              topLeft: const Radius.circular(18),
+              topRight: const Radius.circular(18),
+              bottomLeft: Radius.circular(isLearner ? 18 : 5),
+              bottomRight: Radius.circular(isLearner ? 5 : 18),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                speaker,
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                  color: colors.primary,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 5),
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 180),
+                child: Text(
+                  text,
+                  key: ValueKey(text),
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:jlpt_practice/data/models/vocabulary.dart';
 
 void main() {
   late List<Map<String, dynamic>> catalog;
@@ -67,6 +68,23 @@ void main() {
       expect(sentence.contains(answer), isTrue);
       expect(quizSentence, sentence.replaceFirst(answer, '＿＿＿'));
     }
+  });
+
+  test('only speaker-tagged examples are classified as role-play', () {
+    final rolePlayWords = catalog
+        .map(Vocabulary.fromCatalogJson)
+        .where((word) => word.example.hasRolePlay)
+        .toList();
+
+    expect(rolePlayWords, hasLength(1));
+    expect(rolePlayWords.single.jlptLevel, 'N5');
+    expect(rolePlayWords.single.rank, 89);
+    expect(rolePlayWords.single.word, 'ええ');
+    expect(
+      rolePlayWords.single.example.rolePlayTurns
+          .map((turn) => turn.speaker),
+      ['A', 'B'],
+    );
   });
 }
 

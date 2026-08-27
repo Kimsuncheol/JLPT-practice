@@ -27,6 +27,46 @@ class VocabularyExample {
 
   String translation(String language) =>
       translations[language] ?? translations['en'] ?? '';
+
+  bool get hasRolePlay {
+    final turns = _parseRolePlayTurns(sentence);
+    return turns.map((turn) => turn.speaker).toSet().length >= 2 &&
+        quizSentence.isNotEmpty &&
+        answer.isNotEmpty;
+  }
+
+  List<VocabularyRolePlayTurn> get rolePlayTurns =>
+      _parseRolePlayTurns(quizSentence);
+
+  String get completedQuizSentence =>
+      quizSentence.replaceFirst(RegExp(r'＿+'), answer);
+}
+
+class VocabularyRolePlayTurn {
+  const VocabularyRolePlayTurn({required this.speaker, required this.text});
+
+  final String speaker;
+  final String text;
+
+  bool get isLearnerTurn => text.contains('＿');
+}
+
+final _rolePlaySpeakerPattern = RegExp(
+  r'(?:^|\s)([A-Za-z][A-Za-z0-9]{0,2})\s*[：:]\s*',
+);
+
+List<VocabularyRolePlayTurn> _parseRolePlayTurns(String script) {
+  final matches = _rolePlaySpeakerPattern.allMatches(script).toList();
+  return List.generate(matches.length, (index) {
+    final match = matches[index];
+    final end = index + 1 < matches.length
+        ? matches[index + 1].start
+        : script.length;
+    return VocabularyRolePlayTurn(
+      speaker: match.group(1)!,
+      text: script.substring(match.end, end).trim(),
+    );
+  });
 }
 
 class Vocabulary {
