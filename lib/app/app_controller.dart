@@ -88,7 +88,6 @@ class AppController extends AsyncNotifier<AppState> {
 
   Future<void> completeOnboarding({
     required String level,
-    required int dailyGoal,
     required String languageCode,
     required bool autoPlayAudio,
   }) async {
@@ -100,7 +99,6 @@ class AppController extends AsyncNotifier<AppState> {
     final next = _value.copyWith(
       onboardingComplete: true,
       selectedLevel: level,
-      dailyGoal: dailyGoal,
       languageCode: languageCode,
       meaningLanguage: resolvedLanguage,
       autoPlayAudio: autoPlayAudio,
@@ -109,7 +107,6 @@ class AppController extends AsyncNotifier<AppState> {
     await Future.wait([
       _store.setValue('onboardingComplete', true),
       _store.setValue('selectedLevel', level),
-      _store.setValue('dailyGoal', dailyGoal),
       _store.setValue('languageCode', languageCode),
       _store.setValue('meaningLanguage', resolvedLanguage),
       _store.setValue('autoPlayAudio', autoPlayAudio),

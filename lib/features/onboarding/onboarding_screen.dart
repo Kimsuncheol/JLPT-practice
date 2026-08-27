@@ -14,7 +14,6 @@ class OnboardingScreen extends ConsumerStatefulWidget {
 
 class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   String _level = 'N5';
-  final int _goal = 10;
   String? _language;
   bool _autoAudio = false;
   bool _submitting = false;
@@ -129,7 +128,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                                   .read(appControllerProvider.notifier)
                                   .completeOnboarding(
                                     level: _level,
-                                    dailyGoal: _goal,
                                     languageCode: _language!,
                                     autoPlayAudio: _autoAudio,
                                   );
