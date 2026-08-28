@@ -37,9 +37,6 @@ class VocabularyExample {
 
   List<VocabularyRolePlayTurn> get rolePlayTurns =>
       _parseRolePlayTurns(quizSentence);
-
-  String get completedQuizSentence =>
-      quizSentence.replaceFirst(RegExp(r'＿+'), answer);
 }
 
 class VocabularyRolePlayTurn {
