@@ -5,6 +5,7 @@ import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/ads/ad_service.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/core/services/account_service.dart';
+import 'package:jlpt_practice/shared/session_actions.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -186,6 +187,18 @@ class SettingsScreen extends ConsumerWidget {
                   ),
                 ],
               ),
+              if (user != null) ...[
+                const SizedBox(height: 14),
+                _SettingsGroup(
+                  children: [
+                    ListTile(
+                      leading: const Icon(Icons.logout_rounded),
+                      title: Text(strings('signOut')),
+                      onTap: () => confirmAndSignOut(context, ref),
+                    ),
+                  ],
+                ),
+              ],
               const SizedBox(height: 22),
               Text(
                 user != null

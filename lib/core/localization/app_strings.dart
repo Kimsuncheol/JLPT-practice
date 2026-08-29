@@ -32,6 +32,7 @@ class AppStrings {
     'words': 'Words',
     'progress': 'Progress',
     'settings': 'Settings',
+    'me': 'Me',
     'welcomeBack': 'Ready for today?',
     'dailyMomentum': 'Daily momentum',
     'wordsStudied': 'Words studied',
@@ -153,6 +154,9 @@ class AppStrings {
     'protectProgressTitle': 'Sign in to protect your progress',
     'protectProgressBody':
         'Your current study history will be linked to your account and restored after reinstalling the app.',
+    'welcomeSignInTitle': 'Sign in to get started',
+    'welcomeSignInBody':
+        'Create an account or sign in so your progress saves and syncs across every device.',
     'createAccountTitle': 'Create your account',
     'signInWithGoogle': 'Sign in with Google',
     'signUpWithGoogle': 'Sign up with Google',
@@ -191,6 +195,9 @@ class AppStrings {
     'deleteAccount': 'Delete account',
     'deleteAccountConfirm':
         'This permanently deletes your account and all synchronized study data. This cannot be undone.',
+    'optOut': 'Opt out',
+    'profile': 'Profile',
+    'authMethod': 'Sign-in method',
     'anonymousBody':
         'Sign in to restore your study history after reinstalling or changing devices.',
     'privacyBody':
@@ -301,6 +308,7 @@ class AppStrings {
     'words': '단어',
     'progress': '진행',
     'settings': '설정',
+    'me': '내 정보',
     'welcomeBack': '오늘도 시작해 볼까요?',
     'dailyMomentum': '오늘의 흐름',
     'wordsStudied': '학습한 단어',
@@ -418,6 +426,8 @@ class AppStrings {
     'protectProgress': '학습 기록 보호하기',
     'protectProgressTitle': '로그인하여 학습 기록을 보호하세요',
     'protectProgressBody': '현재 학습 기록이 계정에 연결되어 앱을 다시 설치해도 복원됩니다.',
+    'welcomeSignInTitle': '로그인하고 시작하기',
+    'welcomeSignInBody': '계정을 만들거나 로그인하면 학습 기록이 저장되고 모든 기기에서 동기화됩니다.',
     'createAccountTitle': '계정 만들기',
     'signInWithGoogle': 'Google로 로그인',
     'signUpWithGoogle': 'Google로 가입하기',
@@ -454,6 +464,9 @@ class AppStrings {
     'signOutConfirm': '클라우드 기록은 계정에 유지되며 이 기기의 계정 데이터는 삭제됩니다.',
     'deleteAccount': '계정 삭제',
     'deleteAccountConfirm': '계정과 동기화된 모든 학습 기록이 영구 삭제됩니다. 되돌릴 수 없습니다.',
+    'optOut': '탈퇴하기',
+    'profile': '프로필',
+    'authMethod': '로그인 방법',
     'anonymousBody': '로그인하면 앱 재설치 또는 기기 변경 후에도 학습 기록을 복원할 수 있습니다.',
     'privacyBody': '학습 설정과 익명 사용 식별자만 사용합니다. 광고를 활성화하면 광고 동의 선택 항목이 제공됩니다.',
     'attributionBody':

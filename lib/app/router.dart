@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:jlpt_practice/features/auth/auth_gate_screen.dart';
 import 'package:jlpt_practice/features/dashboard/choose_study_screen.dart';
 import 'package:jlpt_practice/features/dashboard/home_shell.dart';
 import 'package:jlpt_practice/features/grammar/grammar_detail_screen.dart';
@@ -30,6 +31,7 @@ GoRouter createAppRouter({String initialLocation = '/'}) => GoRouter(
   initialLocation: initialLocation,
   routes: [
     GoRoute(path: '/', builder: (_, _) => const BootstrapScreen()),
+    GoRoute(path: '/sign-in', builder: (_, _) => const AuthGateScreen()),
     GoRoute(path: '/onboarding', builder: (_, _) => const OnboardingScreen()),
     GoRoute(path: '/home', builder: (_, _) => const HomeShell()),
     GoRoute(

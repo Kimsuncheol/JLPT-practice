@@ -1,10 +1,12 @@
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/app/theme/app_theme.dart';
+import 'package:jlpt_practice/core/services/firebase_bootstrap.dart';
 import 'package:jlpt_practice/core/services/notification_service.dart';
 
 class BootstrapScreen extends ConsumerStatefulWidget {
@@ -40,6 +42,11 @@ class _BootstrapScreenState extends ConsumerState<BootstrapScreen> {
   void _continueIfReady() {
     final onboardingComplete = _onboardingComplete;
     if (!mounted || !_minimumTimeElapsed || onboardingComplete == null) return;
+    final user = FirebaseAuth.instance.currentUser;
+    if (FirebaseBootstrap.isAvailable && (user == null || user.isAnonymous)) {
+      context.go('/sign-in');
+      return;
+    }
     final initialRoute = NotificationService.instance.takeInitialRoute();
     context.go(onboardingComplete ? initialRoute ?? '/home' : '/onboarding');
   }
