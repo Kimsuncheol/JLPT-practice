@@ -265,7 +265,8 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('5 / 5'), findsOneWidget);
 
-    await tester.drag(find.byType(PageView), const Offset(-400, 0));
+    final pageView = find.byType(PageView);
+    await tester.drag(pageView, Offset(-tester.getSize(pageView).width, 0));
     await tester.pumpAndSettle();
 
     expect(find.text('Great work!'), findsOneWidget);

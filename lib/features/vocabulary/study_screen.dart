@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
@@ -37,25 +36,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   bool _suppressAutoAudio = false;
 
   @override
-  void initState() {
-    super.initState();
-    // The app is locked to portrait everywhere else (see main.dart); this
-    // screen alone has a landscape layout, so it briefly allows rotation
-    // into it and restores the app-wide lock on dispose.
-    unawaited(
-      SystemChrome.setPreferredOrientations([
-        DeviceOrientation.portraitUp,
-        DeviceOrientation.landscapeLeft,
-        DeviceOrientation.landscapeRight,
-      ]),
-    );
-  }
-
-  @override
   void dispose() {
-    unawaited(
-      SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]),
-    );
     _pageController?.dispose();
     if (_ttsService != null) unawaited(_ttsService!.stop());
     super.dispose();
@@ -94,8 +75,6 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
       );
     }
     _initializePage(words, state);
-    final isLandscape =
-        MediaQuery.orientationOf(context) == Orientation.landscape;
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -126,9 +105,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
                 if (index == words.length) return const SizedBox.shrink();
                 final word = words[index];
                 return Padding(
-                  padding: isLandscape
-                      ? const EdgeInsets.fromLTRB(8, 2, 8, 2)
-                      : const EdgeInsets.fromLTRB(20, 8, 20, 14),
+                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 14),
                   child: _StudyCard(
                     vocabulary: word,
                     language: state.meaningLanguage,
@@ -159,9 +136,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
           SafeArea(
             top: false,
             child: Padding(
-              padding: isLandscape
-                  ? const EdgeInsets.fromLTRB(20, 2, 20, 6)
-                  : const EdgeInsets.fromLTRB(20, 6, 20, 14),
+              padding: const EdgeInsets.fromLTRB(20, 6, 20, 14),
               child: Text(
                 '${_index + 1} / ${words.length}',
                 style: const TextStyle(fontWeight: FontWeight.w700),
@@ -333,11 +308,7 @@ class _StudyCard extends StatelessWidget {
   final VoidCallback onReview;
 
   @override
-  Widget build(BuildContext context) {
-    final isLandscape =
-        MediaQuery.orientationOf(context) == Orientation.landscape;
-    return isLandscape ? _buildLandscape(context) : _buildPortrait(context);
-  }
+  Widget build(BuildContext context) => _buildPortrait(context);
 
   Widget _buildPortrait(BuildContext context) {
     return Column(
@@ -369,66 +340,6 @@ class _StudyCard extends StatelessWidget {
         ),
         const SizedBox(height: 15),
         _buildActionsRow(context),
-      ],
-    );
-  }
-
-  Widget _buildLandscape(BuildContext context) {
-    final identityColumn = Column(
-      children: [
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _buildChips(),
-                  const SizedBox(height: 18),
-                  _buildReading(context),
-                  const SizedBox(height: 6),
-                  _buildWord(context),
-                  const SizedBox(height: 8),
-                  _buildRomaji(context),
-                  const SizedBox(height: 6),
-                  _buildMeaning(context),
-                ],
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: 6),
-        _buildActionsRow(context),
-        const SizedBox(height: 6),
-      ],
-    );
-
-    if (!vocabulary.hasExample) {
-      return Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 420),
-          child: identityColumn,
-        ),
-      );
-    }
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Expanded(flex: 2, child: identityColumn),
-        VerticalDivider(
-          width: 1,
-          thickness: 1,
-          color: Theme.of(context).colorScheme.outlineVariant,
-        ),
-        Expanded(
-          flex: 3,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(24, 20, 24, 12),
-            child: _buildExample(context),
-          ),
-        ),
       ],
     );
   }
