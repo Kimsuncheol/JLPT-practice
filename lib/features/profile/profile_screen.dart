@@ -5,8 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/core/services/account_service.dart';
-import 'package:jlpt_practice/features/settings/account_screen.dart'
-    show accountAvatarInitial, accountDisplayLabel;
 import 'package:jlpt_practice/shared/session_actions.dart';
 
 class ProfileScreen extends ConsumerWidget {
@@ -19,7 +17,9 @@ class ProfileScreen extends ConsumerWidget {
     final strings = context.strings;
 
     if (user == null) {
-      return const Center(child: CircularProgressIndicator());
+      // Sign-in is mandatory before this tab is reachable at all, so this
+      // only shows for an instant mid sign-out; nothing worth animating.
+      return const SizedBox.shrink();
     }
 
     final label = accountDisplayLabel(
@@ -127,6 +127,27 @@ class ProfileScreen extends ConsumerWidget {
       _ => context.strings('email'),
     };
   }
+}
+
+String accountDisplayLabel({
+  required String? displayName,
+  required String? email,
+  required String fallback,
+}) {
+  final normalizedName = displayName?.trim() ?? '';
+  if (normalizedName.isNotEmpty) return normalizedName;
+  final normalizedEmail = email?.trim() ?? '';
+  if (normalizedEmail.isNotEmpty) return normalizedEmail;
+  return fallback;
+}
+
+String accountAvatarInitial({String? displayName, String? email}) {
+  final label = accountDisplayLabel(
+    displayName: displayName,
+    email: email,
+    fallback: 'A',
+  );
+  return label.characters.isEmpty ? 'A' : label.characters.first.toUpperCase();
 }
 
 class _ProfileGroup extends StatelessWidget {

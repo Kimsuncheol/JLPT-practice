@@ -149,7 +149,7 @@ class AppStrings {
     'resetConfirm': 'This removes study history on this device.',
     'cancel': 'Cancel',
     'reset': 'Reset',
-    'account': 'Account & cloud sync',
+    'account': 'Account',
     'protectProgress': 'Protect your progress',
     'protectProgressTitle': 'Sign in to protect your progress',
     'protectProgressBody':
@@ -422,7 +422,7 @@ class AppStrings {
     'resetConfirm': '이 기기의 학습 기록이 삭제됩니다.',
     'cancel': '취소',
     'reset': '초기화',
-    'account': '계정 및 클라우드 동기화',
+    'account': '계정',
     'protectProgress': '학습 기록 보호하기',
     'protectProgressTitle': '로그인하여 학습 기록을 보호하세요',
     'protectProgressBody': '현재 학습 기록이 계정에 연결되어 앱을 다시 설치해도 복원됩니다.',

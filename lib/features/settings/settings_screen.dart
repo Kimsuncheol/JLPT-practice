@@ -5,6 +5,7 @@ import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/ads/ad_service.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/core/services/account_service.dart';
+import 'package:jlpt_practice/features/dashboard/home_tab_provider.dart';
 import 'package:jlpt_practice/shared/session_actions.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -44,7 +45,9 @@ class SettingsScreen extends ConsumerWidget {
                           : strings('protectProgress'),
                     ),
                     trailing: const Icon(Icons.chevron_right_rounded),
-                    onTap: () => context.push('/settings/account'),
+                    onTap: () => ref
+                        .read(homeTabIndexProvider.notifier)
+                        .select(homeTabProfile),
                   ),
                   ListTile(
                     leading: const Icon(Icons.translate_rounded),
