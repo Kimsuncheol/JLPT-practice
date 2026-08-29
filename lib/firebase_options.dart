@@ -56,13 +56,14 @@ class DefaultFirebaseOptions {
     projectId: 'jlpt-practice-20a4e',
     storageBucket: 'jlpt-practice-20a4e.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyAS5DWeMsnJ7ihsWDLSSnPxXU11Gn_DozE',
     appId: '1:218704881410:ios:21eac361f570ae5d20441b',
     messagingSenderId: '218704881410',
     projectId: 'jlpt-practice-20a4e',
     storageBucket: 'jlpt-practice-20a4e.firebasestorage.app',
+    androidClientId: '218704881410-qbfibk4mq3ct1te7ujlu7jddh8po5tsk.apps.googleusercontent.com',
+    iosClientId: '218704881410-cjrdtpl32hel789qqvt9p7b7929cm39p.apps.googleusercontent.com',
     iosBundleId: 'com.jlptpractice.jlptPractice',
   );
 }
