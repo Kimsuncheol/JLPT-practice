@@ -15,6 +15,7 @@ import 'package:jlpt_practice/data/models/app_state.dart';
 import 'package:jlpt_practice/data/models/review_progress.dart';
 import 'package:jlpt_practice/data/models/study_session.dart';
 import 'package:jlpt_practice/data/models/vocabulary.dart';
+import 'package:jlpt_practice/shared/app_toast.dart';
 
 class StudyScreen extends ConsumerStatefulWidget {
   const StudyScreen({required this.day, super.key});
@@ -128,18 +129,28 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
               vocabulary: word,
               language: state.meaningLanguage,
               showFurigana: _showFurigana!,
+              isInReview: state.progress.containsKey(word.id),
               onToggleFurigana: () {
                 setState(() => _showFurigana = !_showFurigana!);
               },
               onSpeakWord: () => _speakIfAudible(word.reading),
               onSpeakExample: () => _speakIfAudible(word.example.sentence),
               onReview: () async {
-                await ref
-                    .read(appControllerProvider.notifier)
-                    .rateVocabulary(word.id, ReviewRating.again);
+                final controller = ref.read(appControllerProvider.notifier);
+                final wasInReview = state.progress.containsKey(word.id);
+                if (wasInReview) {
+                  await controller.removeVocabularyProgress(word.id);
+                } else {
+                  await controller.rateVocabulary(word.id, ReviewRating.again);
+                }
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(context.strings('markReview'))),
+                  showAppToast(
+                    context,
+                    context.strings(
+                      wasInReview
+                          ? 'removedFromReviewToast'
+                          : 'addedToReviewToast',
+                    ),
                   );
                 }
               },
@@ -294,6 +305,7 @@ class _StudyCard extends StatelessWidget {
     required this.vocabulary,
     required this.language,
     required this.showFurigana,
+    required this.isInReview,
     required this.onToggleFurigana,
     required this.onSpeakWord,
     required this.onSpeakExample,
@@ -303,6 +315,7 @@ class _StudyCard extends StatelessWidget {
   final Vocabulary vocabulary;
   final String language;
   final bool showFurigana;
+  final bool isInReview;
   final VoidCallback onToggleFurigana;
   final VoidCallback onSpeakWord;
   final VoidCallback onSpeakExample;
@@ -530,8 +543,10 @@ class _StudyCard extends StatelessWidget {
         onTap: onToggleFurigana,
       ),
       _CardAction(
-        icon: Icons.bookmark_add_outlined,
-        label: context.strings('markReview'),
+        icon: isInReview
+            ? Icons.bookmark_added_rounded
+            : Icons.bookmark_add_outlined,
+        label: context.strings(isInReview ? 'removeFromReview' : 'markReview'),
         onTap: onReview,
       ),
     ],

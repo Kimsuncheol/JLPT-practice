@@ -218,6 +218,12 @@ class CloudSyncService {
     }, SetOptions(merge: true));
   }
 
+  Future<void> deleteProgress(String vocabularyId) async {
+    final user = _user;
+    if (user == null) return;
+    await user.collection('vocabularyProgress').doc(vocabularyId).delete();
+  }
+
   Future<void> syncGrammarProgress(GrammarProgress progress) async {
     final user = _user;
     if (user == null) return;

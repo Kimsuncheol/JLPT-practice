@@ -154,6 +154,14 @@ class AppController extends AsyncNotifier<AppState> {
     unawaited(_syncLearningSummary(next));
   }
 
+  Future<void> removeVocabularyProgress(String vocabularyId) async {
+    final progress = {..._value.progress}..remove(vocabularyId);
+    final next = _value.copyWith(progress: progress);
+    state = AsyncData(next);
+    await _store.saveProgress(progress);
+    unawaited(ref.read(cloudSyncProvider).deleteProgress(vocabularyId));
+  }
+
   Future<void> recordQuizResult(
     QuizResult result,
     List<QuizQuestion> questions,
