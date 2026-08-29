@@ -36,9 +36,13 @@ class JlptPracticeApp extends ConsumerWidget {
         }
         final stableMediaQuery = mediaQuery.copyWith(
           padding: mediaQuery.padding.copyWith(
+            left: 0,
+            right: 0,
             bottom: SystemBarMetrics.bottomInset,
           ),
           viewPadding: mediaQuery.viewPadding.copyWith(
+            left: 0,
+            right: 0,
             bottom: SystemBarMetrics.bottomInset,
           ),
         );
