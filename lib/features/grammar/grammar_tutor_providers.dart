@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jlpt_practice/core/services/local_store.dart';
+import 'package:jlpt_practice/core/services/cloud_sync_service.dart';
 import 'package:jlpt_practice/data/models/grammar_progress.dart';
 
 final grammarProgressProvider =
@@ -15,7 +16,16 @@ class GrammarProgressController
   @override
   Future<Map<String, GrammarProgress>> build() async {
     _store = await LocalStore.create();
-    return _store.loadGrammarProgress();
+    final local = _store.loadGrammarProgress();
+    try {
+      final merged = await const CloudSyncService().restoreGrammarProgress(
+        local,
+      );
+      await _store.saveGrammarProgress(merged);
+      return merged;
+    } on Object {
+      return local;
+    }
   }
 
   Future<void> record({
@@ -49,5 +59,10 @@ class GrammarProgressController
     final next = {...?state.value, grammarId: updated};
     state = AsyncData(next);
     await _store.saveGrammarProgress(next);
+    try {
+      await const CloudSyncService().syncGrammarProgress(updated);
+    } on Object {
+      // Local progress remains authoritative while offline.
+    }
   }
 }

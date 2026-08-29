@@ -33,8 +33,11 @@ service cloud.firestore {
     match /users/{userId} {
       allow read: if owns(userId);
       allow create: if owns(userId)
-        && request.resource.data.isAnonymous == true;
+        && request.resource.data.isAnonymous is bool
+        && request.resource.data.isAnonymous
+          == (request.auth.token.firebase.sign_in_provider == 'anonymous');
       allow update: if owns(userId)
+        && request.resource.data.isAnonymous is bool
         && (!('selectedJlptLevel' in request.resource.data)
           || validLevel(request.resource.data.selectedJlptLevel))
         && (!('dailyGoal' in request.resource.data)

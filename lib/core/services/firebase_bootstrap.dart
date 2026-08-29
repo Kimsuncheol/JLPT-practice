@@ -10,6 +10,7 @@ class FirebaseBootstrap {
 
   static bool isAvailable = false;
   static String? userId;
+  static bool isAnonymous = true;
 
   static Future<void> initialize() async {
     try {
@@ -33,14 +34,11 @@ class FirebaseBootstrap {
       final credential = auth.currentUser == null
           ? await auth.signInAnonymously()
           : null;
-      userId = auth.currentUser?.uid ?? credential?.user?.uid;
+      updateUser(auth.currentUser ?? credential?.user);
       if (userId == null) return;
       isAvailable = true;
-      await FirebaseFirestore.instance.collection('users').doc(userId).set({
-        'isAnonymous': auth.currentUser?.isAnonymous ?? true,
-        'updatedAt': FieldValue.serverTimestamp(),
-        'createdAt': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
+      await ensureUserDocument();
+      auth.userChanges().listen(updateUser);
     } catch (error, stackTrace) {
       isAvailable = false;
       if (kDebugMode) {
@@ -48,5 +46,24 @@ class FirebaseBootstrap {
         debugPrintStack(stackTrace: stackTrace);
       }
     }
+  }
+
+  static void updateUser(User? user) {
+    userId = user?.uid;
+    isAnonymous = user?.isAnonymous ?? true;
+  }
+
+  static Future<void> ensureUserDocument() async {
+    final id = userId;
+    if (id == null) return;
+    final reference = FirebaseFirestore.instance.collection('users').doc(id);
+    await FirebaseFirestore.instance.runTransaction((transaction) async {
+      final snapshot = await transaction.get(reference);
+      transaction.set(reference, {
+        'isAnonymous': isAnonymous,
+        'updatedAt': FieldValue.serverTimestamp(),
+        if (!snapshot.exists) 'createdAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+    });
   }
 }

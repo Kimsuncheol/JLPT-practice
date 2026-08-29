@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:jlpt_practice/data/models/app_state.dart';
 import 'package:jlpt_practice/data/models/grammar_progress.dart';
 import 'package:jlpt_practice/data/models/review_progress.dart';
 import 'package:jlpt_practice/data/models/study_session.dart';
@@ -84,6 +85,31 @@ class LocalStore {
   }
 
   String? get lastStudyDate => _preferences.getString('lastStudyDate');
+
+  Future<void> saveAppState(AppState state, {String? lastStudyDate}) async {
+    await Future.wait([
+      setValue('onboardingComplete', state.onboardingComplete),
+      setValue('selectedLevel', state.selectedLevel),
+      setValue('languageCode', state.languageCode),
+      setValue('meaningLanguage', state.meaningLanguage),
+      setValue('showFurigana', state.showFurigana),
+      setValue('autoPlayAudio', state.autoPlayAudio),
+      setValue('themeMode', state.themeMode.name),
+      setValue('notificationsEnabled', state.notificationsEnabled),
+      setValue('reminderHour', state.reminderHour),
+      setValue('reminderMinute', state.reminderMinute),
+      setValue('studySeconds', state.studySeconds),
+      setValue('quizAnswered', state.quizAnswered),
+      setValue('quizCorrect', state.quizCorrect),
+      setValue('currentStreak', state.currentStreak),
+      setValue('longestStreak', state.longestStreak),
+      setValue('totalXp', state.totalXp),
+      saveProgress(state.progress),
+      saveStudySessions(state.studySessions),
+      saveCompletedStudyDays(state.completedStudyDays),
+      if (lastStudyDate != null) setValue('lastStudyDate', lastStudyDate),
+    ]);
+  }
 
   Map<String, ReviewProgress> loadProgress() {
     final raw = _preferences.getString('progress');
@@ -209,6 +235,39 @@ class LocalStore {
       _preferences.remove('studySessions'),
       _preferences.remove('completedStudyDays'),
       _preferences.remove('grammarProgress'),
+      _preferences.remove('lastStudyDate'),
     ]);
+  }
+
+  Future<void> clearAccountData() async {
+    const keys = <String>{
+      'onboardingComplete',
+      'selectedLevel',
+      'languageCode',
+      'meaningLanguage',
+      'showFurigana',
+      'autoPlayAudio',
+      'themeMode',
+      'notificationsEnabled',
+      'reminderHour',
+      'reminderMinute',
+      'progress',
+      'studySeconds',
+      'quizAnswered',
+      'quizCorrect',
+      'currentStreak',
+      'longestStreak',
+      'totalXp',
+      'studySessions',
+      'completedStudyDays',
+      'grammarProgress',
+      'lastStudyDate',
+    };
+    final dynamicKeys = _preferences.getKeys().where(
+      (key) =>
+          key.startsWith('unlockedDayBlocks_') ||
+          key.startsWith('rewardedStudyDays_'),
+    );
+    await Future.wait({...keys, ...dynamicKeys}.map(_preferences.remove));
   }
 }

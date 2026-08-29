@@ -7,6 +7,7 @@ import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/ads/ad_service.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/core/services/day_block_access.dart';
+import 'package:jlpt_practice/core/services/cloud_sync_service.dart';
 import 'package:jlpt_practice/core/utils/study_batches.dart';
 import 'package:jlpt_practice/features/vocabulary/day_selection_skeleton.dart';
 
@@ -107,6 +108,11 @@ class _DaySelectionScreenState extends ConsumerState<DaySelectionScreen> {
     if (!earned || !mounted) return;
 
     await DayBlockAccess.unlockRewardedDay(level, day);
+    try {
+      await const CloudSyncService().syncAccess();
+    } on Object {
+      // The local unlock remains available while offline.
+    }
     if (!mounted) return;
     setState(() => _rewardedDays = {..._rewardedDays, day});
     context.push('/study/day/$day');

@@ -41,15 +41,17 @@ mock-test flow.
 ## Configure Firebase
 
 1. Create Android and iOS apps in a Firebase project.
-2. Enable Anonymous Authentication and Cloud Firestore.
+2. Enable Anonymous, Email/Password, Google, and Apple Authentication plus
+   Cloud Firestore. Add Android SHA fingerprints and refresh both Firebase
+   configuration files so they contain the OAuth client IDs.
 3. Run `flutterfire configure`, or add `google-services.json` and
    `GoogleService-Info.plist` using the normal FlutterFire setup.
-4. Deploy rules and indexes with `firebase deploy --only firestore`.
+4. Deploy rules and the account-deletion function with
+   `firebase deploy --only firestore:rules,functions`.
 5. Enable App Check and Crashlytics for release builds.
 
 If Firebase initialization fails, the app deliberately continues in local
-mode. Cloud writes are kept in repositories/services and never issued by UI
-widgets.
+mode. Cloud access is encapsulated in dedicated services.
 
 ## Enable development ads
 

@@ -1,8 +1,10 @@
 import {initializeApp} from "firebase-admin/app";
+import {getAuth} from "firebase-admin/auth";
 import {FieldValue, getFirestore} from "firebase-admin/firestore";
 import {getMessaging} from "firebase-admin/messaging";
 import {logger} from "firebase-functions";
 import {onDocumentCreated} from "firebase-functions/v2/firestore";
+import {HttpsError, onCall} from "firebase-functions/v2/https";
 import {NotificationJobInput, parseNotificationJob} from "./job";
 
 initializeApp();
@@ -14,6 +16,26 @@ const INVALID_TOKEN_CODES = new Set([
   "messaging/registration-token-not-registered",
   "messaging/invalid-registration-token",
 ]);
+
+export const deleteAccount = onCall(
+  {enforceAppCheck: true, timeoutSeconds: 120},
+  async (request) => {
+    const userId = request.auth?.uid;
+    if (!userId) {
+      throw new HttpsError("unauthenticated", "Sign in before deleting an account.");
+    }
+
+    try {
+      await db.recursiveDelete(db.collection("users").doc(userId));
+      await getAuth().deleteUser(userId);
+      logger.info("Deleted user account and synchronized data", {userId});
+      return {deleted: true};
+    } catch (error) {
+      logger.error("Account deletion failed", {userId, error});
+      throw new HttpsError("internal", "The account could not be deleted.");
+    }
+  },
+);
 
 interface MessagingFailure {
   code?: string;

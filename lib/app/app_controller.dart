@@ -58,7 +58,7 @@ class AppController extends AsyncNotifier<AppState> {
         await _store.setValue('notificationsEnabled', false);
       }
     }
-    return AppState(
+    final local = AppState(
       vocabulary: vocabulary,
       progress: _store.loadProgress(),
       onboardingComplete: settings.onboardingComplete,
@@ -82,6 +82,24 @@ class AppController extends AsyncNotifier<AppState> {
       studySessions: _store.loadStudySessions(),
       completedStudyDays: _store.loadCompletedStudyDays(),
     );
+    try {
+      final restored = await ref.read(cloudSyncProvider).restore(local);
+      await _store.saveAppState(
+        restored.state,
+        lastStudyDate: restored.lastStudyDate,
+      );
+      unawaited(
+        ref
+            .read(cloudSyncProvider)
+            .syncAll(
+              restored.state,
+              lastStudyDate: restored.lastStudyDate ?? _store.lastStudyDate,
+            ),
+      );
+      return restored.state;
+    } on Object {
+      return local;
+    }
   }
 
   AppState get _value => state.requireValue;
@@ -133,6 +151,7 @@ class AppController extends AsyncNotifier<AppState> {
     state = AsyncData(next);
     await _store.saveProgress(progress);
     unawaited(ref.read(cloudSyncProvider).syncProgress(scheduled));
+    unawaited(_syncLearningSummary(next));
   }
 
   Future<void> recordQuizResult(
@@ -171,6 +190,8 @@ class AppController extends AsyncNotifier<AppState> {
     for (final scheduled in progress.values) {
       unawaited(ref.read(cloudSyncProvider).syncProgress(scheduled));
     }
+    unawaited(ref.read(cloudSyncProvider).recordQuizResult(result));
+    unawaited(_syncLearningSummary(next));
   }
 
   Future<void> recordMockTestResult(
@@ -213,12 +234,15 @@ class AppController extends AsyncNotifier<AppState> {
     for (final scheduled in progress.values) {
       unawaited(ref.read(cloudSyncProvider).syncProgress(scheduled));
     }
+    unawaited(ref.read(cloudSyncProvider).recordMockTestResult(result));
+    unawaited(_syncLearningSummary(next));
   }
 
   Future<void> addBonusXp(int amount) async {
     final next = _value.copyWith(totalXp: _value.totalXp + amount);
     state = AsyncData(next);
     await _store.setValue('totalXp', next.totalXp);
+    unawaited(_syncLearningSummary(next));
   }
 
   Future<AppState> _withRecordedActivity(AppState current) async {
@@ -327,6 +351,7 @@ class AppController extends AsyncNotifier<AppState> {
     final sessions = {..._value.studySessions, session.level: session};
     state = AsyncData(_value.copyWith(studySessions: sessions));
     await _persistStudySessions(sessions);
+    unawaited(_syncLearningSummary(_value));
   }
 
   Future<void> completeStudySession(String level, int day) async {
@@ -345,6 +370,7 @@ class AppController extends AsyncNotifier<AppState> {
       _persistStudySessions(sessions),
       _store.saveCompletedStudyDays(completedStudyDays),
     ]);
+    unawaited(_syncLearningSummary(_value));
   }
 
   Future<void> _persistStudySessions(Map<String, StudySession> sessions) {
@@ -378,9 +404,34 @@ class AppController extends AsyncNotifier<AppState> {
       studySessions: {},
       completedStudyDays: {},
     );
+    await ref.read(cloudSyncProvider).resetLearningData();
     state = AsyncData(next);
     await _studySessionWrite;
     await _store.clearLearningData();
     await DayBlockAccess.clearRewardedDays();
   }
+
+  Future<void> mergeCurrentAccount() async {
+    final restored = await ref.read(cloudSyncProvider).restore(_value);
+    state = AsyncData(restored.state);
+    await _store.saveAppState(
+      restored.state,
+      lastStudyDate: restored.lastStudyDate ?? _store.lastStudyDate,
+    );
+    await ref
+        .read(cloudSyncProvider)
+        .syncAll(
+          restored.state,
+          lastStudyDate: restored.lastStudyDate ?? _store.lastStudyDate,
+        );
+  }
+
+  Future<void> clearLocalForAccountSwitch() async {
+    await _studySessionWrite;
+    await _store.clearAccountData();
+  }
+
+  Future<void> _syncLearningSummary(AppState value) => ref
+      .read(cloudSyncProvider)
+      .syncLearningSummary(value, lastStudyDate: _store.lastStudyDate);
 }

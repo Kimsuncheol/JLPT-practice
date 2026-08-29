@@ -88,4 +88,46 @@ class DayBlockAccess {
     );
     await Future.wait(keys.map(preferences.remove));
   }
+
+  static Future<Map<String, List<int>>> exportAccess() async {
+    final preferences = await SharedPreferences.getInstance();
+    final result = <String, List<int>>{};
+    for (final key in preferences.getKeys()) {
+      if (!key.startsWith('unlockedDayBlocks_') &&
+          !key.startsWith('rewardedStudyDays_')) {
+        continue;
+      }
+      final values = preferences
+          .getStringList(key)
+          ?.map(int.tryParse)
+          .whereType<int>()
+          .toSet()
+          .toList();
+      if (values != null) result[key] = values..sort();
+    }
+    return result;
+  }
+
+  static Future<void> mergeAccess(Map<String, dynamic> cloud) async {
+    final preferences = await SharedPreferences.getInstance();
+    for (final entry in cloud.entries) {
+      if (!entry.key.startsWith('unlockedDayBlocks_') &&
+          !entry.key.startsWith('rewardedStudyDays_')) {
+        continue;
+      }
+      final remote =
+          (entry.value as List<dynamic>?)?.whereType<num>().map(
+            (value) => value.toInt(),
+          ) ??
+          const Iterable<int>.empty();
+      final local =
+          preferences
+              .getStringList(entry.key)
+              ?.map(int.tryParse)
+              .whereType<int>() ??
+          const Iterable<int>.empty();
+      final merged = {...local, ...remote}.map((value) => '$value').toList();
+      await preferences.setStringList(entry.key, merged);
+    }
+  }
 }

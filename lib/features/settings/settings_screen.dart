@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/ads/ad_service.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
+import 'package:jlpt_practice/core/services/account_service.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -18,6 +19,7 @@ class SettingsScreen extends ConsumerWidget {
         data: (state) {
           final controller = ref.read(appControllerProvider.notifier);
           final strings = context.strings;
+          final user = ref.watch(firebaseUserProvider).value;
           return ListView(
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 36),
             children: [
@@ -28,6 +30,21 @@ class SettingsScreen extends ConsumerWidget {
               const SizedBox(height: 18),
               _SettingsGroup(
                 children: [
+                  ListTile(
+                    leading: Icon(
+                      user?.isAnonymous == false
+                          ? Icons.cloud_done_outlined
+                          : Icons.person_add_alt_1_outlined,
+                    ),
+                    title: Text(strings('account')),
+                    subtitle: Text(
+                      user?.isAnonymous == false
+                          ? user?.email ?? strings('syncActive')
+                          : strings('protectProgress'),
+                    ),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => context.push('/settings/account'),
+                  ),
                   ListTile(
                     leading: const Icon(Icons.translate_rounded),
                     title: Text(strings('languages')),
@@ -171,7 +188,9 @@ class SettingsScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 22),
               Text(
-                strings('anonymousBody'),
+                user?.isAnonymous == false
+                    ? strings('syncActiveBody')
+                    : strings('anonymousBody'),
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
