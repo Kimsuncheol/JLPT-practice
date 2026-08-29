@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "218704881410-qbfibk4mq3ct1te7ujlu7jddh8po5tsk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.jlptpractice.jlpt_practice",
+            "certificate_hash": "ad8670af5eeb2c1a2706d942cc8cf71b50e3b001"
+          }
+        },
+        {
           "client_id": "218704881410-kdno8pof6co3tepoqoqodkvnihedfb40.apps.googleusercontent.com",
           "client_type": 3
         }
