@@ -39,8 +39,8 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
     return Scaffold(
       appBar: AppBar(title: Text(context.strings('account'))),
       body: SafeArea(
-        child: user?.isAnonymous == false
-            ? _AccountDetails(user: user!)
+        child: user != null
+            ? _AccountDetails(user: user)
             : _AuthForm(
                 formKey: _formKey,
                 emailController: _emailController,
@@ -183,6 +183,8 @@ class _AuthForm extends StatelessWidget {
   final VoidCallback onResetPassword;
   final VoidCallback onToggleMode;
 
+  bool doPasswordMatches(String? value) => value == passwordController.text;
+
   @override
   Widget build(BuildContext context) => SingleChildScrollView(
     padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
@@ -211,31 +213,6 @@ class _AuthForm extends StatelessWidget {
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           const SizedBox(height: 28),
-          OutlinedButton.icon(
-            onPressed: busy ? null : onGoogle,
-            icon: const Icon(Icons.g_mobiledata_rounded, size: 28),
-            label: Text(context.strings('continueWithGoogle')),
-          ),
-          if (onApple != null) ...[
-            const SizedBox(height: 10),
-            OutlinedButton.icon(
-              onPressed: busy ? null : onApple,
-              icon: const Icon(Icons.apple_rounded),
-              label: Text(context.strings('continueWithApple')),
-            ),
-          ],
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              const Expanded(child: Divider()),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Text(context.strings('orUseEmail')),
-              ),
-              const Expanded(child: Divider()),
-            ],
-          ),
-          const SizedBox(height: 20),
           TextFormField(
             controller: emailController,
             enabled: !busy,
@@ -269,11 +246,25 @@ class _AuthForm extends StatelessWidget {
                 ),
               ),
             ),
-            validator: (value) => value != null && value.length >= 8
-                ? null
-                : context.strings('passwordRequirement'),
+            validator: (value) => createAccount
+                ? (value != null &&
+                          _passwordConstraints(
+                            context,
+                          ).every((constraint) => constraint.isSatisfied(value))
+                      ? null
+                      : context.strings('passwordRequirement'))
+                : (value != null && value.length >= 8
+                      ? null
+                      : context.strings('passwordRequirement')),
           ),
           if (createAccount) ...[
+            const SizedBox(height: 10),
+            AnimatedBuilder(
+              animation: passwordController,
+              builder: (context, _) => _PasswordConstraintsChecklist(
+                password: passwordController.text,
+              ),
+            ),
             const SizedBox(height: 12),
             TextFormField(
               controller: confirmPasswordController,
@@ -284,7 +275,7 @@ class _AuthForm extends StatelessWidget {
                 labelText: context.strings('confirmPassword'),
                 prefixIcon: const Icon(Icons.lock_reset_rounded),
               ),
-              validator: (value) => value == passwordController.text
+              validator: (value) => doPasswordMatches(value)
                   ? null
                   : context.strings('passwordsDoNotMatch'),
             ),
@@ -308,6 +299,35 @@ class _AuthForm extends StatelessWidget {
                   )
                 : Text(context.strings(createAccount ? 'signUp' : 'signIn')),
           ),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              const Expanded(child: Divider()),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Text(context.strings('orContinueWith')),
+              ),
+              const Expanded(child: Divider()),
+            ],
+          ),
+          const SizedBox(height: 20),
+          OutlinedButton.icon(
+            onPressed: busy ? null : onGoogle,
+            icon: const Icon(Icons.g_mobiledata_rounded, size: 28),
+            label: Text(
+              context.strings(
+                createAccount ? 'signUpWithGoogle' : 'signInWithGoogle',
+              ),
+            ),
+          ),
+          if (onApple != null) ...[
+            const SizedBox(height: 10),
+            OutlinedButton.icon(
+              onPressed: busy ? null : onApple,
+              icon: const Icon(Icons.apple_rounded),
+              label: Text(context.strings('continueWithApple')),
+            ),
+          ],
           const SizedBox(height: 10),
           TextButton(
             onPressed: busy ? null : onToggleMode,
@@ -323,74 +343,149 @@ class _AuthForm extends StatelessWidget {
   );
 }
 
+typedef _PasswordConstraint = ({
+  bool Function(String value) isSatisfied,
+  String label,
+});
+
+List<_PasswordConstraint> _passwordConstraints(BuildContext context) => [
+  (
+    isSatisfied: (value) => value.length >= 8,
+    label: context.strings('passwordConstraintLength'),
+  ),
+  (
+    isSatisfied: (value) => value.contains(RegExp('[A-Z]')),
+    label: context.strings('passwordConstraintUppercase'),
+  ),
+  (
+    isSatisfied: (value) => value.contains(RegExp('[a-z]')),
+    label: context.strings('passwordConstraintLowercase'),
+  ),
+  (
+    isSatisfied: (value) => value.contains(RegExp('[0-9]')),
+    label: context.strings('passwordConstraintNumber'),
+  ),
+];
+
+class _PasswordConstraintsChecklist extends StatelessWidget {
+  const _PasswordConstraintsChecklist({required this.password});
+
+  final String password;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (final constraint in _passwordConstraints(context))
+          Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: Row(
+              children: [
+                Icon(
+                  constraint.isSatisfied(password)
+                      ? Icons.check_circle_rounded
+                      : Icons.circle_outlined,
+                  size: 16,
+                  color: constraint.isSatisfied(password)
+                      ? Colors.green
+                      : theme.colorScheme.onSurfaceVariant,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  constraint.label,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: constraint.isSatisfied(password)
+                        ? theme.colorScheme.onSurface
+                        : theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+}
+
 class _AccountDetails extends ConsumerWidget {
   const _AccountDetails({required this.user});
 
   final User user;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => ListView(
-    padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
-    children: [
-      CircleAvatar(
-        radius: 36,
-        child: Text(
-          (user.displayName ?? user.email ?? 'A').characters.first
-              .toUpperCase(),
-          style: Theme.of(context).textTheme.headlineMedium,
-        ),
-      ),
-      const SizedBox(height: 16),
-      Text(
-        user.displayName ?? user.email ?? context.strings('account'),
-        textAlign: TextAlign.center,
-        style: Theme.of(context).textTheme.titleLarge,
-      ),
-      if (user.email != null) ...[
-        const SizedBox(height: 4),
-        Text(user.email!, textAlign: TextAlign.center),
-      ],
-      const SizedBox(height: 28),
-      Card(
-        child: Column(
-          children: [
-            ListTile(
-              leading: const Icon(Icons.cloud_done_outlined),
-              title: Text(context.strings('syncActive')),
-              subtitle: Text(context.strings('syncActiveBody')),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final label = accountDisplayLabel(
+      displayName: user.displayName,
+      email: user.email,
+      fallback: context.strings('account'),
+    );
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
+      children: [
+        CircleAvatar(
+          radius: 36,
+          child: Text(
+            accountAvatarInitial(
+              displayName: user.displayName,
+              email: user.email,
             ),
-            if (user.email != null && !user.emailVerified)
+            style: Theme.of(context).textTheme.headlineMedium,
+          ),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          label,
+          textAlign: TextAlign.center,
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
+        if (user.email != null) ...[
+          const SizedBox(height: 4),
+          Text(user.email!, textAlign: TextAlign.center),
+        ],
+        const SizedBox(height: 28),
+        Card(
+          child: Column(
+            children: [
               ListTile(
-                leading: const Icon(Icons.mark_email_unread_outlined),
-                title: Text(context.strings('emailNotVerified')),
-                trailing: TextButton(
-                  onPressed: () => _resendVerification(context, ref),
-                  child: Text(context.strings('resend')),
-                ),
+                leading: const Icon(Icons.cloud_done_outlined),
+                title: Text(context.strings('syncActive')),
+                subtitle: Text(context.strings('syncActiveBody')),
               ),
-          ],
+              if (user.email != null && !user.emailVerified)
+                ListTile(
+                  leading: const Icon(Icons.mark_email_unread_outlined),
+                  title: Text(context.strings('emailNotVerified')),
+                  trailing: TextButton(
+                    onPressed: () => _resendVerification(context, ref),
+                    child: Text(context.strings('resend')),
+                  ),
+                ),
+            ],
+          ),
         ),
-      ),
-      const SizedBox(height: 18),
-      OutlinedButton.icon(
-        onPressed: () => _signOut(context, ref),
-        icon: const Icon(Icons.logout_rounded),
-        label: Text(context.strings('signOut')),
-      ),
-      const SizedBox(height: 10),
-      TextButton.icon(
-        onPressed: () => _deleteAccount(context, ref),
-        icon: Icon(
-          Icons.delete_forever_outlined,
-          color: Theme.of(context).colorScheme.error,
+        const SizedBox(height: 18),
+        OutlinedButton.icon(
+          onPressed: () => _signOut(context, ref),
+          icon: const Icon(Icons.logout_rounded),
+          label: Text(context.strings('signOut')),
         ),
-        label: Text(
-          context.strings('deleteAccount'),
-          style: TextStyle(color: Theme.of(context).colorScheme.error),
+        const SizedBox(height: 10),
+        TextButton.icon(
+          onPressed: () => _deleteAccount(context, ref),
+          icon: Icon(
+            Icons.delete_forever_outlined,
+            color: Theme.of(context).colorScheme.error,
+          ),
+          label: Text(
+            context.strings('deleteAccount'),
+            style: TextStyle(color: Theme.of(context).colorScheme.error),
+          ),
         ),
-      ),
-    ],
-  );
+      ],
+    );
+  }
 
   Future<void> _resendVerification(BuildContext context, WidgetRef ref) async {
     await ref.read(accountServiceProvider).resendVerification();
@@ -409,7 +504,7 @@ class _AccountDetails extends ConsumerWidget {
     );
     if (!confirmed || !context.mounted) return;
     await ref.read(appControllerProvider.notifier).clearLocalForAccountSwitch();
-    await ref.read(accountServiceProvider).signOutToAnonymous();
+    await ref.read(accountServiceProvider).signOut();
     ref.invalidate(appControllerProvider);
     ref.invalidate(grammarProgressProvider);
     if (context.mounted) context.pop();
@@ -470,4 +565,25 @@ class _AccountDetails extends ConsumerWidget {
         ),
       ) ??
       false;
+}
+
+String accountDisplayLabel({
+  required String? displayName,
+  required String? email,
+  required String fallback,
+}) {
+  final normalizedName = displayName?.trim() ?? '';
+  if (normalizedName.isNotEmpty) return normalizedName;
+  final normalizedEmail = email?.trim() ?? '';
+  if (normalizedEmail.isNotEmpty) return normalizedEmail;
+  return fallback;
+}
+
+String accountAvatarInitial({String? displayName, String? email}) {
+  final label = accountDisplayLabel(
+    displayName: displayName,
+    email: email,
+    fallback: 'A',
+  );
+  return label.characters.isEmpty ? 'A' : label.characters.first.toUpperCase();
 }

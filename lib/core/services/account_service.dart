@@ -21,17 +21,15 @@ class AccountService {
   Future<void>? _googleInitialization;
 
   User? get currentUser => _auth.currentUser;
-  bool get hasPermanentAccount => currentUser?.isAnonymous == false;
 
   Future<UserCredential> registerWithEmail({
     required String email,
     required String password,
   }) async {
-    final credential = EmailAuthProvider.credential(
+    final result = await _auth.createUserWithEmailAndPassword(
       email: email.trim(),
       password: password,
     );
-    final result = await _linkCredential(credential);
     await result.user?.sendEmailVerification();
     await _afterAuthentication(result.user);
     return result;
@@ -51,11 +49,7 @@ class AccountService {
 
   Future<UserCredential> continueWithGoogle() async {
     if (kIsWeb) {
-      final provider = GoogleAuthProvider();
-      final current = _auth.currentUser;
-      final result = current?.isAnonymous == true
-          ? await current!.linkWithPopup(provider)
-          : await _auth.signInWithPopup(provider);
+      final result = await _auth.signInWithPopup(GoogleAuthProvider());
       await _afterAuthentication(result.user);
       return result;
     }
@@ -69,16 +63,7 @@ class AccountService {
       throw StateError('Google did not return an identity token.');
     }
     final credential = GoogleAuthProvider.credential(idToken: idToken);
-    late UserCredential result;
-    try {
-      result = await _linkCredential(credential);
-    } on FirebaseAuthException catch (error) {
-      if (error.code != 'credential-already-in-use' &&
-          error.code != 'email-already-in-use') {
-        rethrow;
-      }
-      result = await _auth.signInWithCredential(credential);
-    }
+    final result = await _auth.signInWithCredential(credential);
     await _afterAuthentication(result.user);
     return result;
   }
@@ -87,19 +72,7 @@ class AccountService {
     final provider = AppleAuthProvider()
       ..addScope('email')
       ..addScope('name');
-    final current = _auth.currentUser;
-    late UserCredential result;
-    try {
-      result = current?.isAnonymous == true
-          ? await current!.linkWithProvider(provider)
-          : await _auth.signInWithProvider(provider);
-    } on FirebaseAuthException catch (error) {
-      if (error.code != 'credential-already-in-use' &&
-          error.code != 'email-already-in-use') {
-        rethrow;
-      }
-      result = await _auth.signInWithProvider(provider);
-    }
+    final result = await _auth.signInWithProvider(provider);
     await _afterAuthentication(result.user);
     return result;
   }
@@ -114,29 +87,16 @@ class AccountService {
     }
   }
 
-  Future<void> signOutToAnonymous() async {
+  Future<void> signOut() async {
     await _auth.signOut();
     if (!kIsWeb) await GoogleSignIn.instance.signOut();
-    final result = await _auth.signInAnonymously();
-    await _afterAuthentication(result.user);
   }
 
   Future<void> deleteAccount() async {
     await FirebaseFunctions.instance
         .httpsCallable('deleteAccount')
         .call<Map<String, dynamic>>();
-    await _auth.signOut();
-    if (!kIsWeb) await GoogleSignIn.instance.signOut();
-    final result = await _auth.signInAnonymously();
-    await _afterAuthentication(result.user);
-  }
-
-  Future<UserCredential> _linkCredential(AuthCredential credential) async {
-    final current = _auth.currentUser;
-    if (current?.isAnonymous == true) {
-      return current!.linkWithCredential(credential);
-    }
-    return _auth.signInWithCredential(credential);
+    await signOut();
   }
 
   Future<void> _afterAuthentication(User? user) async {

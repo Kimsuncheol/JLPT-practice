@@ -32,14 +32,14 @@ class SettingsScreen extends ConsumerWidget {
                 children: [
                   ListTile(
                     leading: Icon(
-                      user?.isAnonymous == false
+                      user != null
                           ? Icons.cloud_done_outlined
                           : Icons.person_add_alt_1_outlined,
                     ),
                     title: Text(strings('account')),
                     subtitle: Text(
-                      user?.isAnonymous == false
-                          ? user?.email ?? strings('syncActive')
+                      user != null
+                          ? user.email ?? strings('syncActive')
                           : strings('protectProgress'),
                     ),
                     trailing: const Icon(Icons.chevron_right_rounded),
@@ -188,7 +188,7 @@ class SettingsScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 22),
               Text(
-                user?.isAnonymous == false
+                user != null
                     ? strings('syncActiveBody')
                     : strings('anonymousBody'),
                 textAlign: TextAlign.center,

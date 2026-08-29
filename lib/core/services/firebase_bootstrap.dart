@@ -10,7 +10,6 @@ class FirebaseBootstrap {
 
   static bool isAvailable = false;
   static String? userId;
-  static bool isAnonymous = true;
 
   static Future<void> initialize() async {
     try {
@@ -31,13 +30,9 @@ class FirebaseBootstrap {
         persistenceEnabled: true,
       );
       final auth = FirebaseAuth.instance;
-      final credential = auth.currentUser == null
-          ? await auth.signInAnonymously()
-          : null;
-      updateUser(auth.currentUser ?? credential?.user);
-      if (userId == null) return;
+      updateUser(auth.currentUser);
       isAvailable = true;
-      await ensureUserDocument();
+      if (userId != null) await ensureUserDocument();
       auth.userChanges().listen(updateUser);
     } catch (error, stackTrace) {
       isAvailable = false;
@@ -50,7 +45,6 @@ class FirebaseBootstrap {
 
   static void updateUser(User? user) {
     userId = user?.uid;
-    isAnonymous = user?.isAnonymous ?? true;
   }
 
   static Future<void> ensureUserDocument() async {
@@ -60,7 +54,6 @@ class FirebaseBootstrap {
     await FirebaseFirestore.instance.runTransaction((transaction) async {
       final snapshot = await transaction.get(reference);
       transaction.set(reference, {
-        'isAnonymous': isAnonymous,
         'updatedAt': FieldValue.serverTimestamp(),
         if (!snapshot.exists) 'createdAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));

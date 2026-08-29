@@ -163,7 +163,6 @@ class CloudSyncService {
     final user = _user;
     if (user == null) return;
     await user.set({
-      'isAnonymous': FirebaseBootstrap.isAnonymous,
       'onboardingComplete': state.onboardingComplete,
       'preferredLanguage': state.languageCode,
       'meaningLanguage': state.meaningLanguage,
