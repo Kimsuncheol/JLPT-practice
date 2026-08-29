@@ -9,9 +9,8 @@ import 'package:jlpt_practice/core/services/notification_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-  ]);
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   await FirebaseBootstrap.initialize();
   await NotificationService.instance.initialize();
   NotificationService.instance.onRoute = appRouter.go;

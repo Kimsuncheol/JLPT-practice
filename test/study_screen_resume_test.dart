@@ -65,55 +65,45 @@ void main() {
     );
   }
 
-  testWidgets(
-    'swiping down on the resume modal re-hides a visible navigation bar',
-    (tester) async {
-      final platformCalls = <MethodCall>[];
-      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+  testWidgets('study screen keeps the system navigation bar visible', (
+    tester,
+  ) async {
+    final platformCalls = <MethodCall>[];
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      SystemChannels.platform,
+      (call) async {
+        platformCalls.add(call);
+        return null;
+      },
+    );
+    addTearDown(
+      () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
         SystemChannels.platform,
-        (call) async {
-          platformCalls.add(call);
-          return null;
-        },
-      );
-      addTearDown(
-        () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-          SystemChannels.platform,
-          null,
-        ),
-      );
-
-      final container = _createContainer();
-      addTearDown(container.dispose);
-      await container.read(appControllerProvider.future);
-
-      await tester.pumpWidget(
-        UncontrolledProviderScope(
-          container: container,
-          child: const MaterialApp(home: StudyScreen(day: 1)),
-        ),
-      );
-      await tester.pumpAndSettle();
-      platformCalls.clear();
-
-      await tester.binding.defaultBinaryMessenger.handlePlatformMessage(
-        SystemChannels.platform.name,
-        const JSONMethodCodec().encodeMethodCall(
-          const MethodCall('SystemChrome.systemUIChange', <bool>[true]),
-        ),
         null,
-      );
-      await tester.drag(find.byType(AlertDialog), const Offset(0, 100));
-      await tester.pump();
+      ),
+    );
 
-      expect(
-        platformCalls.where(
-          (call) => call.method == 'SystemChrome.setEnabledSystemUIOverlays',
-        ),
-        hasLength(1),
-      );
-    },
-  );
+    final container = _createContainer();
+    addTearDown(container.dispose);
+    await container.read(appControllerProvider.future);
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const MaterialApp(home: StudyScreen(day: 1)),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      platformCalls.where(
+        (call) =>
+            call.method == 'SystemChrome.setEnabledSystemUIMode' &&
+            call.arguments == SystemUiMode.edgeToEdge.toString(),
+      ),
+      hasLength(1),
+    );
+  });
 
   testWidgets('direct study-day route waits for state before prompting', (
     tester,

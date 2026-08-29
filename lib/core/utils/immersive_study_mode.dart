@@ -3,14 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:jlpt_practice/core/utils/system_bar_metrics.dart';
 
 mixin ImmersiveStudyMode<T extends StatefulWidget> on State<T> {
-  bool _systemNavBarVisible = false;
   Color? _outerBackgroundColor;
 
   @override
   void initState() {
     super.initState();
-    _hideSystemNavBar();
-    SystemChrome.setSystemUIChangeCallback(_handleSystemUIChange);
+    _showSystemBars();
   }
 
   @override
@@ -18,17 +16,11 @@ mixin ImmersiveStudyMode<T extends StatefulWidget> on State<T> {
     if (SystemBarMetrics.outerBackgroundColor.value == _outerBackgroundColor) {
       SystemBarMetrics.outerBackgroundColor.value = null;
     }
-    SystemChrome.setSystemUIChangeCallback(null);
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     super.dispose();
   }
 
-  /// Re-hides the system navigation bar. Call this after showing a dialog
-  /// or bottom sheet on an immersive screen: presenting an overlay route can
-  /// make Android redraw its window insets and reveal the (unstyled) system
-  /// nav bar even though it was hidden before, and nothing else in this
-  /// mixin re-hides it since that isn't a user-initiated swipe-down.
-  void reassertImmersiveMode() => _hideSystemNavBar();
+  /// Reasserts that both system bars remain visible after an overlay closes.
+  void reassertImmersiveMode() => _showSystemBars();
 
   /// Applies the same style imperatively after an overlay route or system UI
   /// mode change. Android can otherwise retain the previous window-bar colors
@@ -44,51 +36,21 @@ mixin ImmersiveStudyMode<T extends StatefulWidget> on State<T> {
     SystemBarMetrics.outerBackgroundColor.value = color;
   }
 
-  void _hideSystemNavBar() {
-    SystemChrome.setEnabledSystemUIMode(
-      SystemUiMode.manual,
-      overlays: [SystemUiOverlay.top],
-    );
-  }
+  void _showSystemBars() =>
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
-  Future<void> _handleSystemUIChange(bool systemOverlaysAreVisible) async {
-    if (!mounted) return;
-    _systemNavBarVisible = systemOverlaysAreVisible;
-  }
-
-  /// Wrap a screen's root content so that:
-  /// - swiping down outside of any scrollable (which claims vertical drags
-  ///   itself) re-hides the system navigation bar once swiped into view.
-  /// - the status bar and navigation bar always render in the screen's own
-  ///   background color, so even a transient reveal (e.g. Android redrawing
-  ///   insets while a dialog is presented) looks like part of the screen
-  ///   instead of a mismatched black/white system strip. AnnotatedRegion keeps
-  ///   the normal screen state declarative; overlay routes can additionally
-  ///   call [applyImmersiveSystemBarColor] after they are presented.
+  /// Styles the always-visible status and navigation bars to match the screen.
   Widget wrapImmersive(Widget child, {Color? systemBarColor}) {
     final backgroundColor =
         systemBarColor ?? Theme.of(context).scaffoldBackgroundColor;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: _systemBarStyle(backgroundColor),
-      child: wrapImmersiveSystemBarGesture(child),
-    );
-  }
-
-  /// Adds the immersive-mode drag behavior to content presented above the
-  /// screen's route, such as a dialog. Overlay routes receive pointer events
-  /// before [wrapImmersive], so they need their own gesture detector.
-  Widget wrapImmersiveSystemBarGesture(Widget child) {
-    return GestureDetector(
-      behavior: HitTestBehavior.translucent,
-      onVerticalDragUpdate: (details) {
-        if (_systemNavBarVisible && details.delta.dy > 0) {
-          _systemNavBarVisible = false;
-          _hideSystemNavBar();
-        }
-      },
       child: child,
     );
   }
+
+  /// Keeps existing call sites simple while dialogs retain normal gestures.
+  Widget wrapImmersiveSystemBarGesture(Widget child) => child;
 
   SystemUiOverlayStyle _systemBarStyle(Color backgroundColor) {
     final backgroundBrightness = ThemeData.estimateBrightnessForColor(
