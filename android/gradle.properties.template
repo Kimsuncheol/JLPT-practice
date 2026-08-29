@@ -1,0 +1,22 @@
+# Release Signing Configuration Template
+# Copy this to local.properties and fill in your values
+# IMPORTANT: Never commit local.properties to version control!
+
+# Path to your release keystore file (relative or absolute)
+# Example: signing.keystore.path=/Users/yourname/keys/my-release-key.jks
+# signing.keystore.path=
+
+# Password for the keystore
+# signing.keystore.password=
+
+# Alias of the key within the keystore
+# signing.key.alias=
+
+# Password for the key
+# signing.key.password=
+
+# Existing Gradle properties
+org.gradle.jvmargs=-Xmx8G -XX:MaxMetaspaceSize=4G -XX:ReservedCodeCacheSize=512m -XX:+HeapDumpOnOutOfMemoryError
+android.useAndroidX=true
+android.newDsl=false
+android.builtInKotlin=false

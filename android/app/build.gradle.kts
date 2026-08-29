@@ -25,11 +25,45 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        getByName("debug") {
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+            storeFile = file(System.getProperty("user.home") + "/.android/debug.keystore")
+            storePassword = "android"
+        }
+        create("release") {
+            // TODO: Add your own signing config for the release build.
+            // Configure these properties in local.properties or gradle.properties:
+            // - signing.keystore.path=path/to/your/keystore.jks
+            // - signing.keystore.password=your-password
+            // - signing.key.alias=your-key-alias
+            // - signing.key.password=your-key-password
+            val signingKeystore = project.findProperty("signing.keystore.path") as? String
+            val signingKeystorePassword = project.findProperty("signing.keystore.password") as? String
+            val signingKeyAlias = project.findProperty("signing.key.alias") as? String
+            val signingKeyPassword = project.findProperty("signing.key.password") as? String
+
+            if (!signingKeystore.isNullOrEmpty() &&
+                !signingKeystorePassword.isNullOrEmpty() &&
+                !signingKeyAlias.isNullOrEmpty() &&
+                !signingKeyPassword.isNullOrEmpty()) {
+                keyAlias = signingKeyAlias!!
+                keyPassword = signingKeyPassword!!
+                storeFile = file(signingKeystore)
+                storePassword = signingKeystorePassword!!
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            // Use release signing config if properly configured, otherwise use debug
+            signingConfig = if (project.findProperty("signing.keystore.path") != null) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
         }
     }
 }
