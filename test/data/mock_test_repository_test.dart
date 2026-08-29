@@ -19,12 +19,7 @@ GrammarPoint _point({
   formation: 'formation-$id',
   summaryKo: summaryKo.isEmpty ? '$summary-ko' : summaryKo,
   examples: const [
-    GrammarExample(
-      japanese: '日本語',
-      reading: 'にほんご',
-      romaji: 'nihongo',
-      english: 'Japanese',
-    ),
+    GrammarExample(japanese: '日本語', reading: 'にほんご', english: 'Japanese'),
   ],
 );
 

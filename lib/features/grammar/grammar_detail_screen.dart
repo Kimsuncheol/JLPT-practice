@@ -157,8 +157,6 @@ class _ExampleCard extends StatelessWidget {
           style: TextStyle(color: Theme.of(context).colorScheme.primary),
         ),
         const SizedBox(height: 7),
-        Text(example.romaji),
-        const SizedBox(height: 7),
         Text(
           example.translation(language),
           style: TextStyle(

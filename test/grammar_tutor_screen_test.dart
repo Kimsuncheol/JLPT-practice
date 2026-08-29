@@ -81,7 +81,6 @@ const _target = GrammarPoint(
     GrammarExample(
       japanese: '寿司が一番好きです。',
       reading: 'すしがいちばんすきです。',
-      romaji: 'Sushi ga ichiban suki desu.',
       english: 'I like sushi the most.',
     ),
   ],
@@ -99,7 +98,6 @@ const _distractor = GrammarPoint(
     GrammarExample(
       japanese: 'ここに座ってもいいです。',
       reading: 'ここにすわってもいいです。',
-      romaji: 'Koko ni suwatte mo ii desu.',
       english: 'You may sit here.',
     ),
   ],

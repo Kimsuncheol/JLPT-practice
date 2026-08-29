@@ -62,7 +62,6 @@ void main() {
         expect(example['japanese'], isNotEmpty);
         expect(example['reading'], isNotEmpty);
         expect(_containsKanji(example['reading'] as String), isFalse);
-        expect(example['romaji'], isNotEmpty);
         expect(example['english'], isNotEmpty);
         expect(example['korean'], isNotEmpty);
         expect(_hasCleanKorean(example['korean'] as String), isTrue);
