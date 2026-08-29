@@ -187,6 +187,8 @@ class _PartList extends StatelessWidget {
           clipBehavior: Clip.antiAlias,
           child: ExpansionTile(
             initiallyExpanded: number == 1,
+            shape: const Border(),
+            collapsedShape: const Border(),
             tilePadding: const EdgeInsets.fromLTRB(18, 8, 14, 8),
             childrenPadding: const EdgeInsets.fromLTRB(12, 0, 12, 14),
             title: Text(
