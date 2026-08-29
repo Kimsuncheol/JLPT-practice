@@ -22,14 +22,20 @@ class GrammarDetailScreen extends ConsumerWidget {
       loading: () =>
           const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (error, _) => Scaffold(
-        appBar: AppBar(),
+        appBar: AppBar(
+          surfaceTintColor: Colors.transparent,
+          scrolledUnderElevation: 0,
+        ),
         body: Center(child: Text(error.toString())),
       ),
       data: (items) {
         final grammar = _findGrammar(items, grammarId);
         if (grammar == null) {
           return Scaffold(
-            appBar: AppBar(),
+            appBar: AppBar(
+              surfaceTintColor: Colors.transparent,
+              scrolledUnderElevation: 0,
+            ),
             body: Center(child: Text(context.strings('noGrammarResults'))),
           );
         }
@@ -78,7 +84,11 @@ class _GrammarDetailsState extends ConsumerState<_GrammarDetails> {
     final grammar = widget.grammar;
     final language = Localizations.localeOf(context).languageCode;
     return Scaffold(
-      appBar: AppBar(title: Text('${grammar.level} · #${grammar.rank}')),
+      appBar: AppBar(
+        surfaceTintColor: Colors.transparent,
+        scrolledUnderElevation: 0,
+        title: Text('${grammar.level} · #${grammar.rank}'),
+      ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 10, 20, 32),
         children: [

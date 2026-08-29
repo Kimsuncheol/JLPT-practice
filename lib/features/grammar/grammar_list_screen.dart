@@ -29,6 +29,8 @@ class _GrammarListScreenState extends ConsumerState<GrammarListScreen> {
     final progress = ref.watch(grammarProgressProvider).value ?? const {};
     return Scaffold(
       appBar: AppBar(
+        surfaceTintColor: Colors.transparent,
+        scrolledUnderElevation: 0,
         title: Text('$selectedLevel ${context.strings('grammar')}'),
       ),
       body: catalog.when(

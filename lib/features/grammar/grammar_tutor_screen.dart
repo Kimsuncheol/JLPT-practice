@@ -47,7 +47,10 @@ class _GrammarTutorScreenState extends ConsumerState<GrammarTutorScreen>
           final grammar = items.where((item) => item.id == widget.grammarId);
           if (grammar.isEmpty) {
             return Scaffold(
-              appBar: AppBar(),
+              appBar: AppBar(
+                surfaceTintColor: Colors.transparent,
+                scrolledUnderElevation: 0,
+              ),
               body: Center(child: Text(context.strings('noGrammarResults'))),
             );
           }
@@ -62,6 +65,8 @@ class _GrammarTutorScreenState extends ConsumerState<GrammarTutorScreen>
     final part = grammarPartForRank(grammar.rank);
     return Scaffold(
       appBar: AppBar(
+        surfaceTintColor: Colors.transparent,
+        scrolledUnderElevation: 0,
         title: Text(
           '${context.strings('part')} ${part.number} · #${grammar.rank}',
         ),

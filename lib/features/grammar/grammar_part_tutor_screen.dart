@@ -52,7 +52,10 @@ class _GrammarPartTutorScreenState extends ConsumerState<GrammarPartTutorScreen>
                 ..sort((a, b) => a.rank.compareTo(b.rank));
           if (partItems.isEmpty) {
             return Scaffold(
-              appBar: AppBar(),
+              appBar: AppBar(
+                surfaceTintColor: Colors.transparent,
+                scrolledUnderElevation: 0,
+              ),
               body: Center(child: Text(context.strings('noGrammarResults'))),
             );
           }
@@ -86,6 +89,8 @@ class _GrammarPartTutorScreenState extends ConsumerState<GrammarPartTutorScreen>
     final complete = _index >= questions.length;
     return Scaffold(
       appBar: AppBar(
+        surfaceTintColor: Colors.transparent,
+        scrolledUnderElevation: 0,
         title: Text(
           '${widget.level} · ${context.strings('part')} ${widget.part}',
         ),
