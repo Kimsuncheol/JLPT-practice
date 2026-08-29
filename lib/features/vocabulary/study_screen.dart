@@ -382,13 +382,18 @@ class _StudyCard extends StatelessWidget {
                     horizontal: 12,
                     vertical: 4,
                   ),
-                  child: Text(
-                    vocabulary.word,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 56,
-                      height: 1.15,
-                      fontWeight: FontWeight.w800,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      vocabulary.word,
+                      maxLines: 1,
+                      softWrap: false,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 56,
+                        height: 1.15,
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
                   ),
                 ),
