@@ -8,17 +8,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AdIds {
   AdIds._();
 
-  static String get banner => Platform.isIOS
-      ? 'ca-app-pub-3940256099942544/2435281174'
-      : 'ca-app-pub-3940256099942544/9214589741';
-
   static String get interstitial => Platform.isIOS
       ? 'ca-app-pub-3940256099942544/4411468910'
-      : 'ca-app-pub-3940256099942544/1033173712';
+      : 'ca-app-pub-3041793072447483/1064523399';
 
   static String get rewarded => Platform.isIOS
       ? 'ca-app-pub-3940256099942544/1712485313'
-      : 'ca-app-pub-3940256099942544/5224354917';
+      : 'ca-app-pub-3041793072447483/7864031777';
 }
 
 class AdService {
@@ -28,6 +24,8 @@ class AdService {
     'ENABLE_ADS',
     defaultValue: false,
   );
+
+  static const rewardedXpAmount = 15;
 
   static Future<void> initialize() async {
     if (!enabled || kIsWeb) return;

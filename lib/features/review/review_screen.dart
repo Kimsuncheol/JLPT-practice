@@ -31,13 +31,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
     final queue = _queue!;
     if (queue.isEmpty || _index >= queue.length) {
       return Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            onPressed: context.pop,
-            icon: const Icon(Icons.close_rounded),
-          ),
-          title: Text(context.strings('reviewTitle')),
-        ),
+        appBar: AppBar(title: Text(context.strings('reviewTitle'))),
         body: EmptyState(
           icon: Icons.done_all_rounded,
           title: context.strings('queueComplete'),
@@ -52,10 +46,6 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
     final word = queue[_index];
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          onPressed: context.pop,
-          icon: const Icon(Icons.close_rounded),
-        ),
         title: Text(context.strings('reviewTitle')),
         actions: [
           Padding(

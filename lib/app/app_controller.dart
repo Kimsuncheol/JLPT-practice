@@ -5,12 +5,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:jlpt_practice/core/services/cloud_sync_service.dart';
+import 'package:jlpt_practice/core/services/day_block_access.dart';
 import 'package:jlpt_practice/core/services/local_store.dart';
+import 'package:jlpt_practice/core/services/notification_service.dart';
 import 'package:jlpt_practice/core/services/srs_scheduler.dart';
 import 'package:jlpt_practice/core/services/tts_service.dart';
 import 'package:jlpt_practice/data/models/app_state.dart';
+import 'package:jlpt_practice/data/models/mock_test.dart';
 import 'package:jlpt_practice/data/models/quiz.dart';
 import 'package:jlpt_practice/data/models/review_progress.dart';
+import 'package:jlpt_practice/data/models/study_session.dart';
 import 'package:jlpt_practice/data/repositories/quiz_repository.dart';
 import 'package:jlpt_practice/data/repositories/vocabulary_repository.dart';
 
@@ -32,6 +36,7 @@ final appControllerProvider = AsyncNotifierProvider<AppController, AppState>(
 
 class AppController extends AsyncNotifier<AppState> {
   late LocalStore _store;
+  Future<void> _studySessionWrite = Future.value();
 
   @override
   Future<AppState> build() async {
@@ -39,7 +44,21 @@ class AppController extends AsyncNotifier<AppState> {
     final language = ui.PlatformDispatcher.instance.locale.languageCode;
     final settings = _store.loadSettings(language);
     final vocabulary = await ref.read(vocabularyRepositoryProvider).load();
-    return AppState(
+    var notificationsEnabled = settings.notificationsEnabled;
+    if (notificationsEnabled) {
+      notificationsEnabled = await NotificationService.instance.hasPermission();
+      if (notificationsEnabled) {
+        await NotificationService.instance.scheduleDailyReminder(
+          hour: settings.reminderHour,
+          minute: settings.reminderMinute,
+          languageCode: settings.meaningLanguage,
+        );
+        unawaited(NotificationService.instance.setRemoteEnabled(true));
+      } else {
+        await _store.setValue('notificationsEnabled', false);
+      }
+    }
+    final local = AppState(
       vocabulary: vocabulary,
       progress: _store.loadProgress(),
       onboardingComplete: settings.onboardingComplete,
@@ -50,20 +69,43 @@ class AppController extends AsyncNotifier<AppState> {
       showFurigana: settings.showFurigana,
       autoPlayAudio: settings.autoPlayAudio,
       themeMode: settings.themeMode,
-      notificationsEnabled: settings.notificationsEnabled,
+      notificationsEnabled: notificationsEnabled,
+      reminderHour: settings.reminderHour,
+      reminderMinute: settings.reminderMinute,
+      timeZone: NotificationService.instance.timeZoneId,
       studySeconds: settings.studySeconds,
       quizAnswered: settings.quizAnswered,
       quizCorrect: settings.quizCorrect,
       currentStreak: settings.currentStreak,
       longestStreak: settings.longestStreak,
+      totalXp: settings.totalXp,
+      studySessions: _store.loadStudySessions(),
+      completedStudyDays: _store.loadCompletedStudyDays(),
     );
+    try {
+      final restored = await ref.read(cloudSyncProvider).restore(local);
+      await _store.saveAppState(
+        restored.state,
+        lastStudyDate: restored.lastStudyDate,
+      );
+      unawaited(
+        ref
+            .read(cloudSyncProvider)
+            .syncAll(
+              restored.state,
+              lastStudyDate: restored.lastStudyDate ?? _store.lastStudyDate,
+            ),
+      );
+      return restored.state;
+    } on Object {
+      return local;
+    }
   }
 
   AppState get _value => state.requireValue;
 
   Future<void> completeOnboarding({
     required String level,
-    required int dailyGoal,
     required String languageCode,
     required bool autoPlayAudio,
   }) async {
@@ -75,7 +117,6 @@ class AppController extends AsyncNotifier<AppState> {
     final next = _value.copyWith(
       onboardingComplete: true,
       selectedLevel: level,
-      dailyGoal: dailyGoal,
       languageCode: languageCode,
       meaningLanguage: resolvedLanguage,
       autoPlayAudio: autoPlayAudio,
@@ -84,7 +125,6 @@ class AppController extends AsyncNotifier<AppState> {
     await Future.wait([
       _store.setValue('onboardingComplete', true),
       _store.setValue('selectedLevel', level),
-      _store.setValue('dailyGoal', dailyGoal),
       _store.setValue('languageCode', languageCode),
       _store.setValue('meaningLanguage', resolvedLanguage),
       _store.setValue('autoPlayAudio', autoPlayAudio),
@@ -111,6 +151,15 @@ class AppController extends AsyncNotifier<AppState> {
     state = AsyncData(next);
     await _store.saveProgress(progress);
     unawaited(ref.read(cloudSyncProvider).syncProgress(scheduled));
+    unawaited(_syncLearningSummary(next));
+  }
+
+  Future<void> removeVocabularyProgress(String vocabularyId) async {
+    final progress = {..._value.progress}..remove(vocabularyId);
+    final next = _value.copyWith(progress: progress);
+    state = AsyncData(next);
+    await _store.saveProgress(progress);
+    unawaited(ref.read(cloudSyncProvider).deleteProgress(vocabularyId));
   }
 
   Future<void> recordQuizResult(
@@ -149,6 +198,59 @@ class AppController extends AsyncNotifier<AppState> {
     for (final scheduled in progress.values) {
       unawaited(ref.read(cloudSyncProvider).syncProgress(scheduled));
     }
+    unawaited(ref.read(cloudSyncProvider).recordQuizResult(result));
+    unawaited(_syncLearningSummary(next));
+  }
+
+  Future<void> recordMockTestResult(
+    MockTestResult result, {
+    required List<QuizQuestion> vocabularyQuestions,
+  }) async {
+    final progress = {..._value.progress};
+    final vocabularySection = result.sectionFor(TestSectionType.vocabulary);
+    if (vocabularySection != null) {
+      for (final question in vocabularyQuestions) {
+        final rating =
+            vocabularySection.incorrectIds.contains(question.vocabulary.id)
+            ? ReviewRating.again
+            : ReviewRating.good;
+        progress[question.vocabulary.id] = ref
+            .read(srsSchedulerProvider)
+            .schedule(
+              vocabularyId: question.vocabulary.id,
+              jlptLevel: question.vocabulary.jlptLevel,
+              rating: rating,
+              current: progress[question.vocabulary.id],
+            );
+      }
+    }
+    var next = _value.copyWith(
+      progress: progress,
+      quizAnswered: _value.quizAnswered + result.total,
+      quizCorrect: _value.quizCorrect + result.correct,
+      studySeconds: _value.studySeconds + result.duration.inSeconds,
+      lastMockTestResult: result,
+    );
+    next = await _withRecordedActivity(next);
+    state = AsyncData(next);
+    await Future.wait([
+      _store.saveProgress(progress),
+      _store.setValue('quizAnswered', next.quizAnswered),
+      _store.setValue('quizCorrect', next.quizCorrect),
+      _store.setValue('studySeconds', next.studySeconds),
+    ]);
+    for (final scheduled in progress.values) {
+      unawaited(ref.read(cloudSyncProvider).syncProgress(scheduled));
+    }
+    unawaited(ref.read(cloudSyncProvider).recordMockTestResult(result));
+    unawaited(_syncLearningSummary(next));
+  }
+
+  Future<void> addBonusXp(int amount) async {
+    final next = _value.copyWith(totalXp: _value.totalXp + amount);
+    state = AsyncData(next);
+    await _store.setValue('totalXp', next.totalXp);
+    unawaited(_syncLearningSummary(next));
   }
 
   Future<AppState> _withRecordedActivity(AppState current) async {
@@ -191,13 +293,15 @@ class AppController extends AsyncNotifier<AppState> {
       _store.setValue('languageCode', value),
       _store.setValue('meaningLanguage', resolved),
     ]);
+    if (next.notificationsEnabled) {
+      await NotificationService.instance.scheduleDailyReminder(
+        hour: next.reminderHour,
+        minute: next.reminderMinute,
+        languageCode: resolved,
+      );
+    }
     unawaited(ref.read(cloudSyncProvider).syncProfile(next));
   }
-
-  Future<void> setDailyGoal(int value) =>
-      _updatePreference('dailyGoal', value, (current) {
-        return current.copyWith(dailyGoal: value);
-      });
 
   Future<void> setShowFurigana(bool value) =>
       _updatePreference('showFurigana', value, (current) {
@@ -209,15 +313,81 @@ class AppController extends AsyncNotifier<AppState> {
         return current.copyWith(autoPlayAudio: value);
       });
 
-  Future<void> setNotifications(bool value) =>
-      _updatePreference('notificationsEnabled', value, (current) {
-        return current.copyWith(notificationsEnabled: value);
-      });
+  Future<bool> setNotifications(bool value) async {
+    var enabled = value;
+    if (value) {
+      enabled = await NotificationService.instance.enableDailyReminder(
+        hour: _value.reminderHour,
+        minute: _value.reminderMinute,
+        languageCode: _value.meaningLanguage,
+      );
+    } else {
+      await NotificationService.instance.disableNotifications();
+    }
+    await _updatePreference('notificationsEnabled', enabled, (current) {
+      return current.copyWith(notificationsEnabled: enabled);
+    });
+    return enabled;
+  }
+
+  Future<void> setReminderTime(TimeOfDay value) async {
+    final next = _value.copyWith(
+      reminderHour: value.hour,
+      reminderMinute: value.minute,
+    );
+    state = AsyncData(next);
+    await Future.wait([
+      _store.setValue('reminderHour', value.hour),
+      _store.setValue('reminderMinute', value.minute),
+    ]);
+    if (next.notificationsEnabled) {
+      await NotificationService.instance.scheduleDailyReminder(
+        hour: value.hour,
+        minute: value.minute,
+        languageCode: next.meaningLanguage,
+      );
+    }
+    unawaited(ref.read(cloudSyncProvider).syncProfile(next));
+  }
 
   Future<void> setThemeMode(ThemeMode value) =>
       _updatePreference('themeMode', value.name, (current) {
         return current.copyWith(themeMode: value);
       });
+
+  Future<void> saveStudySession(StudySession session) async {
+    final sessions = {..._value.studySessions, session.level: session};
+    state = AsyncData(_value.copyWith(studySessions: sessions));
+    await _persistStudySessions(sessions);
+    unawaited(_syncLearningSummary(_value));
+  }
+
+  Future<void> completeStudySession(String level, int day) async {
+    final sessions = {..._value.studySessions}..remove(level);
+    final completedStudyDays = {
+      ..._value.completedStudyDays,
+      level: {...?_value.completedStudyDays[level], day},
+    };
+    state = AsyncData(
+      _value.copyWith(
+        studySessions: sessions,
+        completedStudyDays: completedStudyDays,
+      ),
+    );
+    await Future.wait([
+      _persistStudySessions(sessions),
+      _store.saveCompletedStudyDays(completedStudyDays),
+    ]);
+    unawaited(_syncLearningSummary(_value));
+  }
+
+  Future<void> _persistStudySessions(Map<String, StudySession> sessions) {
+    final snapshot = Map<String, StudySession>.unmodifiable(sessions);
+    _studySessionWrite = _studySessionWrite.then(
+      (_) => _store.saveStudySessions(snapshot),
+    );
+    return _studySessionWrite;
+  }
 
   Future<void> _updatePreference(
     String key,
@@ -238,8 +408,38 @@ class AppController extends AsyncNotifier<AppState> {
       quizCorrect: 0,
       currentStreak: 0,
       longestStreak: 0,
+      totalXp: 0,
+      studySessions: {},
+      completedStudyDays: {},
     );
+    await ref.read(cloudSyncProvider).resetLearningData();
     state = AsyncData(next);
+    await _studySessionWrite;
     await _store.clearLearningData();
+    await DayBlockAccess.clearRewardedDays();
   }
+
+  Future<void> mergeCurrentAccount() async {
+    final restored = await ref.read(cloudSyncProvider).restore(_value);
+    state = AsyncData(restored.state);
+    await _store.saveAppState(
+      restored.state,
+      lastStudyDate: restored.lastStudyDate ?? _store.lastStudyDate,
+    );
+    await ref
+        .read(cloudSyncProvider)
+        .syncAll(
+          restored.state,
+          lastStudyDate: restored.lastStudyDate ?? _store.lastStudyDate,
+        );
+  }
+
+  Future<void> clearLocalForAccountSwitch() async {
+    await _studySessionWrite;
+    await _store.clearAccountData();
+  }
+
+  Future<void> _syncLearningSummary(AppState value) => ref
+      .read(cloudSyncProvider)
+      .syncLearningSummary(value, lastStudyDate: _store.lastStudyDate);
 }

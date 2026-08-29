@@ -1,6 +1,1 @@
-{
-  "firestore": {
-    "rules": "firestore.rules",
-    "indexes": "firestore.indexes.json"
-  }
-}
+{"functions":{"source":"functions","runtime":"nodejs20"},"firestore":{"rules":"firestore.rules","indexes":"firestore.indexes.json"},"hosting":{"public":"public","ignore":["firebase.json","**/.*","**/node_modules/**"]},"flutter":{"platforms":{"android":{"default":{"projectId":"jlpt-practice-20a4e","appId":"1:218704881410:android:4acab4c0237a9d4120441b","fileOutput":"android/app/google-services.json"}},"ios":{"default":{"projectId":"jlpt-practice-20a4e","appId":"1:218704881410:ios:21eac361f570ae5d20441b","uploadDebugSymbols":true,"fileOutput":"ios/Runner/GoogleService-Info.plist"}},"dart":{"lib/firebase_options.dart":{"projectId":"jlpt-practice-20a4e","configurations":{"android":"1:218704881410:android:4acab4c0237a9d4120441b","ios":"1:218704881410:ios:21eac361f570ae5d20441b"}}}}}}

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:jlpt_practice/data/models/mock_test.dart';
 import 'package:jlpt_practice/data/models/quiz.dart';
 import 'package:jlpt_practice/data/models/review_progress.dart';
+import 'package:jlpt_practice/data/models/study_session.dart';
 import 'package:jlpt_practice/data/models/vocabulary.dart';
 
 class AppState {
@@ -16,12 +18,19 @@ class AppState {
     required this.autoPlayAudio,
     required this.themeMode,
     required this.notificationsEnabled,
+    this.reminderHour = 20,
+    this.reminderMinute = 0,
+    this.timeZone = 'UTC',
     required this.studySeconds,
     required this.quizAnswered,
     required this.quizCorrect,
     required this.currentStreak,
     required this.longestStreak,
+    this.totalXp = 0,
+    this.studySessions = const {},
+    this.completedStudyDays = const {},
     this.lastQuizResult,
+    this.lastMockTestResult,
   });
 
   final List<Vocabulary> vocabulary;
@@ -35,12 +44,19 @@ class AppState {
   final bool autoPlayAudio;
   final ThemeMode themeMode;
   final bool notificationsEnabled;
+  final int reminderHour;
+  final int reminderMinute;
+  final String timeZone;
   final int studySeconds;
   final int quizAnswered;
   final int quizCorrect;
   final int currentStreak;
   final int longestStreak;
+  final int totalXp;
+  final Map<String, StudySession> studySessions;
+  final Map<String, Set<int>> completedStudyDays;
   final QuizResult? lastQuizResult;
+  final MockTestResult? lastMockTestResult;
 
   List<Vocabulary> get selectedVocabulary =>
       vocabulary
@@ -81,12 +97,19 @@ class AppState {
     bool? autoPlayAudio,
     ThemeMode? themeMode,
     bool? notificationsEnabled,
+    int? reminderHour,
+    int? reminderMinute,
+    String? timeZone,
     int? studySeconds,
     int? quizAnswered,
     int? quizCorrect,
     int? currentStreak,
     int? longestStreak,
+    int? totalXp,
+    Map<String, StudySession>? studySessions,
+    Map<String, Set<int>>? completedStudyDays,
     QuizResult? lastQuizResult,
+    MockTestResult? lastMockTestResult,
   }) {
     return AppState(
       vocabulary: vocabulary ?? this.vocabulary,
@@ -100,12 +123,19 @@ class AppState {
       autoPlayAudio: autoPlayAudio ?? this.autoPlayAudio,
       themeMode: themeMode ?? this.themeMode,
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
+      reminderHour: reminderHour ?? this.reminderHour,
+      reminderMinute: reminderMinute ?? this.reminderMinute,
+      timeZone: timeZone ?? this.timeZone,
       studySeconds: studySeconds ?? this.studySeconds,
       quizAnswered: quizAnswered ?? this.quizAnswered,
       quizCorrect: quizCorrect ?? this.quizCorrect,
       currentStreak: currentStreak ?? this.currentStreak,
       longestStreak: longestStreak ?? this.longestStreak,
+      totalXp: totalXp ?? this.totalXp,
+      studySessions: studySessions ?? this.studySessions,
+      completedStudyDays: completedStudyDays ?? this.completedStudyDays,
       lastQuizResult: lastQuizResult ?? this.lastQuizResult,
+      lastMockTestResult: lastMockTestResult ?? this.lastMockTestResult,
     );
   }
 }

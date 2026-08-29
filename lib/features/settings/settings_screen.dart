@@ -4,7 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/ads/ad_service.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
-import 'package:jlpt_practice/core/services/firebase_bootstrap.dart';
+import 'package:jlpt_practice/core/services/account_service.dart';
+import 'package:jlpt_practice/features/dashboard/home_tab_provider.dart';
+import 'package:jlpt_practice/shared/session_actions.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -19,6 +21,7 @@ class SettingsScreen extends ConsumerWidget {
         data: (state) {
           final controller = ref.read(appControllerProvider.notifier);
           final strings = context.strings;
+          final user = ref.watch(firebaseUserProvider).value;
           return ListView(
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 36),
             children: [
@@ -27,40 +30,25 @@ class SettingsScreen extends ConsumerWidget {
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
               const SizedBox(height: 18),
-              Container(
-                padding: const EdgeInsets.all(18),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  borderRadius: BorderRadius.circular(22),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.cloud_done_outlined, size: 28),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            strings('anonymousNotice'),
-                            style: const TextStyle(fontWeight: FontWeight.w700),
-                          ),
-                          const SizedBox(height: 3),
-                          Text(
-                            FirebaseBootstrap.isAvailable
-                                ? 'Firebase sync active'
-                                : strings('offlineMode'),
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 18),
               _SettingsGroup(
                 children: [
+                  ListTile(
+                    leading: Icon(
+                      user != null
+                          ? Icons.cloud_done_outlined
+                          : Icons.person_add_alt_1_outlined,
+                    ),
+                    title: Text(strings('account')),
+                    subtitle: Text(
+                      user != null
+                          ? user.email ?? strings('syncActive')
+                          : strings('protectProgress'),
+                    ),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => ref
+                        .read(homeTabIndexProvider.notifier)
+                        .select(homeTabProfile),
+                  ),
                   ListTile(
                     leading: const Icon(Icons.translate_rounded),
                     title: Text(strings('languages')),
@@ -78,25 +66,6 @@ class SettingsScreen extends ConsumerWidget {
                     subtitle: Text(state.selectedLevel),
                     trailing: const Icon(Icons.chevron_right_rounded),
                     onTap: () => context.push('/settings/levels'),
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.flag_rounded),
-                    title: Text(strings('dailyGoal')),
-                    trailing: DropdownButton<int>(
-                      value: state.dailyGoal,
-                      underline: const SizedBox.shrink(),
-                      items: [5, 10, 20, 30]
-                          .map(
-                            (goal) => DropdownMenuItem(
-                              value: goal,
-                              child: Text('$goal'),
-                            ),
-                          )
-                          .toList(),
-                      onChanged: (value) {
-                        if (value != null) controller.setDailyGoal(value);
-                      },
-                    ),
                   ),
                 ],
               ),
@@ -118,8 +87,50 @@ class SettingsScreen extends ConsumerWidget {
                   SwitchListTile(
                     secondary: const Icon(Icons.notifications_active_outlined),
                     title: Text(strings('notifications')),
+                    subtitle: Text(
+                      TimeOfDay(
+                        hour: state.reminderHour,
+                        minute: state.reminderMinute,
+                      ).format(context),
+                    ),
                     value: state.notificationsEnabled,
-                    onChanged: controller.setNotifications,
+                    onChanged: (value) async {
+                      final enabled = await controller.setNotifications(value);
+                      if (context.mounted && value && !enabled) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              strings('notificationPermissionDenied'),
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                  ListTile(
+                    enabled: state.notificationsEnabled,
+                    leading: const Icon(Icons.schedule_rounded),
+                    title: Text(strings('reminderTime')),
+                    trailing: Text(
+                      TimeOfDay(
+                        hour: state.reminderHour,
+                        minute: state.reminderMinute,
+                      ).format(context),
+                    ),
+                    onTap: state.notificationsEnabled
+                        ? () async {
+                            final selected = await showTimePicker(
+                              context: context,
+                              initialTime: TimeOfDay(
+                                hour: state.reminderHour,
+                                minute: state.reminderMinute,
+                              ),
+                            );
+                            if (selected != null) {
+                              await controller.setReminderTime(selected);
+                            }
+                          }
+                        : null,
                   ),
                 ],
               ),
@@ -129,21 +140,9 @@ class SettingsScreen extends ConsumerWidget {
                   ListTile(
                     leading: const Icon(Icons.brightness_6_rounded),
                     title: Text(strings('appearance')),
-                    trailing: DropdownButton<ThemeMode>(
-                      value: state.themeMode,
-                      underline: const SizedBox.shrink(),
-                      items: ThemeMode.values
-                          .map(
-                            (mode) => DropdownMenuItem(
-                              value: mode,
-                              child: Text(strings(mode.name)),
-                            ),
-                          )
-                          .toList(),
-                      onChanged: (value) {
-                        if (value != null) controller.setThemeMode(value);
-                      },
-                    ),
+                    subtitle: Text(strings(state.themeMode.name)),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => context.push('/settings/appearance'),
                   ),
                 ],
               ),
@@ -191,9 +190,23 @@ class SettingsScreen extends ConsumerWidget {
                   ),
                 ],
               ),
+              if (user != null) ...[
+                const SizedBox(height: 14),
+                _SettingsGroup(
+                  children: [
+                    ListTile(
+                      leading: const Icon(Icons.logout_rounded),
+                      title: Text(strings('signOut')),
+                      onTap: () => confirmAndSignOut(context, ref),
+                    ),
+                  ],
+                ),
+              ],
               const SizedBox(height: 22),
               Text(
-                strings('anonymousBody'),
+                user != null
+                    ? strings('syncActiveBody')
+                    : strings('anonymousBody'),
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
