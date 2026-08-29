@@ -1,7 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
+import 'package:jlpt_practice/core/services/tts_service.dart';
+import 'package:jlpt_practice/core/services/volume_service.dart';
 import 'package:jlpt_practice/data/models/grammar_point.dart';
 import 'package:jlpt_practice/features/grammar/grammar_providers.dart';
 
@@ -34,13 +39,43 @@ class GrammarDetailScreen extends ConsumerWidget {
   }
 }
 
-class _GrammarDetails extends StatelessWidget {
+class _GrammarDetails extends ConsumerStatefulWidget {
   const _GrammarDetails({required this.grammar});
 
   final GrammarPoint grammar;
 
   @override
+  ConsumerState<_GrammarDetails> createState() => _GrammarDetailsState();
+}
+
+class _GrammarDetailsState extends ConsumerState<_GrammarDetails> {
+  TtsService? _ttsService;
+
+  @override
+  void dispose() {
+    if (_ttsService != null) unawaited(_ttsService!.stop());
+    super.dispose();
+  }
+
+  void _speak(String text) {
+    _ttsService ??= ref.read(ttsServiceProvider);
+    unawaited(_ttsService!.speak(text));
+  }
+
+  Future<void> _speakIfAudible(String text) async {
+    if (await isSystemVolumeTooLow()) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(context.strings('lowVolumeBody'))));
+      return;
+    }
+    _speak(text);
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final grammar = widget.grammar;
     final language = Localizations.localeOf(context).languageCode;
     return Scaffold(
       appBar: AppBar(title: Text('${grammar.level} · #${grammar.rank}')),
@@ -91,6 +126,7 @@ class _GrammarDetails extends StatelessWidget {
               number: indexed.$1 + 1,
               example: indexed.$2,
               language: language,
+              onSpeak: () => _speakIfAudible(indexed.$2.japanese),
             ),
           ),
         ],
@@ -129,11 +165,13 @@ class _ExampleCard extends StatelessWidget {
     required this.number,
     required this.example,
     required this.language,
+    required this.onSpeak,
   });
 
   final int number;
   final GrammarExample example;
   final String language;
+  final VoidCallback onSpeak;
 
   @override
   Widget build(BuildContext context) => Container(
@@ -147,9 +185,18 @@ class _ExampleCard extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          '$number. ${example.japanese}',
-          style: Theme.of(context).textTheme.titleMedium,
+        Semantics(
+          button: true,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(12),
+            splashFactory: NoSplash.splashFactory,
+            overlayColor: const WidgetStatePropertyAll(Colors.transparent),
+            onTap: onSpeak,
+            child: Text(
+              '$number. ${example.japanese}',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+          ),
         ),
         const SizedBox(height: 5),
         Text(
