@@ -126,7 +126,7 @@ void main() {
 
     expect(tester.takeException(), isNull);
     expect(find.text('Continue your recent session?'), findsOneWidget);
-    expect(find.text('1 / 5'), findsOneWidget);
+    expect(find.text('1 / 5'), findsNothing);
   });
 
   testWidgets('asks inside study screen before restoring the saved word', (
@@ -147,8 +147,9 @@ void main() {
     final controller =
         container.read(appControllerProvider.notifier) as _ResumeAppController;
     expect(find.text('Continue your recent session?'), findsOneWidget);
-    expect(find.text('1 / 5'), findsOneWidget);
+    expect(find.text('1 / 5'), findsNothing);
     expect(find.text('単語1'), findsOneWidget);
+    expect(find.byType(Chip), findsNothing);
     expect(controller.savedSessions, isEmpty);
 
     await tester.binding.handlePopRoute();
@@ -159,8 +160,9 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Continue your recent session?'), findsNothing);
-    expect(find.text('3 / 5'), findsOneWidget);
+    expect(find.text('3 / 5'), findsNothing);
     expect(find.text('単語3'), findsOneWidget);
+    expect(find.byType(Chip), findsNothing);
     expect(controller.savedSessions.last.wordId, 'word_2');
   });
 
@@ -194,7 +196,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Continue your recent session?'), findsOneWidget);
-      expect(find.text('1 / 5'), findsOneWidget);
+      expect(find.text('1 / 5'), findsNothing);
       expect(find.text('単語1'), findsOneWidget);
       expect(find.text('Choose another day'), findsOneWidget);
 
@@ -223,7 +225,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Continue your recent session?'), findsNothing);
-    expect(find.text('1 / 5'), findsOneWidget);
+    expect(find.text('1 / 5'), findsNothing);
     expect(find.text('単語6'), findsOneWidget);
     final controller =
         container.read(appControllerProvider.notifier) as _ResumeAppController;
@@ -253,7 +255,8 @@ void main() {
 
     await tester.tap(find.text('Continue'));
     await tester.pumpAndSettle();
-    expect(find.text('5 / 5'), findsOneWidget);
+    expect(find.text('5 / 5'), findsNothing);
+    expect(find.text('単語5'), findsOneWidget);
 
     final pageView = find.byType(PageView);
     await tester.drag(pageView, Offset(-tester.getSize(pageView).width, 0));
