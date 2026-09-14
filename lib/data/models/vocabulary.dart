@@ -109,6 +109,7 @@ class Vocabulary {
     final level = json['level'] as String;
     final rank = json['rank'] as int;
     final exampleJson = json['example'] as Map<String, dynamic>?;
+    final meaningKo = json['meaningKo'] as String?;
     return Vocabulary(
       id: '${level}_${rank}_${_safeIdPart(word)}_${_safeIdPart(reading)}',
       word: word,
@@ -117,6 +118,7 @@ class Vocabulary {
       romaji: '',
       meanings: {
         'en': [json['meaning'] as String],
+        if (meaningKo != null && meaningKo.isNotEmpty) 'ko': [meaningKo],
       },
       partOfSpeech: 'word',
       jlptLevel: level,
