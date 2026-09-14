@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
@@ -30,6 +29,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
     with ImmersiveStudyMode<StudyScreen> {
   static const _resumeDialogBarrierColor = Colors.black54;
 
+  int _index = 0;
   bool? _showFurigana;
   PageController? _pageController;
   TtsService? _ttsService;
@@ -38,24 +38,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   bool _suppressAutoAudio = false;
 
   @override
-  void initState() {
-    super.initState();
-    // The study screen supports rotation while the rest of the app remains
-    // portrait-only. The system navigation bar stays visible in both modes.
-    unawaited(
-      SystemChrome.setPreferredOrientations([
-        DeviceOrientation.portraitUp,
-        DeviceOrientation.landscapeLeft,
-        DeviceOrientation.landscapeRight,
-      ]),
-    );
-  }
-
-  @override
   void dispose() {
-    unawaited(
-      SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]),
-    );
     _pageController?.dispose();
     if (_ttsService != null) unawaited(_ttsService!.stop());
     super.dispose();
@@ -94,8 +77,6 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
       );
     }
     _initializePage(words, state);
-    final isLandscape =
-        MediaQuery.orientationOf(context) == Orientation.landscape;
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -103,60 +84,81 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
           icon: const Icon(Icons.close_rounded),
         ),
       ),
-      body: PageView.builder(
-        controller: _pageController,
-        itemCount: words.length + 1,
-        onPageChanged: (index) {
-          if (index == words.length) {
-            unawaited(_finishStudying());
-            return;
-          }
-          if (_resumeDecisionPending) return;
-          unawaited(_savePosition(state, words[index], index));
-          if (state.autoPlayAudio && !_suppressAutoAudio) {
-            _speak(words[index].word);
-          }
-          _suppressAutoAudio = false;
-        },
-        itemBuilder: (context, index) {
-          if (index == words.length) return const SizedBox.shrink();
-          final word = words[index];
-          return Padding(
-            padding: isLandscape
-                ? const EdgeInsets.fromLTRB(8, 2, 8, 0)
-                : const EdgeInsets.fromLTRB(20, 8, 20, 14),
-            child: _StudyCard(
-              vocabulary: word,
-              language: state.meaningLanguage,
-              showFurigana: _showFurigana!,
-              isInReview: state.progress.containsKey(word.id),
-              onToggleFurigana: () {
-                setState(() => _showFurigana = !_showFurigana!);
+      body: Column(
+        children: [
+          Expanded(
+            child: PageView.builder(
+              controller: _pageController,
+              itemCount: words.length + 1,
+              onPageChanged: (index) {
+                if (index == words.length) {
+                  unawaited(_finishStudying());
+                  return;
+                }
+                setState(() => _index = index);
+                if (_resumeDecisionPending) return;
+                unawaited(_savePosition(state, words[index], index));
+                if (state.autoPlayAudio && !_suppressAutoAudio) {
+                  _speak(words[index].word);
+                }
+                _suppressAutoAudio = false;
               },
-              onSpeakWord: () => _speakIfAudible(word.reading),
-              onSpeakExample: () => _speakIfAudible(word.example.sentence),
-              onReview: () async {
-                final controller = ref.read(appControllerProvider.notifier);
-                final wasInReview = state.progress.containsKey(word.id);
-                if (wasInReview) {
-                  await controller.removeVocabularyProgress(word.id);
-                } else {
-                  await controller.rateVocabulary(word.id, ReviewRating.again);
-                }
-                if (context.mounted) {
-                  showAppToast(
-                    context,
-                    context.strings(
-                      wasInReview
-                          ? 'removedFromReviewToast'
-                          : 'addedToReviewToast',
-                    ),
-                  );
-                }
+              itemBuilder: (context, index) {
+                if (index == words.length) return const SizedBox.shrink();
+                final word = words[index];
+                return Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 14),
+                  child: _StudyCard(
+                    vocabulary: word,
+                    language: state.meaningLanguage,
+                    showFurigana: _showFurigana!,
+                    isInReview: state.progress.containsKey(word.id),
+                    onToggleFurigana: () {
+                      setState(() => _showFurigana = !_showFurigana!);
+                    },
+                    onSpeakWord: () => _speakIfAudible(word.reading),
+                    onSpeakExample: () =>
+                        _speakIfAudible(word.example.sentence),
+                    onReview: () async {
+                      final controller = ref.read(
+                        appControllerProvider.notifier,
+                      );
+                      final wasInReview = state.progress.containsKey(word.id);
+                      if (wasInReview) {
+                        await controller.removeVocabularyProgress(word.id);
+                      } else {
+                        await controller.rateVocabulary(
+                          word.id,
+                          ReviewRating.again,
+                        );
+                      }
+                      if (context.mounted) {
+                        showAppToast(
+                          context,
+                          context.strings(
+                            wasInReview
+                                ? 'removedFromReviewToast'
+                                : 'addedToReviewToast',
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                );
               },
             ),
-          );
-        },
+          ),
+          SafeArea(
+            top: false,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 6, 20, 14),
+              child: Text(
+                '${_index + 1} / ${words.length}',
+                style: const TextStyle(fontWeight: FontWeight.w700),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -323,12 +325,6 @@ class _StudyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isLandscape =
-        MediaQuery.orientationOf(context) == Orientation.landscape;
-    return isLandscape ? _buildLandscape(context) : _buildPortrait(context);
-  }
-
-  Widget _buildPortrait(BuildContext context) {
     return Column(
       children: [
         Expanded(
@@ -361,63 +357,6 @@ class _StudyCard extends StatelessWidget {
     );
   }
 
-  Widget _buildLandscape(BuildContext context) {
-    final identityColumn = Column(
-      children: [
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _buildReading(context, enlarged: true),
-                  const SizedBox(height: 6),
-                  _buildWord(context, enlarged: true),
-                  const SizedBox(height: 8),
-                  _buildRomaji(context, enlarged: true),
-                  const SizedBox(height: 6),
-                  _buildMeaning(context, enlarged: true),
-                ],
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: 6),
-        _buildActionsRow(context),
-      ],
-    );
-
-    if (!vocabulary.hasExample) {
-      return Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 420),
-          child: identityColumn,
-        ),
-      );
-    }
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Expanded(flex: 2, child: identityColumn),
-        VerticalDivider(
-          width: 1,
-          thickness: 1,
-          color: Theme.of(context).colorScheme.outlineVariant,
-        ),
-        Expanded(
-          flex: 3,
-          child: _centeredScrollable(
-            padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
-            child: _buildExample(context),
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _centeredScrollable({
     required EdgeInsets padding,
     required Widget child,
@@ -435,23 +374,20 @@ class _StudyCard extends StatelessWidget {
     );
   }
 
-  Widget _buildReading(BuildContext context, {bool enlarged = false}) =>
-      AnimatedOpacity(
-        opacity:
-            showFurigana && vocabulary.reading.compareTo(vocabulary.word) != 0
-            ? 1
-            : 0,
-        duration: const Duration(milliseconds: 180),
-        child: Text(
-          vocabulary.reading,
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontSize: enlarged ? 28 : null,
-            color: Theme.of(context).colorScheme.primary,
-          ),
-        ),
-      );
+  Widget _buildReading(BuildContext context) => AnimatedOpacity(
+    opacity: showFurigana && vocabulary.reading.compareTo(vocabulary.word) != 0
+        ? 1
+        : 0,
+    duration: const Duration(milliseconds: 180),
+    child: Text(
+      vocabulary.reading,
+      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+        color: Theme.of(context).colorScheme.primary,
+      ),
+    ),
+  );
 
-  Widget _buildWord(BuildContext context, {bool enlarged = false}) => Semantics(
+  Widget _buildWord(BuildContext context) => Semantics(
     button: true,
     child: InkWell(
       borderRadius: BorderRadius.circular(16),
@@ -467,8 +403,8 @@ class _StudyCard extends StatelessWidget {
             maxLines: 1,
             softWrap: false,
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: enlarged ? 68 : 56,
+            style: const TextStyle(
+              fontSize: 56,
               height: 1.15,
               fontWeight: FontWeight.w800,
             ),
@@ -478,20 +414,15 @@ class _StudyCard extends StatelessWidget {
     ),
   );
 
-  Widget _buildRomaji(BuildContext context, {bool enlarged = false}) => Text(
+  Widget _buildRomaji(BuildContext context) => Text(
     vocabulary.romaji,
-    style: TextStyle(
-      fontSize: enlarged ? 18 : null,
-      color: Theme.of(context).colorScheme.onSurfaceVariant,
-    ),
+    style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
   );
 
-  Widget _buildMeaning(BuildContext context, {bool enlarged = false}) => Text(
+  Widget _buildMeaning(BuildContext context) => Text(
     vocabulary.meaning(language),
     textAlign: TextAlign.center,
-    style: Theme.of(
-      context,
-    ).textTheme.headlineMedium?.copyWith(fontSize: enlarged ? 34 : null),
+    style: Theme.of(context).textTheme.headlineMedium,
   );
 
   Widget _buildExample(BuildContext context) => Column(
