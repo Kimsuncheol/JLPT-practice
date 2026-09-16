@@ -36,6 +36,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   bool _resumeDecisionPending = false;
   bool _resumeDialogVisible = false;
   bool _suppressAutoAudio = false;
+  int _pageChangeRequest = 0;
 
   @override
   void dispose() {
@@ -90,19 +91,9 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
             child: PageView.builder(
               controller: _pageController,
               itemCount: words.length + 1,
-              onPageChanged: (index) {
-                if (index == words.length) {
-                  unawaited(_finishStudying());
-                  return;
-                }
-                setState(() => _index = index);
-                if (_resumeDecisionPending) return;
-                unawaited(_savePosition(state, words[index], index));
-                if (state.autoPlayAudio && !_suppressAutoAudio) {
-                  _speak(words[index].word);
-                }
-                _suppressAutoAudio = false;
-              },
+              onPageChanged: (index) => unawaited(
+                _handlePageChanged(index: index, words: words, state: state),
+              ),
               itemBuilder: (context, index) {
                 if (index == words.length) return const SizedBox.shrink();
                 final word = words[index];
@@ -289,6 +280,28 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
       return;
     }
     _speak(text);
+  }
+
+  Future<void> _handlePageChanged({
+    required int index,
+    required List<Vocabulary> words,
+    required AppState state,
+  }) async {
+    final request = ++_pageChangeRequest;
+    if (_ttsService != null) await _ttsService!.stop();
+    if (!mounted || request != _pageChangeRequest) return;
+
+    if (index == words.length) {
+      await _finishStudying();
+      return;
+    }
+    setState(() => _index = index);
+    if (_resumeDecisionPending) return;
+    unawaited(_savePosition(state, words[index], index));
+    if (state.autoPlayAudio && !_suppressAutoAudio) {
+      _speak(words[index].word);
+    }
+    _suppressAutoAudio = false;
   }
 
   Future<void> _finishStudying() async {

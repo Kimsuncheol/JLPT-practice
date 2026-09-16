@@ -60,6 +60,53 @@ void main() {
     expect(speech.spoken, ['たんご', 'たんご', 'たんご']);
   });
 
+  testWidgets('swiping stops current speech before automatic pronunciation', (
+    tester,
+  ) async {
+    const volumeChannel = MethodChannel(
+      'com.kurenai7968.volume_controller.method',
+    );
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      volumeChannel,
+      (call) async => call.method == 'isMuted' ? false : 0.8,
+    );
+    addTearDown(
+      () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        volumeChannel,
+        null,
+      ),
+    );
+    final speech = _RecordingTtsService();
+    final container = ProviderContainer(
+      overrides: [
+        appControllerProvider.overrideWith(
+          () => _ResumeAppController('word_0', 0, autoPlayAudio: true),
+        ),
+        ttsServiceProvider.overrideWithValue(speech),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container.read(appControllerProvider.future);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const MaterialApp(home: StudyScreen(day: 1)),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Continue'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('単語1'));
+    await tester.pumpAndSettle();
+
+    final pageView = find.byType(PageView);
+    await tester.drag(pageView, Offset(-tester.getSize(pageView).width, 0));
+    await tester.pumpAndSettle();
+
+    expect(find.text('単語2'), findsOneWidget);
+    expect(speech.events, ['speak:たんご', 'stop', 'speak:単語2']);
+  });
+
   for (final theme in {
     'light': AppTheme.light(),
     'dark': AppTheme.dark(),
@@ -332,15 +379,19 @@ void main() {
 
 class _RecordingTtsService implements TtsService {
   final spoken = <String>[];
+  final events = <String>[];
 
   @override
-  Future<void> speak(String text) async => spoken.add(text);
+  Future<void> speak(String text) async {
+    spoken.add(text);
+    events.add('speak:$text');
+  }
 
   @override
   Future<void> speakDialogue(List<DialogueTurn> turns) async {}
 
   @override
-  Future<void> stop() async {}
+  Future<void> stop() async => events.add('stop');
 
   @override
   Future<void> dispose() async {}
@@ -395,10 +446,15 @@ ProviderContainer _createContainer({
 );
 
 class _ResumeAppController extends AppController {
-  _ResumeAppController(this.wordId, this.indexFallback);
+  _ResumeAppController(
+    this.wordId,
+    this.indexFallback, {
+    this.autoPlayAudio = false,
+  });
 
   final String wordId;
   final int indexFallback;
+  final bool autoPlayAudio;
   final List<StudySession> savedSessions = [];
 
   @override
@@ -412,7 +468,7 @@ class _ResumeAppController extends AppController {
       meaningLanguage: 'en',
       dailyGoal: 5,
       showFurigana: true,
-      autoPlayAudio: false,
+      autoPlayAudio: autoPlayAudio,
       themeMode: ThemeMode.system,
       notificationsEnabled: false,
       studySeconds: 0,

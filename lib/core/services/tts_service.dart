@@ -152,9 +152,11 @@ class TtsService {
   }
 
   Future<void> stop() async {
-    _speechRequest++;
+    final request = ++_speechRequest;
     await _ready;
+    if (request != _speechRequest) return;
     await _tts.stop();
+    if (request != _speechRequest) return;
     await _releaseAudioFocus();
   }
 
