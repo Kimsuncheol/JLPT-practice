@@ -375,6 +375,47 @@ void main() {
     expect(find.text('Finish this study session?'), findsNothing);
     expect(find.text('Great work!'), findsOneWidget);
   });
+
+  for (final alreadyCompleted in [false, true]) {
+    testWidgets(
+      'finishing day 6 returns to day selection (completed: $alreadyCompleted)',
+      (tester) async {
+        final container = _createContainer();
+        addTearDown(container.dispose);
+        await container.read(appControllerProvider.future);
+        final controller =
+            container.read(appControllerProvider.notifier)
+                as _ResumeAppController;
+        if (alreadyCompleted) {
+          await controller.completeStudySession('N5', 6);
+        }
+        final router = _createRouter(initialLocation: '/study/day/6/finish');
+        addTearDown(router.dispose);
+        await tester.pumpWidget(
+          UncontrolledProviderScope(
+            container: container,
+            child: MaterialApp.router(routerConfig: router),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('Finish this session'));
+        await tester.pumpAndSettle();
+        if (!alreadyCompleted) {
+          expect(find.text('Finish this study session?'), findsOneWidget);
+          await tester.tap(find.widgetWithText(FilledButton, 'Finish'));
+          await tester.pumpAndSettle();
+        }
+
+        expect(find.text('Day selection'), findsOneWidget);
+        expect(find.byType(AlertDialog), findsNothing);
+        expect(tester.takeException(), isNull);
+        final state = container.read(appControllerProvider).requireValue;
+        expect(state.completedStudyDays['N5'], contains(6));
+        expect(state.studySessions, isEmpty);
+      },
+    );
+  }
 }
 
 class _RecordingTtsService implements TtsService {
@@ -486,6 +527,20 @@ class _ResumeAppController extends AppController {
           updatedAt: DateTime.utc(2026, 8, 2),
         ),
       },
+    );
+  }
+
+  @override
+  Future<void> completeStudySession(String level, int day) async {
+    final current = state.requireValue;
+    state = AsyncData(
+      current.copyWith(
+        studySessions: {...current.studySessions}..remove(level),
+        completedStudyDays: {
+          ...current.completedStudyDays,
+          level: {...?current.completedStudyDays[level], day},
+        },
+      ),
     );
   }
 

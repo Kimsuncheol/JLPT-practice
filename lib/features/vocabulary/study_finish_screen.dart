@@ -71,29 +71,35 @@ class StudyFinishScreen extends ConsumerWidget {
   }
 
   Future<void> _finish(BuildContext context, WidgetRef ref) async {
-    final shouldComplete = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(context.strings('finishSessionConfirm')),
-        content: Text(context.strings('finishSessionConfirmBody')),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child: Text(context.strings('cancel')),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            child: Text(context.strings('finish')),
-          ),
-        ],
-      ),
-    );
+    final state = ref.read(appControllerProvider).requireValue;
+    final level = state.selectedLevel;
+    final alreadyCompleted =
+        state.completedStudyDays[level]?.contains(day) ?? false;
+    final shouldComplete =
+        alreadyCompleted ||
+        await showDialog<bool>(
+              context: context,
+              builder: (dialogContext) => AlertDialog(
+                title: Text(context.strings('finishSessionConfirm')),
+                content: Text(context.strings('finishSessionConfirmBody')),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(dialogContext, false),
+                    child: Text(context.strings('cancel')),
+                  ),
+                  FilledButton(
+                    onPressed: () => Navigator.pop(dialogContext, true),
+                    child: Text(context.strings('finish')),
+                  ),
+                ],
+              ),
+            ) ==
+            true;
     if (shouldComplete != true || !context.mounted) return;
 
-    final level = ref.read(appControllerProvider).requireValue.selectedLevel;
     await ref
         .read(appControllerProvider.notifier)
         .completeStudySession(level, day);
-    if (context.mounted) context.pop();
+    if (context.mounted) context.go('/study');
   }
 }
