@@ -379,10 +379,16 @@ class _StudyCard extends StatelessWidget {
         ? 1
         : 0,
     duration: const Duration(milliseconds: 180),
-    child: Text(
-      vocabulary.reading,
-      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-        color: Theme.of(context).colorScheme.primary,
+    child: IgnorePointer(
+      ignoring: !showFurigana || vocabulary.reading == vocabulary.word,
+      child: _speechTarget(
+        onTap: onSpeakWord,
+        child: Text(
+          vocabulary.reading,
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            color: Theme.of(context).colorScheme.primary,
+          ),
+        ),
       ),
     ),
   );
@@ -414,10 +420,28 @@ class _StudyCard extends StatelessWidget {
     ),
   );
 
-  Widget _buildRomaji(BuildContext context) => Text(
-    vocabulary.romaji,
-    style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+  Widget _buildRomaji(BuildContext context) => _speechTarget(
+    onTap: onSpeakWord,
+    child: Text(
+      vocabulary.romaji,
+      style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+    ),
   );
+
+  Widget _speechTarget({required VoidCallback onTap, required Widget child}) =>
+      Semantics(
+        button: true,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          splashFactory: NoSplash.splashFactory,
+          overlayColor: const WidgetStatePropertyAll(Colors.transparent),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            child: child,
+          ),
+        ),
+      );
 
   Widget _buildMeaning(BuildContext context) => Text(
     vocabulary.meaning(language),
@@ -447,9 +471,12 @@ class _StudyCard extends StatelessWidget {
       ),
       if (showFurigana) ...[
         const SizedBox(height: 6),
-        Text(
-          _withRolePlayLineBreaks(vocabulary.example.reading),
-          textAlign: TextAlign.center,
+        _speechTarget(
+          onTap: onSpeakExample,
+          child: Text(
+            _withRolePlayLineBreaks(vocabulary.example.reading),
+            textAlign: TextAlign.center,
+          ),
         ),
       ],
       const SizedBox(height: 4),

@@ -89,6 +89,7 @@ class TtsService {
     await _tts.awaitSpeakCompletion(true);
     await _tts.setLanguage('ja-JP');
     await _tts.setSpeechRate(0.42);
+    await _tts.setVolume(1.0);
     await _tts.setPitch(1);
   }
 

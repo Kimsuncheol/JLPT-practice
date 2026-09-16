@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/app/theme/app_theme.dart';
 import 'package:jlpt_practice/core/utils/system_bar_metrics.dart';
+import 'package:jlpt_practice/core/services/tts_service.dart';
 import 'package:jlpt_practice/data/models/app_state.dart';
 import 'package:jlpt_practice/data/models/study_session.dart';
 import 'package:jlpt_practice/data/models/vocabulary.dart';
@@ -15,6 +16,50 @@ import 'package:jlpt_practice/features/vocabulary/study_finish_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/study_screen.dart';
 
 void main() {
+  testWidgets('word, furigana and romaji taps speak the Japanese reading', (
+    tester,
+  ) async {
+    const volumeChannel = MethodChannel(
+      'com.kurenai7968.volume_controller.method',
+    );
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      volumeChannel,
+      (call) async => call.method == 'isMuted' ? false : 0.8,
+    );
+    addTearDown(
+      () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        volumeChannel,
+        null,
+      ),
+    );
+    final speech = _RecordingTtsService();
+    final container = ProviderContainer(
+      overrides: [
+        appControllerProvider.overrideWith(
+          () => _ResumeAppController('word_0', 0),
+        ),
+        ttsServiceProvider.overrideWithValue(speech),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container.read(appControllerProvider.future);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const MaterialApp(home: StudyScreen(day: 1)),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Continue'));
+    await tester.pumpAndSettle();
+
+    for (final label in ['単語1', 'たんご', 'tango']) {
+      await tester.tap(find.text(label));
+      await tester.pumpAndSettle();
+    }
+    expect(speech.spoken, ['たんご', 'たんご', 'たんご']);
+  });
+
   for (final theme in {
     'light': AppTheme.light(),
     'dark': AppTheme.dark(),
@@ -283,6 +328,22 @@ void main() {
     expect(find.text('Finish this study session?'), findsNothing);
     expect(find.text('Great work!'), findsOneWidget);
   });
+}
+
+class _RecordingTtsService implements TtsService {
+  final spoken = <String>[];
+
+  @override
+  Future<void> speak(String text) async => spoken.add(text);
+
+  @override
+  Future<void> speakDialogue(List<DialogueTurn> turns) async {}
+
+  @override
+  Future<void> stop() async {}
+
+  @override
+  Future<void> dispose() async {}
 }
 
 SystemUiOverlayStyle _studyOverlayStyle(WidgetTester tester) {
