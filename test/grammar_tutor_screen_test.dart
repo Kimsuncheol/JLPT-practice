@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:jlpt_practice/core/services/local_store.dart';
 import 'package:jlpt_practice/data/models/grammar_point.dart';
-import 'package:jlpt_practice/features/grammar/grammar_providers.dart';
 import 'package:jlpt_practice/features/grammar/grammar_part_tutor_screen.dart';
+import 'package:jlpt_practice/features/grammar/grammar_providers.dart';
 import 'package:jlpt_practice/features/grammar/grammar_tutor_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -22,6 +23,10 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    expect(
+      (await LocalStore.create()).loadGrammarStudySessions()['N5']!.route,
+      '/grammar/tutor/N5_1',
+    );
     expect(find.text('Understand'), findsOneWidget);
     expect(find.text(_target.explanation), findsOneWidget);
     expect(find.text(_target.formation), findsOneWidget);
@@ -50,6 +55,10 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    expect(
+      (await LocalStore.create()).loadGrammarStudySessions()['N5']!.route,
+      '/grammar/part/N5/1',
+    );
     expect(find.text('Question 1/2'), findsOneWidget);
     await tester.tap(find.textContaining(_target.title));
     await tester.pump();

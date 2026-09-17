@@ -5,6 +5,7 @@ import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/app/theme/app_theme.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/features/dashboard/dashboard_skeleton.dart';
+import 'package:jlpt_practice/features/dashboard/recent_study_card.dart';
 import 'package:jlpt_practice/shared/rewarded_xp_card.dart';
 
 class DashboardScreen extends ConsumerWidget {
@@ -136,6 +137,7 @@ class DashboardScreen extends ConsumerWidget {
                         ],
                       ),
                     ),
+                    RecentStudyCard(state: state),
                     const SizedBox(height: 18),
                     GridView.count(
                       shrinkWrap: true,

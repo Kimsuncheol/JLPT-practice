@@ -8,7 +8,9 @@ import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/core/services/tts_service.dart';
 import 'package:jlpt_practice/core/services/volume_service.dart';
 import 'package:jlpt_practice/data/models/grammar_point.dart';
+import 'package:jlpt_practice/data/models/grammar_study_session.dart';
 import 'package:jlpt_practice/features/grammar/grammar_providers.dart';
+import 'package:jlpt_practice/features/grammar/grammar_study_session_provider.dart';
 
 class GrammarDetailScreen extends ConsumerWidget {
   const GrammarDetailScreen({required this.grammarId, super.key});
@@ -39,7 +41,18 @@ class GrammarDetailScreen extends ConsumerWidget {
             body: Center(child: Text(context.strings('noGrammarResults'))),
           );
         }
-        return _GrammarDetails(grammar: grammar);
+        return TrackGrammarStudy(
+          key: ValueKey(grammar.id),
+          session: GrammarStudySession(
+            level: grammar.level,
+            part: (grammar.rank - 1) ~/ 10 + 1,
+            kind: GrammarStudyKind.detail,
+            grammarId: grammar.id,
+            title: grammar.title,
+            updatedAt: DateTime.now(),
+          ),
+          child: _GrammarDetails(grammar: grammar),
+        );
       },
     );
   }

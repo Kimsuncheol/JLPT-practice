@@ -8,6 +8,7 @@ import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/core/services/account_service.dart';
 import 'package:jlpt_practice/core/services/notification_service.dart';
 import 'package:jlpt_practice/features/auth/auth_form.dart';
+import 'package:jlpt_practice/features/grammar/grammar_study_session_provider.dart';
 import 'package:jlpt_practice/features/grammar/grammar_tutor_providers.dart';
 
 /// The mandatory sign-in gate shown before onboarding/home whenever there is
@@ -101,6 +102,7 @@ class _AuthGateScreenState extends ConsumerState<AuthGateScreen> {
   Future<void> _finishAuthentication() async {
     await ref.read(appControllerProvider.notifier).mergeCurrentAccount();
     ref.invalidate(grammarProgressProvider);
+    ref.invalidate(grammarStudySessionsProvider);
     if (!mounted) return;
     final onboardingComplete =
         ref.read(appControllerProvider).value?.onboardingComplete ?? false;

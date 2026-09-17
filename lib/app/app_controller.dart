@@ -17,6 +17,7 @@ import 'package:jlpt_practice/data/models/review_progress.dart';
 import 'package:jlpt_practice/data/models/study_session.dart';
 import 'package:jlpt_practice/data/repositories/quiz_repository.dart';
 import 'package:jlpt_practice/data/repositories/vocabulary_repository.dart';
+import 'package:jlpt_practice/features/grammar/grammar_study_session_provider.dart';
 
 final vocabularyRepositoryProvider = Provider(
   (ref) => const VocabularyRepository(),
@@ -416,6 +417,7 @@ class AppController extends AsyncNotifier<AppState> {
     state = AsyncData(next);
     await _studySessionWrite;
     await _store.clearLearningData();
+    ref.invalidate(grammarStudySessionsProvider);
     await DayBlockAccess.clearRewardedDays();
   }
 

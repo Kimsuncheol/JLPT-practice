@@ -4,7 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/core/utils/immersive_study_mode.dart';
 import 'package:jlpt_practice/data/models/grammar_point.dart';
+import 'package:jlpt_practice/data/models/grammar_study_session.dart';
 import 'package:jlpt_practice/features/grammar/grammar_providers.dart';
+import 'package:jlpt_practice/features/grammar/grammar_study_session_provider.dart';
 import 'package:jlpt_practice/features/grammar/grammar_tutor_ai_service.dart';
 import 'package:jlpt_practice/features/grammar/grammar_tutor_models.dart';
 import 'package:jlpt_practice/features/grammar/grammar_tutor_providers.dart';
@@ -54,7 +56,19 @@ class _GrammarTutorScreenState extends ConsumerState<GrammarTutorScreen>
               body: Center(child: Text(context.strings('noGrammarResults'))),
             );
           }
-          return _buildLesson(grammar.first, items);
+          final item = grammar.first;
+          return TrackGrammarStudy(
+            key: ValueKey(item.id),
+            session: GrammarStudySession(
+              level: item.level,
+              part: (item.rank - 1) ~/ 10 + 1,
+              kind: GrammarStudyKind.tutor,
+              grammarId: item.id,
+              title: item.title,
+              updatedAt: DateTime.now(),
+            ),
+            child: _buildLesson(item, items),
+          );
         },
       ),
     );

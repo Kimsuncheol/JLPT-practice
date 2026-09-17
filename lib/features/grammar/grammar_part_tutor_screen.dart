@@ -4,7 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/core/utils/immersive_study_mode.dart';
 import 'package:jlpt_practice/data/models/grammar_point.dart';
+import 'package:jlpt_practice/data/models/grammar_study_session.dart';
 import 'package:jlpt_practice/features/grammar/grammar_providers.dart';
+import 'package:jlpt_practice/features/grammar/grammar_study_session_provider.dart';
 import 'package:jlpt_practice/features/grammar/grammar_tutor_providers.dart';
 
 class GrammarPartTutorScreen extends ConsumerStatefulWidget {
@@ -60,7 +62,16 @@ class _GrammarPartTutorScreenState extends ConsumerState<GrammarPartTutorScreen>
             );
           }
           final questions = _selectQuestions(partItems);
-          return _buildCheckpoint(questions, partItems);
+          return TrackGrammarStudy(
+            key: ValueKey('${widget.level}/${widget.part}'),
+            session: GrammarStudySession(
+              level: widget.level,
+              part: widget.part,
+              kind: GrammarStudyKind.checkpoint,
+              updatedAt: DateTime.now(),
+            ),
+            child: _buildCheckpoint(questions, partItems),
+          );
         },
       ),
     );

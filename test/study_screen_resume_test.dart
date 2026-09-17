@@ -5,17 +5,100 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/app/theme/app_theme.dart';
-import 'package:jlpt_practice/core/utils/system_bar_metrics.dart';
+import 'package:jlpt_practice/core/services/local_store.dart';
 import 'package:jlpt_practice/core/services/tts_service.dart';
+import 'package:jlpt_practice/core/utils/system_bar_metrics.dart';
 import 'package:jlpt_practice/data/models/app_state.dart';
+import 'package:jlpt_practice/data/models/grammar_study_session.dart';
 import 'package:jlpt_practice/data/models/study_session.dart';
 import 'package:jlpt_practice/data/models/vocabulary.dart';
 import 'package:jlpt_practice/features/dashboard/choose_study_screen.dart';
 import 'package:jlpt_practice/features/dashboard/dashboard_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/study_finish_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/study_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  setUp(() => SharedPreferences.setMockInitialValues({}));
+
+  testWidgets(
+    'leaving day 6 shows recent study below streak and reopens day 6',
+    (tester) async {
+      final container = _createContainer();
+      addTearDown(container.dispose);
+      await container.read(appControllerProvider.future);
+      final router = _createRouter();
+      addTearDown(router.dispose);
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp.router(
+            theme: AppTheme.light(),
+            routerConfig: router,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      router.push('/study/day/6');
+      await tester.pumpAndSettle();
+      final pageView = find.byType(PageView);
+      await tester.drag(pageView, Offset(-tester.getSize(pageView).width, 0));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.close_rounded));
+      await tester.pumpAndSettle();
+
+      expect(find.text('N5 · Words · Day 6'), findsOneWidget);
+      expect(
+        tester.getTopLeft(find.text('Recent study')).dy,
+        greaterThan(tester.getBottomLeft(find.text('0 day streak')).dy),
+      );
+      await tester.tap(find.text('N5 · Words · Day 6'));
+      await tester.pumpAndSettle();
+      expect(tester.widget<StudyScreen>(find.byType(StudyScreen)).day, 6);
+      await tester.tap(find.text('Continue'));
+      await tester.pumpAndSettle();
+      expect(find.text('単語27'), findsOneWidget);
+      expect(find.text('2 / 5'), findsOneWidget);
+    },
+  );
+
+  for (final kind in GrammarStudyKind.values) {
+    testWidgets('recent grammar opens saved ${kind.name} screen', (
+      tester,
+    ) async {
+      final session = GrammarStudySession(
+        level: 'N5',
+        part: 6,
+        kind: kind,
+        grammarId: 'N5_51',
+        title: 'Grammar 51',
+        updatedAt: DateTime.now(),
+      );
+      await (await LocalStore.create()).saveGrammarStudySessions({
+        'N5': session,
+      });
+      final container = _createContainer();
+      addTearDown(container.dispose);
+      await container.read(appControllerProvider.future);
+      final router = _createRouter();
+      addTearDown(router.dispose);
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp.router(
+            theme: AppTheme.light(),
+            routerConfig: router,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('N5 · Grammar · Part 6 · Grammar 51'));
+      await tester.pumpAndSettle();
+      expect(find.text(session.route), findsOneWidget);
+      expect(find.text('Saved grammar screen'), findsOneWidget);
+    });
+  }
+
   testWidgets('word, furigana and romaji taps speak the Japanese reading', (
     tester,
   ) async {
@@ -454,6 +537,22 @@ GoRouter _createRouter({String initialLocation = '/'}) => GoRouter(
       path: '/',
       builder: (_, _) => const Scaffold(body: DashboardScreen()),
     ),
+    for (final path in [
+      '/grammar/detail/:id',
+      '/grammar/tutor/:id',
+      '/grammar/part/:level/:part',
+    ])
+      GoRoute(
+        path: path,
+        builder: (_, state) => Scaffold(
+          body: Column(
+            children: [
+              const Text('Saved grammar screen'),
+              Text(state.uri.path),
+            ],
+          ),
+        ),
+      ),
     GoRoute(
       path: '/study/choose',
       builder: (_, _) => const ChooseStudyScreen(),
@@ -501,7 +600,7 @@ class _ResumeAppController extends AppController {
   @override
   Future<AppState> build() async {
     return AppState(
-      vocabulary: List.generate(10, _word),
+      vocabulary: List.generate(30, _word),
       progress: const {},
       onboardingComplete: true,
       selectedLevel: 'N5',

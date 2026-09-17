@@ -1,11 +1,44 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jlpt_practice/core/services/local_store.dart';
-import 'package:jlpt_practice/data/models/study_session.dart';
 import 'package:jlpt_practice/data/models/grammar_progress.dart';
+import 'package:jlpt_practice/data/models/grammar_study_session.dart';
+import 'package:jlpt_practice/data/models/study_session.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+
+  test(
+    'grammar recent study survives reload and clears with learning data',
+    () async {
+      SharedPreferences.setMockInitialValues({});
+      final store = await LocalStore.create();
+      final session = GrammarStudySession(
+        level: 'N5',
+        part: 6,
+        kind: GrammarStudyKind.tutor,
+        grammarId: 'N5_51',
+        title: 'Lesson',
+        updatedAt: DateTime.utc(2026, 9, 17),
+      );
+      await store.saveGrammarStudySessions({'N5': session});
+      final restored = (await LocalStore.create())
+          .loadGrammarStudySessions()['N5']!;
+      expect(restored.route, '/grammar/tutor/N5_51');
+      expect(restored.title, 'Lesson');
+      expect(restored.updatedAt, session.updatedAt);
+      await store.clearLearningData();
+      expect(store.loadGrammarStudySessions(), isEmpty);
+      await store.saveGrammarStudySessions({'N5': session});
+      await store.clearAccountData();
+      expect(store.loadGrammarStudySessions(), isEmpty);
+    },
+  );
+
+  test('malformed grammar recent study is ignored', () async {
+    SharedPreferences.setMockInitialValues({'grammarStudySessions': '{broken'});
+    expect((await LocalStore.create()).loadGrammarStudySessions(), isEmpty);
+  });
 
   test('persists resumable study sessions by JLPT level', () async {
     SharedPreferences.setMockInitialValues({});

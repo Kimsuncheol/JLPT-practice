@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:jlpt_practice/data/models/app_state.dart';
 import 'package:jlpt_practice/data/models/grammar_progress.dart';
+import 'package:jlpt_practice/data/models/grammar_study_session.dart';
 import 'package:jlpt_practice/data/models/review_progress.dart';
 import 'package:jlpt_practice/data/models/study_session.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -127,6 +128,35 @@ class LocalStore {
     }
   }
 
+  Map<String, GrammarStudySession> loadGrammarStudySessions() {
+    final raw = _preferences.getString('grammarStudySessions');
+    if (raw == null) return {};
+    try {
+      final decoded = jsonDecode(raw) as Map<String, dynamic>;
+      return decoded.map(
+        (key, value) => MapEntry(
+          key,
+          GrammarStudySession.fromJson(value as Map<String, dynamic>),
+        ),
+      );
+    } on FormatException {
+      return {};
+    } on TypeError {
+      return {};
+    } on ArgumentError {
+      return {};
+    }
+  }
+
+  Future<void> saveGrammarStudySessions(
+    Map<String, GrammarStudySession> sessions,
+  ) async {
+    await _preferences.setString(
+      'grammarStudySessions',
+      jsonEncode(sessions.map((key, value) => MapEntry(key, value.toJson()))),
+    );
+  }
+
   Map<String, StudySession> loadStudySessions() {
     final raw = _preferences.getString('studySessions');
     if (raw == null) return {};
@@ -235,6 +265,7 @@ class LocalStore {
       _preferences.remove('studySessions'),
       _preferences.remove('completedStudyDays'),
       _preferences.remove('grammarProgress'),
+      _preferences.remove('grammarStudySessions'),
       _preferences.remove('lastStudyDate'),
     ]);
   }
@@ -261,6 +292,7 @@ class LocalStore {
       'studySessions',
       'completedStudyDays',
       'grammarProgress',
+      'grammarStudySessions',
       'lastStudyDate',
     };
     final dynamicKeys = _preferences.getKeys().where(

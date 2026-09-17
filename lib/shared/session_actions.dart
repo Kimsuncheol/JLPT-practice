@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/core/services/account_service.dart';
+import 'package:jlpt_practice/features/grammar/grammar_study_session_provider.dart';
 import 'package:jlpt_practice/features/grammar/grammar_tutor_providers.dart';
 
 /// Confirms with the user, then signs out and returns to the mandatory
@@ -21,6 +22,7 @@ Future<void> confirmAndSignOut(BuildContext context, WidgetRef ref) async {
   await ref.read(accountServiceProvider).signOut();
   ref.invalidate(appControllerProvider);
   ref.invalidate(grammarProgressProvider);
+  ref.invalidate(grammarStudySessionsProvider);
   if (context.mounted) context.go('/sign-in');
 }
 
@@ -41,18 +43,15 @@ Future<void> confirmAndDeleteAccount(
   if (!confirmed || !context.mounted) return;
   try {
     await ref.read(accountServiceProvider).deleteAccount();
-    await ref
-        .read(appControllerProvider.notifier)
-        .clearLocalForAccountSwitch();
+    await ref.read(appControllerProvider.notifier).clearLocalForAccountSwitch();
     ref.invalidate(appControllerProvider);
     ref.invalidate(grammarProgressProvider);
+    ref.invalidate(grammarStudySessionsProvider);
     if (context.mounted) context.go('/sign-in');
   } on FirebaseFunctionsException catch (error) {
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(error.message ?? context.strings('accountError')),
-      ),
+      SnackBar(content: Text(error.message ?? context.strings('accountError'))),
     );
   }
 }
