@@ -614,6 +614,7 @@ class _ResumeAppController extends AppController {
       onboardingComplete: true,
       selectedLevel: 'N5',
       languageCode: 'system',
+      meaningLanguageMode: 'en',
       meaningLanguage: 'en',
       dailyGoal: 5,
       showFurigana: true,

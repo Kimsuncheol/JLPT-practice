@@ -61,6 +61,17 @@ class SettingsScreen extends ConsumerWidget {
                     onTap: () => context.push('/settings/languages'),
                   ),
                   ListTile(
+                    leading: const Icon(Icons.menu_book_rounded),
+                    title: Text(strings('learningLanguage')),
+                    subtitle: Text(switch (state.meaningLanguageMode) {
+                      'en' => 'English',
+                      'ko' => '한국어',
+                      _ => strings('system'),
+                    }),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => context.push('/settings/learning-language'),
+                  ),
+                  ListTile(
                     leading: const Icon(Icons.school_rounded),
                     title: Text(strings('levels')),
                     subtitle: Text(state.selectedLevel),

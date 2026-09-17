@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/core/utils/immersive_study_mode.dart';
 import 'package:jlpt_practice/data/models/grammar_point.dart';
@@ -76,7 +77,9 @@ class _GrammarTutorScreenState extends ConsumerState<GrammarTutorScreen>
   }
 
   Widget _buildLesson(GrammarPoint grammar, List<GrammarPoint> catalog) {
-    final language = Localizations.localeOf(context).languageCode;
+    final meaningLanguage = ref.watch(appControllerProvider).value?.meaningLanguage;
+    final language =
+        meaningLanguage ?? Localizations.localeOf(context).languageCode;
     final part = grammarPartForRank(grammar.rank);
     return Scaffold(
       appBar: AppBar(
@@ -85,6 +88,12 @@ class _GrammarTutorScreenState extends ConsumerState<GrammarTutorScreen>
         title: Text(
           '${context.strings('part')} ${part.number} · #${grammar.rank}',
         ),
+        actions: [
+          IconButton(
+            onPressed: () => context.push('/settings/learning-language'),
+            icon: const Icon(Icons.settings_rounded),
+          ),
+        ],
       ),
       body: SafeArea(
         top: false,
@@ -310,9 +319,10 @@ class _GrammarTutorScreenState extends ConsumerState<GrammarTutorScreen>
       _evaluating = true;
       _error = null;
     });
-    final language = Localizations.localeOf(context).languageCode == 'ko'
-        ? 'Korean'
-        : 'English';
+    final meaningLanguage =
+        ref.read(appControllerProvider).value?.meaningLanguage ??
+        Localizations.localeOf(context).languageCode;
+    final language = meaningLanguage == 'ko' ? 'Korean' : 'English';
     try {
       final evaluator = await ref.read(grammarTutorEvaluatorProvider.future);
       final feedback = await evaluator.evaluate(

@@ -96,12 +96,20 @@ class _GrammarDetailsState extends ConsumerState<_GrammarDetails> {
   @override
   Widget build(BuildContext context) {
     final grammar = widget.grammar;
-    final language = Localizations.localeOf(context).languageCode;
+    final meaningLanguage = ref.watch(appControllerProvider).value?.meaningLanguage;
+    final language =
+        meaningLanguage ?? Localizations.localeOf(context).languageCode;
     return Scaffold(
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
         scrolledUnderElevation: 0,
         title: Text('${grammar.level} · #${grammar.rank}'),
+        actions: [
+          IconButton(
+            onPressed: () => context.push('/settings/learning-language'),
+            icon: const Icon(Icons.settings_rounded),
+          ),
+        ],
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 10, 20, 32),

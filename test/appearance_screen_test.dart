@@ -71,6 +71,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    await tester.scrollUntilVisible(find.text('Appearance'), 200);
     await tester.tap(find.text('Appearance'));
     await tester.pumpAndSettle();
 
@@ -132,6 +133,7 @@ class _FakeAppController extends AppController {
     onboardingComplete: true,
     selectedLevel: 'N5',
     languageCode: 'en',
+    meaningLanguageMode: 'en',
     meaningLanguage: 'en',
     dailyGoal: 10,
     showFurigana: true,

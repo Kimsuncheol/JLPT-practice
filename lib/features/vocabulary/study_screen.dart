@@ -84,6 +84,12 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
           onPressed: context.pop,
           icon: const Icon(Icons.close_rounded),
         ),
+        actions: [
+          IconButton(
+            onPressed: () => context.push('/settings/learning-language'),
+            icon: const Icon(Icons.settings_rounded),
+          ),
+        ],
       ),
       body: Column(
         children: [

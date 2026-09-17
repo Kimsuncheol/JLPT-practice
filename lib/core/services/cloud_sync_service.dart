@@ -118,6 +118,9 @@ class CloudSyncService {
           _validLevel(profile?['selectedJlptLevel']) ?? local.selectedLevel,
       languageCode:
           profile?['preferredLanguage'] as String? ?? local.languageCode,
+      meaningLanguageMode:
+          profile?['meaningLanguageMode'] as String? ??
+          local.meaningLanguageMode,
       meaningLanguage:
           profile?['meaningLanguage'] as String? ?? local.meaningLanguage,
       dailyGoal: _positiveInt(profile?['dailyGoal']) ?? local.dailyGoal,
@@ -165,6 +168,7 @@ class CloudSyncService {
     await user.set({
       'onboardingComplete': state.onboardingComplete,
       'preferredLanguage': state.languageCode,
+      'meaningLanguageMode': state.meaningLanguageMode,
       'meaningLanguage': state.meaningLanguage,
       'selectedJlptLevel': state.selectedLevel,
       'dailyGoal': state.dailyGoal,

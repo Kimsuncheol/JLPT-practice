@@ -14,6 +14,7 @@ import 'package:jlpt_practice/features/quiz/quiz_screen.dart';
 import 'package:jlpt_practice/features/review/review_screen.dart';
 import 'package:jlpt_practice/features/settings/appearance_screen.dart';
 import 'package:jlpt_practice/features/settings/languages_screen.dart';
+import 'package:jlpt_practice/features/settings/learning_language_screen.dart';
 import 'package:jlpt_practice/features/settings/levels_screen.dart';
 import 'package:jlpt_practice/data/models/mock_test_problem.dart';
 import 'package:jlpt_practice/features/test/level_practice_test_screen.dart';
@@ -41,6 +42,10 @@ GoRouter createAppRouter({String initialLocation = '/'}) => GoRouter(
     GoRoute(
       path: '/settings/languages',
       builder: (_, _) => const LanguagesScreen(),
+    ),
+    GoRoute(
+      path: '/settings/learning-language',
+      builder: (_, _) => const LearningLanguageScreen(),
     ),
     GoRoute(path: '/settings/levels', builder: (_, _) => const LevelsScreen()),
     GoRoute(

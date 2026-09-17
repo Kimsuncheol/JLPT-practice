@@ -13,6 +13,7 @@ class LocalSettings {
     required this.onboardingComplete,
     required this.selectedLevel,
     required this.languageCode,
+    required this.meaningLanguageMode,
     required this.meaningLanguage,
     required this.dailyGoal,
     required this.showFurigana,
@@ -32,6 +33,7 @@ class LocalSettings {
   final bool onboardingComplete;
   final String selectedLevel;
   final String languageCode;
+  final String meaningLanguageMode;
   final String meaningLanguage;
   final int dailyGoal;
   final bool showFurigana;
@@ -58,13 +60,21 @@ class LocalStore {
 
   LocalSettings loadSettings(String deviceLanguage) {
     final themeName = _preferences.getString('themeMode') ?? 'system';
+    final languageCode = _preferences.getString('languageCode') ?? 'system';
+    final meaningLanguageMode =
+        _preferences.getString('meaningLanguageMode') ?? 'system';
+    final resolvedUiLanguage = languageCode == 'system'
+        ? (deviceLanguage == 'ko' ? 'ko' : 'en')
+        : languageCode;
+    final meaningLanguage = meaningLanguageMode == 'system'
+        ? resolvedUiLanguage
+        : meaningLanguageMode;
     return LocalSettings(
       onboardingComplete: _preferences.getBool('onboardingComplete') ?? false,
       selectedLevel: _preferences.getString('selectedLevel') ?? 'N5',
-      languageCode: _preferences.getString('languageCode') ?? 'system',
-      meaningLanguage:
-          _preferences.getString('meaningLanguage') ??
-          (deviceLanguage == 'ko' ? 'ko' : 'en'),
+      languageCode: languageCode,
+      meaningLanguageMode: meaningLanguageMode,
+      meaningLanguage: meaningLanguage,
       dailyGoal: 30,
       showFurigana: _preferences.getBool('showFurigana') ?? true,
       autoPlayAudio: _preferences.getBool('autoPlayAudio') ?? false,
@@ -92,6 +102,7 @@ class LocalStore {
       setValue('onboardingComplete', state.onboardingComplete),
       setValue('selectedLevel', state.selectedLevel),
       setValue('languageCode', state.languageCode),
+      setValue('meaningLanguageMode', state.meaningLanguageMode),
       setValue('meaningLanguage', state.meaningLanguage),
       setValue('showFurigana', state.showFurigana),
       setValue('autoPlayAudio', state.autoPlayAudio),
@@ -275,6 +286,7 @@ class LocalStore {
       'onboardingComplete',
       'selectedLevel',
       'languageCode',
+      'meaningLanguageMode',
       'meaningLanguage',
       'showFurigana',
       'autoPlayAudio',

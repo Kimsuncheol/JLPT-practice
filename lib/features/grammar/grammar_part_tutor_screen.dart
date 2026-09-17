@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/core/utils/immersive_study_mode.dart';
 import 'package:jlpt_practice/data/models/grammar_point.dart';
@@ -105,6 +106,12 @@ class _GrammarPartTutorScreenState extends ConsumerState<GrammarPartTutorScreen>
         title: Text(
           '${widget.level} · ${context.strings('part')} ${widget.part}',
         ),
+        actions: [
+          IconButton(
+            onPressed: () => context.push('/settings/learning-language'),
+            icon: const Icon(Icons.settings_rounded),
+          ),
+        ],
       ),
       body: SafeArea(
         top: false,
@@ -120,7 +127,9 @@ class _GrammarPartTutorScreenState extends ConsumerState<GrammarPartTutorScreen>
     List<GrammarPoint> partItems,
   ) {
     final grammar = questions[_index];
-    final language = Localizations.localeOf(context).languageCode;
+    final meaningLanguage = ref.watch(appControllerProvider).value?.meaningLanguage;
+    final language =
+        meaningLanguage ?? Localizations.localeOf(context).languageCode;
     final distractors = partItems
         .where((item) => item.id != grammar.id)
         .take(2)

@@ -65,6 +65,7 @@ class AppController extends AsyncNotifier<AppState> {
       onboardingComplete: settings.onboardingComplete,
       selectedLevel: settings.selectedLevel,
       languageCode: settings.languageCode,
+      meaningLanguageMode: settings.meaningLanguageMode,
       meaningLanguage: settings.meaningLanguage,
       dailyGoal: settings.dailyGoal,
       showFurigana: settings.showFurigana,
@@ -105,20 +106,28 @@ class AppController extends AsyncNotifier<AppState> {
 
   AppState get _value => state.requireValue;
 
+  String _deviceLanguage() =>
+      ui.PlatformDispatcher.instance.locale.languageCode == 'ko'
+      ? 'ko'
+      : 'en';
+
+  String _resolveUiLanguage(String languageCode) =>
+      languageCode == 'system' ? _deviceLanguage() : languageCode;
+
+  String _resolveMeaningLanguage(String mode, String languageCode) =>
+      mode == 'system' ? _resolveUiLanguage(languageCode) : mode;
+
   Future<void> completeOnboarding({
     required String level,
     required String languageCode,
     required bool autoPlayAudio,
   }) async {
-    final resolvedLanguage = languageCode == 'system'
-        ? (ui.PlatformDispatcher.instance.locale.languageCode == 'ko'
-              ? 'ko'
-              : 'en')
-        : languageCode;
+    final resolvedLanguage = _resolveUiLanguage(languageCode);
     final next = _value.copyWith(
       onboardingComplete: true,
       selectedLevel: level,
       languageCode: languageCode,
+      meaningLanguageMode: 'system',
       meaningLanguage: resolvedLanguage,
       autoPlayAudio: autoPlayAudio,
     );
@@ -127,6 +136,7 @@ class AppController extends AsyncNotifier<AppState> {
       _store.setValue('onboardingComplete', true),
       _store.setValue('selectedLevel', level),
       _store.setValue('languageCode', languageCode),
+      _store.setValue('meaningLanguageMode', 'system'),
       _store.setValue('meaningLanguage', resolvedLanguage),
       _store.setValue('autoPlayAudio', autoPlayAudio),
     ]);
@@ -280,25 +290,45 @@ class AppController extends AsyncNotifier<AppState> {
       });
 
   Future<void> setLanguage(String value) async {
-    final resolved = value == 'system'
-        ? (ui.PlatformDispatcher.instance.locale.languageCode == 'ko'
-              ? 'ko'
-              : 'en')
-        : value;
+    final resolvedMeaning = _resolveMeaningLanguage(
+      _value.meaningLanguageMode,
+      value,
+    );
     final next = _value.copyWith(
       languageCode: value,
-      meaningLanguage: resolved,
+      meaningLanguage: resolvedMeaning,
     );
     state = AsyncData(next);
     await Future.wait([
       _store.setValue('languageCode', value),
-      _store.setValue('meaningLanguage', resolved),
+      _store.setValue('meaningLanguage', resolvedMeaning),
     ]);
     if (next.notificationsEnabled) {
       await NotificationService.instance.scheduleDailyReminder(
         hour: next.reminderHour,
         minute: next.reminderMinute,
-        languageCode: resolved,
+        languageCode: resolvedMeaning,
+      );
+    }
+    unawaited(ref.read(cloudSyncProvider).syncProfile(next));
+  }
+
+  Future<void> setMeaningLanguage(String value) async {
+    final resolvedMeaning = _resolveMeaningLanguage(value, _value.languageCode);
+    final next = _value.copyWith(
+      meaningLanguageMode: value,
+      meaningLanguage: resolvedMeaning,
+    );
+    state = AsyncData(next);
+    await Future.wait([
+      _store.setValue('meaningLanguageMode', value),
+      _store.setValue('meaningLanguage', resolvedMeaning),
+    ]);
+    if (next.notificationsEnabled) {
+      await NotificationService.instance.scheduleDailyReminder(
+        hour: next.reminderHour,
+        minute: next.reminderMinute,
+        languageCode: resolvedMeaning,
       );
     }
     unawaited(ref.read(cloudSyncProvider).syncProfile(next));

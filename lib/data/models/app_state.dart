@@ -12,6 +12,7 @@ class AppState {
     required this.onboardingComplete,
     required this.selectedLevel,
     required this.languageCode,
+    required this.meaningLanguageMode,
     required this.meaningLanguage,
     required this.dailyGoal,
     required this.showFurigana,
@@ -38,6 +39,7 @@ class AppState {
   final bool onboardingComplete;
   final String selectedLevel;
   final String languageCode;
+  final String meaningLanguageMode;
   final String meaningLanguage;
   final int dailyGoal;
   final bool showFurigana;
@@ -91,6 +93,7 @@ class AppState {
     bool? onboardingComplete,
     String? selectedLevel,
     String? languageCode,
+    String? meaningLanguageMode,
     String? meaningLanguage,
     int? dailyGoal,
     bool? showFurigana,
@@ -117,6 +120,7 @@ class AppState {
       onboardingComplete: onboardingComplete ?? this.onboardingComplete,
       selectedLevel: selectedLevel ?? this.selectedLevel,
       languageCode: languageCode ?? this.languageCode,
+      meaningLanguageMode: meaningLanguageMode ?? this.meaningLanguageMode,
       meaningLanguage: meaningLanguage ?? this.meaningLanguage,
       dailyGoal: dailyGoal ?? this.dailyGoal,
       showFurigana: showFurigana ?? this.showFurigana,

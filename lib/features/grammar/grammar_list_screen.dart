@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/data/models/grammar_point.dart';
 import 'package:jlpt_practice/data/models/grammar_progress.dart';
@@ -23,7 +24,9 @@ class _GrammarListScreenState extends ConsumerState<GrammarListScreen> {
   @override
   Widget build(BuildContext context) {
     final catalog = ref.watch(grammarCatalogProvider);
-    final language = Localizations.localeOf(context).languageCode;
+    final meaningLanguage = ref.watch(appControllerProvider).value?.meaningLanguage;
+    final language =
+        meaningLanguage ?? Localizations.localeOf(context).languageCode;
     final selectedLevel =
         (widget.level ?? ref.watch(selectedGrammarLevelProvider))!;
     final progress = ref.watch(grammarProgressProvider).value ?? const {};

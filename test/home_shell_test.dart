@@ -63,6 +63,7 @@ class _FakeAppController extends AppController {
     onboardingComplete: true,
     selectedLevel: 'N5',
     languageCode: 'en',
+    meaningLanguageMode: 'en',
     meaningLanguage: 'en',
     dailyGoal: 10,
     showFurigana: true,
