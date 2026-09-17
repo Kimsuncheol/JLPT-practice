@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:jlpt_practice/features/offline_ai/offline_ai_screen.dart';
 import 'package:jlpt_practice/features/auth/auth_gate_screen.dart';
 import 'package:jlpt_practice/features/dashboard/choose_study_screen.dart';
 import 'package:jlpt_practice/features/dashboard/home_shell.dart';
@@ -48,6 +49,10 @@ GoRouter createAppRouter({String initialLocation = '/'}) => GoRouter(
     ),
     GoRoute(path: '/study', builder: (_, _) => const DaySelectionScreen()),
     GoRoute(
+      path: '/settings/offline-ai',
+      builder: (_, _) => const OfflineAiScreen(),
+    ),
+    GoRoute(
       path: '/study/day/:day',
       builder: (_, state) => KeepScreenOn(
         child: StudyScreen(
@@ -74,7 +79,11 @@ GoRouter createAppRouter({String initialLocation = '/'}) => GoRouter(
     GoRoute(
       path: '/grammar/tutor/:id',
       builder: (_, state) => KeepScreenOn(
-        child: GrammarTutorScreen(grammarId: state.pathParameters['id'] ?? ''),
+        child: OfflineAiGate(
+          child: GrammarTutorScreen(
+            grammarId: state.pathParameters['id'] ?? '',
+          ),
+        ),
       ),
     ),
     GoRoute(

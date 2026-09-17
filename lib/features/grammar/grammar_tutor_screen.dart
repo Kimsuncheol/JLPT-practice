@@ -10,6 +10,7 @@ import 'package:jlpt_practice/features/grammar/grammar_study_session_provider.da
 import 'package:jlpt_practice/features/grammar/grammar_tutor_ai_service.dart';
 import 'package:jlpt_practice/features/grammar/grammar_tutor_models.dart';
 import 'package:jlpt_practice/features/grammar/grammar_tutor_providers.dart';
+import 'package:jlpt_practice/features/offline_ai/offline_ai_model.dart';
 
 class GrammarTutorScreen extends ConsumerStatefulWidget {
   const GrammarTutorScreen({required this.grammarId, super.key});
@@ -193,6 +194,7 @@ class _GrammarTutorScreenState extends ConsumerState<GrammarTutorScreen>
       const SizedBox(height: 16),
       TextField(
         controller: _sentenceController,
+        maxLength: 300,
         enabled: !_evaluating,
         minLines: 3,
         maxLines: 5,
@@ -345,9 +347,13 @@ class _GrammarTutorScreenState extends ConsumerState<GrammarTutorScreen>
         _feedback = feedback;
         _step = 4;
       });
-    } catch (_) {
+    } catch (error) {
       if (!mounted) return;
-      setState(() => _error = context.strings('aiFeedbackError'));
+      setState(
+        () => _error = context.strings(
+          error is OfflineAiException ? error.key : 'offlineInferenceError',
+        ),
+      );
     } finally {
       if (mounted) setState(() => _evaluating = false);
     }

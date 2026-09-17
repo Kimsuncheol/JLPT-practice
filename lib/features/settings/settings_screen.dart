@@ -144,6 +144,13 @@ class SettingsScreen extends ConsumerWidget {
                     trailing: const Icon(Icons.chevron_right_rounded),
                     onTap: () => context.push('/settings/appearance'),
                   ),
+                  ListTile(
+                    leading: const Icon(Icons.offline_bolt_outlined),
+                    title: Text(strings('offlineAi')),
+                    subtitle: Text(strings('offlineManage')),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => context.push('/settings/offline-ai'),
+                  ),
                 ],
               ),
               const SizedBox(height: 14),

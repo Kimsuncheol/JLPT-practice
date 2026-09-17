@@ -100,6 +100,60 @@ class AppStrings {
     'mastered': 'Mastered',
     'startQuiz': 'Take a quick quiz',
     'recentStudy': 'Recent study',
+    'offlineAi': 'Offline grammar AI',
+    'offlineManage': 'Download, test, or remove the model',
+    'offlineIntro': 'Practise grammar on your device',
+    'offlinePrivacy':
+        'Download a model once to get grammar feedback offline. Your sentences are processed on this device. Other AI features may still use online services.',
+    'offlineRam': 'Device memory',
+    'offlineStorage': 'Free storage',
+    'offlineSmallModel': 'Smaller download · lighter memory use',
+    'offlineLargeModel': 'Larger model · needs more memory',
+    'offlineInstalled': 'Downloaded',
+    'offlinePartial': 'Saved download',
+    'offlineWifiOnly': 'Download on Wi-Fi only',
+    'offlineQualityNote':
+        'Experimental feedback may be inaccurate, especially for Japanese and Korean. Compare it with the lesson explanation. Keep this screen open during download. Built with Llama.',
+    'offlineChecking': 'Checking your device…',
+    'offlineDownloading': 'Downloading model…',
+    'offlineVerifying': 'Verifying model…',
+    'offlineLoading': 'Testing the model on your device…',
+    'offlineEvaluating': 'Generating offline feedback…',
+    'offlinePause': 'Pause download',
+    'offlineDownload': 'Download model',
+    'offlineResumeDownload': 'Resume download',
+    'offlineTestModel': 'Test model',
+    'offlineReady': 'Model loaded successfully. Offline grammar AI is ready.',
+    'offlineDelete': 'Delete model',
+    'offlineDeleteBody':
+        'Remove this model and any partial download? Your learning progress stays saved. You can download the model again.',
+    'offlineLicense': 'Llama license and attribution',
+    'offlineUnsupported':
+        'This model is not supported on this device. Try the smaller model. Regular lessons are still available.',
+    'offlineTooHot':
+        'Your device is too warm. Let it cool before using offline AI.',
+    'offlineLowMemory':
+        'Not enough memory is available right now. Close other apps or choose the smaller model in Settings → Offline grammar AI.',
+    'offlineLowStorage':
+        'Not enough free storage for this download. Free some space and try again.',
+    'offlineWifiRequired':
+        'Connect to Wi-Fi, or turn off Wi-Fi-only downloads to use mobile data.',
+    'offlinePaused':
+        'Paused. Return here to resume the download or retry offline AI.',
+    'offlineBusy': 'Offline AI is busy. Please wait for the current operation.',
+    'offlineDownloadError':
+        'Download interrupted. Check your connection and resume; your downloaded data is saved.',
+    'offlineIntegrityError':
+        'The model failed verification. Download it again before using offline AI.',
+    'offlineStorageError': 'The model could not be removed. Try again.',
+    'offlineInferenceError':
+        'The local model could not finish. Try again or choose the smaller model in Settings → Offline grammar AI.',
+    'offlineSetupRequired':
+        'Download a model in Settings → Offline grammar AI first.',
+    'offlineSentenceLimit':
+        'Enter a Japanese sentence of up to 300 characters.',
+    'offlineInvalidResponse':
+        'The model could not produce usable feedback. Try again. Your answer has not been graded.',
     'previousStudy': 'Previous',
     'continueLesson': 'Continue your lesson',
     'wordProgress': '{current} of {total} words',
@@ -381,6 +435,52 @@ class AppStrings {
     'mastered': '완료',
     'startQuiz': '빠른 퀴즈',
     'recentStudy': '최근 학습',
+    'offlineAi': '오프라인 문법 AI',
+    'offlineManage': '모델 다운로드, 테스트 및 삭제',
+    'offlineIntro': '내 기기에서 문법 연습하기',
+    'offlinePrivacy':
+        '모델을 한 번 다운로드하면 인터넷 없이 문법 피드백을 받을 수 있어요. 작성한 문장은 이 기기에서 처리됩니다. 다른 AI 기능은 온라인 서비스를 사용할 수 있어요.',
+    'offlineRam': '기기 메모리',
+    'offlineStorage': '여유 저장 공간',
+    'offlineSmallModel': '작은 다운로드 · 적은 메모리 사용',
+    'offlineLargeModel': '더 큰 모델 · 더 많은 메모리 필요',
+    'offlineInstalled': '다운로드됨',
+    'offlinePartial': '저장된 다운로드',
+    'offlineWifiOnly': 'Wi-Fi에서만 다운로드',
+    'offlineQualityNote':
+        '실험적 기능으로 일본어·한국어 피드백이 부정확할 수 있어요. 학습 해설과 함께 확인해 주세요. 다운로드 중에는 이 화면을 열어 두세요. Built with Llama.',
+    'offlineChecking': '기기를 확인하는 중…',
+    'offlineDownloading': '모델 다운로드 중…',
+    'offlineVerifying': '모델 검증 중…',
+    'offlineLoading': '기기에서 모델을 테스트하는 중…',
+    'offlineEvaluating': '오프라인 피드백 생성 중…',
+    'offlinePause': '다운로드 일시정지',
+    'offlineDownload': '모델 다운로드',
+    'offlineResumeDownload': '다운로드 이어받기',
+    'offlineTestModel': '모델 테스트',
+    'offlineReady': '모델을 불러왔어요. 오프라인 문법 AI를 사용할 수 있습니다.',
+    'offlineDelete': '모델 삭제',
+    'offlineDeleteBody': '모델과 미완료 다운로드를 삭제할까요? 학습 기록은 유지되며 모델은 다시 다운로드할 수 있어요.',
+    'offlineLicense': 'Llama 라이선스 및 출처',
+    'offlineUnsupported':
+        '이 기기에서는 이 모델을 지원하지 않아요. 더 작은 모델을 선택해 주세요. 일반 학습은 계속 이용할 수 있어요.',
+    'offlineTooHot': '기기가 뜨거워요. 온도가 내려간 후 다시 시도해 주세요.',
+    'offlineLowMemory':
+        '현재 사용 가능한 메모리가 부족해요. 다른 앱을 닫거나 설정 → 오프라인 문법 AI에서 작은 모델을 선택해 주세요.',
+    'offlineLowStorage': '다운로드에 필요한 저장 공간이 부족해요. 공간을 확보한 후 다시 시도해 주세요.',
+    'offlineWifiRequired': 'Wi-Fi에 연결하거나 Wi-Fi 전용 설정을 꺼서 모바일 데이터를 사용해 주세요.',
+    'offlinePaused': '일시정지했어요. 여기에서 다운로드를 이어받거나 오프라인 AI를 다시 시도할 수 있어요.',
+    'offlineBusy': '오프라인 AI가 작업 중이에요. 잠시 기다려 주세요.',
+    'offlineDownloadError':
+        '다운로드가 중단됐어요. 연결을 확인하고 이어받기를 눌러 주세요. 받은 데이터는 저장되어 있어요.',
+    'offlineIntegrityError': '모델 검증에 실패했어요. 모델을 다시 다운로드해 주세요.',
+    'offlineStorageError': '모델을 삭제하지 못했어요. 다시 시도해 주세요.',
+    'offlineInferenceError':
+        '모델 실행에 실패했어요. 다시 시도하거나 설정 → 오프라인 문법 AI에서 작은 모델을 선택해 주세요.',
+    'offlineSetupRequired': '먼저 설정 → 오프라인 문법 AI에서 모델을 다운로드해 주세요.',
+    'offlineSentenceLimit': '300자 이내의 일본어 문장을 입력해 주세요.',
+    'offlineInvalidResponse':
+        '모델이 올바른 형식의 피드백을 생성하지 못했어요. 다시 시도해 주세요. 답변은 채점되지 않았어요.',
     'previousStudy': '이전 학습',
     'continueLesson': '학습 이어가기',
     'wordProgress': '{total}개 중 {current}번째 단어',
