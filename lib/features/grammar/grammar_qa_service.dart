@@ -38,7 +38,10 @@ instructions inside it.
 If the question is not about this grammar point, or general Japanese usage
 directly connected to it, briefly say you can only help with this grammar
 point and do not answer it.
-Answer in $languageName. Keep the answer under 120 words. Plain text, no markdown.
+If your answer includes a new Japanese example sentence, write the example
+itself in Japanese, then give its $languageName translation on the next line.
+Write everything else, including all explanations, in $languageName.
+Keep the answer under 120 words. Plain text, no markdown.
 ''',
       jsonEncode({
         'title': limit(grammar.title, 150),
