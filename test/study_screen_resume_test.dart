@@ -542,6 +542,10 @@ GoRouter _createRouter({String initialLocation = '/'}) => GoRouter(
       path: '/',
       builder: (_, _) => const Scaffold(body: DashboardScreen()),
     ),
+    GoRoute(
+      path: '/grammar',
+      builder: (_, _) => const Scaffold(body: Text('Grammar list')),
+    ),
     for (final path in [
       '/grammar/detail/:id',
       '/grammar/tutor/:id',

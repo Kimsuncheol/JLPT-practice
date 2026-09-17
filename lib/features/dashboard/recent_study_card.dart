@@ -47,6 +47,7 @@ class RecentStudyCard extends ConsumerWidget {
                   .replaceAll('{current}', '$position')
                   .replaceAll('{total}', '${words.length}'),
               route: '/study/day/${vocabulary.day}',
+              parentRoute: '/study',
               updatedAt: vocabulary.updatedAt,
               symbol: '語',
               progress: position / words.length,
@@ -61,6 +62,7 @@ class RecentStudyCard extends ConsumerWidget {
               '${grammar.title == null ? '' : ' · ${grammar.title}'}',
           detail: context.strings('continueLesson'),
           route: grammar.route,
+          parentRoute: '/grammar',
           updatedAt: grammar.updatedAt,
           symbol: '文',
         ),
@@ -85,7 +87,10 @@ class RecentStudyCard extends ConsumerWidget {
           children: [
             InkWell(
               key: ValueKey('recent-study-${primary.route}'),
-              onTap: () => context.push(primary.route),
+              onTap: () {
+                context.push(primary.parentRoute);
+                context.push(primary.route);
+              },
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -166,7 +171,10 @@ class RecentStudyCard extends ConsumerWidget {
               Divider(height: 1, color: colors.outlineVariant),
               InkWell(
                 key: ValueKey('recent-study-${previous.route}'),
-                onTap: () => context.push(previous.route),
+                onTap: () {
+                  context.push(previous.parentRoute);
+                  context.push(previous.route);
+                },
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 12, 12, 12),
                   child: Row(
@@ -238,6 +246,7 @@ class _RecentStudyEntry {
     required this.destination,
     required this.detail,
     required this.route,
+    required this.parentRoute,
     required this.updatedAt,
     required this.symbol,
     this.progress,
@@ -247,6 +256,7 @@ class _RecentStudyEntry {
   final String destination;
   final String detail;
   final String route;
+  final String parentRoute;
   final DateTime updatedAt;
   final String symbol;
   final double? progress;

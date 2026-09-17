@@ -79,11 +79,7 @@ GoRouter createAppRouter({String initialLocation = '/'}) => GoRouter(
     GoRoute(
       path: '/grammar/tutor/:id',
       builder: (_, state) => KeepScreenOn(
-        child: OfflineAiGate(
-          child: GrammarTutorScreen(
-            grammarId: state.pathParameters['id'] ?? '',
-          ),
-        ),
+        child: GrammarTutorScreen(grammarId: state.pathParameters['id'] ?? ''),
       ),
     ),
     GoRoute(

@@ -90,7 +90,7 @@ class _GrammarTutorScreenState extends ConsumerState<GrammarTutorScreen>
         top: false,
         child: Column(
           children: [
-            LinearProgressIndicator(value: (_step + 1) / 5),
+            LinearProgressIndicator(value: (_step + 1) / 4),
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(20, 22, 20, 24),
@@ -99,9 +99,8 @@ class _GrammarTutorScreenState extends ConsumerState<GrammarTutorScreen>
                   const SizedBox(height: 20),
                   switch (_step) {
                     0 => _understandStep(grammar, language),
-                    1 => _meaningStep(grammar, catalog, language),
-                    2 => _exampleStep(grammar, catalog),
-                    3 => _productionStep(grammar),
+                    1 => _exampleStep(grammar, catalog),
+                    2 => _productionStep(grammar),
                     _ => _resultStep(grammar),
                   },
                 ],
@@ -134,27 +133,6 @@ class _GrammarTutorScreenState extends ConsumerState<GrammarTutorScreen>
       ),
     ],
   );
-
-  Widget _meaningStep(
-    GrammarPoint grammar,
-    List<GrammarPoint> catalog,
-    String language,
-  ) {
-    final choices = _nearbyGrammar(
-      grammar,
-      catalog,
-    ).map((item) => item.localizedSummary(language)).toList();
-    return _QuestionCard(
-      question: context.strings('chooseGrammarMeaning'),
-      choices: choices,
-      correctChoice: grammar.localizedSummary(language),
-      enabled: _lastCorrect == null,
-      onChoice: (choice) =>
-          _answer(choice == grammar.localizedSummary(language)),
-      feedback: _answerFeedback(),
-      onNext: _lastCorrect == null ? null : _next,
-    );
-  }
 
   Widget _exampleStep(GrammarPoint grammar, List<GrammarPoint> catalog) {
     final candidates = _nearbyGrammar(
@@ -345,7 +323,7 @@ class _GrammarTutorScreenState extends ConsumerState<GrammarTutorScreen>
       if (!mounted) return;
       setState(() {
         _feedback = feedback;
-        _step = 4;
+        _step = 3;
       });
     } catch (error) {
       if (!mounted) return;
@@ -387,9 +365,7 @@ class _LessonHeader extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text(
-        context.strings(
-          ['understand', 'recognize', 'apply', 'produce', 'result'][step],
-        ),
+        context.strings(['understand', 'apply', 'produce', 'result'][step]),
         style: Theme.of(context).textTheme.labelLarge?.copyWith(
           color: Theme.of(context).colorScheme.primary,
         ),

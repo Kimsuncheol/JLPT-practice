@@ -11,7 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('rank tutor moves through explanation and recognition', (
+  testWidgets('rank tutor moves through understanding and recognition', (
     tester,
   ) async {
     SharedPreferences.setMockInitialValues({});
@@ -34,9 +34,13 @@ void main() {
     await tester.tap(find.text('Check my understanding'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Recognize'), findsOneWidget);
-    expect(find.text('What does this grammar point mean?'), findsOneWidget);
-    await tester.tap(find.text(_target.summary));
+    expect(find.text('Apply'), findsOneWidget);
+    expect(
+      find.text('Which sentence uses this grammar point?'),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.text(_target.examples.first.japanese));
     await tester.pump();
 
     expect(find.text('Correct'), findsOneWidget);

@@ -5,49 +5,8 @@ import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/features/offline_ai/offline_ai_controller.dart';
 import 'package:jlpt_practice/features/offline_ai/offline_ai_model.dart';
 
-/// Guards every grammar-tutor route, including deep links and recent study.
-class OfflineAiGate extends ConsumerStatefulWidget {
-  const OfflineAiGate({required this.child, super.key});
-  final Widget child;
-  @override
-  ConsumerState<OfflineAiGate> createState() => _OfflineAiGateState();
-}
-
-class _OfflineAiGateState extends ConsumerState<OfflineAiGate> {
-  bool _entered = false;
-  late final OfflineAiController _controller;
-  @override
-  void initState() {
-    super.initState();
-    _controller = ref.read(offlineAiProvider);
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (!mounted) return;
-      final controller = ref.read(offlineAiProvider);
-      await controller.initialized;
-      if (!mounted || !controller.installed.contains(controller.selected.id)) {
-        return;
-      }
-      if (await controller.prepare() && mounted) {
-        setState(() => _entered = true);
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _controller.interrupt('offlinePaused');
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) => _entered
-      ? widget.child
-      : OfflineAiScreen(onContinue: () => setState(() => _entered = true));
-}
-
 class OfflineAiScreen extends ConsumerWidget {
-  const OfflineAiScreen({this.onContinue, super.key});
-  final VoidCallback? onContinue;
+  const OfflineAiScreen({super.key});
 
   String _size(int bytes) => '${(bytes / 1000000000).toStringAsFixed(2)} GB';
 
@@ -174,14 +133,9 @@ class OfflineAiScreen extends ConsumerWidget {
                     ? null
                     : () async {
                         if (installed) {
-                          if (await controller.prepare() && context.mounted) {
-                            onContinue?.call();
-                          }
+                          await controller.prepare();
                         } else {
                           await controller.download();
-                          if (context.mounted && controller.ready) {
-                            onContinue?.call();
-                          }
                         }
                       },
                 icon: Icon(
@@ -190,7 +144,7 @@ class OfflineAiScreen extends ConsumerWidget {
                 label: Text(
                   strings(
                     installed
-                        ? (onContinue != null ? 'continue' : 'offlineTestModel')
+                        ? 'offlineTestModel'
                         : (controller.partialBytes[selected.id] ?? 0) > 0
                         ? 'offlineResumeDownload'
                         : 'offlineDownload',

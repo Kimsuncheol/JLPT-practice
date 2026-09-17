@@ -333,38 +333,36 @@ void main() {
     },
   );
 
-  testWidgets(
-    'setup gate explains the download and does not enter tutor without a model',
-    (tester) async {
-      late OfflineAiController controller;
-      await tester.runAsync(() async {
-        controller = OfflineAiController(
-          probe: _Probe(directory.path),
-          engine: _Engine(),
-        );
-        await controller.initialized;
-      });
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [offlineAiProvider.overrideWithValue(controller)],
-          child: MaterialApp(
-            theme: AppTheme.light(),
-            home: const OfflineAiGate(child: Text('Tutor opened')),
-          ),
-        ),
+  testWidgets('setup screen explains the download and shows model sizes', (
+    tester,
+  ) async {
+    late OfflineAiController controller;
+    await tester.runAsync(() async {
+      controller = OfflineAiController(
+        probe: _Probe(directory.path),
+        engine: _Engine(),
       );
-      await tester.pumpAndSettle();
-      expect(find.text('Offline grammar AI'), findsOneWidget);
-      expect(find.text('Tutor opened'), findsNothing);
-      expect(find.textContaining('0.81 GB'), findsOneWidget);
-      expect(find.textContaining('2.02 GB'), findsOneWidget);
-      await tester.scrollUntilVisible(find.text('Download model'), 250);
-      expect(find.text('Download model'), findsOneWidget);
-      expect(tester.takeException(), isNull);
-      await tester.pumpWidget(const SizedBox());
-      controller.dispose();
-    },
-  );
+      await controller.initialized;
+    });
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [offlineAiProvider.overrideWithValue(controller)],
+        child: MaterialApp(
+          theme: AppTheme.light(),
+          home: const OfflineAiScreen(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Offline grammar AI'), findsOneWidget);
+    expect(find.textContaining('0.81 GB'), findsOneWidget);
+    expect(find.textContaining('2.02 GB'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('Download model'), 250);
+    expect(find.text('Download model'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox());
+    controller.dispose();
+  });
 }
 
 Matcher _error(String key) =>

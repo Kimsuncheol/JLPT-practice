@@ -10,7 +10,9 @@ import 'package:jlpt_practice/core/services/volume_service.dart';
 import 'package:jlpt_practice/data/models/grammar_point.dart';
 import 'package:jlpt_practice/data/models/grammar_study_session.dart';
 import 'package:jlpt_practice/features/grammar/grammar_providers.dart';
+import 'package:jlpt_practice/features/grammar/grammar_qa_service.dart';
 import 'package:jlpt_practice/features/grammar/grammar_study_session_provider.dart';
+import 'package:jlpt_practice/features/offline_ai/offline_ai_model.dart';
 
 class GrammarDetailScreen extends ConsumerWidget {
   const GrammarDetailScreen({required this.grammarId, super.key});
@@ -69,16 +71,62 @@ class _GrammarDetails extends ConsumerStatefulWidget {
 
 class _GrammarDetailsState extends ConsumerState<_GrammarDetails> {
   TtsService? _ttsService;
+  final _questionController = TextEditingController();
+  bool _asking = false;
+  String? _answer;
+  String? _qaError;
 
   @override
   void dispose() {
     if (_ttsService != null) unawaited(_ttsService!.stop());
+    _questionController.dispose();
     super.dispose();
   }
 
   void _speak(String text) {
     _ttsService ??= ref.read(ttsServiceProvider);
     unawaited(_ttsService!.speak(text));
+  }
+
+  Future<void> _askSuggested(
+    GrammarPoint grammar,
+    String languageCode,
+    String question,
+  ) {
+    _questionController.text = question;
+    return _askQuestion(grammar, languageCode);
+  }
+
+  Future<void> _askQuestion(GrammarPoint grammar, String languageCode) async {
+    final question = _questionController.text.trim();
+    if (question.isEmpty) {
+      setState(() => _qaError = context.strings('offlineQuestionLimit'));
+      return;
+    }
+    setState(() {
+      _asking = true;
+      _qaError = null;
+      _answer = null;
+    });
+    try {
+      final service = await ref.read(grammarQaServiceProvider.future);
+      final answer = await service.ask(
+        grammar: grammar,
+        question: question,
+        languageCode: languageCode,
+      );
+      if (!mounted) return;
+      setState(() => _answer = answer);
+    } catch (error) {
+      if (!mounted) return;
+      setState(
+        () => _qaError = context.strings(
+          error is OfflineAiException ? error.key : 'offlineInferenceError',
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _asking = false);
+    }
   }
 
   Future<void> _speakIfAudible(String text) async {
@@ -150,6 +198,67 @@ class _GrammarDetailsState extends ConsumerState<_GrammarDetails> {
               example: indexed.$2,
               language: language,
               onSpeak: () => _speakIfAudible(indexed.$2.japanese),
+            ),
+          ),
+          const SizedBox(height: 26),
+          _DetailSection(
+            title: context.strings('askAboutThisGrammar'),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (final suggestion in [
+                      context.strings('askSuggestionWhenToUse'),
+                      context.strings('askSuggestionMoreExamples'),
+                      context.strings('askSuggestionDifference'),
+                    ])
+                      ActionChip(
+                        label: Text(suggestion),
+                        onPressed: _asking
+                            ? null
+                            : () =>
+                                  _askSuggested(grammar, language, suggestion),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _questionController,
+                  enabled: !_asking,
+                  minLines: 1,
+                  maxLines: 3,
+                  maxLength: 300,
+                  decoration: InputDecoration(
+                    hintText: context.strings('askAboutThisGrammarHint'),
+                  ),
+                  onSubmitted: (_) => _askQuestion(grammar, language),
+                ),
+                const SizedBox(height: 8),
+                FilledButton(
+                  onPressed: _asking
+                      ? null
+                      : () => _askQuestion(grammar, language),
+                  child: _asking
+                      ? Text(context.strings('offlineAnswering'))
+                      : Text(context.strings('askButton')),
+                ),
+                if (_qaError != null) ...[
+                  const SizedBox(height: 12),
+                  Text(
+                    _qaError!,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                  ),
+                ],
+                if (_answer != null) ...[
+                  const SizedBox(height: 12),
+                  SelectableText(_answer!),
+                ],
+              ],
             ),
           ),
         ],
