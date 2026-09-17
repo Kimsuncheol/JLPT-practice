@@ -47,12 +47,14 @@ void main() {
       await tester.tap(find.byIcon(Icons.close_rounded));
       await tester.pumpAndSettle();
 
-      expect(find.text('N5 · Words · Day 6'), findsOneWidget);
+      expect(find.text('Words · N5'), findsOneWidget);
+      expect(find.text('Day 6'), findsOneWidget);
+      expect(find.text('2 of 5 words'), findsOneWidget);
       expect(
-        tester.getTopLeft(find.text('Recent study')).dy,
+        tester.getTopLeft(find.text('RECENT STUDY')).dy,
         greaterThan(tester.getBottomLeft(find.text('0 day streak')).dy),
       );
-      await tester.tap(find.text('N5 · Words · Day 6'));
+      await tester.tap(find.byKey(const ValueKey('recent-study-/study/day/6')));
       await tester.pumpAndSettle();
       expect(tester.widget<StudyScreen>(find.byType(StudyScreen)).day, 6);
       await tester.tap(find.text('Continue'));
@@ -92,7 +94,10 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      await tester.tap(find.text('N5 · Grammar · Part 6 · Grammar 51'));
+      expect(find.text('Grammar · N5'), findsOneWidget);
+      expect(find.text('Part 6 · Grammar 51'), findsOneWidget);
+      expect(find.text('Previous'), findsOneWidget);
+      await tester.tap(find.byKey(ValueKey('recent-study-${session.route}')));
       await tester.pumpAndSettle();
       expect(find.text(session.route), findsOneWidget);
       expect(find.text('Saved grammar screen'), findsOneWidget);

@@ -48,6 +48,40 @@ class DashboardSkeleton extends StatelessWidget {
                   ],
                 ),
               ),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: BorderRadius.circular(22),
+                ),
+                child: const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ShimmerBone(width: 92, height: 12, radius: 5),
+                    SizedBox(height: 12),
+                    Row(
+                      children: [
+                        ShimmerBone(width: 44, height: 44, radius: 14),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ShimmerBone(width: 120, height: 16, radius: 6),
+                              SizedBox(height: 7),
+                              ShimmerBone(width: 72, height: 13, radius: 5),
+                            ],
+                          ),
+                        ),
+                        ShimmerCircle(size: 44),
+                      ],
+                    ),
+                    SizedBox(height: 14),
+                    ShimmerBone(width: double.infinity, height: 6, radius: 6),
+                  ],
+                ),
+              ),
               const SizedBox(height: 18),
               GridView.count(
                 shrinkWrap: true,
