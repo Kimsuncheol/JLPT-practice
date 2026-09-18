@@ -136,6 +136,11 @@ class CloudSyncService {
         (value) => value.name == settings?['themeMode'],
         orElse: () => local.themeMode,
       ),
+      eyeComfortEnabled:
+          settings?['eyeComfortEnabled'] as bool? ?? local.eyeComfortEnabled,
+      eyeComfortLevel:
+          (settings?['eyeComfortLevel'] as num?)?.toDouble().clamp(0.0, 1.0) ??
+          local.eyeComfortLevel,
       notificationsEnabled:
           settings?['notificationsEnabled'] as bool? ??
           local.notificationsEnabled,
@@ -180,6 +185,8 @@ class CloudSyncService {
       'showFurigana': state.showFurigana,
       'autoPlayAudio': state.autoPlayAudio,
       'themeMode': state.themeMode.name,
+      'eyeComfortEnabled': state.eyeComfortEnabled,
+      'eyeComfortLevel': state.eyeComfortLevel,
       'notificationsEnabled': state.notificationsEnabled,
       'reminderHour': state.reminderHour,
       'reminderMinute': state.reminderMinute,

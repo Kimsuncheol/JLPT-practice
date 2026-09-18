@@ -24,7 +24,10 @@ class _GrammarListScreenState extends ConsumerState<GrammarListScreen> {
   @override
   Widget build(BuildContext context) {
     final catalog = ref.watch(grammarCatalogProvider);
-    final meaningLanguage = ref.watch(appControllerProvider).value?.meaningLanguage;
+    final meaningLanguage = ref
+        .watch(appControllerProvider)
+        .value
+        ?.meaningLanguage;
     final language =
         meaningLanguage ?? Localizations.localeOf(context).languageCode;
     final selectedLevel =
@@ -35,6 +38,12 @@ class _GrammarListScreenState extends ConsumerState<GrammarListScreen> {
         surfaceTintColor: Colors.transparent,
         scrolledUnderElevation: 0,
         title: Text('$selectedLevel ${context.strings('grammar')}'),
+        actions: [
+          IconButton(
+            onPressed: () => context.push('/settings/learning'),
+            icon: const Icon(Icons.settings_rounded),
+          ),
+        ],
       ),
       body: catalog.when(
         loading: () => const GrammarListSkeleton(),

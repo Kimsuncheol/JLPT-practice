@@ -18,6 +18,8 @@ class AppState {
     required this.showFurigana,
     required this.autoPlayAudio,
     required this.themeMode,
+    this.eyeComfortEnabled = false,
+    this.eyeComfortLevel = 0.5,
     required this.notificationsEnabled,
     this.reminderHour = 20,
     this.reminderMinute = 0,
@@ -45,6 +47,8 @@ class AppState {
   final bool showFurigana;
   final bool autoPlayAudio;
   final ThemeMode themeMode;
+  final bool eyeComfortEnabled;
+  final double eyeComfortLevel;
   final bool notificationsEnabled;
   final int reminderHour;
   final int reminderMinute;
@@ -99,6 +103,8 @@ class AppState {
     bool? showFurigana,
     bool? autoPlayAudio,
     ThemeMode? themeMode,
+    bool? eyeComfortEnabled,
+    double? eyeComfortLevel,
     bool? notificationsEnabled,
     int? reminderHour,
     int? reminderMinute,
@@ -126,6 +132,8 @@ class AppState {
       showFurigana: showFurigana ?? this.showFurigana,
       autoPlayAudio: autoPlayAudio ?? this.autoPlayAudio,
       themeMode: themeMode ?? this.themeMode,
+      eyeComfortEnabled: eyeComfortEnabled ?? this.eyeComfortEnabled,
+      eyeComfortLevel: eyeComfortLevel ?? this.eyeComfortLevel,
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
       reminderHour: reminderHour ?? this.reminderHour,
       reminderMinute: reminderMinute ?? this.reminderMinute,

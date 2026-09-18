@@ -108,7 +108,7 @@ class _GrammarPartTutorScreenState extends ConsumerState<GrammarPartTutorScreen>
         ),
         actions: [
           IconButton(
-            onPressed: () => context.push('/settings/learning-language'),
+            onPressed: () => context.push('/settings/learning'),
             icon: const Icon(Icons.settings_rounded),
           ),
         ],
@@ -127,7 +127,10 @@ class _GrammarPartTutorScreenState extends ConsumerState<GrammarPartTutorScreen>
     List<GrammarPoint> partItems,
   ) {
     final grammar = questions[_index];
-    final meaningLanguage = ref.watch(appControllerProvider).value?.meaningLanguage;
+    final meaningLanguage = ref
+        .watch(appControllerProvider)
+        .value
+        ?.meaningLanguage;
     final language =
         meaningLanguage ?? Localizations.localeOf(context).languageCode;
     final distractors = partItems

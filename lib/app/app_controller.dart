@@ -71,6 +71,8 @@ class AppController extends AsyncNotifier<AppState> {
       showFurigana: settings.showFurigana,
       autoPlayAudio: settings.autoPlayAudio,
       themeMode: settings.themeMode,
+      eyeComfortEnabled: settings.eyeComfortEnabled,
+      eyeComfortLevel: settings.eyeComfortLevel,
       notificationsEnabled: notificationsEnabled,
       reminderHour: settings.reminderHour,
       reminderMinute: settings.reminderMinute,
@@ -107,9 +109,7 @@ class AppController extends AsyncNotifier<AppState> {
   AppState get _value => state.requireValue;
 
   String _deviceLanguage() =>
-      ui.PlatformDispatcher.instance.locale.languageCode == 'ko'
-      ? 'ko'
-      : 'en';
+      ui.PlatformDispatcher.instance.locale.languageCode == 'ko' ? 'ko' : 'en';
 
   String _resolveUiLanguage(String languageCode) =>
       languageCode == 'system' ? _deviceLanguage() : languageCode;
@@ -385,6 +385,18 @@ class AppController extends AsyncNotifier<AppState> {
       _updatePreference('themeMode', value.name, (current) {
         return current.copyWith(themeMode: value);
       });
+
+  Future<void> setEyeComfortEnabled(bool value) =>
+      _updatePreference('eyeComfortEnabled', value, (current) {
+        return current.copyWith(eyeComfortEnabled: value);
+      });
+
+  Future<void> setEyeComfortLevel(double value) {
+    final level = value.clamp(0.0, 1.0);
+    return _updatePreference('eyeComfortLevel', level, (current) {
+      return current.copyWith(eyeComfortLevel: level);
+    });
+  }
 
   Future<void> saveStudySession(StudySession session) async {
     final sessions = {..._value.studySessions, session.level: session};

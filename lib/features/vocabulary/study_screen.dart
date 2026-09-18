@@ -86,7 +86,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
         ),
         actions: [
           IconButton(
-            onPressed: () => context.push('/settings/learning-language'),
+            onPressed: () => context.push('/settings/learning'),
             icon: const Icon(Icons.settings_rounded),
           ),
         ],

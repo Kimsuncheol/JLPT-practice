@@ -19,6 +19,8 @@ class LocalSettings {
     required this.showFurigana,
     required this.autoPlayAudio,
     required this.themeMode,
+    this.eyeComfortEnabled = false,
+    this.eyeComfortLevel = 0.5,
     required this.notificationsEnabled,
     required this.reminderHour,
     required this.reminderMinute,
@@ -39,6 +41,8 @@ class LocalSettings {
   final bool showFurigana;
   final bool autoPlayAudio;
   final ThemeMode themeMode;
+  final bool eyeComfortEnabled;
+  final double eyeComfortLevel;
   final bool notificationsEnabled;
   final int reminderHour;
   final int reminderMinute;
@@ -82,6 +86,11 @@ class LocalStore {
         (value) => value.name == themeName,
         orElse: () => ThemeMode.system,
       ),
+      eyeComfortEnabled: _preferences.getBool('eyeComfortEnabled') ?? false,
+      eyeComfortLevel: (_preferences.getDouble('eyeComfortLevel') ?? 0.5).clamp(
+        0.0,
+        1.0,
+      ),
       notificationsEnabled:
           _preferences.getBool('notificationsEnabled') ?? false,
       reminderHour: _preferences.getInt('reminderHour') ?? 20,
@@ -107,6 +116,8 @@ class LocalStore {
       setValue('showFurigana', state.showFurigana),
       setValue('autoPlayAudio', state.autoPlayAudio),
       setValue('themeMode', state.themeMode.name),
+      setValue('eyeComfortEnabled', state.eyeComfortEnabled),
+      setValue('eyeComfortLevel', state.eyeComfortLevel),
       setValue('notificationsEnabled', state.notificationsEnabled),
       setValue('reminderHour', state.reminderHour),
       setValue('reminderMinute', state.reminderMinute),
@@ -291,6 +302,8 @@ class LocalStore {
       'showFurigana',
       'autoPlayAudio',
       'themeMode',
+      'eyeComfortEnabled',
+      'eyeComfortLevel',
       'notificationsEnabled',
       'reminderHour',
       'reminderMinute',

@@ -77,7 +77,10 @@ class _GrammarTutorScreenState extends ConsumerState<GrammarTutorScreen>
   }
 
   Widget _buildLesson(GrammarPoint grammar, List<GrammarPoint> catalog) {
-    final meaningLanguage = ref.watch(appControllerProvider).value?.meaningLanguage;
+    final meaningLanguage = ref
+        .watch(appControllerProvider)
+        .value
+        ?.meaningLanguage;
     final language =
         meaningLanguage ?? Localizations.localeOf(context).languageCode;
     final part = grammarPartForRank(grammar.rank);
@@ -90,7 +93,7 @@ class _GrammarTutorScreenState extends ConsumerState<GrammarTutorScreen>
         ),
         actions: [
           IconButton(
-            onPressed: () => context.push('/settings/learning-language'),
+            onPressed: () => context.push('/settings/learning'),
             icon: const Icon(Icons.settings_rounded),
           ),
         ],

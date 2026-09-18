@@ -15,6 +15,7 @@ import 'package:jlpt_practice/features/review/review_screen.dart';
 import 'package:jlpt_practice/features/settings/appearance_screen.dart';
 import 'package:jlpt_practice/features/settings/languages_screen.dart';
 import 'package:jlpt_practice/features/settings/learning_language_screen.dart';
+import 'package:jlpt_practice/features/settings/learning_settings_screen.dart';
 import 'package:jlpt_practice/features/settings/levels_screen.dart';
 import 'package:jlpt_practice/data/models/mock_test_problem.dart';
 import 'package:jlpt_practice/features/test/level_practice_test_screen.dart';
@@ -26,6 +27,7 @@ import 'package:jlpt_practice/features/vocabulary/day_selection_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/study_finish_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/study_screen.dart';
 import 'package:jlpt_practice/shared/bootstrap_screen.dart';
+import 'package:jlpt_practice/shared/eye_comfort_overlay.dart';
 import 'package:jlpt_practice/shared/keep_screen_on.dart';
 
 GoRouter createAppRouter({String initialLocation = '/'}) => GoRouter(
@@ -44,6 +46,11 @@ GoRouter createAppRouter({String initialLocation = '/'}) => GoRouter(
       builder: (_, _) => const LanguagesScreen(),
     ),
     GoRoute(
+      path: '/settings/learning',
+      builder: (_, _) =>
+          const EyeComfortOverlay(child: LearningSettingsScreen()),
+    ),
+    GoRoute(
       path: '/settings/learning-language',
       builder: (_, _) => const LearningLanguageScreen(),
     ),
@@ -60,8 +67,10 @@ GoRouter createAppRouter({String initialLocation = '/'}) => GoRouter(
     GoRoute(
       path: '/study/day/:day',
       builder: (_, state) => KeepScreenOn(
-        child: StudyScreen(
-          day: int.tryParse(state.pathParameters['day'] ?? '') ?? 1,
+        child: EyeComfortOverlay(
+          child: StudyScreen(
+            day: int.tryParse(state.pathParameters['day'] ?? '') ?? 1,
+          ),
         ),
       ),
     ),
@@ -73,26 +82,38 @@ GoRouter createAppRouter({String initialLocation = '/'}) => GoRouter(
     ),
     GoRoute(
       path: '/grammar',
-      builder: (_, _) => const KeepScreenOn(child: GrammarListScreen()),
+      builder: (_, _) => const KeepScreenOn(
+        child: EyeComfortOverlay(child: GrammarListScreen()),
+      ),
     ),
     GoRoute(
       path: '/grammar/detail/:id',
       builder: (_, state) => KeepScreenOn(
-        child: GrammarDetailScreen(grammarId: state.pathParameters['id'] ?? ''),
+        child: EyeComfortOverlay(
+          child: GrammarDetailScreen(
+            grammarId: state.pathParameters['id'] ?? '',
+          ),
+        ),
       ),
     ),
     GoRoute(
       path: '/grammar/tutor/:id',
       builder: (_, state) => KeepScreenOn(
-        child: GrammarTutorScreen(grammarId: state.pathParameters['id'] ?? ''),
+        child: EyeComfortOverlay(
+          child: GrammarTutorScreen(
+            grammarId: state.pathParameters['id'] ?? '',
+          ),
+        ),
       ),
     ),
     GoRoute(
       path: '/grammar/part/:level/:part',
       builder: (_, state) => KeepScreenOn(
-        child: GrammarPartTutorScreen(
-          level: state.pathParameters['level'] ?? 'N5',
-          part: int.tryParse(state.pathParameters['part'] ?? '') ?? 1,
+        child: EyeComfortOverlay(
+          child: GrammarPartTutorScreen(
+            level: state.pathParameters['level'] ?? 'N5',
+            part: int.tryParse(state.pathParameters['part'] ?? '') ?? 1,
+          ),
         ),
       ),
     ),
