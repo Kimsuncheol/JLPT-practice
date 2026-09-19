@@ -363,7 +363,8 @@ class AppStrings {
     'coverWordBody':
         'Covers the word, including where it appears in the example sentence.',
     'coverMeaningsTitle': 'Meanings',
-    'coverMeaningsBody': 'Choose what the meanings cover hides.',
+    'coverMeaningsBody':
+        'Covers the meaning and the matching meaning words in the example translation.',
     'coverMeaningAndTranslation': 'Meanings and translations',
     'coverMeaningAndTranslationBody':
         'Covers the meaning and the example translation.',
@@ -719,7 +720,7 @@ class AppStrings {
         '단어와 뜻을 테이프로 가리고 기억나는 대로 말해 보세요. 학습 화면 아래 버튼으로 바로 켜고 끌 수 있습니다.',
     'coverWordBody': '단어를 가립니다. 예문 속 같은 단어도 함께 가려집니다.',
     'coverMeaningsTitle': '뜻',
-    'coverMeaningsBody': '뜻 숨기기가 가리는 범위를 고르세요.',
+    'coverMeaningsBody': '뜻과 예문 번역에서 해당 뜻에 해당하는 부분을 가립니다.',
     'coverMeaningAndTranslation': '뜻 + 번역',
     'coverMeaningAndTranslationBody': '뜻과 예문 번역을 모두 가립니다.',
     'coverMeaningOnly': '뜻만',
