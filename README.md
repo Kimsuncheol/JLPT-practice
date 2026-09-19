@@ -1,4 +1,4 @@
-# Kotoba Flow
+# JLPT study
 
 An offline-first Flutter JLPT vocabulary and grammar app with English and
 Korean UI, swipe study cards, text-to-speech, fill-in-the-blank quizzes,

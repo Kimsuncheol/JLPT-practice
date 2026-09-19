@@ -37,7 +37,7 @@ class JlptPracticeApp extends ConsumerWidget {
         ) ??
         ThemeMode.system;
     return MaterialApp.router(
-      title: 'Kotoba Flow',
+      title: 'JLPT study',
       debugShowCheckedModeBanner: false,
       routerConfig: appRouter,
       builder: (context, child) {
