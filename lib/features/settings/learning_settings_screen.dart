@@ -69,9 +69,7 @@ class LearningSettingsScreen extends ConsumerWidget {
                   ListTile(
                     leading: const Icon(Icons.record_voice_over_rounded),
                     title: Text(strings('ttsSettingsTile')),
-                    subtitle: Text(
-                      '${japaneseTtsVoiceById(state.ttsVoiceId).name} · ${strings('ttsSettingsTileBody')}',
-                    ),
+                    subtitle: Text(japaneseTtsVoiceById(state.ttsVoiceId).name),
                     trailing: const Icon(Icons.chevron_right_rounded),
                     onTap: () => context.push('/settings/tts'),
                   ),

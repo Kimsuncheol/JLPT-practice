@@ -37,6 +37,33 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
     super.dispose();
   }
 
+  Future<void> _confirmLeave() async {
+    _autoAdvanceTimer?.cancel();
+    final leave = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(dialogContext.strings('leaveQuizTitle')),
+        content: Text(dialogContext.strings('leaveQuizBody')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(dialogContext.strings('cancel')),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(dialogContext.strings('leave')),
+          ),
+        ],
+      ),
+    );
+    if (!mounted) return;
+    if (leave ?? false) {
+      context.pop();
+    } else if (_answered) {
+      unawaited(_advance());
+    }
+  }
+
   Future<void> _advance() async {
     _autoAdvanceTimer?.cancel();
     final questions = _questions!;
@@ -87,248 +114,256 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
     }
     final question = questions[_index];
     final isCorrect = _selected == question.correctAnswer;
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: context.pop,
-          icon: const Icon(Icons.close_rounded),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) unawaited(_confirmLeave());
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            onPressed: _confirmLeave,
+            icon: const Icon(Icons.close_rounded),
+          ),
+          title: Text(context.strings('startQuiz')),
         ),
-        title: Text(context.strings('startQuiz')),
-      ),
-      body: SafeArea(
-        top: false,
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(22, 6, 22, 0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: LinearProgressIndicator(
-                      value: (_index + 1) / questions.length,
-                      minHeight: 8,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                  Text(
-                    '${_index + 1}/${questions.length}',
-                    style: const TextStyle(fontWeight: FontWeight.w700),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(22, 30, 22, 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+        body: SafeArea(
+          top: false,
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(22, 6, 22, 0),
+                child: Row(
                   children: [
+                    Expanded(
+                      child: LinearProgressIndicator(
+                        value: (_index + 1) / questions.length,
+                        minHeight: 8,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    const SizedBox(width: 14),
                     Text(
-                      context.strings('quizInstruction'),
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
+                      '${_index + 1}/${questions.length}',
+                      style: const TextStyle(fontWeight: FontWeight.w700),
                     ),
-                    const SizedBox(height: 20),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 22,
-                        vertical: 34,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surface,
-                        borderRadius: BorderRadius.circular(28),
-                      ),
-                      child: Column(
-                        children: [
-                          Text(
-                            question.vocabulary.example.quizSentence,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              fontSize: 25,
-                              height: 1.6,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          const SizedBox(height: 14),
-                          Text(
-                            question.vocabulary.example.translation(
-                              state.meaningLanguage,
-                            ),
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    if (!_answered)
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton.icon(
-                          onPressed: () async {
-                            if (_hintRevealed) {
-                              setState(() => _hintRevealed = false);
-                              return;
-                            }
-                            if (AdService.enabled) {
-                              final earned = await AdService.showRewarded();
-                              if (earned && mounted) {
-                                setState(() => _hintRevealed = true);
-                              }
-                            } else {
-                              setState(() => _hintRevealed = true);
-                            }
-                          },
-                          icon: Icon(
-                            _hintRevealed
-                                ? Icons.lightbulb_rounded
-                                : AdService.enabled
-                                ? Icons.ondemand_video_rounded
-                                : Icons.lightbulb_outline_rounded,
-                          ),
-                          label: Text(_hintRevealed ? 'Hide Hint' : 'Hint'),
-                        ),
-                      ),
-                    if (_hintRevealed && !_answered)
-                      Container(
-                        width: double.infinity,
-                        margin: const EdgeInsets.only(bottom: 12),
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.secondaryContainer,
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Text(
-                          '${question.vocabulary.reading} · ${question.vocabulary.meaning(state.meaningLanguage)}',
-                        ),
-                      ),
-                    ...question.choices.asMap().entries.map((entry) {
-                      final choice = entry.value;
-                      final selected = _selected == choice;
-                      Color? color;
-                      IconData? trailing;
-                      if (_answered && choice == question.correctAnswer) {
-                        color = Theme.of(context).colorScheme.primaryContainer;
-                        trailing = Icons.check_circle_rounded;
-                      } else if (_answered && selected) {
-                        color = Theme.of(context).colorScheme.errorContainer;
-                        trailing = Icons.cancel_rounded;
-                      }
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 10),
-                        child: Material(
-                          color:
-                              color ??
-                              (selected
-                                  ? Theme.of(
-                                      context,
-                                    ).colorScheme.secondaryContainer
-                                  : Theme.of(context).colorScheme.surface),
-                          borderRadius: BorderRadius.circular(19),
-                          child: InkWell(
-                            onTap: _answered
-                                ? null
-                                : () {
-                                    setState(() {
-                                      _selected = choice;
-                                      _answered = true;
-                                      if (choice == question.correctAnswer) {
-                                        _correct++;
-                                      } else {
-                                        _incorrectIds.add(
-                                          question.vocabulary.id,
-                                        );
-                                      }
-                                    });
-                                    _autoAdvanceTimer?.cancel();
-                                    _autoAdvanceTimer = Timer(
-                                      const Duration(milliseconds: 1400),
-                                      _advance,
-                                    );
-                                  },
-                            borderRadius: BorderRadius.circular(19),
-                            child: Padding(
-                              padding: const EdgeInsets.all(17),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    width: 30,
-                                    height: 30,
-                                    alignment: Alignment.center,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.surfaceContainerHighest,
-                                    ),
-                                    child: Text(
-                                      String.fromCharCode(65 + entry.key),
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w800,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 14),
-                                  Expanded(
-                                    child: Text(
-                                      choice,
-                                      style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ),
-                                  if (trailing != null) Icon(trailing),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    }),
-                    if (_answered)
-                      Container(
-                        width: double.infinity,
-                        margin: const EdgeInsets.only(top: 6),
-                        padding: const EdgeInsets.all(18),
-                        decoration: BoxDecoration(
-                          color: isCorrect
-                              ? Theme.of(context).colorScheme.primaryContainer
-                              : Theme.of(context).colorScheme.errorContainer,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              isCorrect
-                                  ? context.strings('correct')
-                                  : context.strings('incorrect'),
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              '${question.vocabulary.reading} · ${question.vocabulary.meaning(state.meaningLanguage)}',
-                            ),
-                            const SizedBox(height: 6),
-                            Text(question.vocabulary.example.sentence),
-                          ],
-                        ),
-                      ),
                   ],
                 ),
               ),
-            ),
-          ],
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(22, 30, 22, 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        context.strings('quizInstruction'),
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 22,
+                          vertical: 34,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surface,
+                          borderRadius: BorderRadius.circular(28),
+                        ),
+                        child: Column(
+                          children: [
+                            Text(
+                              question.vocabulary.example.quizSentence,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 25,
+                                height: 1.6,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            const SizedBox(height: 14),
+                            Text(
+                              question.vocabulary.example.translation(
+                                state.meaningLanguage,
+                              ),
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      if (!_answered)
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton.icon(
+                            onPressed: () async {
+                              if (_hintRevealed) {
+                                setState(() => _hintRevealed = false);
+                                return;
+                              }
+                              if (AdService.enabled) {
+                                final earned = await AdService.showRewarded();
+                                if (earned && mounted) {
+                                  setState(() => _hintRevealed = true);
+                                }
+                              } else {
+                                setState(() => _hintRevealed = true);
+                              }
+                            },
+                            icon: Icon(
+                              _hintRevealed
+                                  ? Icons.lightbulb_rounded
+                                  : AdService.enabled
+                                  ? Icons.ondemand_video_rounded
+                                  : Icons.lightbulb_outline_rounded,
+                            ),
+                            label: Text(_hintRevealed ? 'Hide Hint' : 'Hint'),
+                          ),
+                        ),
+                      if (_hintRevealed && !_answered)
+                        Container(
+                          width: double.infinity,
+                          margin: const EdgeInsets.only(bottom: 12),
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.secondaryContainer,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Text(
+                            '${question.vocabulary.reading} · ${question.vocabulary.meaning(state.meaningLanguage)}',
+                          ),
+                        ),
+                      ...question.choices.asMap().entries.map((entry) {
+                        final choice = entry.value;
+                        final selected = _selected == choice;
+                        Color? color;
+                        IconData? trailing;
+                        if (_answered && choice == question.correctAnswer) {
+                          color = Theme.of(
+                            context,
+                          ).colorScheme.primaryContainer;
+                          trailing = Icons.check_circle_rounded;
+                        } else if (_answered && selected) {
+                          color = Theme.of(context).colorScheme.errorContainer;
+                          trailing = Icons.cancel_rounded;
+                        }
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 10),
+                          child: Material(
+                            color:
+                                color ??
+                                (selected
+                                    ? Theme.of(
+                                        context,
+                                      ).colorScheme.secondaryContainer
+                                    : Theme.of(context).colorScheme.surface),
+                            borderRadius: BorderRadius.circular(19),
+                            child: InkWell(
+                              onTap: _answered
+                                  ? null
+                                  : () {
+                                      setState(() {
+                                        _selected = choice;
+                                        _answered = true;
+                                        if (choice == question.correctAnswer) {
+                                          _correct++;
+                                        } else {
+                                          _incorrectIds.add(
+                                            question.vocabulary.id,
+                                          );
+                                        }
+                                      });
+                                      _autoAdvanceTimer?.cancel();
+                                      _autoAdvanceTimer = Timer(
+                                        const Duration(milliseconds: 1400),
+                                        _advance,
+                                      );
+                                    },
+                              borderRadius: BorderRadius.circular(19),
+                              child: Padding(
+                                padding: const EdgeInsets.all(17),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 30,
+                                      height: 30,
+                                      alignment: Alignment.center,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.surfaceContainerHighest,
+                                      ),
+                                      child: Text(
+                                        String.fromCharCode(65 + entry.key),
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 14),
+                                    Expanded(
+                                      child: Text(
+                                        choice,
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                    if (trailing != null) Icon(trailing),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      }),
+                      if (_answered)
+                        Container(
+                          width: double.infinity,
+                          margin: const EdgeInsets.only(top: 6),
+                          padding: const EdgeInsets.all(18),
+                          decoration: BoxDecoration(
+                            color: isCorrect
+                                ? Theme.of(context).colorScheme.primaryContainer
+                                : Theme.of(context).colorScheme.errorContainer,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                isCorrect
+                                    ? context.strings('correct')
+                                    : context.strings('incorrect'),
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                '${question.vocabulary.reading} · ${question.vocabulary.meaning(state.meaningLanguage)}',
+                              ),
+                              const SizedBox(height: 6),
+                              Text(question.vocabulary.example.sentence),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
