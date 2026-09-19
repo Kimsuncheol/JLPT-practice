@@ -36,6 +36,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   final PageController _actionPageController = PageController(
     initialPage: 10000,
   );
+  int _currentActionPage = 10000;
   TtsService? _ttsService;
   bool _resumeDecisionPending = false;
   bool _resumeDialogVisible = false;
@@ -164,6 +165,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
               child: PageView.builder(
                 key: const ValueKey('study-action-carousel'),
                 controller: _actionPageController,
+                onPageChanged: (page) => _currentActionPage = page,
                 itemBuilder: (context, page) => page.isEven
                     ? _primaryActionPage(state, words[_index])
                     : _actionPage([_autoReviewTab(state)]),
@@ -534,6 +536,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
     required AppState state,
   }) async {
     final request = ++_pageChangeRequest;
+    if (index < words.length) _resetActionCarousel();
     if (_ttsService != null) await _ttsService!.stop();
     if (!mounted || request != _pageChangeRequest) return;
 
@@ -549,6 +552,13 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
       _speak(words[index].word);
     }
     _suppressAutoAudio = false;
+  }
+
+  void _resetActionCarousel() {
+    if (_currentActionPage.isEven || !_actionPageController.hasClients) return;
+    final primaryPage = _currentActionPage - 1;
+    _currentActionPage = primaryPage;
+    _actionPageController.jumpToPage(primaryPage);
   }
 
   Future<void> _finishStudying() async {

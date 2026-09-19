@@ -431,6 +431,42 @@ void main() {
     expect(find.text('Auto review').hitTestable(), findsOneWidget);
   });
 
+  testWidgets('changing words resets the action carousel to hide controls', (
+    tester,
+  ) async {
+    final container = ProviderContainer(
+      overrides: [
+        appControllerProvider.overrideWith(
+          () => _ResumeAppController('word_0', 0),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container.read(appControllerProvider.future);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const MaterialApp(home: StudyScreen(day: 2)),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await _showAutoReviewActions(tester);
+    expect(find.text('Auto review').hitTestable(), findsOneWidget);
+
+    final wordPages = find.byType(PageView).first;
+    await tester.drag(wordPages, Offset(-tester.getSize(wordPages).width, 0));
+    await tester.pumpAndSettle();
+    expect(find.text('2 / 5'), findsOneWidget);
+    expect(find.text('Hide word').hitTestable(), findsOneWidget);
+
+    await _showAutoReviewActions(tester);
+    await tester.drag(wordPages, Offset(tester.getSize(wordPages).width, 0));
+    await tester.pumpAndSettle();
+    expect(find.text('1 / 5'), findsOneWidget);
+    expect(find.text('Hide word').hitTestable(), findsOneWidget);
+  });
+
   testWidgets('auto review reveals each element in the chosen order', (
     tester,
   ) async {
