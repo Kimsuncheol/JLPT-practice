@@ -1,11 +1,21 @@
+import 'dart:async';
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
+import 'package:jlpt_practice/core/services/tts_service.dart';
+import 'package:jlpt_practice/core/services/volume_service.dart';
+import 'package:jlpt_practice/core/utils/immersive_study_mode.dart';
 import 'package:jlpt_practice/core/utils/study_batches.dart';
-import 'package:jlpt_practice/data/models/review_progress.dart';
+import 'package:jlpt_practice/data/models/app_state.dart';
+import 'package:jlpt_practice/data/models/study_preferences.dart';
+import 'package:jlpt_practice/data/models/study_session.dart';
 import 'package:jlpt_practice/data/models/vocabulary.dart';
+import 'package:jlpt_practice/features/vocabulary/cover_masking.dart';
+import 'package:jlpt_practice/features/vocabulary/cover_tape.dart';
 
 class StudyScreen extends ConsumerStatefulWidget {
   const StudyScreen({required this.day, super.key});
@@ -16,13 +26,46 @@ class StudyScreen extends ConsumerStatefulWidget {
   ConsumerState<StudyScreen> createState() => _StudyScreenState();
 }
 
-class _StudyScreenState extends ConsumerState<StudyScreen> {
+class _StudyScreenState extends ConsumerState<StudyScreen>
+    with ImmersiveStudyMode<StudyScreen> {
+  static const _resumeDialogBarrierColor = Colors.black54;
+
   int _index = 0;
   bool? _showFurigana;
+  PageController? _pageController;
+  TtsService? _ttsService;
+  bool _resumeDecisionPending = false;
+  bool _resumeDialogVisible = false;
+  bool _suppressAutoAudio = false;
+  int _pageChangeRequest = 0;
+
+  @override
+  void dispose() {
+    _pageController?.dispose();
+    if (_ttsService != null) unawaited(_ttsService!.stop());
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(appControllerProvider).requireValue;
+    final asyncState = ref.watch(appControllerProvider);
+    final scaffoldBackgroundColor = Theme.of(context).scaffoldBackgroundColor;
+    final systemBarColor = _resumeDialogVisible
+        ? Color.alphaBlend(_resumeDialogBarrierColor, scaffoldBackgroundColor)
+        : scaffoldBackgroundColor;
+    return wrapImmersive(
+      asyncState.when(
+        loading: () =>
+            const Scaffold(body: Center(child: CircularProgressIndicator())),
+        error: (error, _) =>
+            Scaffold(body: Center(child: Text(error.toString()))),
+        data: (state) => _buildStudyScreen(context, state),
+      ),
+      systemBarColor: systemBarColor,
+    );
+  }
+
+  Widget _buildStudyScreen(BuildContext context, AppState state) {
     final words = StudyBatches.wordsForDay(
       state.selectedVocabulary,
       day: widget.day,
@@ -35,25 +78,31 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
         body: Center(child: Text(context.strings('noResults'))),
       );
     }
+    _initializePage(words, state);
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           onPressed: context.pop,
           icon: const Icon(Icons.close_rounded),
         ),
+        actions: [
+          IconButton(
+            onPressed: () => context.push('/settings/learning'),
+            icon: const Icon(Icons.settings_rounded),
+          ),
+        ],
       ),
       body: Column(
         children: [
           Expanded(
             child: PageView.builder(
-              itemCount: words.length,
-              onPageChanged: (index) {
-                setState(() => _index = index);
-                if (state.autoPlayAudio) {
-                  ref.read(ttsServiceProvider).speak(words[index].word);
-                }
-              },
+              controller: _pageController,
+              itemCount: words.length + 1,
+              onPageChanged: (index) => unawaited(
+                _handlePageChanged(index: index, words: words, state: state),
+              ),
               itemBuilder: (context, index) {
+                if (index == words.length) return const SizedBox.shrink();
                 final word = words[index];
                 return Padding(
                   padding: const EdgeInsets.fromLTRB(20, 8, 20, 14),
@@ -61,32 +110,71 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                     vocabulary: word,
                     language: state.meaningLanguage,
                     showFurigana: _showFurigana!,
-                    onToggleFurigana: () {
-                      setState(() => _showFurigana = !_showFurigana!);
-                    },
-                    onSpeak: () =>
-                        ref.read(ttsServiceProvider).speak(word.word),
-                    onReview: () async {
-                      await ref
-                          .read(appControllerProvider.notifier)
-                          .rateVocabulary(word.id, ReviewRating.again);
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(context.strings('markReview')),
-                          ),
-                        );
-                      }
-                    },
+                    hideWord: state.hideWord,
+                    hideMeaning:
+                        state.hideMeanings &&
+                        state.meaningCoverMode != MeaningCoverMode.translation,
+                    hideTranslation:
+                        state.hideMeanings &&
+                        state.meaningCoverMode != MeaningCoverMode.meaning,
+                    maskMeaningInTranslation:
+                        state.hideMeanings &&
+                        state.meaningCoverMode == MeaningCoverMode.meaning,
+                    onSpeakWord: () => _speakIfAudible(word.reading),
+                    onSpeakExample: () =>
+                        _speakIfAudible(word.example.sentence),
                   ),
                 );
               },
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _CardAction(
+                  icon: _showFurigana!
+                      ? Icons.visibility_off_rounded
+                      : Icons.visibility_rounded,
+                  label: context.strings(
+                    _showFurigana! ? 'hideReading' : 'showReading',
+                  ),
+                  onTap: () => setState(() => _showFurigana = !_showFurigana!),
+                ),
+                _CardAction(
+                  icon: state.hideWord
+                      ? Icons.visibility_rounded
+                      : Icons.visibility_off_rounded,
+                  label: context.strings(
+                    state.hideWord ? 'showWord' : 'hideWord',
+                  ),
+                  onTap: () => unawaited(
+                    ref
+                        .read(appControllerProvider.notifier)
+                        .setHideWord(!state.hideWord),
+                  ),
+                ),
+                _CardAction(
+                  icon: state.hideMeanings
+                      ? Icons.visibility_rounded
+                      : Icons.visibility_off_rounded,
+                  label: context.strings(
+                    state.hideMeanings ? 'showMeanings' : 'hideMeanings',
+                  ),
+                  onTap: () => unawaited(
+                    ref
+                        .read(appControllerProvider.notifier)
+                        .setHideMeanings(!state.hideMeanings),
+                  ),
+                ),
+              ],
+            ),
+          ),
           SafeArea(
             top: false,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 6, 20, 14),
+              padding: const EdgeInsets.fromLTRB(20, 30, 20, 20),
               child: Text(
                 '${_index + 1} / ${words.length}',
                 style: const TextStyle(fontWeight: FontWeight.w700),
@@ -97,6 +185,188 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
       ),
     );
   }
+
+  void _initializePage(List<Vocabulary> words, AppState state) {
+    if (_pageController != null) return;
+    final session = state.studySessions[state.selectedLevel];
+    final canResume =
+        session != null &&
+        session.day == widget.day &&
+        session.isCompatible(
+          level: state.selectedLevel,
+          dailyGoal: state.dailyGoal,
+        );
+    _pageController = PageController();
+    _resumeDecisionPending = canResume;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      if (canResume) {
+        unawaited(_confirmResume(session, words));
+      } else {
+        unawaited(_savePosition(state, words.first, 0));
+        _autoPlayFirstWord(words.first);
+      }
+    });
+  }
+
+  Future<void> _confirmResume(
+    StudySession session,
+    List<Vocabulary> words,
+  ) async {
+    final resumeIndex = session.resolveIndex(
+      words.map((word) => word.id).toList(),
+    );
+    setImmersiveOuterBackgroundColor(
+      Color.alphaBlend(
+        _resumeDialogBarrierColor,
+        Theme.of(context).scaffoldBackgroundColor,
+      ),
+    );
+    setState(() => _resumeDialogVisible = true);
+    bool? shouldResume;
+    try {
+      final dialogResult = showDialog<bool>(
+        context: context,
+        barrierColor: _resumeDialogBarrierColor,
+        barrierDismissible: false,
+        builder: (dialogContext) => wrapImmersiveSystemBarGesture(
+          PopScope(
+            canPop: false,
+            child: AlertDialog(
+              title: Text(dialogContext.strings('resumeConfirmTitle')),
+              content: Text(
+                '${dialogContext.strings('day')} ${session.day} · ${resumeIndex + 1}/${words.length}\n${dialogContext.strings('resumeConfirmBody')}',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext, false),
+                  child: Text(dialogContext.strings('chooseAnotherDay')),
+                ),
+                FilledButton(
+                  onPressed: () => Navigator.pop(dialogContext, true),
+                  child: Text(dialogContext.strings('continue')),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      _applySystemBarColorAfterFrame(modalVisible: true);
+      shouldResume = await dialogResult;
+    } finally {
+      if (mounted) {
+        setImmersiveOuterBackgroundColor(null);
+        setState(() => _resumeDialogVisible = false);
+        reassertImmersiveMode();
+        _applySystemBarColorAfterFrame(modalVisible: false);
+      }
+    }
+    if (!mounted || shouldResume == null) return;
+    _resumeDecisionPending = false;
+    if (!shouldResume) {
+      context.pushReplacement('/study');
+      return;
+    }
+
+    if (resumeIndex == 0) {
+      // Resuming on the first word never changes the page, so the page-change
+      // handler cannot play it.
+      _autoPlayFirstWord(words.first);
+      return;
+    }
+    _suppressAutoAudio = true;
+    _pageController!.jumpToPage(resumeIndex);
+  }
+
+  void _applySystemBarColorAfterFrame({required bool modalVisible}) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _resumeDialogVisible != modalVisible) return;
+      final scaffoldBackgroundColor = Theme.of(context).scaffoldBackgroundColor;
+      final color = modalVisible
+          ? Color.alphaBlend(_resumeDialogBarrierColor, scaffoldBackgroundColor)
+          : scaffoldBackgroundColor;
+      applyImmersiveSystemBarColor(color);
+    });
+  }
+
+  Future<void> _savePosition(AppState state, Vocabulary word, int index) {
+    return ref
+        .read(appControllerProvider.notifier)
+        .saveStudySession(
+          StudySession(
+            level: state.selectedLevel,
+            day: widget.day,
+            wordId: word.id,
+            indexFallback: index,
+            dailyGoal: state.dailyGoal,
+            updatedAt: DateTime.now(),
+          ),
+        );
+  }
+
+  /// The first word is on screen from the start, so no page change fires to
+  /// trigger automatic pronunciation for it.
+  void _autoPlayFirstWord(Vocabulary word) {
+    if (!mounted) return;
+    if (ref.read(appControllerProvider).value?.autoPlayAudio ?? false) {
+      _speak(word.word);
+    }
+  }
+
+  void _speak(String text) {
+    _ttsService ??= ref.read(ttsServiceProvider);
+    unawaited(_ttsService!.speak(text));
+  }
+
+  Future<void> _speakIfAudible(String text) async {
+    // Slider mode sets the device volume itself when speaking, so only the
+    // level chosen there can make speech inaudible.
+    final settings = ref.read(appControllerProvider).value;
+    final tooQuiet = settings?.ttsVolumeMode == TtsVolumeMode.slider
+        ? settings!.ttsVolume <= lowVolumeThreshold
+        : await isSystemVolumeTooLow();
+    if (tooQuiet) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(context.strings('lowVolumeBody'))));
+      return;
+    }
+    if (!mounted) return;
+    _speak(text);
+  }
+
+  Future<void> _handlePageChanged({
+    required int index,
+    required List<Vocabulary> words,
+    required AppState state,
+  }) async {
+    final request = ++_pageChangeRequest;
+    if (_ttsService != null) await _ttsService!.stop();
+    if (!mounted || request != _pageChangeRequest) return;
+
+    if (index == words.length) {
+      await _finishStudying();
+      return;
+    }
+    setState(() => _index = index);
+    if (_resumeDecisionPending) return;
+    unawaited(_savePosition(state, words[index], index));
+    if (state.autoPlayAudio && !_suppressAutoAudio) {
+      _speak(words[index].word);
+    }
+    _suppressAutoAudio = false;
+  }
+
+  Future<void> _finishStudying() async {
+    if (_ttsService != null) {
+      await _ttsService!.stop();
+      _ttsService = null;
+    }
+    if (mounted) {
+      context.pushReplacement('/study/day/${widget.day}/finish');
+    }
+  }
 }
 
 class _StudyCard extends StatelessWidget {
@@ -104,148 +374,287 @@ class _StudyCard extends StatelessWidget {
     required this.vocabulary,
     required this.language,
     required this.showFurigana,
-    required this.onToggleFurigana,
-    required this.onSpeak,
-    required this.onReview,
+    required this.hideWord,
+    required this.hideMeaning,
+    required this.hideTranslation,
+    required this.maskMeaningInTranslation,
+    required this.onSpeakWord,
+    required this.onSpeakExample,
   });
 
   final Vocabulary vocabulary;
   final String language;
   final bool showFurigana;
-  final VoidCallback onToggleFurigana;
-  final VoidCallback onSpeak;
-  final VoidCallback onReview;
+  final bool hideWord;
+  final bool hideMeaning;
+  final bool hideTranslation;
+  final bool maskMeaningInTranslation;
+  final VoidCallback onSpeakWord;
+  final VoidCallback onSpeakExample;
+
+  /// The romaji spells out the reading, so it is taped whenever both the word
+  /// and the reading are hidden; otherwise it would give the word away.
+  bool get _hideRomaji => hideWord && !showFurigana;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(32),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
-            blurRadius: 28,
-            offset: const Offset(0, 12),
-          ),
-        ],
-      ),
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(24, 26, 24, 24),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Chip(
-                  label: Text('${vocabulary.jlptLevel} · #${vocabulary.rank}'),
-                ),
-                if (vocabulary.partOfSpeech != 'word') ...[
-                  const SizedBox(width: 6),
-                  Chip(label: Text(vocabulary.partOfSpeech)),
-                ],
-              ],
-            ),
-            const SizedBox(height: 44),
-            AnimatedOpacity(
-              opacity: showFurigana ? 1 : 0,
-              duration: const Duration(milliseconds: 180),
-              child: Text(
-                vocabulary.reading,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-              ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              vocabulary.word,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 56,
-                height: 1.15,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              vocabulary.romaji,
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: 28),
-            Text(
-              vocabulary.meaning(language),
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            if (vocabulary.hasExample) ...[
-              const SizedBox(height: 34),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  borderRadius: BorderRadius.circular(22),
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      vocabulary.example.sentence,
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    if (showFurigana) ...[
-                      const SizedBox(height: 6),
-                      Text(
-                        vocabulary.example.reading,
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                    const SizedBox(height: 10),
-                    Text(
-                      vocabulary.example.translation(language),
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-            const SizedBox(height: 28),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _CardAction(
-                  icon: Icons.volume_up_rounded,
-                  label: 'Audio',
-                  onTap: onSpeak,
-                ),
-                _CardAction(
-                  icon: showFurigana
-                      ? Icons.visibility_off_rounded
-                      : Icons.visibility_rounded,
-                  label: showFurigana
-                      ? context.strings('hideReading')
-                      : context.strings('showReading'),
-                  onTap: onToggleFurigana,
-                ),
-                _CardAction(
-                  icon: Icons.bookmark_add_outlined,
-                  label: context.strings('markReview'),
-                  onTap: onReview,
-                ),
-              ],
+    return _centeredScrollable(
+      padding: const EdgeInsets.fromLTRB(24, 26, 24, 24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _buildReading(context),
+          const SizedBox(height: 6),
+          _buildWord(context),
+          const SizedBox(height: 10),
+          _buildRomaji(context),
+          const SizedBox(height: 8),
+          _buildMeaning(context),
+          if (vocabulary.hasExample) ...[
+            const SizedBox(height: 34),
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: _buildExample(context),
             ),
           ],
+        ],
+      ),
+    );
+  }
+
+  Widget _centeredScrollable({
+    required EdgeInsets padding,
+    required Widget child,
+  }) {
+    return LayoutBuilder(
+      builder: (context, constraints) => SingleChildScrollView(
+        padding: padding,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            minHeight: math.max(0, constraints.maxHeight - padding.vertical),
+          ),
+          child: Center(child: child),
         ),
       ),
     );
   }
+
+  Widget _buildReading(BuildContext context) {
+    final hasReading = vocabulary.reading != vocabulary.word;
+    final titleLarge = Theme.of(context).textTheme.titleLarge;
+    return AnimatedOpacity(
+      opacity: hasReading ? 1 : 0,
+      duration: const Duration(milliseconds: 180),
+      child: IgnorePointer(
+        ignoring: !hasReading,
+        child: _speechTarget(
+          onTap: onSpeakWord,
+          child: showFurigana
+              ? Text(
+                  vocabulary.reading,
+                  style: titleLarge?.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                )
+              : coverTapeFor(
+                  characters: vocabulary.reading.length,
+                  fontSize: titleLarge?.fontSize ?? 22,
+                  maxWidth: 220,
+                  glyphWidth: 0.9,
+                ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWord(BuildContext context) => Semantics(
+    button: true,
+    child: InkWell(
+      borderRadius: BorderRadius.circular(16),
+      splashFactory: NoSplash.splashFactory,
+      overlayColor: const WidgetStatePropertyAll(Colors.transparent),
+      onTap: onSpeakWord,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: hideWord
+              ? coverTapeFor(
+                  characters: vocabulary.word.length,
+                  fontSize: 56 * 1.15,
+                  tilt: -0.02,
+                )
+              : Text(
+                  vocabulary.word,
+                  maxLines: 1,
+                  softWrap: false,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 56,
+                    height: 1.15,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+        ),
+      ),
+    ),
+  );
+
+  Widget _buildRomaji(BuildContext context) => _speechTarget(
+    onTap: onSpeakWord,
+    child: _hideRomaji
+        ? coverTapeFor(
+            characters: vocabulary.romaji.length,
+            fontSize: 14,
+            maxWidth: 160,
+            glyphWidth: 0.6,
+            tilt: 0.01,
+          )
+        : Text(
+            vocabulary.romaji,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
+  );
+
+  Widget _speechTarget({required VoidCallback onTap, required Widget child}) =>
+      Semantics(
+        button: true,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          splashFactory: NoSplash.splashFactory,
+          overlayColor: const WidgetStatePropertyAll(Colors.transparent),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            child: child,
+          ),
+        ),
+      );
+
+  Widget _buildMeaning(BuildContext context) {
+    final style = Theme.of(context).textTheme.headlineMedium;
+    final meaning = vocabulary.meaning(language);
+    if (!hideMeaning) {
+      return Text(meaning, textAlign: TextAlign.center, style: style);
+    }
+    return coverTapeFor(
+      characters: meaning.length,
+      fontSize: style?.fontSize ?? 28,
+      maxWidth: 260,
+      glyphWidth: 0.7,
+      tilt: 0.015,
+    );
+  }
+
+  Widget _buildExample(BuildContext context) {
+    final sentenceStyle = Theme.of(context).textTheme.titleLarge;
+    final translationStyle = TextStyle(
+      color: Theme.of(context).colorScheme.onSurfaceVariant,
+    );
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Semantics(
+          button: true,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(12),
+            splashFactory: NoSplash.splashFactory,
+            overlayColor: const WidgetStatePropertyAll(Colors.transparent),
+            onTap: onSpeakExample,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              child: _maskedText(
+                _withRolePlayLineBreaks(vocabulary.example.sentence),
+                style: sentenceStyle,
+                targets: hideWord ? wordMaskTargets(vocabulary.word) : const [],
+                glyphWidth: 1,
+              ),
+            ),
+          ),
+        ),
+        if (showFurigana) ...[
+          const SizedBox(height: 6),
+          _speechTarget(
+            onTap: onSpeakExample,
+            child: Text(
+              _withRolePlayLineBreaks(vocabulary.example.reading),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
+        const SizedBox(height: 4),
+        _buildTranslation(context, translationStyle),
+      ],
+    );
+  }
+
+  Widget _buildTranslation(BuildContext context, TextStyle style) {
+    final translation = _withRolePlayLineBreaks(
+      vocabulary.example.translation(language),
+    );
+    if (hideTranslation) {
+      return coverTapeFor(
+        characters: translation.length,
+        fontSize: 16,
+        maxWidth: 280,
+        glyphWidth: 0.5,
+        tilt: -0.01,
+      );
+    }
+    return _maskedText(
+      translation,
+      style: style,
+      targets: maskMeaningInTranslation
+          ? meaningMaskTargets(
+              vocabulary.meanings[language] ??
+                  vocabulary.meanings['en'] ??
+                  const [],
+            )
+          : const [],
+      glyphWidth: 0.55,
+    );
+  }
+
+  /// Renders [text] centered, laying tape over every run matching [targets].
+  Widget _maskedText(
+    String text, {
+    required TextStyle? style,
+    required List<String> targets,
+    required double glyphWidth,
+  }) {
+    if (targets.isEmpty) {
+      return Text(text, textAlign: TextAlign.center, style: style);
+    }
+    final fontSize = style?.fontSize ?? 14;
+    return Text.rich(
+      TextSpan(
+        style: style,
+        children: [
+          for (final segment in maskSegments(text, targets))
+            if (segment.covered)
+              WidgetSpan(
+                alignment: PlaceholderAlignment.middle,
+                child: coverTapeFor(
+                  characters: segment.text.length,
+                  fontSize: fontSize,
+                  glyphWidth: glyphWidth,
+                ),
+              )
+            else
+              TextSpan(text: segment.text),
+        ],
+      ),
+      textAlign: TextAlign.center,
+    );
+  }
 }
+
+String _withRolePlayLineBreaks(String text) => text.replaceAllMapped(
+  RegExp(r'([.!?。！？])\s*(?=[A-Za-z][A-Za-z0-9]{0,2}\s*[：:])'),
+  (match) => '${match.group(1)}\n',
+);
 
 class _CardAction extends StatelessWidget {
   const _CardAction({
@@ -261,6 +670,8 @@ class _CardAction extends StatelessWidget {
   Widget build(BuildContext context) => Expanded(
     child: InkWell(
       borderRadius: BorderRadius.circular(16),
+      splashFactory: NoSplash.splashFactory,
+      highlightColor: Colors.transparent,
       onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 3),

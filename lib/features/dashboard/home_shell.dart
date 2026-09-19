@@ -1,35 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/features/dashboard/dashboard_screen.dart';
+import 'package:jlpt_practice/features/dashboard/home_tab_provider.dart';
+import 'package:jlpt_practice/features/profile/profile_screen.dart';
 import 'package:jlpt_practice/features/settings/settings_screen.dart';
 import 'package:jlpt_practice/features/statistics/statistics_screen.dart';
-import 'package:jlpt_practice/features/vocabulary/vocabulary_list_screen.dart';
 
-class HomeShell extends StatefulWidget {
+class HomeShell extends ConsumerWidget {
   const HomeShell({super.key});
-
-  @override
-  State<HomeShell> createState() => _HomeShellState();
-}
-
-class _HomeShellState extends State<HomeShell> {
-  int _index = 0;
 
   static const _screens = [
     DashboardScreen(),
-    VocabularyListScreen(),
     StatisticsScreen(),
+    ProfileScreen(),
     SettingsScreen(),
   ];
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final strings = context.strings;
+    final index = ref.watch(homeTabIndexProvider);
     return Scaffold(
-      body: IndexedStack(index: _index, children: _screens),
+      body: IndexedStack(index: index, children: _screens),
       bottomNavigationBar: NavigationBar(
-        selectedIndex: _index,
-        onDestinationSelected: (value) => setState(() => _index = value),
+        selectedIndex: index,
+        onDestinationSelected: (value) =>
+            ref.read(homeTabIndexProvider.notifier).select(value),
         destinations: [
           NavigationDestination(
             icon: const Icon(Icons.home_outlined),
@@ -37,14 +34,14 @@ class _HomeShellState extends State<HomeShell> {
             label: strings('home'),
           ),
           NavigationDestination(
-            icon: const Icon(Icons.menu_book_outlined),
-            selectedIcon: const Icon(Icons.menu_book_rounded),
-            label: strings('words'),
-          ),
-          NavigationDestination(
             icon: const Icon(Icons.bar_chart_outlined),
             selectedIcon: const Icon(Icons.bar_chart_rounded),
             label: strings('progress'),
+          ),
+          NavigationDestination(
+            icon: const Icon(Icons.person_outline_rounded),
+            selectedIcon: const Icon(Icons.person_rounded),
+            label: strings('me'),
           ),
           NavigationDestination(
             icon: const Icon(Icons.tune_rounded),

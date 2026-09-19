@@ -24,11 +24,20 @@ service cloud.firestore {
       allow create, update, delete: if false;
     }
 
+    // Only trusted Admin SDK code (for example Cloud Functions) may enqueue or
+    // inspect push jobs. Admin SDK requests bypass Firestore Security Rules.
+    match /notificationJobs/{jobId} {
+      allow read, write: if false;
+    }
+
     match /users/{userId} {
       allow read: if owns(userId);
       allow create: if owns(userId)
-        && request.resource.data.isAnonymous == true;
+        && request.resource.data.isAnonymous is bool
+        && request.resource.data.isAnonymous
+          == (request.auth.token.firebase.sign_in_provider == 'anonymous');
       allow update: if owns(userId)
+        && request.resource.data.isAnonymous is bool
         && (!('selectedJlptLevel' in request.resource.data)
           || validLevel(request.resource.data.selectedJlptLevel))
         && (!('dailyGoal' in request.resource.data)
@@ -47,8 +56,25 @@ service cloud.firestore {
           ];
       }
 
-      match /{document=**} {
-        allow read, write: if owns(userId);
+      match /devices/{deviceId} {
+        allow read, delete: if owns(userId);
+        allow create, update: if owns(userId)
+          && request.resource.data.keys().hasOnly([
+            'token', 'platform', 'enabled', 'updatedAt'
+          ])
+          && request.resource.data.token is string
+          && request.resource.data.token.size() >= 20
+          && request.resource.data.token.size() <= 4096
+          && request.resource.data.platform in ['android', 'ios']
+          && request.resource.data.enabled is bool
+          && request.resource.data.updatedAt is timestamp;
+      }
+
+      match /{collection}/{document=**} {
+        // Keep the general per-user storage behavior while ensuring the
+        // stricter schemas above cannot be bypassed by this recursive rule.
+        allow read, write: if owns(userId)
+          && !(collection in ['devices', 'vocabularyProgress']);
       }
     }
   }

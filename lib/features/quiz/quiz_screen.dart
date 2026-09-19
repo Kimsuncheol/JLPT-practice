@@ -1,13 +1,20 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/ads/ad_service.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
+import 'package:jlpt_practice/core/utils/study_batches.dart';
 import 'package:jlpt_practice/data/models/quiz.dart';
 
 class QuizScreen extends ConsumerStatefulWidget {
-  const QuizScreen({super.key});
+  const QuizScreen({this.day, super.key});
+
+  /// When set, the quiz is scoped to that study day's vocabulary instead of
+  /// the whole selected level.
+  final int? day;
 
   @override
   ConsumerState<QuizScreen> createState() => _QuizScreenState();
@@ -22,13 +29,55 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
   int _correct = 0;
   final List<String> _incorrectIds = [];
   late final DateTime _startedAt = DateTime.now();
+  Timer? _autoAdvanceTimer;
+
+  @override
+  void dispose() {
+    _autoAdvanceTimer?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _advance() async {
+    _autoAdvanceTimer?.cancel();
+    final questions = _questions!;
+    if (_index < questions.length - 1) {
+      setState(() {
+        _index++;
+        _selected = null;
+        _answered = false;
+        _hintRevealed = false;
+      });
+      return;
+    }
+    final result = QuizResult(
+      total: questions.length,
+      correct: _correct,
+      duration: DateTime.now().difference(_startedAt),
+      incorrectIds: List.unmodifiable(_incorrectIds),
+    );
+    await ref
+        .read(appControllerProvider.notifier)
+        .recordQuizResult(result, questions);
+    if (mounted) context.go('/quiz/result');
+  }
 
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(appControllerProvider).requireValue;
-    _questions ??= ref
-        .read(quizRepositoryProvider)
-        .buildQuestions(state.vocabulary, level: state.selectedLevel);
+    _questions ??= widget.day != null
+        ? ref
+              .read(quizRepositoryProvider)
+              .buildQuestions(
+                StudyBatches.wordsForDay(
+                  state.selectedVocabulary,
+                  day: widget.day!,
+                  dailyGoal: state.dailyGoal,
+                ),
+                count: state.dailyGoal,
+              )
+        : ref
+              .read(quizRepositoryProvider)
+              .buildQuestions(state.vocabulary, level: state.selectedLevel);
     final questions = _questions!;
     if (questions.isEmpty) {
       return Scaffold(
@@ -123,20 +172,28 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
                       Align(
                         alignment: Alignment.centerRight,
                         child: TextButton.icon(
-                          onPressed: AdService.enabled
-                              ? () async {
-                                  final earned = await AdService.showRewarded();
-                                  if (earned && mounted) {
-                                    setState(() => _hintRevealed = true);
-                                  }
-                                }
-                              : () => setState(() => _hintRevealed = true),
+                          onPressed: () async {
+                            if (_hintRevealed) {
+                              setState(() => _hintRevealed = false);
+                              return;
+                            }
+                            if (AdService.enabled) {
+                              final earned = await AdService.showRewarded();
+                              if (earned && mounted) {
+                                setState(() => _hintRevealed = true);
+                              }
+                            } else {
+                              setState(() => _hintRevealed = true);
+                            }
+                          },
                           icon: Icon(
-                            AdService.enabled
+                            _hintRevealed
+                                ? Icons.lightbulb_rounded
+                                : AdService.enabled
                                 ? Icons.ondemand_video_rounded
                                 : Icons.lightbulb_outline_rounded,
                           ),
-                          label: const Text('Hint'),
+                          label: Text(_hintRevealed ? 'Hide Hint' : 'Hint'),
                         ),
                       ),
                     if (_hintRevealed && !_answered)
@@ -192,6 +249,11 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
                                         );
                                       }
                                     });
+                                    _autoAdvanceTimer?.cancel();
+                                    _autoAdvanceTimer = Timer(
+                                      const Duration(milliseconds: 1400),
+                                      _advance,
+                                    );
                                   },
                             borderRadius: BorderRadius.circular(19),
                             child: Padding(
@@ -263,42 +325,6 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
                         ),
                       ),
                   ],
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(22, 10, 22, 18),
-              child: FilledButton(
-                onPressed: !_answered
-                    ? null
-                    : () async {
-                        if (_index < questions.length - 1) {
-                          setState(() {
-                            _index++;
-                            _selected = null;
-                            _answered = false;
-                            _hintRevealed = false;
-                          });
-                          return;
-                        }
-                        final result = QuizResult(
-                          total: questions.length,
-                          correct: _correct,
-                          duration: DateTime.now().difference(_startedAt),
-                          incorrectIds: List.unmodifiable(_incorrectIds),
-                        );
-                        await ref
-                            .read(appControllerProvider.notifier)
-                            .recordQuizResult(result, questions);
-                        if (context.mounted) context.go('/quiz/result');
-                      },
-                style: FilledButton.styleFrom(
-                  minimumSize: const Size.fromHeight(56),
-                ),
-                child: Text(
-                  _index == questions.length - 1
-                      ? context.strings('seeResults')
-                      : context.strings('next'),
                 ),
               ),
             ),

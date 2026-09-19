@@ -4,8 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
+import 'package:jlpt_practice/core/ads/ad_service.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
+import 'package:jlpt_practice/core/services/day_block_access.dart';
+import 'package:jlpt_practice/core/services/cloud_sync_service.dart';
 import 'package:jlpt_practice/core/utils/study_batches.dart';
+import 'package:jlpt_practice/features/vocabulary/day_selection_skeleton.dart';
 
 class DaySelectionScreen extends ConsumerStatefulWidget {
   const DaySelectionScreen({super.key});
@@ -17,11 +21,101 @@ class DaySelectionScreen extends ConsumerStatefulWidget {
 class _DaySelectionScreenState extends ConsumerState<DaySelectionScreen> {
   final ScrollController _scrollController = ScrollController();
   String? _lastFocusSignature;
+  String? _rewardedLevel;
+  Set<int> _rewardedDays = const {};
 
   @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
+  }
+
+  void _ensureRewardedDaysLoaded(String level) {
+    if (_rewardedLevel == level) return;
+    _rewardedLevel = level;
+    _rewardedDays = const {};
+    DayBlockAccess.rewardedDays(level).then((days) {
+      if (!mounted || _rewardedLevel != level) return;
+      setState(() => _rewardedDays = days);
+    });
+  }
+
+  Future<void> _handleDayTap(
+    String level,
+    int day,
+    Set<int> completedDays,
+  ) async {
+    if (completedDays.contains(day)) {
+      if (mounted) context.push('/study/day/$day');
+      return;
+    }
+
+    final strings = context.strings;
+    if (!DayBlockAccess.prerequisitesComplete(day, completedDays)) {
+      await showDialog<void>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: Text(strings('finishPreviousDaysTitle')),
+          content: Text(
+            strings('finishPreviousDaysBody').replaceAll('{day}', '${day - 1}'),
+          ),
+          actions: [
+            FilledButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(strings('ok')),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    if (!DayBlockAccess.requiresRewardedAd(day) ||
+        _rewardedDays.contains(day)) {
+      if (mounted) context.push('/study/day/$day');
+      return;
+    }
+
+    final persistedRewardedDays = await DayBlockAccess.rewardedDays(level);
+    if (!mounted) return;
+    if (persistedRewardedDays.contains(day)) {
+      setState(() => _rewardedDays = persistedRewardedDays);
+      context.push('/study/day/$day');
+      return;
+    }
+
+    final proceed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(strings('unlockDaysTitle').replaceAll('{day}', '$day')),
+        content: Text(strings('unlockDaysBody').replaceAll('{day}', '$day')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(strings('cancel')),
+          ),
+          FilledButton.icon(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            icon: const Icon(Icons.ondemand_video_rounded),
+            label: Text(strings('watchAd')),
+          ),
+        ],
+      ),
+    );
+    if (proceed != true || !mounted) return;
+
+    final earned = AdService.enabled ? await AdService.showRewarded() : true;
+    if (!earned || !mounted) return;
+
+    await DayBlockAccess.unlockRewardedDay(level, day);
+    try {
+      await const CloudSyncService().syncAccess();
+    } on Object {
+      // The local unlock remains available while offline.
+    }
+    if (!mounted) return;
+    setState(() => _rewardedDays = {..._rewardedDays, day});
+    context.push('/study/day/$day');
   }
 
   @override
@@ -30,29 +124,17 @@ class _DaySelectionScreenState extends ConsumerState<DaySelectionScreen> {
     return Scaffold(
       appBar: AppBar(title: Text(context.strings('chooseStudyDay'))),
       body: asyncState.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const DaySelectionSkeleton(),
         error: (error, _) => Center(child: Text(error.toString())),
         data: (state) {
+          _ensureRewardedDaysLoaded(state.selectedLevel);
           final words = state.selectedVocabulary;
           final dayCount = StudyBatches.count(words.length, state.dailyGoal);
-          final completedByDay = List.generate(dayCount, (index) {
-            final batch = StudyBatches.wordsForDay(
-              words,
-              day: index + 1,
-              dailyGoal: state.dailyGoal,
-            );
-            return batch
-                .where((word) => state.progress.containsKey(word.id))
-                .length;
-          });
+          final completedDays =
+              state.completedStudyDays[state.selectedLevel] ?? const <int>{};
           final nextIndex = List.generate(dayCount, (index) => index)
               .indexWhere((index) {
-                final batchLength = StudyBatches.wordsForDay(
-                  words,
-                  day: index + 1,
-                  dailyGoal: state.dailyGoal,
-                ).length;
-                return completedByDay[index] < batchLength;
+                return !completedDays.contains(index + 1);
               });
           final focusIndex = nextIndex >= 0
               ? nextIndex
@@ -143,16 +225,17 @@ class _DaySelectionScreenState extends ConsumerState<DaySelectionScreen> {
                         itemCount: dayCount,
                         itemBuilder: (context, index) {
                           final day = index + 1;
-                          final batchLength = StudyBatches.wordsForDay(
-                            words,
-                            day: day,
-                            dailyGoal: state.dailyGoal,
-                          ).length;
-                          final isComplete =
-                              completedByDay[index] == batchLength;
+                          final isComplete = completedDays.contains(day);
                           final isNext = index == nextIndex;
+                          final isLocked = !DayBlockAccess.canStudy(
+                            day: day,
+                            completedDays: completedDays,
+                            rewardedDays: _rewardedDays,
+                          );
                           final foreground = isNext
                               ? Theme.of(context).colorScheme.onPrimary
+                              : isLocked
+                              ? Theme.of(context).colorScheme.onSurfaceVariant
                               : Theme.of(context).colorScheme.onSurface;
                           return Material(
                             color: isNext
@@ -163,19 +246,34 @@ class _DaySelectionScreenState extends ConsumerState<DaySelectionScreen> {
                             borderRadius: BorderRadius.circular(24),
                             child: InkWell(
                               borderRadius: BorderRadius.circular(24),
-                              onTap: () => context.push('/study/day/$day'),
+                              onTap: () => _handleDayTap(
+                                state.selectedLevel,
+                                day,
+                                completedDays,
+                              ),
                               child: Padding(
                                 padding: const EdgeInsets.all(8),
                                 child: Center(
                                   child: FittedBox(
                                     fit: BoxFit.scaleDown,
-                                    child: Text(
-                                      '${context.strings('day')} $day',
-                                      maxLines: 1,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium
-                                          ?.copyWith(color: foreground),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          '${context.strings('day')} $day',
+                                          maxLines: 1,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleMedium
+                                              ?.copyWith(color: foreground),
+                                        ),
+                                        if (isLocked)
+                                          Icon(
+                                            Icons.lock_outline_rounded,
+                                            size: 16,
+                                            color: foreground,
+                                          ),
+                                      ],
                                     ),
                                   ),
                                 ),
