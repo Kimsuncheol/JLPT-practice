@@ -10,6 +10,7 @@ import 'package:jlpt_practice/core/services/local_store.dart';
 import 'package:jlpt_practice/core/services/notification_service.dart';
 import 'package:jlpt_practice/core/services/srs_scheduler.dart';
 import 'package:jlpt_practice/core/services/tts_service.dart';
+import 'package:jlpt_practice/core/services/japanese_tts_service.dart';
 import 'package:jlpt_practice/data/models/app_state.dart';
 import 'package:jlpt_practice/data/models/mock_test.dart';
 import 'package:jlpt_practice/data/models/quiz.dart';
@@ -26,8 +27,8 @@ final vocabularyRepositoryProvider = Provider(
 final quizRepositoryProvider = Provider((ref) => QuizRepository());
 final srsSchedulerProvider = Provider((ref) => const SrsScheduler());
 final cloudSyncProvider = Provider((ref) => const CloudSyncService());
-final ttsServiceProvider = Provider((ref) {
-  final service = TtsService(
+final Provider<TtsService> ttsServiceProvider = Provider((ref) {
+  final service = JapaneseTtsService(
     volumePreference: () {
       final state = ref.read(appControllerProvider).value;
       return TtsVolumePreference(
@@ -35,6 +36,7 @@ final ttsServiceProvider = Provider((ref) {
         level: state?.ttsVolume ?? 0.5,
       );
     },
+    voiceId: () => ref.read(appControllerProvider).value?.ttsVoiceId ?? 'f1',
   );
   ref.onDispose(service.dispose);
   return service;
@@ -87,6 +89,7 @@ class AppController extends AsyncNotifier<AppState> {
       meaningCoverMode: settings.meaningCoverMode,
       ttsVolumeMode: settings.ttsVolumeMode,
       ttsVolume: settings.ttsVolume,
+      ttsVoiceId: settings.ttsVoiceId,
       autoReviewEnabled: settings.autoReviewEnabled,
       autoReviewOrder: settings.autoReviewOrder,
       autoReviewSeconds: settings.autoReviewSeconds,
@@ -411,6 +414,11 @@ class AppController extends AsyncNotifier<AppState> {
       return current.copyWith(ttsVolume: level);
     });
   }
+
+  Future<void> setTtsVoiceId(String value) =>
+      _updatePreference('ttsVoiceId', value, (current) {
+        return current.copyWith(ttsVoiceId: value);
+      });
 
   Future<void> setAutoReviewEnabled(bool value) =>
       _updatePreference('autoReviewEnabled', value, (current) {

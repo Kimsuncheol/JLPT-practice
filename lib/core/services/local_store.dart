@@ -27,6 +27,7 @@ class LocalSettings {
     this.meaningCoverMode = MeaningCoverMode.meaningAndTranslation,
     this.ttsVolumeMode = TtsVolumeMode.system,
     this.ttsVolume = 0.5,
+    this.ttsVoiceId = 'f1',
     this.autoReviewEnabled = false,
     this.autoReviewOrder = AutoReviewOrder.defaultOrder,
     this.autoReviewSeconds = 3,
@@ -57,6 +58,7 @@ class LocalSettings {
   final MeaningCoverMode meaningCoverMode;
   final TtsVolumeMode ttsVolumeMode;
   final double ttsVolume;
+  final String ttsVoiceId;
   final bool autoReviewEnabled;
   final AutoReviewOrder autoReviewOrder;
   final int autoReviewSeconds;
@@ -117,6 +119,7 @@ class LocalStore {
         _preferences.getString('ttsVolumeMode'),
       ),
       ttsVolume: (_preferences.getDouble('ttsVolume') ?? 0.5).clamp(0.0, 1.0),
+      ttsVoiceId: _preferences.getString('ttsVoiceId') ?? 'f1',
       autoReviewEnabled: _preferences.getBool('autoReviewEnabled') ?? false,
       autoReviewOrder: AutoReviewOrder.parse(
         _preferences.getString('autoReviewOrder'),
@@ -154,6 +157,7 @@ class LocalStore {
       setValue('meaningCoverMode', state.meaningCoverMode.name),
       setValue('ttsVolumeMode', state.ttsVolumeMode.name),
       setValue('ttsVolume', state.ttsVolume),
+      setValue('ttsVoiceId', state.ttsVoiceId),
       setValue('autoReviewEnabled', state.autoReviewEnabled),
       setValue('autoReviewOrder', state.autoReviewOrder.id),
       setValue('autoReviewSeconds', state.autoReviewSeconds),
@@ -348,6 +352,7 @@ class LocalStore {
       'meaningCoverMode',
       'ttsVolumeMode',
       'ttsVolume',
+      'ttsVoiceId',
       'autoReviewEnabled',
       'autoReviewOrder',
       'autoReviewSeconds',

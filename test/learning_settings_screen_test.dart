@@ -13,6 +13,7 @@ import 'package:jlpt_practice/features/settings/learning_language_screen.dart';
 import 'package:jlpt_practice/features/settings/learning_settings_screen.dart';
 import 'package:jlpt_practice/features/settings/recall_cover_screen.dart';
 import 'package:jlpt_practice/features/settings/tts_volume_screen.dart';
+import 'package:jlpt_practice/features/settings/tts_settings_screen.dart';
 import 'package:jlpt_practice/shared/eye_comfort_overlay.dart';
 
 void main() {
@@ -43,6 +44,10 @@ void main() {
         GoRoute(
           path: '/settings/auto-review',
           builder: (_, _) => const AutoReviewScreen(),
+        ),
+        GoRoute(
+          path: '/settings/tts',
+          builder: (_, _) => const TtsSettingsScreen(),
         ),
         GoRoute(
           path: '/settings/tts-volume',
@@ -169,7 +174,7 @@ void main() {
     );
   });
 
-  testWidgets('wires to the recall cover, volume and eye comfort screens', (
+  testWidgets('wires to recall, voice, volume and eye comfort screens', (
     tester,
   ) async {
     await pump(tester, const LearningSettingsScreen());
@@ -177,6 +182,7 @@ void main() {
 
     for (final (tile, screen) in [
       ('Hide and recall', RecallCoverScreen),
+      ('Japanese Voice & TTS Settings', TtsSettingsScreen),
       ('Pronunciation volume', TtsVolumeScreen),
       ('Eye comfort mode', EyeComfortScreen),
     ]) {
@@ -187,6 +193,22 @@ void main() {
       await tester.pageBack();
       await tester.pumpAndSettle();
     }
+  });
+
+  testWidgets('Japanese voice selection is stored in app state', (
+    tester,
+  ) async {
+    final container = await pump(tester, const TtsSettingsScreen());
+    AppState state() => container.read(appControllerProvider).requireValue;
+
+    expect(state().ttsVoiceId, 'f1');
+    expect(find.text('Aoi'), findsOneWidget);
+    expect(find.byIcon(Icons.play_circle_outline_rounded), findsNWidgets(5));
+
+    await tester.tap(find.text('Sora'));
+    await tester.pumpAndSettle();
+
+    expect(state().ttsVoiceId, 'm4');
   });
 
   testWidgets('recall cover screen edits word and meaning covers', (
@@ -333,6 +355,11 @@ class _FakeAppController extends AppController {
   @override
   Future<void> setTtsVolume(double value) async {
     state = AsyncData(state.requireValue.copyWith(ttsVolume: value));
+  }
+
+  @override
+  Future<void> setTtsVoiceId(String value) async {
+    state = AsyncData(state.requireValue.copyWith(ttsVoiceId: value));
   }
 
   @override

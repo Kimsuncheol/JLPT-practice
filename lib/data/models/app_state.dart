@@ -26,6 +26,7 @@ class AppState {
     this.meaningCoverMode = MeaningCoverMode.meaningAndTranslation,
     this.ttsVolumeMode = TtsVolumeMode.system,
     this.ttsVolume = 0.5,
+    this.ttsVoiceId = 'f1',
     this.autoReviewEnabled = false,
     this.autoReviewOrder = AutoReviewOrder.defaultOrder,
     this.autoReviewSeconds = 3,
@@ -63,6 +64,7 @@ class AppState {
   final MeaningCoverMode meaningCoverMode;
   final TtsVolumeMode ttsVolumeMode;
   final double ttsVolume;
+  final String ttsVoiceId;
   final bool autoReviewEnabled;
   final AutoReviewOrder autoReviewOrder;
   final int autoReviewSeconds;
@@ -113,6 +115,7 @@ class AppState {
     MeaningCoverMode? meaningCoverMode,
     TtsVolumeMode? ttsVolumeMode,
     double? ttsVolume,
+    String? ttsVoiceId,
     bool? autoReviewEnabled,
     AutoReviewOrder? autoReviewOrder,
     int? autoReviewSeconds,
@@ -150,6 +153,7 @@ class AppState {
       meaningCoverMode: meaningCoverMode ?? this.meaningCoverMode,
       ttsVolumeMode: ttsVolumeMode ?? this.ttsVolumeMode,
       ttsVolume: ttsVolume ?? this.ttsVolume,
+      ttsVoiceId: ttsVoiceId ?? this.ttsVoiceId,
       autoReviewEnabled: autoReviewEnabled ?? this.autoReviewEnabled,
       autoReviewOrder: autoReviewOrder ?? this.autoReviewOrder,
       autoReviewSeconds: autoReviewSeconds ?? this.autoReviewSeconds,
