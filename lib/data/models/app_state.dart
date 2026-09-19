@@ -26,6 +26,9 @@ class AppState {
     this.meaningCoverMode = MeaningCoverMode.meaningAndTranslation,
     this.ttsVolumeMode = TtsVolumeMode.system,
     this.ttsVolume = 0.5,
+    this.autoReviewEnabled = false,
+    this.autoReviewOrder = AutoReviewOrder.defaultOrder,
+    this.autoReviewSeconds = 3,
     required this.notificationsEnabled,
     this.reminderHour = 20,
     this.reminderMinute = 0,
@@ -60,6 +63,9 @@ class AppState {
   final MeaningCoverMode meaningCoverMode;
   final TtsVolumeMode ttsVolumeMode;
   final double ttsVolume;
+  final bool autoReviewEnabled;
+  final AutoReviewOrder autoReviewOrder;
+  final int autoReviewSeconds;
   final bool notificationsEnabled;
   final int reminderHour;
   final int reminderMinute;
@@ -107,6 +113,9 @@ class AppState {
     MeaningCoverMode? meaningCoverMode,
     TtsVolumeMode? ttsVolumeMode,
     double? ttsVolume,
+    bool? autoReviewEnabled,
+    AutoReviewOrder? autoReviewOrder,
+    int? autoReviewSeconds,
     bool? notificationsEnabled,
     int? reminderHour,
     int? reminderMinute,
@@ -141,6 +150,9 @@ class AppState {
       meaningCoverMode: meaningCoverMode ?? this.meaningCoverMode,
       ttsVolumeMode: ttsVolumeMode ?? this.ttsVolumeMode,
       ttsVolume: ttsVolume ?? this.ttsVolume,
+      autoReviewEnabled: autoReviewEnabled ?? this.autoReviewEnabled,
+      autoReviewOrder: autoReviewOrder ?? this.autoReviewOrder,
+      autoReviewSeconds: autoReviewSeconds ?? this.autoReviewSeconds,
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
       reminderHour: reminderHour ?? this.reminderHour,
       reminderMinute: reminderMinute ?? this.reminderMinute,
