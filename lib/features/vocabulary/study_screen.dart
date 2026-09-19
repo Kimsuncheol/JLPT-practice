@@ -162,14 +162,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: SizedBox(
               height: 82,
-              child: PageView.builder(
-                key: const ValueKey('study-action-carousel'),
-                controller: _actionPageController,
-                onPageChanged: (page) => _currentActionPage = page,
-                itemBuilder: (context, page) => page.isEven
-                    ? _primaryActionPage(state, words[_index])
-                    : _actionPage([_autoReviewTab(state)]),
-              ),
+              child: _buildActionArea(state, words[_index]),
             ),
           ),
           SafeArea(
@@ -210,6 +203,20 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
       for (var index = actions.length; index < 3; index++) const Spacer(),
     ],
   );
+
+  Widget _buildActionArea(AppState state, Vocabulary word) {
+    // The combined word/reading control leaves room for Auto review on the
+    // primary page, so a duplicate second page would serve no purpose.
+    if (word.word == word.reading) return _primaryActionPage(state, word);
+    return PageView.builder(
+      key: const ValueKey('study-action-carousel'),
+      controller: _actionPageController,
+      onPageChanged: (page) => _currentActionPage = page,
+      itemBuilder: (context, page) => page.isEven
+          ? _primaryActionPage(state, word)
+          : _actionPage([_autoReviewTab(state)]),
+    );
+  }
 
   Widget _primaryActionPage(AppState state, Vocabulary word) {
     if (_autoReviewActive(state)) {

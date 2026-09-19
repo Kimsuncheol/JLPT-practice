@@ -384,6 +384,8 @@ void main() {
     expect(find.text('Hide word'), findsNothing);
     expect(find.text('Hide word & reading'), findsOneWidget);
     expect(find.text('Auto review').hitTestable(), findsOneWidget);
+    expect(find.text('Auto review'), findsOneWidget);
+    expect(find.byKey(const ValueKey('study-action-carousel')), findsNothing);
 
     await tester.tap(find.text('Hide word & reading'));
     await tester.pumpAndSettle();
