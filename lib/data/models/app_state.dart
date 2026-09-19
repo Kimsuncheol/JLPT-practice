@@ -25,7 +25,7 @@ class AppState {
     this.hideMeanings = false,
     this.meaningCoverMode = MeaningCoverMode.meaningAndTranslation,
     this.ttsVolumeMode = TtsVolumeMode.system,
-    this.ttsVolume = 1.0,
+    this.ttsVolume = 0.5,
     required this.notificationsEnabled,
     this.reminderHour = 20,
     this.reminderMinute = 0,
