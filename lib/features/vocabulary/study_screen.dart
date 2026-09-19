@@ -39,8 +39,15 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   bool _suppressAutoAudio = false;
   int _pageChangeRequest = 0;
 
+  /// Auto review: how many of the order's elements are revealed on the
+  /// current card, the timer that reveals the next one, and the pause switch.
+  Timer? _autoTimer;
+  int _autoRevealed = 1;
+  bool _autoPaused = false;
+
   @override
   void dispose() {
+    _autoTimer?.cancel();
     _pageController?.dispose();
     if (_ttsService != null) unawaited(_ttsService!.stop());
     super.dispose();
@@ -49,6 +56,16 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   @override
   Widget build(BuildContext context) {
     final asyncState = ref.watch(appControllerProvider);
+    ref.listen(
+      appControllerProvider.select(
+        (state) => (
+          state.value == null ? null : _autoReviewActive(state.value!),
+          state.value?.autoReviewOrder,
+          state.value?.autoReviewSeconds,
+        ),
+      ),
+      (_, _) => _restartAutoReview(),
+    );
     final scaffoldBackgroundColor = Theme.of(context).scaffoldBackgroundColor;
     final systemBarColor = _resumeDialogVisible
         ? Color.alphaBlend(_resumeDialogBarrierColor, scaffoldBackgroundColor)
@@ -104,20 +121,40 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
               itemBuilder: (context, index) {
                 if (index == words.length) return const SizedBox.shrink();
                 final word = words[index];
+                final revealed = _autoReviewActive(state)
+                    ? state.autoReviewOrder.elements
+                          .take(index == _index ? _autoRevealed : 1)
+                          .toSet()
+                    : null;
+                final showFurigana = revealed == null
+                    ? _showFurigana!
+                    : revealed.contains(ReviewElement.reading);
                 return Padding(
                   padding: const EdgeInsets.fromLTRB(20, 8, 20, 14),
                   child: _StudyCard(
                     vocabulary: word,
                     language: state.meaningLanguage,
-                    showFurigana: _showFurigana!,
-                    hideWord: state.hideWord,
-                    hideMeaning:
-                        state.hideMeanings &&
-                        state.meaningCoverMode != MeaningCoverMode.translation,
-                    hideTranslation:
-                        state.hideMeanings &&
-                        state.meaningCoverMode != MeaningCoverMode.meaning,
+                    showFurigana: showFurigana,
+                    hideWord: revealed == null
+                        ? state.hideWord
+                        : !revealed.contains(ReviewElement.word),
+                    // The romaji spells out the reading, so it stays taped
+                    // whenever the reading is hidden by auto review, and
+                    // otherwise when both the word and reading are hidden.
+                    hideRomaji: revealed == null
+                        ? state.hideWord && !showFurigana
+                        : !showFurigana,
+                    hideMeaning: revealed == null
+                        ? state.hideMeanings &&
+                              state.meaningCoverMode !=
+                                  MeaningCoverMode.translation
+                        : !revealed.contains(ReviewElement.meanings),
+                    hideTranslation: revealed == null
+                        ? state.hideMeanings &&
+                              state.meaningCoverMode != MeaningCoverMode.meaning
+                        : !revealed.contains(ReviewElement.meanings),
                     maskMeaningInTranslation:
+                        revealed == null &&
                         state.hideMeanings &&
                         state.meaningCoverMode == MeaningCoverMode.meaning,
                     onSpeakWord: () => _speakIfAudible(word.reading),
@@ -132,43 +169,19 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _CardAction(
-                  icon: _showFurigana!
-                      ? Icons.visibility_off_rounded
-                      : Icons.visibility_rounded,
-                  label: context.strings(
-                    _showFurigana! ? 'hideReading' : 'showReading',
-                  ),
-                  onTap: () => setState(() => _showFurigana = !_showFurigana!),
-                ),
-                _CardAction(
-                  icon: state.hideWord
-                      ? Icons.visibility_rounded
-                      : Icons.visibility_off_rounded,
-                  label: context.strings(
-                    state.hideWord ? 'showWord' : 'hideWord',
-                  ),
-                  onTap: () => unawaited(
-                    ref
-                        .read(appControllerProvider.notifier)
-                        .setHideWord(!state.hideWord),
-                  ),
-                ),
-                _CardAction(
-                  icon: state.hideMeanings
-                      ? Icons.visibility_rounded
-                      : Icons.visibility_off_rounded,
-                  label: context.strings(
-                    state.hideMeanings ? 'showMeanings' : 'hideMeanings',
-                  ),
-                  onTap: () => unawaited(
-                    ref
-                        .read(appControllerProvider.notifier)
-                        .setHideMeanings(!state.hideMeanings),
-                  ),
-                ),
-              ],
+              children: _autoReviewActive(state)
+                  ? [
+                      _CardAction(
+                        icon: _autoPaused
+                            ? Icons.play_arrow_rounded
+                            : Icons.pause_rounded,
+                        label: context.strings(
+                          _autoPaused ? 'resumeAutoReview' : 'pauseAutoReview',
+                        ),
+                        onTap: _toggleAutoReviewPause,
+                      ),
+                    ]
+                  : _manualActions(state),
             ),
           ),
           SafeArea(
@@ -185,6 +198,38 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
       ),
     );
   }
+
+  List<Widget> _manualActions(AppState state) => [
+    _CardAction(
+      icon: _showFurigana!
+          ? Icons.visibility_off_rounded
+          : Icons.visibility_rounded,
+      label: context.strings(_showFurigana! ? 'hideReading' : 'showReading'),
+      onTap: () => setState(() => _showFurigana = !_showFurigana!),
+    ),
+    _CardAction(
+      icon: state.hideWord
+          ? Icons.visibility_rounded
+          : Icons.visibility_off_rounded,
+      label: context.strings(state.hideWord ? 'showWord' : 'hideWord'),
+      onTap: () => unawaited(
+        ref.read(appControllerProvider.notifier).setHideWord(!state.hideWord),
+      ),
+    ),
+    _CardAction(
+      icon: state.hideMeanings
+          ? Icons.visibility_rounded
+          : Icons.visibility_off_rounded,
+      label: context.strings(
+        state.hideMeanings ? 'showMeanings' : 'hideMeanings',
+      ),
+      onTap: () => unawaited(
+        ref
+            .read(appControllerProvider.notifier)
+            .setHideMeanings(!state.hideMeanings),
+      ),
+    ),
+  ];
 
   void _initializePage(List<Vocabulary> words, AppState state) {
     if (_pageController != null) return;
@@ -205,6 +250,8 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
       } else {
         unawaited(_savePosition(state, words.first, 0));
         _autoPlayFirstWord(words.first);
+        _restartAutoReview();
+        unawaited(_showAutoReviewNotice());
       }
     });
   }
@@ -267,11 +314,13 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
       context.pushReplacement('/study');
       return;
     }
+    unawaited(_showAutoReviewNotice());
 
     if (resumeIndex == 0) {
       // Resuming on the first word never changes the page, so the page-change
       // handler cannot play it.
       _autoPlayFirstWord(words.first);
+      _restartAutoReview();
       return;
     }
     _suppressAutoAudio = true;
@@ -336,6 +385,86 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
     _speak(text);
   }
 
+  /// Auto review only runs on days already finished; a day still being
+  /// studied for the first time keeps the manual controls.
+  bool _autoReviewActive(AppState state) =>
+      state.autoReviewEnabled &&
+      (state.completedStudyDays[state.selectedLevel]?.contains(widget.day) ??
+          false);
+
+  /// Tells the learner, once per visit, that auto review is switched on but
+  /// this day is not finished yet, so the cards stay manual.
+  Future<void> _showAutoReviewNotice() async {
+    final state = ref.read(appControllerProvider).value;
+    if (!mounted || state == null) return;
+    if (!state.autoReviewEnabled || _autoReviewActive(state)) return;
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => wrapImmersiveSystemBarGesture(
+        AlertDialog(
+          title: Text(dialogContext.strings('autoReviewUnavailableTitle')),
+          content: Text(dialogContext.strings('autoReviewUnavailableBody')),
+          actions: [
+            FilledButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(dialogContext.strings('autoReviewUnavailableOk')),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (mounted) reassertImmersiveMode();
+  }
+
+  /// Starts the current card over at its first element and, unless paused or
+  /// waiting on the resume dialog, schedules the next reveal.
+  void _restartAutoReview() {
+    _autoTimer?.cancel();
+    if (!mounted) return;
+    if (_autoRevealed != 1) setState(() => _autoRevealed = 1);
+    _scheduleAutoStep();
+  }
+
+  void _scheduleAutoStep() {
+    _autoTimer?.cancel();
+    final state = ref.read(appControllerProvider).value;
+    if (state == null ||
+        !_autoReviewActive(state) ||
+        _autoPaused ||
+        _resumeDecisionPending) {
+      return;
+    }
+    _autoTimer = Timer(Duration(seconds: state.autoReviewSeconds), _onAutoStep);
+  }
+
+  void _onAutoStep() {
+    if (!mounted) return;
+    final state = ref.read(appControllerProvider).value;
+    if (state == null || !_autoReviewActive(state)) return;
+    if (_autoRevealed < state.autoReviewOrder.elements.length) {
+      setState(() => _autoRevealed++);
+      _scheduleAutoStep();
+      return;
+    }
+    // Everything is revealed: move on. Past the last word this reaches the
+    // trailing page, which finishes the session.
+    unawaited(
+      _pageController?.nextPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      ),
+    );
+  }
+
+  void _toggleAutoReviewPause() {
+    setState(() => _autoPaused = !_autoPaused);
+    if (_autoPaused) {
+      _autoTimer?.cancel();
+    } else {
+      _scheduleAutoStep();
+    }
+  }
+
   Future<void> _handlePageChanged({
     required int index,
     required List<Vocabulary> words,
@@ -351,6 +480,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
     }
     setState(() => _index = index);
     if (_resumeDecisionPending) return;
+    _restartAutoReview();
     unawaited(_savePosition(state, words[index], index));
     if (state.autoPlayAudio && !_suppressAutoAudio) {
       _speak(words[index].word);
@@ -375,6 +505,7 @@ class _StudyCard extends StatelessWidget {
     required this.language,
     required this.showFurigana,
     required this.hideWord,
+    required this.hideRomaji,
     required this.hideMeaning,
     required this.hideTranslation,
     required this.maskMeaningInTranslation,
@@ -386,15 +517,12 @@ class _StudyCard extends StatelessWidget {
   final String language;
   final bool showFurigana;
   final bool hideWord;
+  final bool hideRomaji;
   final bool hideMeaning;
   final bool hideTranslation;
   final bool maskMeaningInTranslation;
   final VoidCallback onSpeakWord;
   final VoidCallback onSpeakExample;
-
-  /// The romaji spells out the reading, so it is taped whenever both the word
-  /// and the reading are hidden; otherwise it would give the word away.
-  bool get _hideRomaji => hideWord && !showFurigana;
 
   @override
   Widget build(BuildContext context) {
@@ -502,7 +630,7 @@ class _StudyCard extends StatelessWidget {
 
   Widget _buildRomaji(BuildContext context) => _speechTarget(
     onTap: onSpeakWord,
-    child: _hideRomaji
+    child: hideRomaji
         ? coverTapeFor(
             characters: vocabulary.romaji.length,
             fontSize: 14,

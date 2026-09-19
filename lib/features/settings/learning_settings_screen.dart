@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/data/models/study_preferences.dart';
+import 'package:jlpt_practice/features/settings/auto_review_screen.dart';
 
 class LearningSettingsScreen extends ConsumerWidget {
   const LearningSettingsScreen({super.key});
@@ -20,8 +21,9 @@ class LearningSettingsScreen extends ConsumerWidget {
           final controller = ref.read(appControllerProvider.notifier);
           final strings = context.strings;
           return ListView(
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
+            padding: const EdgeInsets.fromLTRB(20, 4, 20, 28),
             children: [
+              _GroupLabel(strings('groupLanguage')),
               _Group(
                 children: [
                   ListTile(
@@ -37,7 +39,7 @@ class LearningSettingsScreen extends ConsumerWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 14),
+              _GroupLabel(strings('groupReadingAudio')),
               _Group(
                 children: [
                   SwitchListTile(
@@ -52,17 +54,6 @@ class LearningSettingsScreen extends ConsumerWidget {
                     value: state.autoPlayAudio,
                     onChanged: controller.setAutoPlayAudio,
                   ),
-                ],
-              ),
-              const SizedBox(height: 14),
-              _Group(
-                children: [
-                  ListTile(
-                    leading: const Icon(Icons.layers_clear_rounded),
-                    title: Text(strings('recallCover')),
-                    trailing: const Icon(Icons.chevron_right_rounded),
-                    onTap: () => context.push('/settings/recall-cover'),
-                  ),
                   ListTile(
                     leading: const Icon(Icons.graphic_eq_rounded),
                     title: Text(strings('ttsVolume')),
@@ -74,6 +65,33 @@ class LearningSettingsScreen extends ConsumerWidget {
                     trailing: const Icon(Icons.chevron_right_rounded),
                     onTap: () => context.push('/settings/tts-volume'),
                   ),
+                ],
+              ),
+              _GroupLabel(strings('groupReview')),
+              _Group(
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.layers_clear_rounded),
+                    title: Text(strings('recallCover')),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => context.push('/settings/recall-cover'),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.play_circle_outline_rounded),
+                    title: Text(strings('autoReview')),
+                    subtitle: Text(
+                      state.autoReviewEnabled
+                          ? '${autoReviewOrderLabel(context, state.autoReviewOrder)} · ${autoReviewSecondsLabel(context, state.autoReviewSeconds)}'
+                          : strings('off'),
+                    ),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => context.push('/settings/auto-review'),
+                  ),
+                ],
+              ),
+              _GroupLabel(strings('groupDisplay')),
+              _Group(
+                children: [
                   ListTile(
                     leading: const Icon(Icons.wb_twilight_rounded),
                     title: Text(strings('eyeComfort')),
@@ -103,5 +121,21 @@ class _Group extends StatelessWidget {
     borderRadius: BorderRadius.circular(22),
     clipBehavior: Clip.antiAlias,
     child: Column(children: children),
+  );
+}
+
+class _GroupLabel extends StatelessWidget {
+  const _GroupLabel(this.text);
+  final String text;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.fromLTRB(8, 20, 8, 8),
+    child: Text(
+      text,
+      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+        color: Theme.of(context).colorScheme.onSurfaceVariant,
+      ),
+    ),
   );
 }

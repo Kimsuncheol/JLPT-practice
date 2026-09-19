@@ -12,6 +12,7 @@ import 'package:jlpt_practice/features/onboarding/onboarding_screen.dart';
 import 'package:jlpt_practice/features/quiz/quiz_result_screen.dart';
 import 'package:jlpt_practice/features/quiz/quiz_screen.dart';
 import 'package:jlpt_practice/features/settings/appearance_screen.dart';
+import 'package:jlpt_practice/features/settings/auto_review_screen.dart';
 import 'package:jlpt_practice/features/settings/eye_comfort_screen.dart';
 import 'package:jlpt_practice/features/settings/languages_screen.dart';
 import 'package:jlpt_practice/features/settings/learning_language_screen.dart';
@@ -55,6 +56,10 @@ GoRouter createAppRouter({String initialLocation = '/'}) => GoRouter(
     GoRoute(
       path: '/settings/recall-cover',
       builder: (_, _) => const EyeComfortOverlay(child: RecallCoverScreen()),
+    ),
+    GoRoute(
+      path: '/settings/auto-review',
+      builder: (_, _) => const EyeComfortOverlay(child: AutoReviewScreen()),
     ),
     GoRoute(
       path: '/settings/tts-volume',

@@ -253,6 +253,139 @@ void main() {
     expect(find.text('word'), findsOneWidget);
   });
 
+  testWidgets('auto review reveals each element in the chosen order', (
+    tester,
+  ) async {
+    final container = ProviderContainer(
+      overrides: [
+        appControllerProvider.overrideWith(
+          () => _ResumeAppController(
+            'word_0',
+            0,
+            autoReviewOrder: const AutoReviewOrder([
+              ReviewElement.meanings,
+              ReviewElement.word,
+              ReviewElement.reading,
+            ]),
+            completedDays: {2},
+          ),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container.read(appControllerProvider.future);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const MaterialApp(home: StudyScreen(day: 2)),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Auto review is not available yet'), findsNothing);
+
+    // Step 1: only the meanings are shown.
+    expect(find.text('word'), findsOneWidget);
+    expect(find.text('単語6'), findsNothing);
+    expect(find.text('たんご'), findsNothing);
+    expect(find.byType(CoverTape), findsWidgets);
+
+    // Step 2: the word joins them.
+    await tester.pump(const Duration(seconds: 2));
+    expect(find.text('word'), findsOneWidget);
+    expect(find.text('単語6'), findsOneWidget);
+    expect(find.text('たんご'), findsNothing);
+
+    // Step 3: the reading completes the card.
+    await tester.pump(const Duration(seconds: 2));
+    expect(find.text('単語6'), findsOneWidget);
+    expect(find.text('たんご'), findsOneWidget);
+
+    // Then the next card starts over at its first element.
+    await tester.pump(const Duration(seconds: 2));
+    await tester.pumpAndSettle();
+    expect(find.text('単語7'), findsNothing);
+    expect(find.text('word'), findsOneWidget);
+    expect(find.text('2 / 5'), findsOneWidget);
+  });
+
+  testWidgets('auto review leaves a day that is not finished alone', (
+    tester,
+  ) async {
+    final container = ProviderContainer(
+      overrides: [
+        appControllerProvider.overrideWith(
+          () => _ResumeAppController(
+            'word_0',
+            0,
+            autoReviewOrder: AutoReviewOrder.defaultOrder,
+            completedDays: {1},
+          ),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container.read(appControllerProvider.future);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const MaterialApp(home: StudyScreen(day: 2)),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // A dialog explains why auto review is not running on this day.
+    expect(find.text('Auto review is not available yet'), findsOneWidget);
+    await tester.tap(find.text('Got it'));
+    await tester.pumpAndSettle();
+    expect(find.text('Auto review is not available yet'), findsNothing);
+
+    // Everything is shown and the manual buttons are back; nothing advances.
+    expect(find.text('単語6'), findsOneWidget);
+    expect(find.text('word'), findsOneWidget);
+    expect(find.text('Pause'), findsNothing);
+    expect(find.text('Hide word'), findsOneWidget);
+    await tester.pump(const Duration(seconds: 30));
+    expect(find.text('1 / 5'), findsOneWidget);
+  });
+
+  testWidgets('auto review can be paused and resumed', (tester) async {
+    final container = ProviderContainer(
+      overrides: [
+        appControllerProvider.overrideWith(
+          () => _ResumeAppController(
+            'word_0',
+            0,
+            autoReviewOrder: AutoReviewOrder.defaultOrder,
+            completedDays: {2},
+          ),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container.read(appControllerProvider.future);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const MaterialApp(home: StudyScreen(day: 2)),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('単語6'), findsOneWidget);
+    expect(find.text('word'), findsNothing);
+
+    await tester.tap(find.text('Pause'));
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 10));
+    expect(find.text('word'), findsNothing);
+    expect(find.text('Resume'), findsOneWidget);
+
+    await tester.tap(find.text('Resume'));
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 2));
+    expect(find.text('word'), findsOneWidget);
+  });
+
   for (final mode in MeaningCoverMode.values) {
     testWidgets('hide meanings covers what ${mode.name} mode says', (
       tester,
@@ -777,6 +910,8 @@ class _ResumeAppController extends AppController {
     this.hideMeanings = false,
     this.meaningCoverMode = MeaningCoverMode.meaningAndTranslation,
     this.withExamples = false,
+    this.autoReviewOrder,
+    this.completedDays = const {},
   });
 
   final String wordId;
@@ -786,6 +921,9 @@ class _ResumeAppController extends AppController {
   final bool hideMeanings;
   final MeaningCoverMode meaningCoverMode;
   final bool withExamples;
+  final AutoReviewOrder? autoReviewOrder;
+  final Set<int> completedDays;
+  final int autoReviewSeconds = 2;
   final List<StudySession> savedSessions = [];
 
   @override
@@ -804,6 +942,10 @@ class _ResumeAppController extends AppController {
       hideWord: hideWord,
       hideMeanings: hideMeanings,
       meaningCoverMode: meaningCoverMode,
+      autoReviewEnabled: autoReviewOrder != null,
+      autoReviewOrder: autoReviewOrder ?? AutoReviewOrder.defaultOrder,
+      autoReviewSeconds: autoReviewSeconds,
+      completedStudyDays: {'N5': completedDays},
       themeMode: ThemeMode.system,
       notificationsEnabled: false,
       studySeconds: 0,

@@ -27,6 +27,9 @@ class LocalSettings {
     this.meaningCoverMode = MeaningCoverMode.meaningAndTranslation,
     this.ttsVolumeMode = TtsVolumeMode.system,
     this.ttsVolume = 0.5,
+    this.autoReviewEnabled = false,
+    this.autoReviewOrder = AutoReviewOrder.defaultOrder,
+    this.autoReviewSeconds = 3,
     required this.notificationsEnabled,
     required this.reminderHour,
     required this.reminderMinute,
@@ -54,6 +57,9 @@ class LocalSettings {
   final MeaningCoverMode meaningCoverMode;
   final TtsVolumeMode ttsVolumeMode;
   final double ttsVolume;
+  final bool autoReviewEnabled;
+  final AutoReviewOrder autoReviewOrder;
+  final int autoReviewSeconds;
   final bool notificationsEnabled;
   final int reminderHour;
   final int reminderMinute;
@@ -111,6 +117,11 @@ class LocalStore {
         _preferences.getString('ttsVolumeMode'),
       ),
       ttsVolume: (_preferences.getDouble('ttsVolume') ?? 0.5).clamp(0.0, 1.0),
+      autoReviewEnabled: _preferences.getBool('autoReviewEnabled') ?? false,
+      autoReviewOrder: AutoReviewOrder.parse(
+        _preferences.getString('autoReviewOrder'),
+      ),
+      autoReviewSeconds: _preferences.getInt('autoReviewSeconds') ?? 3,
       notificationsEnabled:
           _preferences.getBool('notificationsEnabled') ?? false,
       reminderHour: _preferences.getInt('reminderHour') ?? 20,
@@ -143,6 +154,9 @@ class LocalStore {
       setValue('meaningCoverMode', state.meaningCoverMode.name),
       setValue('ttsVolumeMode', state.ttsVolumeMode.name),
       setValue('ttsVolume', state.ttsVolume),
+      setValue('autoReviewEnabled', state.autoReviewEnabled),
+      setValue('autoReviewOrder', state.autoReviewOrder.id),
+      setValue('autoReviewSeconds', state.autoReviewSeconds),
       setValue('notificationsEnabled', state.notificationsEnabled),
       setValue('reminderHour', state.reminderHour),
       setValue('reminderMinute', state.reminderMinute),
@@ -334,6 +348,9 @@ class LocalStore {
       'meaningCoverMode',
       'ttsVolumeMode',
       'ttsVolume',
+      'autoReviewEnabled',
+      'autoReviewOrder',
+      'autoReviewSeconds',
       'notificationsEnabled',
       'reminderHour',
       'reminderMinute',
