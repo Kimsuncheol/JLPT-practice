@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
-import 'package:jlpt_practice/data/models/study_preferences.dart';
 
 /// Settings for covering words and meanings with tape on the word study
 /// screen. The study screen's bottom buttons flip the same switches.
@@ -52,22 +51,6 @@ class RecallCoverScreen extends ConsumerWidget {
                     value: state.hideMeanings,
                     onChanged: controller.setHideMeanings,
                   ),
-                  RadioGroup<MeaningCoverMode>(
-                    groupValue: state.meaningCoverMode,
-                    onChanged: (mode) {
-                      if (mode != null) controller.setMeaningCoverMode(mode);
-                    },
-                    child: Column(
-                      children: [
-                        for (final option in _meaningOptions)
-                          RadioListTile<MeaningCoverMode>(
-                            value: option.$1,
-                            title: Text(strings(option.$2)),
-                            subtitle: Text(strings('${option.$2}Body')),
-                          ),
-                      ],
-                    ),
-                  ),
                 ],
               ),
             ],
@@ -76,12 +59,6 @@ class RecallCoverScreen extends ConsumerWidget {
       ),
     );
   }
-
-  static const _meaningOptions = [
-    (MeaningCoverMode.meaningAndTranslation, 'coverMeaningAndTranslation'),
-    (MeaningCoverMode.meaning, 'coverMeaningOnly'),
-    (MeaningCoverMode.translation, 'coverTranslationOnly'),
-  ];
 }
 
 class _Group extends StatelessWidget {

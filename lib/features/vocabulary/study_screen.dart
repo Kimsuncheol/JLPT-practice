@@ -129,6 +129,9 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
                 final showFurigana = revealed == null
                     ? _showFurigana!
                     : revealed.contains(ReviewElement.reading);
+                final meaningsHidden = revealed == null
+                    ? state.hideMeanings
+                    : !revealed.contains(ReviewElement.meanings);
                 return Padding(
                   padding: const EdgeInsets.fromLTRB(20, 8, 20, 14),
                   child: _StudyCard(
@@ -144,19 +147,8 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
                     hideRomaji: revealed == null
                         ? state.hideWord && !showFurigana
                         : !showFurigana,
-                    hideMeaning: revealed == null
-                        ? state.hideMeanings &&
-                              state.meaningCoverMode !=
-                                  MeaningCoverMode.translation
-                        : !revealed.contains(ReviewElement.meanings),
-                    hideTranslation: revealed == null
-                        ? state.hideMeanings &&
-                              state.meaningCoverMode != MeaningCoverMode.meaning
-                        : !revealed.contains(ReviewElement.meanings),
-                    maskMeaningInTranslation:
-                        revealed == null &&
-                        state.hideMeanings &&
-                        state.meaningCoverMode == MeaningCoverMode.meaning,
+                    hideMeaning: meaningsHidden,
+                    maskMeaningInTranslation: meaningsHidden,
                     onSpeakWord: () => _speakIfAudible(word.reading),
                     onSpeakExample: () =>
                         _speakIfAudible(word.example.sentence),
@@ -502,7 +494,6 @@ class _StudyCard extends StatelessWidget {
     required this.hideWord,
     required this.hideRomaji,
     required this.hideMeaning,
-    required this.hideTranslation,
     required this.maskMeaningInTranslation,
     required this.onSpeakWord,
     required this.onSpeakExample,
@@ -514,7 +505,6 @@ class _StudyCard extends StatelessWidget {
   final bool hideWord;
   final bool hideRomaji;
   final bool hideMeaning;
-  final bool hideTranslation;
   final bool maskMeaningInTranslation;
   final VoidCallback onSpeakWord;
   final VoidCallback onSpeakExample;
@@ -717,15 +707,6 @@ class _StudyCard extends StatelessWidget {
     final translation = _withRolePlayLineBreaks(
       vocabulary.example.translation(language),
     );
-    if (hideTranslation) {
-      return coverTapeFor(
-        characters: translation.length,
-        fontSize: 16,
-        maxWidth: 280,
-        glyphWidth: 0.5,
-        tilt: -0.01,
-      );
-    }
     return _maskedText(
       translation,
       style: style,

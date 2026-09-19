@@ -189,7 +189,9 @@ void main() {
     }
   });
 
-  testWidgets('recall cover screen edits what is covered', (tester) async {
+  testWidgets('recall cover screen edits word and meaning covers', (
+    tester,
+  ) async {
     final container = await pump(tester, const RecallCoverScreen());
     AppState state() => container.read(appControllerProvider).requireValue;
 
@@ -198,13 +200,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(state().hideWord, isTrue);
     expect(state().hideMeanings, isTrue);
-
-    await tester.tap(find.text('Meanings only'));
-    await tester.pumpAndSettle();
-    expect(state().meaningCoverMode, MeaningCoverMode.meaning);
-    await tester.tap(find.text('Translations only'));
-    await tester.pumpAndSettle();
-    expect(state().meaningCoverMode, MeaningCoverMode.translation);
+    expect(find.byType(RadioListTile<MeaningCoverMode>), findsNothing);
   });
 
   testWidgets('volume screen switches between system and slider', (

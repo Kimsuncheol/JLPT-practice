@@ -430,64 +430,43 @@ void main() {
     expect(find.text('word'), findsOneWidget);
   });
 
-  for (final mode in MeaningCoverMode.values) {
-    testWidgets('hide meanings covers what ${mode.name} mode says', (
-      tester,
-    ) async {
-      final container = ProviderContainer(
-        overrides: [
-          appControllerProvider.overrideWith(
-            () => _ResumeAppController(
-              'word_0',
-              0,
-              hideMeanings: true,
-              meaningCoverMode: mode,
-              withExamples: true,
-            ),
+  testWidgets('hide meanings only tapes meaning words in the translation', (
+    tester,
+  ) async {
+    final container = ProviderContainer(
+      overrides: [
+        appControllerProvider.overrideWith(
+          () => _ResumeAppController(
+            'word_0',
+            0,
+            hideMeanings: true,
+            withExamples: true,
           ),
-        ],
-      );
-      addTearDown(container.dispose);
-      await container.read(appControllerProvider.future);
-      await tester.pumpWidget(
-        UncontrolledProviderScope(
-          container: container,
-          child: const MaterialApp(home: StudyScreen(day: 2)),
         ),
-      );
-      await tester.pumpAndSettle();
+      ],
+    );
+    addTearDown(container.dispose);
+    await container.read(appControllerProvider.future);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const MaterialApp(home: StudyScreen(day: 2)),
+      ),
+    );
+    await tester.pumpAndSettle();
 
-      final meaningShown = find.text('word').evaluate().isNotEmpty;
-      final translationShown = find
-          .text('I use the word every day.')
-          .evaluate()
-          .isNotEmpty;
-      final translationMasked = find
-          .textContaining('I use the', findRichText: true)
-          .evaluate()
-          .isNotEmpty;
-      switch (mode) {
-        case MeaningCoverMode.meaningAndTranslation:
-          expect(
-            [meaningShown, translationShown, translationMasked],
-            [false, false, false],
-          );
-        case MeaningCoverMode.meaning:
-          // The meaning is gone and "word" is taped inside the translation.
-          expect(meaningShown, isFalse);
-          expect(translationShown, isFalse);
-          expect(translationMasked, isTrue);
-          expect(
-            find.textContaining('the word', findRichText: true),
-            findsNothing,
-          );
-        case MeaningCoverMode.translation:
-          expect(meaningShown, isTrue);
-          expect(translationShown, isFalse);
-          expect(translationMasked, isFalse);
-      }
-    });
-  }
+    expect(find.text('word'), findsNothing);
+    expect(find.text('I use the word every day.'), findsNothing);
+    expect(
+      find.textContaining('I use the', findRichText: true),
+      findsOneWidget,
+    );
+    expect(find.textContaining('the word', findRichText: true), findsNothing);
+    expect(
+      find.textContaining('every day.', findRichText: true),
+      findsOneWidget,
+    );
+  });
 
   testWidgets('swiping stops current speech before automatic pronunciation', (
     tester,
@@ -950,9 +929,7 @@ class _ResumeAppController extends AppController {
     this.wordId,
     this.indexFallback, {
     this.autoPlayAudio = false,
-    this.hideWord = false,
     this.hideMeanings = false,
-    this.meaningCoverMode = MeaningCoverMode.meaningAndTranslation,
     this.withExamples = false,
     this.autoReviewOrder,
     this.completedDays = const {},
@@ -961,9 +938,7 @@ class _ResumeAppController extends AppController {
   final String wordId;
   final int indexFallback;
   final bool autoPlayAudio;
-  final bool hideWord;
   final bool hideMeanings;
-  final MeaningCoverMode meaningCoverMode;
   final bool withExamples;
   final AutoReviewOrder? autoReviewOrder;
   final Set<int> completedDays;
@@ -983,9 +958,7 @@ class _ResumeAppController extends AppController {
       dailyGoal: 5,
       showFurigana: true,
       autoPlayAudio: autoPlayAudio,
-      hideWord: hideWord,
       hideMeanings: hideMeanings,
-      meaningCoverMode: meaningCoverMode,
       autoReviewEnabled: autoReviewOrder != null,
       autoReviewOrder: autoReviewOrder ?? AutoReviewOrder.defaultOrder,
       autoReviewSeconds: autoReviewSeconds,
