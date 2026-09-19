@@ -1,6 +1,6 @@
-# Kotoba Flow privacy baseline
+# JLPT study privacy baseline
 
-Kotoba Flow uses Firebase Authentication and Firestore to synchronize study
+JLPT study uses Firebase Authentication and Firestore to synchronize study
 preferences, quiz and practice-test history, review progress, grammar progress,
 study sessions, streaks, XP, and unlocks. Use without registration remains
 available through an anonymous Firebase account. Users may optionally protect

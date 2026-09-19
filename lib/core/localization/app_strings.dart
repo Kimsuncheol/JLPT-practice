@@ -6,7 +6,7 @@ class AppStrings {
   final String languageCode;
 
   static const _en = <String, String>{
-    'appName': 'Kotoba Flow',
+    'appName': 'JLPT study',
     'continue': 'Continue',
     'getStarted': 'Start learning',
     'onboardingTitle': 'Build a Japanese habit',
@@ -371,7 +371,7 @@ class AppStrings {
   };
 
   static const _ko = <String, String>{
-    'appName': '코토바 플로우',
+    'appName': 'JLPT 스터디',
     'continue': '계속',
     'getStarted': '학습 시작',
     'onboardingTitle': '일본어 습관을 만들어 보세요',
