@@ -147,12 +147,6 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
                     language: state.meaningLanguage,
                     showFurigana: showFurigana,
                     hideWord: hideWord,
-                    // The romaji spells out the reading, so it stays taped
-                    // whenever the reading is hidden by auto review, and
-                    // otherwise when both the word and reading are hidden.
-                    hideRomaji: revealed == null
-                        ? hideWord && !showFurigana
-                        : !showFurigana,
                     hideMeaning: meaningsHidden,
                     maskMeaningInTranslation: meaningsHidden,
                     onSpeakWord: () => _speakIfAudible(word.reading),
@@ -582,7 +576,6 @@ class _StudyCard extends StatelessWidget {
     required this.language,
     required this.showFurigana,
     required this.hideWord,
-    required this.hideRomaji,
     required this.hideMeaning,
     required this.maskMeaningInTranslation,
     required this.onSpeakWord,
@@ -593,7 +586,6 @@ class _StudyCard extends StatelessWidget {
   final String language;
   final bool showFurigana;
   final bool hideWord;
-  final bool hideRomaji;
   final bool hideMeaning;
   final bool maskMeaningInTranslation;
   final VoidCallback onSpeakWord;
@@ -610,8 +602,7 @@ class _StudyCard extends StatelessWidget {
           const SizedBox(height: 6),
           _buildWord(context),
           const SizedBox(height: 10),
-          _buildRomaji(context),
-          const SizedBox(height: 8),
+          const SizedBox(height: 18),
           _buildMeaning(context),
           if (vocabulary.hasExample) ...[
             const SizedBox(height: 34),
@@ -701,24 +692,6 @@ class _StudyCard extends StatelessWidget {
         ),
       ),
     ),
-  );
-
-  Widget _buildRomaji(BuildContext context) => _speechTarget(
-    onTap: onSpeakWord,
-    child: hideRomaji
-        ? coverTapeFor(
-            characters: vocabulary.romaji.length,
-            fontSize: 14,
-            maxWidth: 160,
-            glyphWidth: 0.6,
-            tilt: 0.01,
-          )
-        : Text(
-            vocabulary.romaji,
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-            ),
-          ),
   );
 
   Widget _speechTarget({required VoidCallback onTap, required Widget child}) =>
