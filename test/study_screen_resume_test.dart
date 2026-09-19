@@ -253,6 +253,125 @@ void main() {
     expect(find.text('word'), findsOneWidget);
   });
 
+  testWidgets('manual hide controls are independent for each word card', (
+    tester,
+  ) async {
+    final container = ProviderContainer(
+      overrides: [
+        appControllerProvider.overrideWith(
+          () => _ResumeAppController('word_0', 0, withExamples: true),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container.read(appControllerProvider.future);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const MaterialApp(home: StudyScreen(day: 2)),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Hide reading'));
+    await tester.tap(find.text('Hide word'));
+    await tester.tap(find.text('Hide meanings'));
+    await tester.pumpAndSettle();
+    expect(find.text('単語6'), findsNothing);
+    expect(find.text('たんご'), findsNothing);
+    expect(find.text('word'), findsNothing);
+
+    final pageView = find.byType(PageView);
+    await tester.drag(pageView, Offset(-tester.getSize(pageView).width, 0));
+    await tester.pumpAndSettle();
+
+    expect(find.text('単語7'), findsOneWidget);
+    expect(find.text('たんご'), findsOneWidget);
+    expect(find.text('word'), findsOneWidget);
+    expect(find.text('Hide reading'), findsOneWidget);
+    expect(find.text('Hide word'), findsOneWidget);
+    expect(find.text('Hide meanings'), findsOneWidget);
+
+    await tester.drag(pageView, Offset(tester.getSize(pageView).width, 0));
+    await tester.pumpAndSettle();
+    expect(find.text('単語6'), findsNothing);
+    expect(find.text('Show reading'), findsOneWidget);
+    expect(find.text('Show word'), findsOneWidget);
+    expect(find.text('Show meanings'), findsOneWidget);
+  });
+
+  testWidgets('identical word and reading use one combined hide control', (
+    tester,
+  ) async {
+    final container = ProviderContainer(
+      overrides: [
+        appControllerProvider.overrideWith(
+          () => _ResumeAppController('word_0', 0, sameWordAndReading: true),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container.read(appControllerProvider.future);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const MaterialApp(home: StudyScreen(day: 2)),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('ことば'), findsOneWidget);
+    expect(find.text('kotoba'), findsOneWidget);
+    expect(find.text('Hide reading'), findsNothing);
+    expect(find.text('Hide word'), findsNothing);
+    expect(find.text('Hide word & reading'), findsOneWidget);
+
+    await tester.tap(find.text('Hide word & reading'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('ことば'), findsNothing);
+    expect(find.text('kotoba'), findsNothing);
+    expect(find.text('Show word & reading'), findsOneWidget);
+    expect(find.byType(CoverTape), findsWidgets);
+
+    await tester.tap(find.text('Show word & reading'));
+    await tester.pumpAndSettle();
+    expect(find.text('ことば'), findsOneWidget);
+    expect(find.text('kotoba'), findsOneWidget);
+  });
+
+  testWidgets('action groups loop between hide controls and auto review', (
+    tester,
+  ) async {
+    final container = ProviderContainer(
+      overrides: [
+        appControllerProvider.overrideWith(
+          () => _ResumeAppController('word_0', 0),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container.read(appControllerProvider.future);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const MaterialApp(home: StudyScreen(day: 2)),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Hide word').hitTestable(), findsOneWidget);
+    await _showAutoReviewActions(tester);
+    expect(find.text('Auto review').hitTestable(), findsOneWidget);
+    await _showHideActions(tester);
+    expect(find.text('Hide word').hitTestable(), findsOneWidget);
+
+    // Continuing in the other direction reaches auto review again rather
+    // than stopping at an edge.
+    await _swipeActionCarousel(tester, -1);
+    expect(find.text('Auto review').hitTestable(), findsOneWidget);
+  });
+
   testWidgets('auto review reveals each element in the chosen order', (
     tester,
   ) async {
@@ -333,12 +452,13 @@ void main() {
     await tester.pumpAndSettle();
 
     // The auto review tab is shown semi-transparent and does nothing.
+    await _showAutoReviewActions(tester);
     final tabOpacity = find.ancestor(
-      of: find.text('Auto review'),
+      of: find.text('Auto review').hitTestable(),
       matching: find.byType(Opacity),
     );
     expect(tester.widget<Opacity>(tabOpacity).opacity, lessThan(1));
-    await tester.tap(find.text('Auto review'));
+    await tester.tap(find.text('Auto review').hitTestable());
     await tester.pump();
     expect(
       container.read(appControllerProvider).requireValue.autoReviewEnabled,
@@ -346,10 +466,11 @@ void main() {
     );
 
     // Everything is shown and the manual buttons are back; nothing advances.
+    await _showHideActions(tester);
     expect(find.text('単語6'), findsOneWidget);
     expect(find.text('word'), findsOneWidget);
-    expect(find.text('Pause'), findsNothing);
-    expect(find.text('Hide word'), findsOneWidget);
+    expect(find.text('Pause').hitTestable(), findsNothing);
+    expect(find.text('Hide word').hitTestable(), findsOneWidget);
     await tester.pump(const Duration(seconds: 30));
     expect(find.text('1 / 5'), findsOneWidget);
   });
@@ -374,22 +495,26 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(find.text('Hide word'), findsOneWidget);
+      await _showAutoReviewActions(tester);
       final tabOpacity = find.ancestor(
-        of: find.text('Auto review'),
+        of: find.text('Auto review').hitTestable(),
         matching: find.byType(Opacity),
       );
       expect(tester.widget<Opacity>(tabOpacity).opacity, 1);
 
-      await tester.tap(find.text('Auto review'));
+      await tester.tap(find.text('Auto review').hitTestable());
       await tester.pumpAndSettle();
-      expect(find.text('Pause'), findsOneWidget);
-      expect(find.text('Hide word'), findsNothing);
+      await _showHideActions(tester);
+      expect(find.text('Pause').hitTestable(), findsOneWidget);
+      expect(find.text('Hide word').hitTestable(), findsNothing);
       expect(find.text('word'), findsNothing);
 
-      await tester.tap(find.text('Auto review'));
+      await _showAutoReviewActions(tester);
+      await tester.tap(find.text('Auto review').hitTestable());
       await tester.pumpAndSettle();
-      expect(find.text('Pause'), findsNothing);
-      expect(find.text('Hide word'), findsOneWidget);
+      await _showHideActions(tester);
+      expect(find.text('Pause').hitTestable(), findsNothing);
+      expect(find.text('Hide word').hitTestable(), findsOneWidget);
     },
   );
 
@@ -832,6 +957,21 @@ void main() {
   }
 }
 
+Future<void> _showAutoReviewActions(WidgetTester tester) =>
+    _swipeActionCarousel(tester, 1);
+
+Future<void> _showHideActions(WidgetTester tester) =>
+    _swipeActionCarousel(tester, -1);
+
+Future<void> _swipeActionCarousel(WidgetTester tester, double direction) async {
+  final carousel = find.byKey(const ValueKey('study-action-carousel'));
+  await tester.drag(
+    carousel,
+    Offset(tester.getSize(carousel).width * direction, 0),
+  );
+  await tester.pumpAndSettle();
+}
+
 class _RecordingTtsService implements TtsService {
   final spoken = <String>[];
   final events = <String>[];
@@ -931,6 +1071,7 @@ class _ResumeAppController extends AppController {
     this.autoPlayAudio = false,
     this.hideMeanings = false,
     this.withExamples = false,
+    this.sameWordAndReading = false,
     this.autoReviewOrder,
     this.completedDays = const {},
   });
@@ -940,6 +1081,7 @@ class _ResumeAppController extends AppController {
   final bool autoPlayAudio;
   final bool hideMeanings;
   final bool withExamples;
+  final bool sameWordAndReading;
   final AutoReviewOrder? autoReviewOrder;
   final Set<int> completedDays;
   final int autoReviewSeconds = 2;
@@ -948,7 +1090,12 @@ class _ResumeAppController extends AppController {
   @override
   Future<AppState> build() async {
     return AppState(
-      vocabulary: List.generate(30, (index) => _word(index, withExamples)),
+      vocabulary: List.generate(
+        30,
+        (index) => sameWordAndReading && index == 5
+            ? _sameReadingWord(index)
+            : _word(index, withExamples),
+      ),
       progress: const {},
       onboardingComplete: true,
       selectedLevel: 'N5',
@@ -1049,4 +1196,25 @@ Vocabulary _word(int index, [bool withExample = false]) => Vocabulary(
           answer: '',
         ),
   rank: index + 1,
+);
+
+Vocabulary _sameReadingWord(int index) => Vocabulary(
+  id: 'word_$index',
+  word: 'ことば',
+  reading: 'ことば',
+  furigana: 'ことば',
+  romaji: 'kotoba',
+  meanings: const {
+    'en': ['word'],
+  },
+  partOfSpeech: 'word',
+  jlptLevel: 'N5',
+  tags: const ['JLPT'],
+  example: const VocabularyExample(
+    sentence: '',
+    reading: '',
+    translations: {},
+    quizSentence: '',
+    answer: '',
+  ),
 );
