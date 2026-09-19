@@ -31,7 +31,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   static const _resumeDialogBarrierColor = Colors.black54;
 
   int _index = 0;
-  bool? _showFurigana;
+  final Map<String, _CardVisibility> _cardVisibility = {};
   PageController? _pageController;
   TtsService? _ttsService;
   bool _resumeDecisionPending = false;
@@ -88,7 +88,6 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
       day: widget.day,
       dailyGoal: state.dailyGoal,
     );
-    _showFurigana ??= state.showFurigana;
     if (words.isEmpty) {
       return Scaffold(
         appBar: AppBar(),
@@ -121,16 +120,21 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
               itemBuilder: (context, index) {
                 if (index == words.length) return const SizedBox.shrink();
                 final word = words[index];
+                final visibility = _visibilityFor(word, state);
                 final revealed = _autoReviewActive(state)
                     ? state.autoReviewOrder.elements
                           .take(index == _index ? _autoRevealed : 1)
                           .toSet()
                     : null;
                 final showFurigana = revealed == null
-                    ? _showFurigana!
+                    ? visibility.showFurigana
                     : revealed.contains(ReviewElement.reading);
+                final hideWord = revealed == null
+                    ? visibility.hideWord ||
+                          (!showFurigana && word.reading == word.word)
+                    : !revealed.contains(ReviewElement.word);
                 final meaningsHidden = revealed == null
-                    ? state.hideMeanings
+                    ? visibility.hideMeanings
                     : !revealed.contains(ReviewElement.meanings);
                 return Padding(
                   padding: const EdgeInsets.fromLTRB(20, 8, 20, 14),
@@ -138,14 +142,12 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
                     vocabulary: word,
                     language: state.meaningLanguage,
                     showFurigana: showFurigana,
-                    hideWord: revealed == null
-                        ? state.hideWord
-                        : !revealed.contains(ReviewElement.word),
+                    hideWord: hideWord,
                     // The romaji spells out the reading, so it stays taped
                     // whenever the reading is hidden by auto review, and
                     // otherwise when both the word and reading are hidden.
                     hideRomaji: revealed == null
-                        ? state.hideWord && !showFurigana
+                        ? hideWord && !showFurigana
                         : !showFurigana,
                     hideMeaning: meaningsHidden,
                     maskMeaningInTranslation: meaningsHidden,
@@ -161,6 +163,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (_autoReviewActive(state))
                   _CardAction(
@@ -173,7 +176,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
                     onTap: _toggleAutoReviewPause,
                   )
                 else
-                  ..._manualActions(state),
+                  ..._manualActions(state, words[_index]),
                 _autoReviewTab(state),
               ],
             ),
@@ -209,37 +212,83 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
         : null,
   );
 
-  List<Widget> _manualActions(AppState state) => [
-    _CardAction(
-      icon: _showFurigana!
-          ? Icons.visibility_off_rounded
-          : Icons.visibility_rounded,
-      label: context.strings(_showFurigana! ? 'hideReading' : 'showReading'),
-      onTap: () => setState(() => _showFurigana = !_showFurigana!),
-    ),
-    _CardAction(
-      icon: state.hideWord
-          ? Icons.visibility_rounded
-          : Icons.visibility_off_rounded,
-      label: context.strings(state.hideWord ? 'showWord' : 'hideWord'),
-      onTap: () => unawaited(
-        ref.read(appControllerProvider.notifier).setHideWord(!state.hideWord),
+  _CardVisibility _visibilityFor(Vocabulary word, AppState state) =>
+      _cardVisibility.putIfAbsent(
+        word.id,
+        () => _CardVisibility(
+          showFurigana: state.showFurigana,
+          hideWord: state.hideWord,
+          hideMeanings: state.hideMeanings,
+        ),
+      );
+
+  List<Widget> _manualActions(AppState state, Vocabulary word) {
+    final visibility = _visibilityFor(word, state);
+    final wordIsReading = word.word == word.reading;
+    final wordAndReadingHidden =
+        visibility.hideWord || !visibility.showFurigana;
+    return [
+      if (wordIsReading)
+        _CardAction(
+          icon: wordAndReadingHidden
+              ? Icons.visibility_rounded
+              : Icons.visibility_off_rounded,
+          label: context.strings(
+            wordAndReadingHidden ? 'showWordAndReading' : 'hideWordAndReading',
+          ),
+          onTap: () => setState(() {
+            final current = _cardVisibility[word.id]!;
+            final hidden = current.hideWord || !current.showFurigana;
+            _cardVisibility[word.id] = current.copyWith(
+              showFurigana: hidden,
+              hideWord: !hidden,
+            );
+          }),
+        )
+      else ...[
+        _CardAction(
+          icon: visibility.showFurigana
+              ? Icons.visibility_off_rounded
+              : Icons.visibility_rounded,
+          label: context.strings(
+            visibility.showFurigana ? 'hideReading' : 'showReading',
+          ),
+          onTap: () => setState(() {
+            final current = _cardVisibility[word.id]!;
+            _cardVisibility[word.id] = current.copyWith(
+              showFurigana: !current.showFurigana,
+            );
+          }),
+        ),
+        _CardAction(
+          icon: visibility.hideWord
+              ? Icons.visibility_rounded
+              : Icons.visibility_off_rounded,
+          label: context.strings(visibility.hideWord ? 'showWord' : 'hideWord'),
+          onTap: () => setState(() {
+            final current = _cardVisibility[word.id]!;
+            _cardVisibility[word.id] = current.copyWith(
+              hideWord: !current.hideWord,
+            );
+          }),
+        ),
+      ],
+      _CardAction(
+        icon: visibility.hideMeanings
+            ? Icons.visibility_rounded
+            : Icons.visibility_off_rounded,
+        label: context.strings(
+          visibility.hideMeanings ? 'showMeanings' : 'hideMeanings',
+        ),
+        onTap: () => setState(() {
+          final current = _cardVisibility[word.id]!;
+          _cardVisibility[word.id] = current.copyWith(
+            hideMeanings: !current.hideMeanings,
+          );
+        }),
       ),
-    ),
-    _CardAction(
-      icon: state.hideMeanings
-          ? Icons.visibility_rounded
-          : Icons.visibility_off_rounded,
-      label: context.strings(
-        state.hideMeanings ? 'showMeanings' : 'hideMeanings',
-      ),
-      onTap: () => unawaited(
-        ref
-            .read(appControllerProvider.notifier)
-            .setHideMeanings(!state.hideMeanings),
-      ),
-    ),
-  ];
+    ];
+  }
 
   void _initializePage(List<Vocabulary> words, AppState state) {
     if (_pageController != null) return;
@@ -484,6 +533,28 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
       context.pushReplacement('/study/day/${widget.day}/finish');
     }
   }
+}
+
+class _CardVisibility {
+  const _CardVisibility({
+    required this.showFurigana,
+    required this.hideWord,
+    required this.hideMeanings,
+  });
+
+  final bool showFurigana;
+  final bool hideWord;
+  final bool hideMeanings;
+
+  _CardVisibility copyWith({
+    bool? showFurigana,
+    bool? hideWord,
+    bool? hideMeanings,
+  }) => _CardVisibility(
+    showFurigana: showFurigana ?? this.showFurigana,
+    hideWord: hideWord ?? this.hideWord,
+    hideMeanings: hideMeanings ?? this.hideMeanings,
+  );
 }
 
 class _StudyCard extends StatelessWidget {
@@ -789,7 +860,8 @@ class _CardAction extends StatelessWidget {
               const SizedBox(height: 6),
               Text(
                 label,
-                maxLines: 1,
+                maxLines: 2,
+                textAlign: TextAlign.center,
                 overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.labelSmall,
               ),

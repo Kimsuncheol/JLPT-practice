@@ -253,6 +253,93 @@ void main() {
     expect(find.text('word'), findsOneWidget);
   });
 
+  testWidgets('manual hide controls are independent for each word card', (
+    tester,
+  ) async {
+    final container = ProviderContainer(
+      overrides: [
+        appControllerProvider.overrideWith(
+          () => _ResumeAppController('word_0', 0, withExamples: true),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container.read(appControllerProvider.future);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const MaterialApp(home: StudyScreen(day: 2)),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Hide reading'));
+    await tester.tap(find.text('Hide word'));
+    await tester.tap(find.text('Hide meanings'));
+    await tester.pumpAndSettle();
+    expect(find.text('単語6'), findsNothing);
+    expect(find.text('たんご'), findsNothing);
+    expect(find.text('word'), findsNothing);
+
+    final pageView = find.byType(PageView);
+    await tester.drag(pageView, Offset(-tester.getSize(pageView).width, 0));
+    await tester.pumpAndSettle();
+
+    expect(find.text('単語7'), findsOneWidget);
+    expect(find.text('たんご'), findsOneWidget);
+    expect(find.text('word'), findsOneWidget);
+    expect(find.text('Hide reading'), findsOneWidget);
+    expect(find.text('Hide word'), findsOneWidget);
+    expect(find.text('Hide meanings'), findsOneWidget);
+
+    await tester.drag(pageView, Offset(tester.getSize(pageView).width, 0));
+    await tester.pumpAndSettle();
+    expect(find.text('単語6'), findsNothing);
+    expect(find.text('Show reading'), findsOneWidget);
+    expect(find.text('Show word'), findsOneWidget);
+    expect(find.text('Show meanings'), findsOneWidget);
+  });
+
+  testWidgets('identical word and reading use one combined hide control', (
+    tester,
+  ) async {
+    final container = ProviderContainer(
+      overrides: [
+        appControllerProvider.overrideWith(
+          () => _ResumeAppController('word_0', 0, sameWordAndReading: true),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container.read(appControllerProvider.future);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const MaterialApp(home: StudyScreen(day: 2)),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('ことば'), findsOneWidget);
+    expect(find.text('kotoba'), findsOneWidget);
+    expect(find.text('Hide reading'), findsNothing);
+    expect(find.text('Hide word'), findsNothing);
+    expect(find.text('Hide word & reading'), findsOneWidget);
+
+    await tester.tap(find.text('Hide word & reading'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('ことば'), findsNothing);
+    expect(find.text('kotoba'), findsNothing);
+    expect(find.text('Show word & reading'), findsOneWidget);
+    expect(find.byType(CoverTape), findsWidgets);
+
+    await tester.tap(find.text('Show word & reading'));
+    await tester.pumpAndSettle();
+    expect(find.text('ことば'), findsOneWidget);
+    expect(find.text('kotoba'), findsOneWidget);
+  });
+
   testWidgets('auto review reveals each element in the chosen order', (
     tester,
   ) async {
@@ -931,6 +1018,7 @@ class _ResumeAppController extends AppController {
     this.autoPlayAudio = false,
     this.hideMeanings = false,
     this.withExamples = false,
+    this.sameWordAndReading = false,
     this.autoReviewOrder,
     this.completedDays = const {},
   });
@@ -940,6 +1028,7 @@ class _ResumeAppController extends AppController {
   final bool autoPlayAudio;
   final bool hideMeanings;
   final bool withExamples;
+  final bool sameWordAndReading;
   final AutoReviewOrder? autoReviewOrder;
   final Set<int> completedDays;
   final int autoReviewSeconds = 2;
@@ -948,7 +1037,12 @@ class _ResumeAppController extends AppController {
   @override
   Future<AppState> build() async {
     return AppState(
-      vocabulary: List.generate(30, (index) => _word(index, withExamples)),
+      vocabulary: List.generate(
+        30,
+        (index) => sameWordAndReading && index == 5
+            ? _sameReadingWord(index)
+            : _word(index, withExamples),
+      ),
       progress: const {},
       onboardingComplete: true,
       selectedLevel: 'N5',
@@ -1049,4 +1143,25 @@ Vocabulary _word(int index, [bool withExample = false]) => Vocabulary(
           answer: '',
         ),
   rank: index + 1,
+);
+
+Vocabulary _sameReadingWord(int index) => Vocabulary(
+  id: 'word_$index',
+  word: 'ことば',
+  reading: 'ことば',
+  furigana: 'ことば',
+  romaji: 'kotoba',
+  meanings: const {
+    'en': ['word'],
+  },
+  partOfSpeech: 'word',
+  jlptLevel: 'N5',
+  tags: const ['JLPT'],
+  example: const VocabularyExample(
+    sentence: '',
+    reading: '',
+    translations: {},
+    quizSentence: '',
+    answer: '',
+  ),
 );
