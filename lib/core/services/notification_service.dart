@@ -202,7 +202,7 @@ class NotificationService {
         iOS: DarwinNotificationDetails(),
       ),
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-      payload: '/review',
+      payload: '/home',
       matchDateTimeComponents: DateTimeComponents.time,
     );
   }
@@ -336,7 +336,9 @@ class NotificationService {
 
   String? _safeRoute(String? candidate) {
     if (candidate == null || !candidate.startsWith('/')) return null;
-    return candidate;
+    // The review screen no longer exists; reminders scheduled before it was
+    // removed still carry its route.
+    return candidate == '/review' ? '/home' : candidate;
   }
 
   Future<void> dispose() async {

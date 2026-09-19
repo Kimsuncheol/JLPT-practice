@@ -62,8 +62,10 @@ class DefaultFirebaseOptions {
     messagingSenderId: '218704881410',
     projectId: 'jlpt-practice-20a4e',
     storageBucket: 'jlpt-practice-20a4e.firebasestorage.app',
-    androidClientId: '218704881410-qbfibk4mq3ct1te7ujlu7jddh8po5tsk.apps.googleusercontent.com',
-    iosClientId: '218704881410-cjrdtpl32hel789qqvt9p7b7929cm39p.apps.googleusercontent.com',
+    androidClientId:
+        '218704881410-qbfibk4mq3ct1te7ujlu7jddh8po5tsk.apps.googleusercontent.com',
+    iosClientId:
+        '218704881410-cjrdtpl32hel789qqvt9p7b7929cm39p.apps.googleusercontent.com',
     iosBundleId: 'com.jlptpractice.jlptPractice',
   );
 }

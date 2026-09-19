@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:jlpt_practice/data/models/mock_test.dart';
 import 'package:jlpt_practice/data/models/quiz.dart';
 import 'package:jlpt_practice/data/models/review_progress.dart';
+import 'package:jlpt_practice/data/models/study_preferences.dart';
 import 'package:jlpt_practice/data/models/study_session.dart';
 import 'package:jlpt_practice/data/models/vocabulary.dart';
 
@@ -20,6 +21,11 @@ class AppState {
     required this.themeMode,
     this.eyeComfortEnabled = false,
     this.eyeComfortLevel = 0.5,
+    this.hideWord = false,
+    this.hideMeanings = false,
+    this.meaningCoverMode = MeaningCoverMode.meaningAndTranslation,
+    this.ttsVolumeMode = TtsVolumeMode.system,
+    this.ttsVolume = 1.0,
     required this.notificationsEnabled,
     this.reminderHour = 20,
     this.reminderMinute = 0,
@@ -49,6 +55,11 @@ class AppState {
   final ThemeMode themeMode;
   final bool eyeComfortEnabled;
   final double eyeComfortLevel;
+  final bool hideWord;
+  final bool hideMeanings;
+  final MeaningCoverMode meaningCoverMode;
+  final TtsVolumeMode ttsVolumeMode;
+  final double ttsVolume;
   final bool notificationsEnabled;
   final int reminderHour;
   final int reminderMinute;
@@ -69,20 +80,6 @@ class AppState {
           .where((item) => item.jlptLevel == selectedLevel)
           .toList(growable: false)
         ..sort((a, b) => a.rank.compareTo(b.rank));
-
-  List<Vocabulary> get dueVocabulary {
-    final due = vocabulary.where((item) {
-      final itemProgress = progress[item.id];
-      return itemProgress != null &&
-          itemProgress.jlptLevel == selectedLevel &&
-          itemProgress.isDue;
-    }).toList();
-    due.sort(
-      (a, b) =>
-          progress[a.id]!.nextReviewAt.compareTo(progress[b.id]!.nextReviewAt),
-    );
-    return due;
-  }
 
   int get learnedCount =>
       progress.values.where((item) => item.isLearned).length;
@@ -105,6 +102,11 @@ class AppState {
     ThemeMode? themeMode,
     bool? eyeComfortEnabled,
     double? eyeComfortLevel,
+    bool? hideWord,
+    bool? hideMeanings,
+    MeaningCoverMode? meaningCoverMode,
+    TtsVolumeMode? ttsVolumeMode,
+    double? ttsVolume,
     bool? notificationsEnabled,
     int? reminderHour,
     int? reminderMinute,
@@ -134,6 +136,11 @@ class AppState {
       themeMode: themeMode ?? this.themeMode,
       eyeComfortEnabled: eyeComfortEnabled ?? this.eyeComfortEnabled,
       eyeComfortLevel: eyeComfortLevel ?? this.eyeComfortLevel,
+      hideWord: hideWord ?? this.hideWord,
+      hideMeanings: hideMeanings ?? this.hideMeanings,
+      meaningCoverMode: meaningCoverMode ?? this.meaningCoverMode,
+      ttsVolumeMode: ttsVolumeMode ?? this.ttsVolumeMode,
+      ttsVolume: ttsVolume ?? this.ttsVolume,
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
       reminderHour: reminderHour ?? this.reminderHour,
       reminderMinute: reminderMinute ?? this.reminderMinute,

@@ -8,18 +8,12 @@ import 'package:jlpt_practice/data/models/app_state.dart';
 import 'package:jlpt_practice/features/dashboard/home_shell.dart';
 
 void main() {
-  testWidgets('review is a dashboard action and not a bottom destination', (
+  testWidgets('home has four destinations and no review action', (
     tester,
   ) async {
     final router = GoRouter(
       initialLocation: '/home',
-      routes: [
-        GoRoute(path: '/home', builder: (_, _) => const HomeShell()),
-        GoRoute(
-          path: '/review',
-          builder: (_, _) => const Scaffold(body: Text('Review route')),
-        ),
-      ],
+      routes: [GoRoute(path: '/home', builder: (_, _) => const HomeShell())],
     );
     addTearDown(router.dispose);
 
@@ -37,21 +31,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(NavigationDestination), findsNWidgets(4));
-    expect(
-      find.descendant(
-        of: find.byType(NavigationBar),
-        matching: find.text('Review'),
-      ),
-      findsNothing,
-    );
-    expect(find.text('Review'), findsOneWidget);
-
-    await tester.ensureVisible(find.text('Review'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Review'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('Review route'), findsOneWidget);
+    expect(find.text('Review'), findsNothing);
+    expect(find.text('Reviews due'), findsNothing);
   });
 }
 

@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/app/theme/app_theme.dart';
+import 'package:jlpt_practice/core/services/app_startup.dart';
 import 'package:jlpt_practice/core/services/firebase_bootstrap.dart';
 import 'package:jlpt_practice/core/services/notification_service.dart';
 
@@ -53,6 +54,19 @@ class _BootstrapScreenState extends ConsumerState<BootstrapScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final startup = ref.watch(appStartupProvider);
+    if (startup.isLoading) {
+      return const Scaffold(body: SplashScreenContent());
+    }
+    if (startup.hasError) {
+      return Scaffold(
+        body: _SplashError(
+          error: startup.error!,
+          onRetry: () => ref.invalidate(appStartupProvider),
+        ),
+      );
+    }
+
     final state = ref.watch(appControllerProvider);
     ref.listen(appControllerProvider, (_, next) {
       next.whenData((value) {

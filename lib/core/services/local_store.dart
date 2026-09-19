@@ -5,6 +5,7 @@ import 'package:jlpt_practice/data/models/app_state.dart';
 import 'package:jlpt_practice/data/models/grammar_progress.dart';
 import 'package:jlpt_practice/data/models/grammar_study_session.dart';
 import 'package:jlpt_practice/data/models/review_progress.dart';
+import 'package:jlpt_practice/data/models/study_preferences.dart';
 import 'package:jlpt_practice/data/models/study_session.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -21,6 +22,11 @@ class LocalSettings {
     required this.themeMode,
     this.eyeComfortEnabled = false,
     this.eyeComfortLevel = 0.5,
+    this.hideWord = false,
+    this.hideMeanings = false,
+    this.meaningCoverMode = MeaningCoverMode.meaningAndTranslation,
+    this.ttsVolumeMode = TtsVolumeMode.system,
+    this.ttsVolume = 1.0,
     required this.notificationsEnabled,
     required this.reminderHour,
     required this.reminderMinute,
@@ -43,6 +49,11 @@ class LocalSettings {
   final ThemeMode themeMode;
   final bool eyeComfortEnabled;
   final double eyeComfortLevel;
+  final bool hideWord;
+  final bool hideMeanings;
+  final MeaningCoverMode meaningCoverMode;
+  final TtsVolumeMode ttsVolumeMode;
+  final double ttsVolume;
   final bool notificationsEnabled;
   final int reminderHour;
   final int reminderMinute;
@@ -91,6 +102,15 @@ class LocalStore {
         0.0,
         1.0,
       ),
+      hideWord: _preferences.getBool('hideWord') ?? false,
+      hideMeanings: _preferences.getBool('hideMeanings') ?? false,
+      meaningCoverMode: MeaningCoverMode.parse(
+        _preferences.getString('meaningCoverMode'),
+      ),
+      ttsVolumeMode: TtsVolumeMode.parse(
+        _preferences.getString('ttsVolumeMode'),
+      ),
+      ttsVolume: (_preferences.getDouble('ttsVolume') ?? 1.0).clamp(0.0, 1.0),
       notificationsEnabled:
           _preferences.getBool('notificationsEnabled') ?? false,
       reminderHour: _preferences.getInt('reminderHour') ?? 20,
@@ -118,6 +138,11 @@ class LocalStore {
       setValue('themeMode', state.themeMode.name),
       setValue('eyeComfortEnabled', state.eyeComfortEnabled),
       setValue('eyeComfortLevel', state.eyeComfortLevel),
+      setValue('hideWord', state.hideWord),
+      setValue('hideMeanings', state.hideMeanings),
+      setValue('meaningCoverMode', state.meaningCoverMode.name),
+      setValue('ttsVolumeMode', state.ttsVolumeMode.name),
+      setValue('ttsVolume', state.ttsVolume),
       setValue('notificationsEnabled', state.notificationsEnabled),
       setValue('reminderHour', state.reminderHour),
       setValue('reminderMinute', state.reminderMinute),
@@ -304,6 +329,11 @@ class LocalStore {
       'themeMode',
       'eyeComfortEnabled',
       'eyeComfortLevel',
+      'hideWord',
+      'hideMeanings',
+      'meaningCoverMode',
+      'ttsVolumeMode',
+      'ttsVolume',
       'notificationsEnabled',
       'reminderHour',
       'reminderMinute',

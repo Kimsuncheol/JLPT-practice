@@ -11,10 +11,11 @@ import 'package:jlpt_practice/core/services/volume_service.dart';
 import 'package:jlpt_practice/core/utils/immersive_study_mode.dart';
 import 'package:jlpt_practice/core/utils/study_batches.dart';
 import 'package:jlpt_practice/data/models/app_state.dart';
-import 'package:jlpt_practice/data/models/review_progress.dart';
+import 'package:jlpt_practice/data/models/study_preferences.dart';
 import 'package:jlpt_practice/data/models/study_session.dart';
 import 'package:jlpt_practice/data/models/vocabulary.dart';
-import 'package:jlpt_practice/shared/app_toast.dart';
+import 'package:jlpt_practice/features/vocabulary/cover_masking.dart';
+import 'package:jlpt_practice/features/vocabulary/cover_tape.dart';
 
 class StudyScreen extends ConsumerStatefulWidget {
   const StudyScreen({required this.day, super.key});
@@ -109,46 +110,71 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
                     vocabulary: word,
                     language: state.meaningLanguage,
                     showFurigana: _showFurigana!,
-                    isInReview: state.progress.containsKey(word.id),
-                    onToggleFurigana: () {
-                      setState(() => _showFurigana = !_showFurigana!);
-                    },
+                    hideWord: state.hideWord,
+                    hideMeaning:
+                        state.hideMeanings &&
+                        state.meaningCoverMode != MeaningCoverMode.translation,
+                    hideTranslation:
+                        state.hideMeanings &&
+                        state.meaningCoverMode != MeaningCoverMode.meaning,
+                    maskMeaningInTranslation:
+                        state.hideMeanings &&
+                        state.meaningCoverMode == MeaningCoverMode.meaning,
                     onSpeakWord: () => _speakIfAudible(word.reading),
                     onSpeakExample: () =>
                         _speakIfAudible(word.example.sentence),
-                    onReview: () async {
-                      final controller = ref.read(
-                        appControllerProvider.notifier,
-                      );
-                      final wasInReview = state.progress.containsKey(word.id);
-                      if (wasInReview) {
-                        await controller.removeVocabularyProgress(word.id);
-                      } else {
-                        await controller.rateVocabulary(
-                          word.id,
-                          ReviewRating.again,
-                        );
-                      }
-                      if (context.mounted) {
-                        showAppToast(
-                          context,
-                          context.strings(
-                            wasInReview
-                                ? 'removedFromReviewToast'
-                                : 'addedToReviewToast',
-                          ),
-                        );
-                      }
-                    },
                   ),
                 );
               },
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _CardAction(
+                  icon: _showFurigana!
+                      ? Icons.visibility_off_rounded
+                      : Icons.visibility_rounded,
+                  label: context.strings(
+                    _showFurigana! ? 'hideReading' : 'showReading',
+                  ),
+                  onTap: () => setState(() => _showFurigana = !_showFurigana!),
+                ),
+                _CardAction(
+                  icon: state.hideWord
+                      ? Icons.visibility_rounded
+                      : Icons.visibility_off_rounded,
+                  label: context.strings(
+                    state.hideWord ? 'showWord' : 'hideWord',
+                  ),
+                  onTap: () => unawaited(
+                    ref
+                        .read(appControllerProvider.notifier)
+                        .setHideWord(!state.hideWord),
+                  ),
+                ),
+                _CardAction(
+                  icon: state.hideMeanings
+                      ? Icons.visibility_rounded
+                      : Icons.visibility_off_rounded,
+                  label: context.strings(
+                    state.hideMeanings ? 'showMeanings' : 'hideMeanings',
+                  ),
+                  onTap: () => unawaited(
+                    ref
+                        .read(appControllerProvider.notifier)
+                        .setHideMeanings(!state.hideMeanings),
+                  ),
+                ),
+              ],
+            ),
+          ),
           SafeArea(
             top: false,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 6, 20, 14),
+              padding: const EdgeInsets.fromLTRB(20, 30, 20, 20),
               child: Text(
                 '${_index + 1} / ${words.length}',
                 style: const TextStyle(fontWeight: FontWeight.w700),
@@ -178,6 +204,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
         unawaited(_confirmResume(session, words));
       } else {
         unawaited(_savePosition(state, words.first, 0));
+        _autoPlayFirstWord(words.first);
       }
     });
   }
@@ -241,7 +268,12 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
       return;
     }
 
-    if (resumeIndex == 0) return;
+    if (resumeIndex == 0) {
+      // Resuming on the first word never changes the page, so the page-change
+      // handler cannot play it.
+      _autoPlayFirstWord(words.first);
+      return;
+    }
     _suppressAutoAudio = true;
     _pageController!.jumpToPage(resumeIndex);
   }
@@ -272,19 +304,35 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
         );
   }
 
+  /// The first word is on screen from the start, so no page change fires to
+  /// trigger automatic pronunciation for it.
+  void _autoPlayFirstWord(Vocabulary word) {
+    if (!mounted) return;
+    if (ref.read(appControllerProvider).value?.autoPlayAudio ?? false) {
+      _speak(word.word);
+    }
+  }
+
   void _speak(String text) {
     _ttsService ??= ref.read(ttsServiceProvider);
     unawaited(_ttsService!.speak(text));
   }
 
   Future<void> _speakIfAudible(String text) async {
-    if (await isSystemVolumeTooLow()) {
+    // Slider mode sets the device volume itself when speaking, so only the
+    // level chosen there can make speech inaudible.
+    final settings = ref.read(appControllerProvider).value;
+    final tooQuiet = settings?.ttsVolumeMode == TtsVolumeMode.slider
+        ? settings!.ttsVolume <= lowVolumeThreshold
+        : await isSystemVolumeTooLow();
+    if (tooQuiet) {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(context.strings('lowVolumeBody'))));
       return;
     }
+    if (!mounted) return;
     _speak(text);
   }
 
@@ -326,53 +374,51 @@ class _StudyCard extends StatelessWidget {
     required this.vocabulary,
     required this.language,
     required this.showFurigana,
-    required this.isInReview,
-    required this.onToggleFurigana,
+    required this.hideWord,
+    required this.hideMeaning,
+    required this.hideTranslation,
+    required this.maskMeaningInTranslation,
     required this.onSpeakWord,
     required this.onSpeakExample,
-    required this.onReview,
   });
 
   final Vocabulary vocabulary;
   final String language;
   final bool showFurigana;
-  final bool isInReview;
-  final VoidCallback onToggleFurigana;
+  final bool hideWord;
+  final bool hideMeaning;
+  final bool hideTranslation;
+  final bool maskMeaningInTranslation;
   final VoidCallback onSpeakWord;
   final VoidCallback onSpeakExample;
-  final VoidCallback onReview;
+
+  /// The romaji spells out the reading, so it is taped whenever both the word
+  /// and the reading are hidden; otherwise it would give the word away.
+  bool get _hideRomaji => hideWord && !showFurigana;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: _centeredScrollable(
-            padding: const EdgeInsets.fromLTRB(24, 26, 24, 24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _buildReading(context),
-                const SizedBox(height: 6),
-                _buildWord(context),
-                const SizedBox(height: 10),
-                _buildRomaji(context),
-                const SizedBox(height: 8),
-                _buildMeaning(context),
-                if (vocabulary.hasExample) ...[
-                  const SizedBox(height: 34),
-                  Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: _buildExample(context),
-                  ),
-                ],
-              ],
+    return _centeredScrollable(
+      padding: const EdgeInsets.fromLTRB(24, 26, 24, 24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _buildReading(context),
+          const SizedBox(height: 6),
+          _buildWord(context),
+          const SizedBox(height: 10),
+          _buildRomaji(context),
+          const SizedBox(height: 8),
+          _buildMeaning(context),
+          if (vocabulary.hasExample) ...[
+            const SizedBox(height: 34),
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: _buildExample(context),
             ),
-          ),
-        ),
-        const SizedBox(height: 15),
-        _buildActionsRow(context),
-      ],
+          ],
+        ],
+      ),
     );
   }
 
@@ -393,24 +439,33 @@ class _StudyCard extends StatelessWidget {
     );
   }
 
-  Widget _buildReading(BuildContext context) => AnimatedOpacity(
-    opacity: showFurigana && vocabulary.reading.compareTo(vocabulary.word) != 0
-        ? 1
-        : 0,
-    duration: const Duration(milliseconds: 180),
-    child: IgnorePointer(
-      ignoring: !showFurigana || vocabulary.reading == vocabulary.word,
-      child: _speechTarget(
-        onTap: onSpeakWord,
-        child: Text(
-          vocabulary.reading,
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            color: Theme.of(context).colorScheme.primary,
-          ),
+  Widget _buildReading(BuildContext context) {
+    final hasReading = vocabulary.reading != vocabulary.word;
+    final titleLarge = Theme.of(context).textTheme.titleLarge;
+    return AnimatedOpacity(
+      opacity: hasReading ? 1 : 0,
+      duration: const Duration(milliseconds: 180),
+      child: IgnorePointer(
+        ignoring: !hasReading,
+        child: _speechTarget(
+          onTap: onSpeakWord,
+          child: showFurigana
+              ? Text(
+                  vocabulary.reading,
+                  style: titleLarge?.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                )
+              : coverTapeFor(
+                  characters: vocabulary.reading.length,
+                  fontSize: titleLarge?.fontSize ?? 22,
+                  maxWidth: 220,
+                  glyphWidth: 0.9,
+                ),
         ),
       ),
-    ),
-  );
+    );
+  }
 
   Widget _buildWord(BuildContext context) => Semantics(
     button: true,
@@ -423,17 +478,23 @@ class _StudyCard extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
         child: FittedBox(
           fit: BoxFit.scaleDown,
-          child: Text(
-            vocabulary.word,
-            maxLines: 1,
-            softWrap: false,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 56,
-              height: 1.15,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
+          child: hideWord
+              ? coverTapeFor(
+                  characters: vocabulary.word.length,
+                  fontSize: 56 * 1.15,
+                  tilt: -0.02,
+                )
+              : Text(
+                  vocabulary.word,
+                  maxLines: 1,
+                  softWrap: false,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 56,
+                    height: 1.15,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
         ),
       ),
     ),
@@ -441,10 +502,20 @@ class _StudyCard extends StatelessWidget {
 
   Widget _buildRomaji(BuildContext context) => _speechTarget(
     onTap: onSpeakWord,
-    child: Text(
-      vocabulary.romaji,
-      style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
-    ),
+    child: _hideRomaji
+        ? coverTapeFor(
+            characters: vocabulary.romaji.length,
+            fontSize: 14,
+            maxWidth: 160,
+            glyphWidth: 0.6,
+            tilt: 0.01,
+          )
+        : Text(
+            vocabulary.romaji,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
   );
 
   Widget _speechTarget({required VoidCallback onTap, required Widget child}) =>
@@ -462,72 +533,122 @@ class _StudyCard extends StatelessWidget {
         ),
       );
 
-  Widget _buildMeaning(BuildContext context) => Text(
-    vocabulary.meaning(language),
-    textAlign: TextAlign.center,
-    style: Theme.of(context).textTheme.headlineMedium,
-  );
+  Widget _buildMeaning(BuildContext context) {
+    final style = Theme.of(context).textTheme.headlineMedium;
+    final meaning = vocabulary.meaning(language);
+    if (!hideMeaning) {
+      return Text(meaning, textAlign: TextAlign.center, style: style);
+    }
+    return coverTapeFor(
+      characters: meaning.length,
+      fontSize: style?.fontSize ?? 28,
+      maxWidth: 260,
+      glyphWidth: 0.7,
+      tilt: 0.015,
+    );
+  }
 
-  Widget _buildExample(BuildContext context) => Column(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      Semantics(
-        button: true,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(12),
-          splashFactory: NoSplash.splashFactory,
-          overlayColor: const WidgetStatePropertyAll(Colors.transparent),
-          onTap: onSpeakExample,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            child: Text(
-              _withRolePlayLineBreaks(vocabulary.example.sentence),
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.titleLarge,
+  Widget _buildExample(BuildContext context) {
+    final sentenceStyle = Theme.of(context).textTheme.titleLarge;
+    final translationStyle = TextStyle(
+      color: Theme.of(context).colorScheme.onSurfaceVariant,
+    );
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Semantics(
+          button: true,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(12),
+            splashFactory: NoSplash.splashFactory,
+            overlayColor: const WidgetStatePropertyAll(Colors.transparent),
+            onTap: onSpeakExample,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              child: _maskedText(
+                _withRolePlayLineBreaks(vocabulary.example.sentence),
+                style: sentenceStyle,
+                targets: hideWord ? wordMaskTargets(vocabulary.word) : const [],
+                glyphWidth: 1,
+              ),
             ),
           ),
         ),
-      ),
-      if (showFurigana) ...[
-        const SizedBox(height: 6),
-        _speechTarget(
-          onTap: onSpeakExample,
-          child: Text(
-            _withRolePlayLineBreaks(vocabulary.example.reading),
-            textAlign: TextAlign.center,
+        if (showFurigana) ...[
+          const SizedBox(height: 6),
+          _speechTarget(
+            onTap: onSpeakExample,
+            child: Text(
+              _withRolePlayLineBreaks(vocabulary.example.reading),
+              textAlign: TextAlign.center,
+            ),
           ),
-        ),
+        ],
+        const SizedBox(height: 4),
+        _buildTranslation(context, translationStyle),
       ],
-      const SizedBox(height: 4),
-      Text(
-        _withRolePlayLineBreaks(vocabulary.example.translation(language)),
-        textAlign: TextAlign.center,
-        style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
-      ),
-    ],
-  );
+    );
+  }
 
-  Widget _buildActionsRow(BuildContext context) => Row(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: [
-      _CardAction(
-        icon: showFurigana
-            ? Icons.visibility_off_rounded
-            : Icons.visibility_rounded,
-        label: showFurigana
-            ? context.strings('hideReading')
-            : context.strings('showReading'),
-        onTap: onToggleFurigana,
+  Widget _buildTranslation(BuildContext context, TextStyle style) {
+    final translation = _withRolePlayLineBreaks(
+      vocabulary.example.translation(language),
+    );
+    if (hideTranslation) {
+      return coverTapeFor(
+        characters: translation.length,
+        fontSize: 16,
+        maxWidth: 280,
+        glyphWidth: 0.5,
+        tilt: -0.01,
+      );
+    }
+    return _maskedText(
+      translation,
+      style: style,
+      targets: maskMeaningInTranslation
+          ? meaningMaskTargets(
+              vocabulary.meanings[language] ??
+                  vocabulary.meanings['en'] ??
+                  const [],
+            )
+          : const [],
+      glyphWidth: 0.55,
+    );
+  }
+
+  /// Renders [text] centered, laying tape over every run matching [targets].
+  Widget _maskedText(
+    String text, {
+    required TextStyle? style,
+    required List<String> targets,
+    required double glyphWidth,
+  }) {
+    if (targets.isEmpty) {
+      return Text(text, textAlign: TextAlign.center, style: style);
+    }
+    final fontSize = style?.fontSize ?? 14;
+    return Text.rich(
+      TextSpan(
+        style: style,
+        children: [
+          for (final segment in maskSegments(text, targets))
+            if (segment.covered)
+              WidgetSpan(
+                alignment: PlaceholderAlignment.middle,
+                child: coverTapeFor(
+                  characters: segment.text.length,
+                  fontSize: fontSize,
+                  glyphWidth: glyphWidth,
+                ),
+              )
+            else
+              TextSpan(text: segment.text),
+        ],
       ),
-      _CardAction(
-        icon: isInReview
-            ? Icons.bookmark_added_rounded
-            : Icons.bookmark_add_outlined,
-        label: context.strings(isInReview ? 'removeFromReview' : 'markReview'),
-        onTap: onReview,
-      ),
-    ],
-  );
+      textAlign: TextAlign.center,
+    );
+  }
 }
 
 String _withRolePlayLineBreaks(String text) => text.replaceAllMapped(
@@ -549,6 +670,8 @@ class _CardAction extends StatelessWidget {
   Widget build(BuildContext context) => Expanded(
     child: InkWell(
       borderRadius: BorderRadius.circular(16),
+      splashFactory: NoSplash.splashFactory,
+      highlightColor: Colors.transparent,
       onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 3),

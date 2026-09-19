@@ -5,8 +5,12 @@ import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/app/theme/app_theme.dart';
 import 'package:jlpt_practice/data/models/app_state.dart';
+import 'package:jlpt_practice/data/models/study_preferences.dart';
+import 'package:jlpt_practice/features/settings/eye_comfort_screen.dart';
 import 'package:jlpt_practice/features/settings/learning_language_screen.dart';
 import 'package:jlpt_practice/features/settings/learning_settings_screen.dart';
+import 'package:jlpt_practice/features/settings/recall_cover_screen.dart';
+import 'package:jlpt_practice/features/settings/tts_volume_screen.dart';
 import 'package:jlpt_practice/shared/eye_comfort_overlay.dart';
 
 void main() {
@@ -23,6 +27,18 @@ void main() {
         GoRoute(
           path: '/settings/learning-language',
           builder: (_, _) => const LearningLanguageScreen(),
+        ),
+        GoRoute(
+          path: '/settings/recall-cover',
+          builder: (_, _) => const RecallCoverScreen(),
+        ),
+        GoRoute(
+          path: '/settings/tts-volume',
+          builder: (_, _) => const TtsVolumeScreen(),
+        ),
+        GoRoute(
+          path: '/settings/eye-comfort',
+          builder: (_, _) => const EyeComfortScreen(),
         ),
       ],
     );
@@ -49,10 +65,91 @@ void main() {
     expect(find.byType(LearningLanguageScreen), findsOneWidget);
   });
 
+  testWidgets('furigana and automatic pronunciation live here', (tester) async {
+    final container = await pump(tester, const LearningSettingsScreen());
+
+    expect(find.text('Show furigana'), findsOneWidget);
+    expect(find.text('Automatic pronunciation'), findsOneWidget);
+
+    await tester.tap(find.text('Automatic pronunciation'));
+    await tester.pumpAndSettle();
+    expect(
+      container.read(appControllerProvider).requireValue.autoPlayAudio,
+      isTrue,
+    );
+    await tester.tap(find.text('Show furigana'));
+    await tester.pumpAndSettle();
+    expect(
+      container.read(appControllerProvider).requireValue.showFurigana,
+      isFalse,
+    );
+  });
+
+  testWidgets('wires to the recall cover, volume and eye comfort screens', (
+    tester,
+  ) async {
+    await pump(tester, const LearningSettingsScreen());
+    expect(find.byType(Slider), findsNothing);
+
+    for (final (tile, screen) in [
+      ('Hide and recall', RecallCoverScreen),
+      ('Pronunciation volume', TtsVolumeScreen),
+      ('Eye comfort mode', EyeComfortScreen),
+    ]) {
+      await tester.tap(find.text(tile));
+      await tester.pumpAndSettle();
+      expect(find.byType(screen), findsOneWidget, reason: tile);
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+    }
+  });
+
+  testWidgets('recall cover screen edits what is covered', (tester) async {
+    final container = await pump(tester, const RecallCoverScreen());
+    AppState state() => container.read(appControllerProvider).requireValue;
+
+    await tester.tap(find.text('Hide word'));
+    await tester.tap(find.text('Hide meanings'));
+    await tester.pumpAndSettle();
+    expect(state().hideWord, isTrue);
+    expect(state().hideMeanings, isTrue);
+
+    await tester.tap(find.text('Meanings only'));
+    await tester.pumpAndSettle();
+    expect(state().meaningCoverMode, MeaningCoverMode.meaning);
+    await tester.tap(find.text('Translations only'));
+    await tester.pumpAndSettle();
+    expect(state().meaningCoverMode, MeaningCoverMode.translation);
+  });
+
+  testWidgets('volume screen switches between system and slider', (
+    tester,
+  ) async {
+    final container = await pump(tester, const TtsVolumeScreen());
+    AppState state() => container.read(appControllerProvider).requireValue;
+
+    expect(state().ttsVolumeMode, TtsVolumeMode.system);
+    expect(find.byType(Slider), findsNothing);
+
+    await tester.tap(find.text('Custom level'));
+    await tester.pumpAndSettle();
+    expect(state().ttsVolumeMode, TtsVolumeMode.slider);
+    expect(find.byType(Slider), findsOneWidget);
+
+    await tester.drag(find.byType(Slider), const Offset(-300, 0));
+    await tester.pumpAndSettle();
+    expect(state().ttsVolume, lessThan(1));
+
+    await tester.tap(find.text('System volume'));
+    await tester.pumpAndSettle();
+    expect(state().ttsVolumeMode, TtsVolumeMode.system);
+    expect(find.byType(Slider), findsNothing);
+  });
+
   testWidgets('slider is disabled until eye comfort mode is on', (
     tester,
   ) async {
-    final container = await pump(tester, const LearningSettingsScreen());
+    final container = await pump(tester, const EyeComfortScreen());
 
     expect(tester.widget<Slider>(find.byType(Slider)).onChanged, isNull);
 
@@ -116,6 +213,41 @@ class _FakeAppController extends AppController {
     currentStreak: 0,
     longestStreak: 0,
   );
+
+  @override
+  Future<void> setShowFurigana(bool value) async {
+    state = AsyncData(state.requireValue.copyWith(showFurigana: value));
+  }
+
+  @override
+  Future<void> setAutoPlayAudio(bool value) async {
+    state = AsyncData(state.requireValue.copyWith(autoPlayAudio: value));
+  }
+
+  @override
+  Future<void> setHideWord(bool value) async {
+    state = AsyncData(state.requireValue.copyWith(hideWord: value));
+  }
+
+  @override
+  Future<void> setHideMeanings(bool value) async {
+    state = AsyncData(state.requireValue.copyWith(hideMeanings: value));
+  }
+
+  @override
+  Future<void> setMeaningCoverMode(MeaningCoverMode value) async {
+    state = AsyncData(state.requireValue.copyWith(meaningCoverMode: value));
+  }
+
+  @override
+  Future<void> setTtsVolumeMode(TtsVolumeMode value) async {
+    state = AsyncData(state.requireValue.copyWith(ttsVolumeMode: value));
+  }
+
+  @override
+  Future<void> setTtsVolume(double value) async {
+    state = AsyncData(state.requireValue.copyWith(ttsVolume: value));
+  }
 
   @override
   Future<void> setEyeComfortEnabled(bool value) async {

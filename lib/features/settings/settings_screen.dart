@@ -84,18 +84,6 @@ class SettingsScreen extends ConsumerWidget {
               _SettingsGroup(
                 children: [
                   SwitchListTile(
-                    secondary: const Icon(Icons.subtitles_rounded),
-                    title: Text(strings('showFurigana')),
-                    value: state.showFurigana,
-                    onChanged: controller.setShowFurigana,
-                  ),
-                  SwitchListTile(
-                    secondary: const Icon(Icons.volume_up_rounded),
-                    title: Text(strings('autoAudio')),
-                    value: state.autoPlayAudio,
-                    onChanged: controller.setAutoPlayAudio,
-                  ),
-                  SwitchListTile(
                     secondary: const Icon(Icons.notifications_active_outlined),
                     title: Text(strings('notifications')),
                     subtitle: Text(

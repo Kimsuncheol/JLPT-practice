@@ -6,6 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/app/router.dart';
 import 'package:jlpt_practice/app/theme/app_theme.dart';
+import 'package:jlpt_practice/core/services/app_startup.dart';
+import 'package:jlpt_practice/core/services/notification_service.dart';
 import 'package:jlpt_practice/core/utils/system_bar_metrics.dart';
 import 'package:jlpt_practice/shared/network_status_screen.dart';
 
@@ -14,18 +16,26 @@ class JlptPracticeApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final asyncState = ref.watch(appControllerProvider);
-    final locale = asyncState.when<Locale?>(
+    final startup = ref.watch(appStartupProvider);
+    final asyncState = startup.hasValue
+        ? ref.watch(appControllerProvider)
+        : null;
+    if (startup.hasValue) {
+      NotificationService.instance.onRoute = appRouter.go;
+    }
+    final locale = asyncState?.when<Locale?>(
       data: (state) =>
           state.languageCode == 'system' ? null : Locale(state.languageCode),
       loading: () => null,
       error: (_, _) => null,
     );
-    final themeMode = asyncState.when(
-      data: (state) => state.themeMode,
-      loading: () => ThemeMode.system,
-      error: (_, _) => ThemeMode.system,
-    );
+    final themeMode =
+        asyncState?.when(
+          data: (state) => state.themeMode,
+          loading: () => ThemeMode.system,
+          error: (_, _) => ThemeMode.system,
+        ) ??
+        ThemeMode.system;
     return MaterialApp.router(
       title: 'Kotoba Flow',
       debugShowCheckedModeBanner: false,

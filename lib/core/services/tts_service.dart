@@ -1,5 +1,7 @@
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:jlpt_practice/data/models/study_preferences.dart';
+import 'package:volume_controller/volume_controller.dart';
 
 final _furiganaAfterKanji = RegExp(
   r'([\u3400-\u4DBF\u4E00-\u9FFF々〆ヵヶ])[\u0020\u3000]*(?:（[ぁ-ゖァ-ヺー・]+）|\([ぁ-ゖァ-ヺー・]+\))',
@@ -57,10 +59,32 @@ List<DialogueTurn> parseDialogueScript(String passage) {
   return turns;
 }
 
+/// The user's chosen source for pronunciation volume.
+class TtsVolumePreference {
+  const TtsVolumePreference({required this.mode, required this.level});
+
+  static const system = TtsVolumePreference(
+    mode: TtsVolumeMode.system,
+    level: 1,
+  );
+
+  final TtsVolumeMode mode;
+
+  /// Media volume in 0..1 that [TtsVolumeMode.slider] applies while speaking.
+  final double level;
+}
+
 class TtsService {
-  TtsService() {
+  TtsService({TtsVolumePreference Function()? volumePreference})
+    : _volumePreference =
+          volumePreference ?? (() => TtsVolumePreference.system) {
     _ready = _initialize();
   }
+
+  final TtsVolumePreference Function() _volumePreference;
+
+  /// System media volume captured before the slider level overrode it.
+  double? _systemVolumeToRestore;
 
   final FlutterTts _tts = FlutterTts();
   late final AudioSession _audioSession;
@@ -108,6 +132,8 @@ class TtsService {
     if (!hasAudioFocus || request != _speechRequest) return;
 
     try {
+      await _applyVolumePreference();
+      if (request != _speechRequest) return;
       // AudioSession owns focus so flutter_tts must not acquire a second,
       // independently managed focus request.
       await _tts.speak(speechText, focus: false);
@@ -136,6 +162,7 @@ class TtsService {
     if (!hasAudioFocus || request != _speechRequest) return;
 
     try {
+      await _applyVolumePreference();
       for (final turn in turns) {
         if (request != _speechRequest) return;
         final speechText = prepareJapaneseTextForSpeech(turn.text).trim();
@@ -162,9 +189,38 @@ class TtsService {
 
   Future<void> dispose() => stop();
 
-  Future<void> _releaseAudioFocus() => _audioSession.setActive(
-    false,
-    avAudioSessionSetActiveOptions:
-        AVAudioSessionSetActiveOptions.notifyOthersOnDeactivation,
-  );
+  Future<void> _releaseAudioFocus() async {
+    await _restoreSystemVolume();
+    await _audioSession.setActive(
+      false,
+      avAudioSessionSetActiveOptions:
+          AVAudioSessionSetActiveOptions.notifyOthersOnDeactivation,
+    );
+  }
+
+  /// In slider mode the device media volume is set to the app's own level for
+  /// the duration of the speech, so it no longer depends on where the system
+  /// volume happened to be. System mode leaves the device volume untouched.
+  Future<void> _applyVolumePreference() async {
+    final preference = _volumePreference();
+    if (preference.mode != TtsVolumeMode.slider) return;
+    try {
+      final controller = VolumeController.instance..showSystemUI = false;
+      _systemVolumeToRestore ??= await controller.getVolume();
+      await controller.setVolume(preference.level.clamp(0.0, 1.0));
+    } catch (_) {
+      // Without volume access, speech simply follows the system volume.
+    }
+  }
+
+  Future<void> _restoreSystemVolume() async {
+    final previous = _systemVolumeToRestore;
+    if (previous == null) return;
+    _systemVolumeToRestore = null;
+    try {
+      await (VolumeController.instance..showSystemUI = false).setVolume(
+        previous,
+      );
+    } catch (_) {}
+  }
 }

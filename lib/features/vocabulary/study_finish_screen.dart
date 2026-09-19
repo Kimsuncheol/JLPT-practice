@@ -100,6 +100,10 @@ class StudyFinishScreen extends ConsumerWidget {
     await ref
         .read(appControllerProvider.notifier)
         .completeStudySession(level, day);
-    if (context.mounted) context.go('/study');
+    if (!context.mounted) return;
+    // go('/study') would leave the day list as the only route, so the system
+    // back button would close the app. Rebuild home → day list instead.
+    context.go('/home');
+    context.push('/study');
   }
 }

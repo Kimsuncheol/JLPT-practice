@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
+import 'package:jlpt_practice/data/models/study_preferences.dart';
 
 class LearningSettingsScreen extends ConsumerWidget {
   const LearningSettingsScreen({super.key});
@@ -40,32 +41,47 @@ class LearningSettingsScreen extends ConsumerWidget {
               _Group(
                 children: [
                   SwitchListTile(
-                    secondary: const Icon(Icons.wb_twilight_rounded),
-                    title: Text(strings('eyeComfort')),
-                    value: state.eyeComfortEnabled,
-                    onChanged: controller.setEyeComfortEnabled,
+                    secondary: const Icon(Icons.subtitles_rounded),
+                    title: Text(strings('showFurigana')),
+                    value: state.showFurigana,
+                    onChanged: controller.setShowFurigana,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-                    child: Row(
-                      children: [
-                        Expanded(child: Text(strings('eyeComfortStrength'))),
-                        Text(
-                          '${(state.eyeComfortLevel * 100).round()}%',
-                          style: Theme.of(context).textTheme.labelLarge,
-                        ),
-                      ],
+                  SwitchListTile(
+                    secondary: const Icon(Icons.volume_up_rounded),
+                    title: Text(strings('autoAudio')),
+                    value: state.autoPlayAudio,
+                    onChanged: controller.setAutoPlayAudio,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              _Group(
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.layers_clear_rounded),
+                    title: Text(strings('recallCover')),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => context.push('/settings/recall-cover'),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.graphic_eq_rounded),
+                    title: Text(strings('ttsVolume')),
+                    subtitle: Text(
+                      state.ttsVolumeMode == TtsVolumeMode.slider
+                          ? '${strings('volumeSlider')} · ${(state.ttsVolume * 100).round()}%'
+                          : strings('volumeSystem'),
                     ),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => context.push('/settings/tts-volume'),
                   ),
-                  Slider(
-                    value: state.eyeComfortLevel,
-                    label: '${(state.eyeComfortLevel * 100).round()}%',
-                    divisions: 20,
-                    semanticFormatterCallback: (value) =>
-                        '${strings('eyeComfortStrength')} ${(value * 100).round()}%',
-                    onChanged: state.eyeComfortEnabled
-                        ? controller.setEyeComfortLevel
-                        : null,
+                  ListTile(
+                    leading: const Icon(Icons.wb_twilight_rounded),
+                    title: Text(strings('eyeComfort')),
+                    subtitle: Text(
+                      strings(state.eyeComfortEnabled ? 'on' : 'off'),
+                    ),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => context.push('/settings/eye-comfort'),
                   ),
                 ],
               ),

@@ -10,11 +10,13 @@ import 'package:jlpt_practice/core/services/tts_service.dart';
 import 'package:jlpt_practice/core/utils/system_bar_metrics.dart';
 import 'package:jlpt_practice/data/models/app_state.dart';
 import 'package:jlpt_practice/data/models/grammar_study_session.dart';
+import 'package:jlpt_practice/data/models/study_preferences.dart';
 import 'package:jlpt_practice/data/models/study_session.dart';
 import 'package:jlpt_practice/data/models/vocabulary.dart';
 import 'package:jlpt_practice/features/dashboard/choose_study_screen.dart';
 import 'package:jlpt_practice/features/dashboard/dashboard_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/study_finish_screen.dart';
+import 'package:jlpt_practice/features/vocabulary/cover_tape.dart';
 import 'package:jlpt_practice/features/vocabulary/study_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -148,6 +150,168 @@ void main() {
     expect(speech.spoken, ['たんご', 'たんご', 'たんご']);
   });
 
+  testWidgets('automatic pronunciation reads the first word of a new day', (
+    tester,
+  ) async {
+    final speech = _RecordingTtsService();
+    final container = ProviderContainer(
+      overrides: [
+        // The saved session belongs to day 1, so day 2 is studied fresh.
+        appControllerProvider.overrideWith(
+          () => _ResumeAppController('word_0', 0, autoPlayAudio: true),
+        ),
+        ttsServiceProvider.overrideWithValue(speech),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container.read(appControllerProvider.future);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const MaterialApp(home: StudyScreen(day: 2)),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('単語6'), findsOneWidget);
+    expect(speech.events, ['speak:単語6']);
+  });
+
+  testWidgets('a new day stays silent while automatic pronunciation is off', (
+    tester,
+  ) async {
+    final speech = _RecordingTtsService();
+    final container = ProviderContainer(
+      overrides: [
+        appControllerProvider.overrideWith(
+          () => _ResumeAppController('word_0', 0),
+        ),
+        ttsServiceProvider.overrideWithValue(speech),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container.read(appControllerProvider.future);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const MaterialApp(home: StudyScreen(day: 2)),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(speech.events, isEmpty);
+  });
+
+  testWidgets('bottom buttons cover the reading, word and meanings with tape', (
+    tester,
+  ) async {
+    final container = ProviderContainer(
+      overrides: [
+        appControllerProvider.overrideWith(
+          () => _ResumeAppController('word_0', 0, withExamples: true),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container.read(appControllerProvider.future);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const MaterialApp(home: StudyScreen(day: 2)),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.byType(CoverTape), findsNothing);
+    expect(find.text('単語6'), findsOneWidget);
+    expect(find.text('毎日単語6を使います。'), findsOneWidget);
+    expect(find.text('word'), findsOneWidget);
+
+    await tester.tap(find.text('Hide word'));
+    await tester.pumpAndSettle();
+    expect(find.text('単語6'), findsNothing);
+    // The example sentence keeps its text but the word in it is taped.
+    expect(find.byType(CoverTape), findsWidgets);
+    expect(find.textContaining('を使います。', findRichText: true), findsOneWidget);
+    expect(find.textContaining('単語6を使います。', findRichText: true), findsNothing);
+    expect(find.text('Show word'), findsOneWidget);
+
+    await tester.tap(find.text('Hide meanings'));
+    await tester.pumpAndSettle();
+    expect(find.text('word'), findsNothing);
+    expect(find.text('I use the word every day.'), findsNothing);
+
+    await tester.tap(find.text('Hide reading'));
+    await tester.pumpAndSettle();
+    expect(find.text('たんご'), findsNothing);
+
+    await tester.tap(find.text('Show word'));
+    await tester.tap(find.text('Show meanings'));
+    await tester.tap(find.text('Show reading'));
+    await tester.pumpAndSettle();
+    expect(find.byType(CoverTape), findsNothing);
+    expect(find.text('単語6'), findsOneWidget);
+    expect(find.text('word'), findsOneWidget);
+  });
+
+  for (final mode in MeaningCoverMode.values) {
+    testWidgets('hide meanings covers what ${mode.name} mode says', (
+      tester,
+    ) async {
+      final container = ProviderContainer(
+        overrides: [
+          appControllerProvider.overrideWith(
+            () => _ResumeAppController(
+              'word_0',
+              0,
+              hideMeanings: true,
+              meaningCoverMode: mode,
+              withExamples: true,
+            ),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+      await container.read(appControllerProvider.future);
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const MaterialApp(home: StudyScreen(day: 2)),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final meaningShown = find.text('word').evaluate().isNotEmpty;
+      final translationShown = find
+          .text('I use the word every day.')
+          .evaluate()
+          .isNotEmpty;
+      final translationMasked = find
+          .textContaining('I use the', findRichText: true)
+          .evaluate()
+          .isNotEmpty;
+      switch (mode) {
+        case MeaningCoverMode.meaningAndTranslation:
+          expect(
+            [meaningShown, translationShown, translationMasked],
+            [false, false, false],
+          );
+        case MeaningCoverMode.meaning:
+          // The meaning is gone and "word" is taped inside the translation.
+          expect(meaningShown, isFalse);
+          expect(translationShown, isFalse);
+          expect(translationMasked, isTrue);
+          expect(
+            find.textContaining('the word', findRichText: true),
+            findsNothing,
+          );
+        case MeaningCoverMode.translation:
+          expect(meaningShown, isTrue);
+          expect(translationShown, isFalse);
+          expect(translationMasked, isFalse);
+      }
+    });
+  }
+
   testWidgets('swiping stops current speech before automatic pronunciation', (
     tester,
   ) async {
@@ -192,7 +356,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('単語2'), findsOneWidget);
-    expect(speech.events, ['speak:たんご', 'stop', 'speak:単語2']);
+    expect(speech.events, ['speak:単語1', 'speak:たんご', 'stop', 'speak:単語2']);
   });
 
   for (final theme in {
@@ -496,6 +660,12 @@ void main() {
         }
 
         expect(find.text('Day selection'), findsOneWidget);
+        // The day list must sit on top of home, otherwise the system back
+        // button has nothing to pop to and closes the app.
+        expect(router.canPop(), isTrue);
+        router.pop();
+        await tester.pumpAndSettle();
+        expect(find.text('Home'), findsOneWidget);
         expect(find.byType(AlertDialog), findsNothing);
         expect(tester.takeException(), isNull);
         final state = container.read(appControllerProvider).requireValue;
@@ -563,6 +733,10 @@ GoRouter _createRouter({String initialLocation = '/'}) => GoRouter(
         ),
       ),
     GoRoute(
+      path: '/home',
+      builder: (_, _) => const Scaffold(body: Text('Home')),
+    ),
+    GoRoute(
       path: '/study/choose',
       builder: (_, _) => const ChooseStudyScreen(),
     ),
@@ -599,17 +773,25 @@ class _ResumeAppController extends AppController {
     this.wordId,
     this.indexFallback, {
     this.autoPlayAudio = false,
+    this.hideWord = false,
+    this.hideMeanings = false,
+    this.meaningCoverMode = MeaningCoverMode.meaningAndTranslation,
+    this.withExamples = false,
   });
 
   final String wordId;
   final int indexFallback;
   final bool autoPlayAudio;
+  final bool hideWord;
+  final bool hideMeanings;
+  final MeaningCoverMode meaningCoverMode;
+  final bool withExamples;
   final List<StudySession> savedSessions = [];
 
   @override
   Future<AppState> build() async {
     return AppState(
-      vocabulary: List.generate(30, _word),
+      vocabulary: List.generate(30, (index) => _word(index, withExamples)),
       progress: const {},
       onboardingComplete: true,
       selectedLevel: 'N5',
@@ -619,6 +801,9 @@ class _ResumeAppController extends AppController {
       dailyGoal: 5,
       showFurigana: true,
       autoPlayAudio: autoPlayAudio,
+      hideWord: hideWord,
+      hideMeanings: hideMeanings,
+      meaningCoverMode: meaningCoverMode,
       themeMode: ThemeMode.system,
       notificationsEnabled: false,
       studySeconds: 0,
@@ -638,6 +823,14 @@ class _ResumeAppController extends AppController {
       },
     );
   }
+
+  @override
+  Future<void> setHideWord(bool value) async =>
+      state = AsyncData(state.requireValue.copyWith(hideWord: value));
+
+  @override
+  Future<void> setHideMeanings(bool value) async =>
+      state = AsyncData(state.requireValue.copyWith(hideMeanings: value));
 
   @override
   Future<void> completeStudySession(String level, int day) async {
@@ -665,7 +858,7 @@ class _ResumeAppController extends AppController {
   }
 }
 
-Vocabulary _word(int index) => Vocabulary(
+Vocabulary _word(int index, [bool withExample = false]) => Vocabulary(
   id: 'word_$index',
   word: '単語${index + 1}',
   reading: 'たんご',
@@ -677,12 +870,20 @@ Vocabulary _word(int index) => Vocabulary(
   partOfSpeech: 'word',
   jlptLevel: 'N5',
   tags: const ['JLPT'],
-  example: const VocabularyExample(
-    sentence: '',
-    reading: '',
-    translations: {},
-    quizSentence: '',
-    answer: '',
-  ),
+  example: withExample
+      ? VocabularyExample(
+          sentence: '毎日単語${index + 1}を使います。',
+          reading: 'まいにち',
+          translations: const {'en': 'I use the word every day.'},
+          quizSentence: '',
+          answer: '',
+        )
+      : const VocabularyExample(
+          sentence: '',
+          reading: '',
+          translations: {},
+          quizSentence: '',
+          answer: '',
+        ),
   rank: index + 1,
 );

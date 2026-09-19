@@ -81,8 +81,7 @@ void main() {
     expect(rolePlayWords.single.rank, 89);
     expect(rolePlayWords.single.word, 'ええ');
     expect(
-      rolePlayWords.single.example.rolePlayTurns
-          .map((turn) => turn.speaker),
+      rolePlayWords.single.example.rolePlayTurns.map((turn) => turn.speaker),
       ['A', 'B'],
     );
   });

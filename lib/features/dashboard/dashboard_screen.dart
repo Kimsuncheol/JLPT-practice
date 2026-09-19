@@ -122,12 +122,6 @@ class DashboardScreen extends ConsumerWidget {
                           Row(
                             children: [
                               _OnPrimaryMetric(
-                                icon: Icons.replay_rounded,
-                                value: '${state.dueVocabulary.length}',
-                                label: strings('reviewsDue'),
-                              ),
-                              const SizedBox(width: 22),
-                              _OnPrimaryMetric(
                                 icon: Icons.local_fire_department_rounded,
                                 value: '${state.currentStreak}',
                                 label: strings('streak'),
@@ -170,18 +164,6 @@ class DashboardScreen extends ConsumerWidget {
                           icon: Icons.grid_view_rounded,
                           title: strings('kanaChartTile'),
                           onTap: () => context.push('/kana'),
-                        ),
-                        _GridActionTile(
-                          color: Color.alphaBlend(
-                            Theme.of(context)
-                                .extension<AppColors>()!
-                                .warning
-                                .withValues(alpha: 0.35),
-                            Theme.of(context).colorScheme.surface,
-                          ),
-                          icon: Icons.replay_circle_filled_rounded,
-                          title: strings('review'),
-                          onTap: () => context.push('/review'),
                         ),
                       ],
                     ),

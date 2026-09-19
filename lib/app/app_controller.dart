@@ -14,6 +14,7 @@ import 'package:jlpt_practice/data/models/app_state.dart';
 import 'package:jlpt_practice/data/models/mock_test.dart';
 import 'package:jlpt_practice/data/models/quiz.dart';
 import 'package:jlpt_practice/data/models/review_progress.dart';
+import 'package:jlpt_practice/data/models/study_preferences.dart';
 import 'package:jlpt_practice/data/models/study_session.dart';
 import 'package:jlpt_practice/data/repositories/quiz_repository.dart';
 import 'package:jlpt_practice/data/repositories/vocabulary_repository.dart';
@@ -26,7 +27,15 @@ final quizRepositoryProvider = Provider((ref) => QuizRepository());
 final srsSchedulerProvider = Provider((ref) => const SrsScheduler());
 final cloudSyncProvider = Provider((ref) => const CloudSyncService());
 final ttsServiceProvider = Provider((ref) {
-  final service = TtsService();
+  final service = TtsService(
+    volumePreference: () {
+      final state = ref.read(appControllerProvider).value;
+      return TtsVolumePreference(
+        mode: state?.ttsVolumeMode ?? TtsVolumeMode.system,
+        level: state?.ttsVolume ?? 1.0,
+      );
+    },
+  );
   ref.onDispose(service.dispose);
   return service;
 });
@@ -73,6 +82,11 @@ class AppController extends AsyncNotifier<AppState> {
       themeMode: settings.themeMode,
       eyeComfortEnabled: settings.eyeComfortEnabled,
       eyeComfortLevel: settings.eyeComfortLevel,
+      hideWord: settings.hideWord,
+      hideMeanings: settings.hideMeanings,
+      meaningCoverMode: settings.meaningCoverMode,
+      ttsVolumeMode: settings.ttsVolumeMode,
+      ttsVolume: settings.ttsVolume,
       notificationsEnabled: notificationsEnabled,
       reminderHour: settings.reminderHour,
       reminderMinute: settings.reminderMinute,
@@ -141,36 +155,6 @@ class AppController extends AsyncNotifier<AppState> {
       _store.setValue('autoPlayAudio', autoPlayAudio),
     ]);
     unawaited(ref.read(cloudSyncProvider).syncProfile(next));
-  }
-
-  Future<void> rateVocabulary(String vocabularyId, ReviewRating rating) async {
-    final vocabulary = _value.vocabulary.firstWhere(
-      (item) => item.id == vocabularyId,
-    );
-    final progress = {..._value.progress};
-    final scheduled = ref
-        .read(srsSchedulerProvider)
-        .schedule(
-          vocabularyId: vocabularyId,
-          jlptLevel: vocabulary.jlptLevel,
-          rating: rating,
-          current: progress[vocabularyId],
-        );
-    progress[vocabularyId] = scheduled;
-    var next = _value.copyWith(progress: progress);
-    next = await _withRecordedActivity(next);
-    state = AsyncData(next);
-    await _store.saveProgress(progress);
-    unawaited(ref.read(cloudSyncProvider).syncProgress(scheduled));
-    unawaited(_syncLearningSummary(next));
-  }
-
-  Future<void> removeVocabularyProgress(String vocabularyId) async {
-    final progress = {..._value.progress}..remove(vocabularyId);
-    final next = _value.copyWith(progress: progress);
-    state = AsyncData(next);
-    await _store.saveProgress(progress);
-    unawaited(ref.read(cloudSyncProvider).deleteProgress(vocabularyId));
   }
 
   Future<void> recordQuizResult(
@@ -395,6 +379,33 @@ class AppController extends AsyncNotifier<AppState> {
     final level = value.clamp(0.0, 1.0);
     return _updatePreference('eyeComfortLevel', level, (current) {
       return current.copyWith(eyeComfortLevel: level);
+    });
+  }
+
+  Future<void> setHideWord(bool value) =>
+      _updatePreference('hideWord', value, (current) {
+        return current.copyWith(hideWord: value);
+      });
+
+  Future<void> setHideMeanings(bool value) =>
+      _updatePreference('hideMeanings', value, (current) {
+        return current.copyWith(hideMeanings: value);
+      });
+
+  Future<void> setMeaningCoverMode(MeaningCoverMode value) =>
+      _updatePreference('meaningCoverMode', value.name, (current) {
+        return current.copyWith(meaningCoverMode: value);
+      });
+
+  Future<void> setTtsVolumeMode(TtsVolumeMode value) =>
+      _updatePreference('ttsVolumeMode', value.name, (current) {
+        return current.copyWith(ttsVolumeMode: value);
+      });
+
+  Future<void> setTtsVolume(double value) {
+    final level = value.clamp(0.0, 1.0);
+    return _updatePreference('ttsVolume', level, (current) {
+      return current.copyWith(ttsVolume: level);
     });
   }
 
