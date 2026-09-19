@@ -32,7 +32,7 @@ final ttsServiceProvider = Provider((ref) {
       final state = ref.read(appControllerProvider).value;
       return TtsVolumePreference(
         mode: state?.ttsVolumeMode ?? TtsVolumeMode.system,
-        level: state?.ttsVolume ?? 1.0,
+        level: state?.ttsVolume ?? 0.5,
       );
     },
   );

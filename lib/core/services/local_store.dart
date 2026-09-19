@@ -26,7 +26,7 @@ class LocalSettings {
     this.hideMeanings = false,
     this.meaningCoverMode = MeaningCoverMode.meaningAndTranslation,
     this.ttsVolumeMode = TtsVolumeMode.system,
-    this.ttsVolume = 1.0,
+    this.ttsVolume = 0.5,
     required this.notificationsEnabled,
     required this.reminderHour,
     required this.reminderMinute,
@@ -110,7 +110,7 @@ class LocalStore {
       ttsVolumeMode: TtsVolumeMode.parse(
         _preferences.getString('ttsVolumeMode'),
       ),
-      ttsVolume: (_preferences.getDouble('ttsVolume') ?? 1.0).clamp(0.0, 1.0),
+      ttsVolume: (_preferences.getDouble('ttsVolume') ?? 0.5).clamp(0.0, 1.0),
       notificationsEnabled:
           _preferences.getBool('notificationsEnabled') ?? false,
       reminderHour: _preferences.getInt('reminderHour') ?? 20,
