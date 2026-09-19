@@ -282,8 +282,6 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Auto review is not available yet'), findsNothing);
-
     // Step 1: only the meanings are shown.
     expect(find.text('word'), findsOneWidget);
     expect(find.text('単語6'), findsNothing);
@@ -334,11 +332,18 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    // A dialog explains why auto review is not running on this day.
-    expect(find.text('Auto review is not available yet'), findsOneWidget);
-    await tester.tap(find.text('Got it'));
-    await tester.pumpAndSettle();
-    expect(find.text('Auto review is not available yet'), findsNothing);
+    // The auto review tab is shown semi-transparent and does nothing.
+    final tabOpacity = find.ancestor(
+      of: find.text('Auto review'),
+      matching: find.byType(Opacity),
+    );
+    expect(tester.widget<Opacity>(tabOpacity).opacity, lessThan(1));
+    await tester.tap(find.text('Auto review'));
+    await tester.pump();
+    expect(
+      container.read(appControllerProvider).requireValue.autoReviewEnabled,
+      isTrue,
+    );
 
     // Everything is shown and the manual buttons are back; nothing advances.
     expect(find.text('単語6'), findsOneWidget);
@@ -348,6 +353,45 @@ void main() {
     await tester.pump(const Duration(seconds: 30));
     expect(find.text('1 / 5'), findsOneWidget);
   });
+
+  testWidgets(
+    'the auto review tab switches auto review on for a finished day',
+    (tester) async {
+      final container = ProviderContainer(
+        overrides: [
+          appControllerProvider.overrideWith(
+            () => _ResumeAppController('word_0', 0, completedDays: {2}),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+      await container.read(appControllerProvider.future);
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const MaterialApp(home: StudyScreen(day: 2)),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Hide word'), findsOneWidget);
+      final tabOpacity = find.ancestor(
+        of: find.text('Auto review'),
+        matching: find.byType(Opacity),
+      );
+      expect(tester.widget<Opacity>(tabOpacity).opacity, 1);
+
+      await tester.tap(find.text('Auto review'));
+      await tester.pumpAndSettle();
+      expect(find.text('Pause'), findsOneWidget);
+      expect(find.text('Hide word'), findsNothing);
+      expect(find.text('word'), findsNothing);
+
+      await tester.tap(find.text('Auto review'));
+      await tester.pumpAndSettle();
+      expect(find.text('Pause'), findsNothing);
+      expect(find.text('Hide word'), findsOneWidget);
+    },
+  );
 
   testWidgets('auto review can be paused and resumed', (tester) async {
     final container = ProviderContainer(
@@ -965,6 +1009,10 @@ class _ResumeAppController extends AppController {
       },
     );
   }
+
+  @override
+  Future<void> setAutoReviewEnabled(bool value) async =>
+      state = AsyncData(state.requireValue.copyWith(autoReviewEnabled: value));
 
   @override
   Future<void> setHideWord(bool value) async =>

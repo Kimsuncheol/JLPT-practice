@@ -20,6 +20,17 @@ class LearningSettingsScreen extends ConsumerWidget {
         data: (state) {
           final controller = ref.read(appControllerProvider.notifier);
           final strings = context.strings;
+          final studySession = state.studySessions[state.selectedLevel];
+          final hasUnfinishedStudyDay =
+              studySession != null &&
+              studySession.isCompatible(
+                level: state.selectedLevel,
+                dailyGoal: state.dailyGoal,
+              ) &&
+              !(state.completedStudyDays[state.selectedLevel]?.contains(
+                    studySession.day,
+                  ) ??
+                  false);
           return ListView(
             padding: const EdgeInsets.fromLTRB(20, 4, 20, 28),
             children: [
@@ -76,16 +87,22 @@ class LearningSettingsScreen extends ConsumerWidget {
                     trailing: const Icon(Icons.chevron_right_rounded),
                     onTap: () => context.push('/settings/recall-cover'),
                   ),
-                  ListTile(
-                    leading: const Icon(Icons.play_circle_outline_rounded),
-                    title: Text(strings('autoReview')),
-                    subtitle: Text(
-                      state.autoReviewEnabled
-                          ? '${autoReviewOrderLabel(context, state.autoReviewOrder)} · ${autoReviewSecondsLabel(context, state.autoReviewSeconds)}'
-                          : strings('off'),
+                  Opacity(
+                    opacity: hasUnfinishedStudyDay ? 0.38 : 1,
+                    child: ListTile(
+                      enabled: !hasUnfinishedStudyDay,
+                      leading: const Icon(Icons.play_circle_outline_rounded),
+                      title: Text(strings('autoReview')),
+                      subtitle: Text(
+                        state.autoReviewEnabled
+                            ? '${autoReviewOrderLabel(context, state.autoReviewOrder)} · ${autoReviewSecondsLabel(context, state.autoReviewSeconds)}'
+                            : strings('off'),
+                      ),
+                      trailing: const Icon(Icons.chevron_right_rounded),
+                      onTap: hasUnfinishedStudyDay
+                          ? null
+                          : () => context.push('/settings/auto-review'),
                     ),
-                    trailing: const Icon(Icons.chevron_right_rounded),
-                    onTap: () => context.push('/settings/auto-review'),
                   ),
                 ],
               ),

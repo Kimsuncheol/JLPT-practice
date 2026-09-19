@@ -6,6 +6,7 @@ import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/app/theme/app_theme.dart';
 import 'package:jlpt_practice/data/models/app_state.dart';
 import 'package:jlpt_practice/data/models/study_preferences.dart';
+import 'package:jlpt_practice/data/models/study_session.dart';
 import 'package:jlpt_practice/features/settings/auto_review_screen.dart';
 import 'package:jlpt_practice/features/settings/eye_comfort_screen.dart';
 import 'package:jlpt_practice/features/settings/learning_language_screen.dart';
@@ -15,10 +16,16 @@ import 'package:jlpt_practice/features/settings/tts_volume_screen.dart';
 import 'package:jlpt_practice/shared/eye_comfort_overlay.dart';
 
 void main() {
-  Future<ProviderContainer> pump(WidgetTester tester, Widget home) async {
+  Future<ProviderContainer> pump(
+    WidgetTester tester,
+    Widget home, {
+    _FakeAppController? controller,
+  }) async {
     final container = ProviderContainer(
       overrides: [
-        appControllerProvider.overrideWith(() => _FakeAppController()),
+        appControllerProvider.overrideWith(
+          () => controller ?? _FakeAppController(),
+        ),
       ],
     );
     addTearDown(container.dispose);
@@ -102,6 +109,35 @@ void main() {
     expect(state().autoReviewEnabled, isTrue);
     expect(state().autoReviewOrder.id, 'reading-word-meanings');
     expect(state().autoReviewSeconds, 5);
+  });
+
+  testWidgets('auto review is disabled while a study day is unfinished', (
+    tester,
+  ) async {
+    await pump(
+      tester,
+      const LearningSettingsScreen(),
+      controller: _FakeAppController(
+        studySession: StudySession(
+          level: 'N5',
+          day: 2,
+          wordId: 'word_0',
+          indexFallback: 0,
+          dailyGoal: 10,
+          updatedAt: DateTime(2026),
+        ),
+      ),
+    );
+
+    final tile = find.widgetWithText(ListTile, 'Auto review');
+    expect(tester.widget<ListTile>(tile).enabled, isFalse);
+    final opacity = find.ancestor(of: tile, matching: find.byType(Opacity));
+    expect(tester.widget<Opacity>(opacity).opacity, lessThan(1));
+
+    await tester.tap(find.text('Auto review'));
+    await tester.pumpAndSettle();
+    expect(find.byType(LearningSettingsScreen), findsOneWidget);
+    expect(find.byType(AutoReviewScreen), findsNothing);
   });
 
   testWidgets('opens the learning language screen', (tester) async {
@@ -242,8 +278,12 @@ void main() {
 }
 
 class _FakeAppController extends AppController {
+  _FakeAppController({this.studySession});
+
+  final StudySession? studySession;
+
   @override
-  Future<AppState> build() async => const AppState(
+  Future<AppState> build() async => AppState(
     vocabulary: [],
     progress: {},
     onboardingComplete: true,
@@ -261,6 +301,7 @@ class _FakeAppController extends AppController {
     quizCorrect: 0,
     currentStreak: 0,
     longestStreak: 0,
+    studySessions: studySession == null ? const {} : {'N5': studySession!},
   );
 
   @override

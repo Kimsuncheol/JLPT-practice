@@ -355,10 +355,6 @@ class AppStrings {
     'elementWord': 'Word',
     'elementMeanings': 'Meanings',
     'elementReading': 'Reading',
-    'autoReviewUnavailableTitle': 'Auto review is not available yet',
-    'autoReviewUnavailableBody':
-        'Auto review only works on days you have already finished. Finish this day first, or turn auto review off in Learning settings.',
-    'autoReviewUnavailableOk': 'Got it',
     'pauseAutoReview': 'Pause',
     'resumeAutoReview': 'Resume',
     'recallCover': 'Hide and recall',
@@ -716,10 +712,6 @@ class AppStrings {
     'elementWord': '단어',
     'elementMeanings': '뜻',
     'elementReading': '읽기',
-    'autoReviewUnavailableTitle': '아직 자동 복습을 사용할 수 없어요',
-    'autoReviewUnavailableBody':
-        '자동 복습은 이미 학습을 마친 날에만 사용할 수 있습니다. 이 날의 학습을 먼저 마치거나 학습 설정에서 자동 복습을 꺼 주세요.',
-    'autoReviewUnavailableOk': '확인',
     'pauseAutoReview': '일시정지',
     'resumeAutoReview': '재생',
     'recallCover': '가리고 떠올리기',

@@ -169,19 +169,21 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: _autoReviewActive(state)
-                  ? [
-                      _CardAction(
-                        icon: _autoPaused
-                            ? Icons.play_arrow_rounded
-                            : Icons.pause_rounded,
-                        label: context.strings(
-                          _autoPaused ? 'resumeAutoReview' : 'pauseAutoReview',
-                        ),
-                        onTap: _toggleAutoReviewPause,
-                      ),
-                    ]
-                  : _manualActions(state),
+              children: [
+                if (_autoReviewActive(state))
+                  _CardAction(
+                    icon: _autoPaused
+                        ? Icons.play_arrow_rounded
+                        : Icons.pause_rounded,
+                    label: context.strings(
+                      _autoPaused ? 'resumeAutoReview' : 'pauseAutoReview',
+                    ),
+                    onTap: _toggleAutoReviewPause,
+                  )
+                else
+                  ..._manualActions(state),
+                _autoReviewTab(state),
+              ],
             ),
           ),
           SafeArea(
@@ -198,6 +200,22 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
       ),
     );
   }
+
+  /// Switches auto review on or off. On a day that is not finished it is
+  /// shown semi-transparent and does nothing.
+  Widget _autoReviewTab(AppState state) => _CardAction(
+    icon: _autoReviewActive(state)
+        ? Icons.play_circle_rounded
+        : Icons.play_circle_outline_rounded,
+    label: context.strings('autoReview'),
+    onTap: _dayFinished(state)
+        ? () => unawaited(
+            ref
+                .read(appControllerProvider.notifier)
+                .setAutoReviewEnabled(!state.autoReviewEnabled),
+          )
+        : null,
+  );
 
   List<Widget> _manualActions(AppState state) => [
     _CardAction(
@@ -251,7 +269,6 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
         unawaited(_savePosition(state, words.first, 0));
         _autoPlayFirstWord(words.first);
         _restartAutoReview();
-        unawaited(_showAutoReviewNotice());
       }
     });
   }
@@ -314,7 +331,6 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
       context.pushReplacement('/study');
       return;
     }
-    unawaited(_showAutoReviewNotice());
 
     if (resumeIndex == 0) {
       // Resuming on the first word never changes the page, so the page-change
@@ -386,35 +402,14 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   }
 
   /// Auto review only runs on days already finished; a day still being
-  /// studied for the first time keeps the manual controls.
-  bool _autoReviewActive(AppState state) =>
-      state.autoReviewEnabled &&
-      (state.completedStudyDays[state.selectedLevel]?.contains(widget.day) ??
-          false);
+  /// studied for the first time keeps the manual controls and shows the
+  /// auto review tab dimmed.
+  bool _dayFinished(AppState state) =>
+      state.completedStudyDays[state.selectedLevel]?.contains(widget.day) ??
+      false;
 
-  /// Tells the learner, once per visit, that auto review is switched on but
-  /// this day is not finished yet, so the cards stay manual.
-  Future<void> _showAutoReviewNotice() async {
-    final state = ref.read(appControllerProvider).value;
-    if (!mounted || state == null) return;
-    if (!state.autoReviewEnabled || _autoReviewActive(state)) return;
-    await showDialog<void>(
-      context: context,
-      builder: (dialogContext) => wrapImmersiveSystemBarGesture(
-        AlertDialog(
-          title: Text(dialogContext.strings('autoReviewUnavailableTitle')),
-          content: Text(dialogContext.strings('autoReviewUnavailableBody')),
-          actions: [
-            FilledButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: Text(dialogContext.strings('autoReviewUnavailableOk')),
-            ),
-          ],
-        ),
-      ),
-    );
-    if (mounted) reassertImmersiveMode();
-  }
+  bool _autoReviewActive(AppState state) =>
+      state.autoReviewEnabled && _dayFinished(state);
 
   /// Starts the current card over at its first element and, unless paused or
   /// waiting on the resume dialog, schedules the next reveal.
@@ -792,28 +787,33 @@ class _CardAction extends StatelessWidget {
   });
   final IconData icon;
   final String label;
-  final VoidCallback onTap;
+
+  /// Null makes the action inert and draws it semi-transparent.
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) => Expanded(
-    child: InkWell(
-      borderRadius: BorderRadius.circular(16),
-      splashFactory: NoSplash.splashFactory,
-      highlightColor: Colors.transparent,
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 3),
-        child: Column(
-          children: [
-            Icon(icon),
-            const SizedBox(height: 6),
-            Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.labelSmall,
-            ),
-          ],
+    child: Opacity(
+      opacity: onTap == null ? 0.38 : 1,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        splashFactory: NoSplash.splashFactory,
+        highlightColor: Colors.transparent,
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 3),
+          child: Column(
+            children: [
+              Icon(icon),
+              const SizedBox(height: 6),
+              Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.labelSmall,
+              ),
+            ],
+          ),
         ),
       ),
     ),
