@@ -182,7 +182,7 @@ void main() {
 
     for (final (tile, screen) in [
       ('Hide and recall', RecallCoverScreen),
-      ('Japanese Voice TTS', TtsSettingsScreen),
+      ('Japanese Voice', TtsSettingsScreen),
       ('Pronunciation volume', TtsVolumeScreen),
       ('Eye comfort mode', EyeComfortScreen),
     ]) {

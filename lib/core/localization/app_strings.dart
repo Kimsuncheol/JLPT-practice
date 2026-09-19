@@ -386,7 +386,7 @@ class AppStrings {
     'coverTranslationOnlyBody': 'Covers only the example translation.',
     'ttsVolume': 'Pronunciation volume',
     'ttsSettings': 'Japanese voice',
-    'ttsSettingsTile': 'Japanese Voice TTS',
+    'ttsSettingsTile': 'Japanese Voice',
     'ttsSettingsBody':
         'Choose the character voice used for Japanese pronunciation.',
     'previewVoice': 'Preview voice',
