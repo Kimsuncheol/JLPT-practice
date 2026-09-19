@@ -53,12 +53,16 @@ class _PracticeTestScreenState extends ConsumerState<PracticeTestScreen> {
   }
 
   Future<void> _playDialogue(String passage) async {
-    if (await isSystemVolumeTooLow()) {
+    final volumeStatus = await getSystemVolumeStatus();
+    if (volumeStatus != SystemVolumeStatus.audible) {
       if (!mounted) return;
+      final warningKey = volumeStatus == SystemVolumeStatus.muted
+          ? 'mutedSystemVolumeBody'
+          : 'lowSystemVolumeBody';
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(context.strings('lowVolumeBody'))));
-      return;
+      ).showSnackBar(SnackBar(content: Text(context.strings(warningKey))));
+      if (volumeStatus == SystemVolumeStatus.muted) return;
     }
     _ttsService ??= ref.read(ttsServiceProvider);
     unawaited(_ttsService!.speakDialogue(parseDialogueScript(passage)));

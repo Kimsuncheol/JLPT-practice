@@ -150,6 +150,64 @@ void main() {
     expect(speech.spoken, ['たんご', 'たんご', 'たんご']);
   });
 
+  for (final scenario in [
+    (
+      muted: false,
+      volume: 0.02,
+      message:
+          'Your device is unmuted, but its volume is too low. Turn it up to hear the pronunciation.',
+    ),
+    (
+      muted: true,
+      volume: 0.8,
+      message: 'Your device is muted. Unmute it to hear the pronunciation.',
+    ),
+  ]) {
+    testWidgets(
+      'system volume warning distinguishes ${scenario.muted ? 'muted' : 'unmuted low'} volume',
+      (tester) async {
+        const volumeChannel = MethodChannel(
+          'com.kurenai7968.volume_controller.method',
+        );
+        tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+          volumeChannel,
+          (call) async =>
+              call.method == 'isMuted' ? scenario.muted : scenario.volume,
+        );
+        addTearDown(
+          () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+            volumeChannel,
+            null,
+          ),
+        );
+        final speech = _RecordingTtsService();
+        final container = ProviderContainer(
+          overrides: [
+            appControllerProvider.overrideWith(
+              () => _ResumeAppController('word_0', 0),
+            ),
+            ttsServiceProvider.overrideWithValue(speech),
+          ],
+        );
+        addTearDown(container.dispose);
+        await container.read(appControllerProvider.future);
+        await tester.pumpWidget(
+          UncontrolledProviderScope(
+            container: container,
+            child: const MaterialApp(home: StudyScreen(day: 2)),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('単語6'));
+        await tester.pumpAndSettle();
+
+        expect(find.text(scenario.message), findsOneWidget);
+        expect(speech.spoken, scenario.muted ? isEmpty : ['たんご']);
+      },
+    );
+  }
+
   testWidgets('automatic pronunciation reads the first word of a new day', (
     tester,
   ) async {
@@ -325,6 +383,7 @@ void main() {
     expect(find.text('Hide reading'), findsNothing);
     expect(find.text('Hide word'), findsNothing);
     expect(find.text('Hide word & reading'), findsOneWidget);
+    expect(find.text('Auto review').hitTestable(), findsOneWidget);
 
     await tester.tap(find.text('Hide word & reading'));
     await tester.pumpAndSettle();

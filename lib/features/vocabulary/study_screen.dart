@@ -165,23 +165,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
                 key: const ValueKey('study-action-carousel'),
                 controller: _actionPageController,
                 itemBuilder: (context, page) => page.isEven
-                    ? _actionPage(
-                        _autoReviewActive(state)
-                            ? [
-                                _CardAction(
-                                  icon: _autoPaused
-                                      ? Icons.play_arrow_rounded
-                                      : Icons.pause_rounded,
-                                  label: context.strings(
-                                    _autoPaused
-                                        ? 'resumeAutoReview'
-                                        : 'pauseAutoReview',
-                                  ),
-                                  onTap: _toggleAutoReviewPause,
-                                ),
-                              ]
-                            : _manualActions(state, words[_index]),
-                      )
+                    ? _primaryActionPage(state, words[_index])
                     : _actionPage([_autoReviewTab(state)]),
               ),
             ),
@@ -224,6 +208,24 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
       for (var index = actions.length; index < 3; index++) const Spacer(),
     ],
   );
+
+  Widget _primaryActionPage(AppState state, Vocabulary word) {
+    if (_autoReviewActive(state)) {
+      return _actionPage([
+        _CardAction(
+          icon: _autoPaused ? Icons.play_arrow_rounded : Icons.pause_rounded,
+          label: context.strings(
+            _autoPaused ? 'resumeAutoReview' : 'pauseAutoReview',
+          ),
+          onTap: _toggleAutoReviewPause,
+        ),
+      ]);
+    }
+
+    final actions = _manualActions(state, word);
+    if (word.word == word.reading) actions.add(_autoReviewTab(state));
+    return _actionPage(actions);
+  }
 
   _CardVisibility _visibilityFor(Vocabulary word, AppState state) =>
       _cardVisibility.putIfAbsent(
@@ -441,15 +443,27 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
     // Slider mode sets the device volume itself when speaking, so only the
     // level chosen there can make speech inaudible.
     final settings = ref.read(appControllerProvider).value;
-    final tooQuiet = settings?.ttsVolumeMode == TtsVolumeMode.slider
-        ? settings!.ttsVolume <= lowVolumeThreshold
-        : await isSystemVolumeTooLow();
-    if (tooQuiet) {
+    String? warningKey;
+    var playbackBlocked = false;
+    if (settings?.ttsVolumeMode == TtsVolumeMode.slider) {
+      if (settings!.ttsVolume <= lowVolumeThreshold) {
+        warningKey = 'lowCustomVolumeBody';
+      }
+    } else {
+      final volumeStatus = await getSystemVolumeStatus();
+      warningKey = switch (volumeStatus) {
+        SystemVolumeStatus.audible => null,
+        SystemVolumeStatus.muted => 'mutedSystemVolumeBody',
+        SystemVolumeStatus.low => 'lowSystemVolumeBody',
+      };
+      playbackBlocked = volumeStatus == SystemVolumeStatus.muted;
+    }
+    if (warningKey != null) {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(context.strings('lowVolumeBody'))));
-      return;
+      ).showSnackBar(SnackBar(content: Text(context.strings(warningKey))));
+      if (playbackBlocked) return;
     }
     if (!mounted) return;
     _speak(text);
