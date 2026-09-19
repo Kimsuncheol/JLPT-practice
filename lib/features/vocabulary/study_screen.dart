@@ -33,6 +33,9 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   int _index = 0;
   final Map<String, _CardVisibility> _cardVisibility = {};
   PageController? _pageController;
+  final PageController _actionPageController = PageController(
+    initialPage: 10000,
+  );
   TtsService? _ttsService;
   bool _resumeDecisionPending = false;
   bool _resumeDialogVisible = false;
@@ -49,6 +52,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   void dispose() {
     _autoTimer?.cancel();
     _pageController?.dispose();
+    _actionPageController.dispose();
     if (_ttsService != null) unawaited(_ttsService!.stop());
     super.dispose();
   }
@@ -161,24 +165,31 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (_autoReviewActive(state))
-                  _CardAction(
-                    icon: _autoPaused
-                        ? Icons.play_arrow_rounded
-                        : Icons.pause_rounded,
-                    label: context.strings(
-                      _autoPaused ? 'resumeAutoReview' : 'pauseAutoReview',
-                    ),
-                    onTap: _toggleAutoReviewPause,
-                  )
-                else
-                  ..._manualActions(state, words[_index]),
-                _autoReviewTab(state),
-              ],
+            child: SizedBox(
+              height: 82,
+              child: PageView.builder(
+                key: const ValueKey('study-action-carousel'),
+                controller: _actionPageController,
+                itemBuilder: (context, page) => page.isEven
+                    ? _actionPage(
+                        _autoReviewActive(state)
+                            ? [
+                                _CardAction(
+                                  icon: _autoPaused
+                                      ? Icons.play_arrow_rounded
+                                      : Icons.pause_rounded,
+                                  label: context.strings(
+                                    _autoPaused
+                                        ? 'resumeAutoReview'
+                                        : 'pauseAutoReview',
+                                  ),
+                                  onTap: _toggleAutoReviewPause,
+                                ),
+                              ]
+                            : _manualActions(state, words[_index]),
+                      )
+                    : _actionPage([_autoReviewTab(state)]),
+              ),
             ),
           ),
           SafeArea(
@@ -210,6 +221,14 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
                 .setAutoReviewEnabled(!state.autoReviewEnabled),
           )
         : null,
+  );
+
+  Widget _actionPage(List<Widget> actions) => Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      ...actions,
+      for (var index = actions.length; index < 3; index++) const Spacer(),
+    ],
   );
 
   _CardVisibility _visibilityFor(Vocabulary word, AppState state) =>

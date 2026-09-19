@@ -340,6 +340,38 @@ void main() {
     expect(find.text('kotoba'), findsOneWidget);
   });
 
+  testWidgets('action groups loop between hide controls and auto review', (
+    tester,
+  ) async {
+    final container = ProviderContainer(
+      overrides: [
+        appControllerProvider.overrideWith(
+          () => _ResumeAppController('word_0', 0),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container.read(appControllerProvider.future);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const MaterialApp(home: StudyScreen(day: 2)),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Hide word').hitTestable(), findsOneWidget);
+    await _showAutoReviewActions(tester);
+    expect(find.text('Auto review').hitTestable(), findsOneWidget);
+    await _showHideActions(tester);
+    expect(find.text('Hide word').hitTestable(), findsOneWidget);
+
+    // Continuing in the other direction reaches auto review again rather
+    // than stopping at an edge.
+    await _swipeActionCarousel(tester, -1);
+    expect(find.text('Auto review').hitTestable(), findsOneWidget);
+  });
+
   testWidgets('auto review reveals each element in the chosen order', (
     tester,
   ) async {
@@ -420,12 +452,13 @@ void main() {
     await tester.pumpAndSettle();
 
     // The auto review tab is shown semi-transparent and does nothing.
+    await _showAutoReviewActions(tester);
     final tabOpacity = find.ancestor(
-      of: find.text('Auto review'),
+      of: find.text('Auto review').hitTestable(),
       matching: find.byType(Opacity),
     );
     expect(tester.widget<Opacity>(tabOpacity).opacity, lessThan(1));
-    await tester.tap(find.text('Auto review'));
+    await tester.tap(find.text('Auto review').hitTestable());
     await tester.pump();
     expect(
       container.read(appControllerProvider).requireValue.autoReviewEnabled,
@@ -433,10 +466,11 @@ void main() {
     );
 
     // Everything is shown and the manual buttons are back; nothing advances.
+    await _showHideActions(tester);
     expect(find.text('単語6'), findsOneWidget);
     expect(find.text('word'), findsOneWidget);
-    expect(find.text('Pause'), findsNothing);
-    expect(find.text('Hide word'), findsOneWidget);
+    expect(find.text('Pause').hitTestable(), findsNothing);
+    expect(find.text('Hide word').hitTestable(), findsOneWidget);
     await tester.pump(const Duration(seconds: 30));
     expect(find.text('1 / 5'), findsOneWidget);
   });
@@ -461,22 +495,26 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(find.text('Hide word'), findsOneWidget);
+      await _showAutoReviewActions(tester);
       final tabOpacity = find.ancestor(
-        of: find.text('Auto review'),
+        of: find.text('Auto review').hitTestable(),
         matching: find.byType(Opacity),
       );
       expect(tester.widget<Opacity>(tabOpacity).opacity, 1);
 
-      await tester.tap(find.text('Auto review'));
+      await tester.tap(find.text('Auto review').hitTestable());
       await tester.pumpAndSettle();
-      expect(find.text('Pause'), findsOneWidget);
-      expect(find.text('Hide word'), findsNothing);
+      await _showHideActions(tester);
+      expect(find.text('Pause').hitTestable(), findsOneWidget);
+      expect(find.text('Hide word').hitTestable(), findsNothing);
       expect(find.text('word'), findsNothing);
 
-      await tester.tap(find.text('Auto review'));
+      await _showAutoReviewActions(tester);
+      await tester.tap(find.text('Auto review').hitTestable());
       await tester.pumpAndSettle();
-      expect(find.text('Pause'), findsNothing);
-      expect(find.text('Hide word'), findsOneWidget);
+      await _showHideActions(tester);
+      expect(find.text('Pause').hitTestable(), findsNothing);
+      expect(find.text('Hide word').hitTestable(), findsOneWidget);
     },
   );
 
@@ -917,6 +955,21 @@ void main() {
       },
     );
   }
+}
+
+Future<void> _showAutoReviewActions(WidgetTester tester) =>
+    _swipeActionCarousel(tester, 1);
+
+Future<void> _showHideActions(WidgetTester tester) =>
+    _swipeActionCarousel(tester, -1);
+
+Future<void> _swipeActionCarousel(WidgetTester tester, double direction) async {
+  final carousel = find.byKey(const ValueKey('study-action-carousel'));
+  await tester.drag(
+    carousel,
+    Offset(tester.getSize(carousel).width * direction, 0),
+  );
+  await tester.pumpAndSettle();
 }
 
 class _RecordingTtsService implements TtsService {
