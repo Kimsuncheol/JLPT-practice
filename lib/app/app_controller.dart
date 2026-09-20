@@ -10,7 +10,7 @@ import 'package:jlpt_practice/core/services/local_store.dart';
 import 'package:jlpt_practice/core/services/notification_service.dart';
 import 'package:jlpt_practice/core/services/srs_scheduler.dart';
 import 'package:jlpt_practice/core/services/tts_service.dart';
-import 'package:jlpt_practice/core/services/japanese_tts_service.dart';
+import 'package:jlpt_practice/core/services/flutter_tts_engine.dart';
 import 'package:jlpt_practice/data/models/app_state.dart';
 import 'package:jlpt_practice/data/models/mock_test.dart';
 import 'package:jlpt_practice/data/models/quiz.dart';
@@ -35,7 +35,10 @@ final meaningMaskServiceProvider = Provider((ref) {
   return service;
 });
 final Provider<TtsService> ttsServiceProvider = Provider((ref) {
-  final service = JapaneseTtsService(
+  final engine = FlutterTtsEngine();
+  final service = AudioFocusTtsService(
+    audioSessionController: SystemTtsAudioSession.initialized,
+    engineSelector: () => engine,
     volumePreference: () {
       final state = ref.read(appControllerProvider).value;
       return TtsVolumePreference(
@@ -43,9 +46,16 @@ final Provider<TtsService> ttsServiceProvider = Provider((ref) {
         level: state?.ttsVolume ?? 0.5,
       );
     },
-    voiceId: () => ref.read(appControllerProvider).value?.ttsVoiceId ?? 'f1',
   );
-  ref.onDispose(service.dispose);
+  ref.onDispose(() {
+    unawaited(() async {
+      try {
+        await service.dispose();
+      } finally {
+        await engine.dispose();
+      }
+    }());
+  });
   return service;
 });
 
@@ -96,7 +106,6 @@ class AppController extends AsyncNotifier<AppState> {
       meaningCoverMode: settings.meaningCoverMode,
       ttsVolumeMode: settings.ttsVolumeMode,
       ttsVolume: settings.ttsVolume,
-      ttsVoiceId: settings.ttsVoiceId,
       notificationsEnabled: notificationsEnabled,
       reminderHour: settings.reminderHour,
       reminderMinute: settings.reminderMinute,
@@ -418,11 +427,6 @@ class AppController extends AsyncNotifier<AppState> {
       return current.copyWith(ttsVolume: level);
     });
   }
-
-  Future<void> setTtsVoiceId(String value) =>
-      _updatePreference('ttsVoiceId', value, (current) {
-        return current.copyWith(ttsVoiceId: value);
-      });
 
   Future<void> saveStudySession(StudySession session) async {
     final sessions = {..._value.studySessions, session.level: session};

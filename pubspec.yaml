@@ -42,10 +42,6 @@ dependencies:
   intl: 0.20.3
   audio_session: ^0.2.4
   flutter_tts: ^4.2.5
-  sherpa_onnx: ^1.13.8
-  audioplayers: ^6.8.1
-  archive: ^4.3.0
-  path: ^1.9.1
   firebase_core: ^4.13.0
   firebase_auth: ^6.5.7
   cloud_functions: ^6.0.7
@@ -67,7 +63,6 @@ dependencies:
   google_sign_in: ^7.2.0
   wakelock_plus: ^1.7.0
   lib_llama_cpp: 0.7.3
-  path_provider: ^2.1.6
   crypto: ^3.0.7
   http: ^1.6.0
 

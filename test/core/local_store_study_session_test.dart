@@ -8,16 +8,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  test('persists the selected Japanese TTS voice', () async {
-    SharedPreferences.setMockInitialValues({});
-    final store = await LocalStore.create();
-    await store.setValue('ttsVoiceId', 'm4');
-
-    final restored = (await LocalStore.create()).loadSettings('en');
-
-    expect(restored.ttsVoiceId, 'm4');
-  });
-
   test(
     'grammar recent study survives reload and clears with learning data',
     () async {

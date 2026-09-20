@@ -26,7 +26,6 @@ class AppState {
     this.meaningCoverMode = MeaningCoverMode.meaningAndTranslation,
     this.ttsVolumeMode = TtsVolumeMode.system,
     this.ttsVolume = 0.5,
-    this.ttsVoiceId = 'f1',
     required this.notificationsEnabled,
     this.reminderHour = 20,
     this.reminderMinute = 0,
@@ -61,7 +60,6 @@ class AppState {
   final MeaningCoverMode meaningCoverMode;
   final TtsVolumeMode ttsVolumeMode;
   final double ttsVolume;
-  final String ttsVoiceId;
   final bool notificationsEnabled;
   final int reminderHour;
   final int reminderMinute;
@@ -109,7 +107,6 @@ class AppState {
     MeaningCoverMode? meaningCoverMode,
     TtsVolumeMode? ttsVolumeMode,
     double? ttsVolume,
-    String? ttsVoiceId,
     bool? notificationsEnabled,
     int? reminderHour,
     int? reminderMinute,
@@ -144,7 +141,6 @@ class AppState {
       meaningCoverMode: meaningCoverMode ?? this.meaningCoverMode,
       ttsVolumeMode: ttsVolumeMode ?? this.ttsVolumeMode,
       ttsVolume: ttsVolume ?? this.ttsVolume,
-      ttsVoiceId: ttsVoiceId ?? this.ttsVoiceId,
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
       reminderHour: reminderHour ?? this.reminderHour,
       reminderMinute: reminderMinute ?? this.reminderMinute,

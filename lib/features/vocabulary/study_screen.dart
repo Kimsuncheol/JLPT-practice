@@ -520,6 +520,8 @@ class _StudyCard extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           _buildReading(context),
+          const SizedBox(height: 4),
+          _buildRomaji(context),
           const SizedBox(height: 6),
           _buildWord(context),
           const SizedBox(height: 10),
@@ -556,29 +558,41 @@ class _StudyCard extends StatelessWidget {
 
   Widget _buildReading(BuildContext context) {
     final hasReading = vocabulary.reading != vocabulary.word;
+    if (!hasReading) return const SizedBox.shrink();
     final titleLarge = Theme.of(context).textTheme.titleLarge;
-    return AnimatedOpacity(
-      opacity: hasReading ? 1 : 0,
-      duration: const Duration(milliseconds: 180),
-      child: IgnorePointer(
-        ignoring: !hasReading,
-        child: _speechTarget(
-          onTap: onSpeakWord,
-          child: showFurigana
-              ? Text(
-                  vocabulary.reading,
-                  style: titleLarge?.copyWith(
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                )
-              : coverTapeFor(
-                  characters: vocabulary.reading.length,
-                  fontSize: titleLarge?.fontSize ?? 22,
-                  maxWidth: 220,
-                  glyphWidth: 0.9,
-                ),
-        ),
-      ),
+    return _speechTarget(
+      onTap: onSpeakWord,
+      child: showFurigana
+          ? Text(
+              vocabulary.reading,
+              style: titleLarge?.copyWith(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            )
+          : coverTapeFor(
+              characters: vocabulary.reading.length,
+              fontSize: titleLarge?.fontSize ?? 22,
+              maxWidth: 220,
+              glyphWidth: 0.9,
+            ),
+    );
+  }
+
+  Widget _buildRomaji(BuildContext context) {
+    if (vocabulary.romaji.isEmpty) return const SizedBox.shrink();
+    final style = Theme.of(context).textTheme.bodyLarge?.copyWith(
+      color: Theme.of(context).colorScheme.onSurfaceVariant,
+    );
+    return _speechTarget(
+      onTap: onSpeakWord,
+      child: showFurigana
+          ? Text(vocabulary.romaji, style: style)
+          : coverTapeFor(
+              characters: vocabulary.romaji.length,
+              fontSize: style?.fontSize ?? 16,
+              maxWidth: 180,
+              glyphWidth: 0.6,
+            ),
     );
   }
 

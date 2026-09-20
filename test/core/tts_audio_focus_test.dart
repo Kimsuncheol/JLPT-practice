@@ -51,7 +51,7 @@ class _FakeEngine implements TtsEngine {
   Future<void> dispose() async {}
 }
 
-class _FakeSherpaEngine implements DeferredFocusTtsEngine {
+class _FakeDeferredEngine implements DeferredFocusTtsEngine {
   final generated = <Completer<void>>[];
   final played = <String>[];
   var _request = 0;
@@ -144,9 +144,9 @@ void main() {
     await service.dispose();
   });
 
-  test('stale Sherpa generation is discarded and never played', () async {
+  test('stale deferred generation is discarded and never played', () async {
     final session = _FakeSession();
-    final engine = _FakeSherpaEngine();
+    final engine = _FakeDeferredEngine();
     final service = AudioFocusTtsService(
       audioSessionController: session,
       engineSelector: () => engine,

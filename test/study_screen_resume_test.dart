@@ -1033,4 +1033,5 @@ Vocabulary _sameReadingWord(int index) => Vocabulary(
     quizSentence: '',
     answer: '',
   ),
+  rank: index + 1,
 );

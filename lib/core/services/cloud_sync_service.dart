@@ -132,7 +132,6 @@ class CloudSyncService {
       totalXp: _maxInt(local.totalXp, summary?['totalXp']),
       showFurigana: settings?['showFurigana'] as bool? ?? local.showFurigana,
       autoPlayAudio: settings?['autoPlayAudio'] as bool? ?? local.autoPlayAudio,
-      ttsVoiceId: settings?['ttsVoiceId'] as String? ?? local.ttsVoiceId,
       themeMode: ThemeMode.values.firstWhere(
         (value) => value.name == settings?['themeMode'],
         orElse: () => local.themeMode,
@@ -185,7 +184,6 @@ class CloudSyncService {
     await user.collection('settings').doc('app').set({
       'showFurigana': state.showFurigana,
       'autoPlayAudio': state.autoPlayAudio,
-      'ttsVoiceId': state.ttsVoiceId,
       'themeMode': state.themeMode.name,
       'eyeComfortEnabled': state.eyeComfortEnabled,
       'eyeComfortLevel': state.eyeComfortLevel,

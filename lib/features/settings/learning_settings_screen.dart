@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
-import 'package:jlpt_practice/core/services/japanese_tts_service.dart';
 import 'package:jlpt_practice/data/models/study_preferences.dart';
 
 class LearningSettingsScreen extends ConsumerWidget {
@@ -53,13 +52,6 @@ class LearningSettingsScreen extends ConsumerWidget {
                     title: Text(strings('autoAudio')),
                     value: state.autoPlayAudio,
                     onChanged: controller.setAutoPlayAudio,
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.record_voice_over_rounded),
-                    title: Text(strings('ttsSettingsTile')),
-                    subtitle: Text(japaneseTtsVoiceById(state.ttsVoiceId).name),
-                    trailing: const Icon(Icons.chevron_right_rounded),
-                    onTap: () => context.push('/settings/tts'),
                   ),
                   ListTile(
                     leading: const Icon(Icons.graphic_eq_rounded),
