@@ -70,6 +70,7 @@ dependencies:
   path_provider: ^2.1.6
   crypto: ^3.0.7
   http: ^1.6.0
+  flutter_kiwi_nlp: ^2026.7.24
 
 dev_dependencies:
   flutter_test:

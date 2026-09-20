@@ -12,6 +12,14 @@ String prepareJapaneseTextForSpeech(String text) {
   return text.replaceAllMapped(_furiganaAfterKanji, (match) => match.group(1)!);
 }
 
+/// Splits a vocabulary reading that lists alternatives (`なん/なに`) into
+/// the individual readings, in order.
+List<String> splitReadings(String reading) => reading
+    .split(RegExp(r'[/／]'))
+    .map((part) => part.trim())
+    .where((part) => part.isNotEmpty)
+    .toList();
+
 /// Matches a speaker-tagged dialogue line such as `M：...` or `F1：...`.
 final _dialogueSpeakerLine = RegExp(r'^([A-Za-z][A-Za-z0-9]{0,2})[：:]\s*(.+)$');
 

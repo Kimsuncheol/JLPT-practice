@@ -42,6 +42,8 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   bool _resumeDialogVisible = false;
   bool _suppressAutoAudio = false;
   int _pageChangeRequest = 0;
+  int _readingsRequest = 0;
+  static const _readingGap = Duration(milliseconds: 500);
 
   /// Auto review: how many of the order's elements are revealed on the
   /// current card, the timer that reveals the next one, and the pause switch.
@@ -54,6 +56,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
     _autoTimer?.cancel();
     _pageController?.dispose();
     _actionPageController.dispose();
+    _readingsRequest++;
     if (_ttsService != null) unawaited(_ttsService!.stop());
     super.dispose();
   }
@@ -150,7 +153,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
                     hideWord: hideWord,
                     hideMeaning: meaningsHidden,
                     maskMeaningInTranslation: meaningsHidden,
-                    onSpeakWord: () => _speakIfAudible(word.reading),
+                    onSpeakWord: () => _speakIfAudible(word.reading, word: word),
                     onSpeakExample: () =>
                         _speakIfAudible(word.example.sentence),
                   ),
@@ -439,16 +442,44 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   void _autoPlayFirstWord(Vocabulary word) {
     if (!mounted) return;
     if (ref.read(appControllerProvider).value?.autoPlayAudio ?? false) {
-      _speak(word.word);
+      _speakWord(word);
     }
   }
 
   void _speak(String text) {
     _ttsService ??= ref.read(ttsServiceProvider);
+    _readingsRequest++;
     unawaited(_ttsService!.speak(text));
   }
 
-  Future<void> _speakIfAudible(String text) async {
+  /// Words with several readings (`なん/なに`) are spoken one reading at a
+  /// time, [_readingGap] apart, so each pronunciation is heard on its own.
+  void _speakReadings(List<String> readings) {
+    final service = ref.read(ttsServiceProvider);
+    _ttsService ??= service;
+    final request = ++_readingsRequest;
+    unawaited(() async {
+      for (var i = 0; i < readings.length; i++) {
+        if (request != _readingsRequest || !mounted) return;
+        if (i > 0) {
+          await Future<void>.delayed(_readingGap);
+          if (request != _readingsRequest || !mounted) return;
+        }
+        await service.speak(readings[i]);
+      }
+    }());
+  }
+
+  void _speakWord(Vocabulary word) {
+    final readings = splitReadings(word.reading);
+    if (readings.length > 1) {
+      _speakReadings(readings);
+    } else {
+      _speak(word.word);
+    }
+  }
+
+  Future<void> _speakIfAudible(String text, {Vocabulary? word}) async {
     // Slider mode sets the device volume itself when speaking, so only the
     // level chosen there can make speech inaudible.
     final settings = ref.read(appControllerProvider).value;
@@ -475,7 +506,12 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
       if (playbackBlocked) return;
     }
     if (!mounted) return;
-    _speak(text);
+    final readings = word == null ? const <String>[] : splitReadings(text);
+    if (readings.length > 1) {
+      _speakReadings(readings);
+    } else {
+      _speak(text);
+    }
   }
 
   /// Auto review only runs on days already finished; a day still being
@@ -556,7 +592,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
     _restartAutoReview();
     unawaited(_savePosition(state, words[index], index));
     if (state.autoPlayAudio && !_suppressAutoAudio) {
-      _speak(words[index].word);
+      _speakWord(words[index]);
     }
     _suppressAutoAudio = false;
   }
