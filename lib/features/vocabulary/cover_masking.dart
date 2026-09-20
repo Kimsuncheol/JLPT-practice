@@ -90,3 +90,27 @@ List<MaskSegment> maskSegments(String text, Iterable<String> targets) {
   }
   return segments;
 }
+
+/// Splits [text] into shown and covered runs for precomputed, sorted,
+/// non-overlapping [spans] (start inclusive, end exclusive).
+List<MaskSegment> maskSegmentsFromSpans(
+  String text,
+  Iterable<({int start, int end})> spans,
+) {
+  final segments = <MaskSegment>[];
+  var cursor = 0;
+  for (final span in spans) {
+    final start = span.start.clamp(cursor, text.length);
+    final end = span.end.clamp(start, text.length);
+    if (end == start) continue;
+    if (start > cursor) {
+      segments.add(MaskSegment(text.substring(cursor, start), covered: false));
+    }
+    segments.add(MaskSegment(text.substring(start, end), covered: true));
+    cursor = end;
+  }
+  if (cursor < text.length) {
+    segments.add(MaskSegment(text.substring(cursor), covered: false));
+  }
+  return segments.isEmpty ? [MaskSegment(text, covered: false)] : segments;
+}

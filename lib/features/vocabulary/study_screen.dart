@@ -16,6 +16,7 @@ import 'package:jlpt_practice/data/models/study_session.dart';
 import 'package:jlpt_practice/data/models/vocabulary.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_masking.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_tape.dart';
+import 'package:jlpt_practice/features/vocabulary/masked_translation.dart';
 
 class StudyScreen extends ConsumerStatefulWidget {
   const StudyScreen({required this.day, super.key});
@@ -153,7 +154,8 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
                     hideWord: hideWord,
                     hideMeaning: meaningsHidden,
                     maskMeaningInTranslation: meaningsHidden,
-                    onSpeakWord: () => _speakIfAudible(word.reading, word: word),
+                    onSpeakWord: () =>
+                        _speakIfAudible(word.reading, word: word),
                     onSpeakExample: () =>
                         _speakIfAudible(word.example.sentence),
                   ),
@@ -837,6 +839,18 @@ class _StudyCard extends StatelessWidget {
     final translation = _withRolePlayLineBreaks(
       vocabulary.example.translation(language),
     );
+    // Korean meanings are inflected inside Korean translations, so they are
+    // matched by lemma; other languages keep the plain substring mask.
+    final koreanMeanings = vocabulary.meanings['ko'];
+    if (language == 'ko' && koreanMeanings != null) {
+      return MaskedTranslation(
+        translation: translation,
+        meanings: koreanMeanings,
+        hideMeanings: maskMeaningInTranslation,
+        style: style,
+        glyphWidth: 0.55,
+      );
+    }
     return _maskedText(
       translation,
       style: style,
@@ -861,26 +875,10 @@ class _StudyCard extends StatelessWidget {
     if (targets.isEmpty) {
       return Text(text, textAlign: TextAlign.center, style: style);
     }
-    final fontSize = style?.fontSize ?? 14;
-    return Text.rich(
-      TextSpan(
-        style: style,
-        children: [
-          for (final segment in maskSegments(text, targets))
-            if (segment.covered)
-              WidgetSpan(
-                alignment: PlaceholderAlignment.middle,
-                child: coverTapeFor(
-                  characters: segment.text.length,
-                  fontSize: fontSize,
-                  glyphWidth: glyphWidth,
-                ),
-              )
-            else
-              TextSpan(text: segment.text),
-        ],
-      ),
-      textAlign: TextAlign.center,
+    return MaskedSegmentsText(
+      segments: maskSegments(text, targets),
+      style: style,
+      glyphWidth: glyphWidth,
     );
   }
 }
