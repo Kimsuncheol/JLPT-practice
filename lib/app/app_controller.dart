@@ -97,9 +97,6 @@ class AppController extends AsyncNotifier<AppState> {
       ttsVolumeMode: settings.ttsVolumeMode,
       ttsVolume: settings.ttsVolume,
       ttsVoiceId: settings.ttsVoiceId,
-      autoReviewEnabled: settings.autoReviewEnabled,
-      autoReviewOrder: settings.autoReviewOrder,
-      autoReviewSeconds: settings.autoReviewSeconds,
       notificationsEnabled: notificationsEnabled,
       reminderHour: settings.reminderHour,
       reminderMinute: settings.reminderMinute,
@@ -425,21 +422,6 @@ class AppController extends AsyncNotifier<AppState> {
   Future<void> setTtsVoiceId(String value) =>
       _updatePreference('ttsVoiceId', value, (current) {
         return current.copyWith(ttsVoiceId: value);
-      });
-
-  Future<void> setAutoReviewEnabled(bool value) =>
-      _updatePreference('autoReviewEnabled', value, (current) {
-        return current.copyWith(autoReviewEnabled: value);
-      });
-
-  Future<void> setAutoReviewOrder(AutoReviewOrder value) =>
-      _updatePreference('autoReviewOrder', value.id, (current) {
-        return current.copyWith(autoReviewOrder: value);
-      });
-
-  Future<void> setAutoReviewSeconds(int value) =>
-      _updatePreference('autoReviewSeconds', value, (current) {
-        return current.copyWith(autoReviewSeconds: value);
       });
 
   Future<void> saveStudySession(StudySession session) async {

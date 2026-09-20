@@ -34,10 +34,6 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   int _index = 0;
   final Map<String, _CardVisibility> _cardVisibility = {};
   PageController? _pageController;
-  final PageController _actionPageController = PageController(
-    initialPage: 10000,
-  );
-  int _currentActionPage = 10000;
   TtsService? _ttsService;
   bool _resumeDecisionPending = false;
   bool _resumeDialogVisible = false;
@@ -46,17 +42,9 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   int _readingsRequest = 0;
   static const _readingGap = Duration(milliseconds: 500);
 
-  /// Auto review: how many of the order's elements are revealed on the
-  /// current card, the timer that reveals the next one, and the pause switch.
-  Timer? _autoTimer;
-  int _autoRevealed = 1;
-  bool _autoPaused = false;
-
   @override
   void dispose() {
-    _autoTimer?.cancel();
     _pageController?.dispose();
-    _actionPageController.dispose();
     _readingsRequest++;
     if (_ttsService != null) unawaited(_ttsService!.stop());
     super.dispose();
@@ -65,16 +53,6 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   @override
   Widget build(BuildContext context) {
     final asyncState = ref.watch(appControllerProvider);
-    ref.listen(
-      appControllerProvider.select(
-        (state) => (
-          state.value == null ? null : _autoReviewActive(state.value!),
-          state.value?.autoReviewOrder,
-          state.value?.autoReviewSeconds,
-        ),
-      ),
-      (_, _) => _restartAutoReview(),
-    );
     final scaffoldBackgroundColor = Theme.of(context).scaffoldBackgroundColor;
     final systemBarColor = _resumeDialogVisible
         ? Color.alphaBlend(_resumeDialogBarrierColor, scaffoldBackgroundColor)
@@ -130,21 +108,11 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
                 if (index == words.length) return const SizedBox.shrink();
                 final word = words[index];
                 final visibility = _visibilityFor(word, state);
-                final revealed = _autoReviewActive(state)
-                    ? state.autoReviewOrder.elements
-                          .take(index == _index ? _autoRevealed : 1)
-                          .toSet()
-                    : null;
-                final showFurigana = revealed == null
-                    ? visibility.showFurigana
-                    : revealed.contains(ReviewElement.reading);
-                final hideWord = revealed == null
-                    ? visibility.hideWord ||
-                          (!showFurigana && word.reading == word.word)
-                    : !revealed.contains(ReviewElement.word);
-                final meaningsHidden = revealed == null
-                    ? visibility.hideMeanings
-                    : !revealed.contains(ReviewElement.meanings);
+                final showFurigana = visibility.showFurigana;
+                final hideWord =
+                    visibility.hideWord ||
+                    (!showFurigana && word.reading == word.word);
+                final meaningsHidden = visibility.hideMeanings;
                 return Padding(
                   padding: const EdgeInsets.fromLTRB(20, 8, 20, 14),
                   child: _StudyCard(
@@ -185,19 +153,6 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
     );
   }
 
-  /// Switches auto review on or off. Only offered on a finished day.
-  Widget _autoReviewTab(AppState state) => _CardAction(
-    icon: _autoReviewActive(state)
-        ? Icons.play_circle_rounded
-        : Icons.play_circle_outline_rounded,
-    label: context.strings('autoReview'),
-    onTap: () => unawaited(
-      ref
-          .read(appControllerProvider.notifier)
-          .setAutoReviewEnabled(!state.autoReviewEnabled),
-    ),
-  );
-
   Widget _actionPage(List<Widget> actions) => Row(
     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -205,40 +160,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   );
 
   Widget _buildActionArea(AppState state, Vocabulary word) {
-    // The combined word/reading control leaves room for Auto review on the
-    // primary page, so a duplicate second page would serve no purpose. With
-    // auto review unavailable there is nothing for a second page to show.
-    if (word.word == word.reading || !_dayFinished(state)) {
-      return _primaryActionPage(state, word);
-    }
-    return PageView.builder(
-      key: const ValueKey('study-action-carousel'),
-      controller: _actionPageController,
-      onPageChanged: (page) => _currentActionPage = page,
-      itemBuilder: (context, page) => page.isEven
-          ? _primaryActionPage(state, word)
-          : _actionPage([_autoReviewTab(state)]),
-    );
-  }
-
-  Widget _primaryActionPage(AppState state, Vocabulary word) {
-    if (_autoReviewActive(state)) {
-      return _actionPage([
-        _CardAction(
-          icon: _autoPaused ? Icons.play_arrow_rounded : Icons.pause_rounded,
-          label: context.strings(
-            _autoPaused ? 'resumeAutoReview' : 'pauseAutoReview',
-          ),
-          onTap: _toggleAutoReviewPause,
-        ),
-      ]);
-    }
-
-    final actions = _manualActions(state, word);
-    if (word.word == word.reading && _dayFinished(state)) {
-      actions.add(_autoReviewTab(state));
-    }
-    return _actionPage(actions);
+    return _actionPage(_manualActions(state, word));
   }
 
   _CardVisibility _visibilityFor(Vocabulary word, AppState state) =>
@@ -338,7 +260,6 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
       } else {
         unawaited(_savePosition(state, words.first, 0));
         _autoPlayFirstWord(words.first);
-        _restartAutoReview();
       }
     });
   }
@@ -406,7 +327,6 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
       // Resuming on the first word never changes the page, so the page-change
       // handler cannot play it.
       _autoPlayFirstWord(words.first);
-      _restartAutoReview();
       return;
     }
     _suppressAutoAudio = true;
@@ -516,72 +436,12 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
     }
   }
 
-  /// Auto review only runs on days already finished; a day still being
-  /// studied for the first time keeps the manual controls and hides the
-  /// auto review tab.
-  bool _dayFinished(AppState state) =>
-      state.completedStudyDays[state.selectedLevel]?.contains(widget.day) ??
-      false;
-
-  bool _autoReviewActive(AppState state) =>
-      state.autoReviewEnabled && _dayFinished(state);
-
-  /// Starts the current card over at its first element and, unless paused or
-  /// waiting on the resume dialog, schedules the next reveal.
-  void _restartAutoReview() {
-    _autoTimer?.cancel();
-    if (!mounted) return;
-    if (_autoRevealed != 1) setState(() => _autoRevealed = 1);
-    _scheduleAutoStep();
-  }
-
-  void _scheduleAutoStep() {
-    _autoTimer?.cancel();
-    final state = ref.read(appControllerProvider).value;
-    if (state == null ||
-        !_autoReviewActive(state) ||
-        _autoPaused ||
-        _resumeDecisionPending) {
-      return;
-    }
-    _autoTimer = Timer(Duration(seconds: state.autoReviewSeconds), _onAutoStep);
-  }
-
-  void _onAutoStep() {
-    if (!mounted) return;
-    final state = ref.read(appControllerProvider).value;
-    if (state == null || !_autoReviewActive(state)) return;
-    if (_autoRevealed < state.autoReviewOrder.elements.length) {
-      setState(() => _autoRevealed++);
-      _scheduleAutoStep();
-      return;
-    }
-    // Everything is revealed: move on. Past the last word this reaches the
-    // trailing page, which finishes the session.
-    unawaited(
-      _pageController?.nextPage(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      ),
-    );
-  }
-
-  void _toggleAutoReviewPause() {
-    setState(() => _autoPaused = !_autoPaused);
-    if (_autoPaused) {
-      _autoTimer?.cancel();
-    } else {
-      _scheduleAutoStep();
-    }
-  }
-
   Future<void> _handlePageChanged({
     required int index,
     required List<Vocabulary> words,
     required AppState state,
   }) async {
     final request = ++_pageChangeRequest;
-    if (index < words.length) _resetActionCarousel();
     if (_ttsService != null) await _ttsService!.stop();
     if (!mounted || request != _pageChangeRequest) return;
 
@@ -591,19 +451,11 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
     }
     setState(() => _index = index);
     if (_resumeDecisionPending) return;
-    _restartAutoReview();
     unawaited(_savePosition(state, words[index], index));
     if (state.autoPlayAudio && !_suppressAutoAudio) {
       _speakWord(words[index]);
     }
     _suppressAutoAudio = false;
-  }
-
-  void _resetActionCarousel() {
-    if (_currentActionPage.isEven || !_actionPageController.hasClients) return;
-    final primaryPage = _currentActionPage - 1;
-    _currentActionPage = primaryPage;
-    _actionPageController.jumpToPage(primaryPage);
   }
 
   Future<void> _finishStudying() async {

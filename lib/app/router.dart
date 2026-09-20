@@ -12,7 +12,6 @@ import 'package:jlpt_practice/features/onboarding/onboarding_screen.dart';
 import 'package:jlpt_practice/features/quiz/quiz_result_screen.dart';
 import 'package:jlpt_practice/features/quiz/quiz_screen.dart';
 import 'package:jlpt_practice/features/settings/appearance_screen.dart';
-import 'package:jlpt_practice/features/settings/auto_review_screen.dart';
 import 'package:jlpt_practice/features/settings/eye_comfort_screen.dart';
 import 'package:jlpt_practice/features/settings/languages_screen.dart';
 import 'package:jlpt_practice/features/settings/learning_language_screen.dart';
@@ -32,7 +31,6 @@ import 'package:jlpt_practice/features/vocabulary/study_finish_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/study_screen.dart';
 import 'package:jlpt_practice/shared/bootstrap_screen.dart';
 import 'package:jlpt_practice/shared/eye_comfort_overlay.dart';
-import 'package:jlpt_practice/shared/keep_screen_on.dart';
 
 GoRouter createAppRouter({String initialLocation = '/'}) => GoRouter(
   initialLocation: initialLocation,
@@ -57,10 +55,6 @@ GoRouter createAppRouter({String initialLocation = '/'}) => GoRouter(
     GoRoute(
       path: '/settings/recall-cover',
       builder: (_, _) => const EyeComfortOverlay(child: RecallCoverScreen()),
-    ),
-    GoRoute(
-      path: '/settings/auto-review',
-      builder: (_, _) => const EyeComfortOverlay(child: AutoReviewScreen()),
     ),
     GoRoute(
       path: '/settings/tts',
@@ -90,11 +84,9 @@ GoRouter createAppRouter({String initialLocation = '/'}) => GoRouter(
     ),
     GoRoute(
       path: '/study/day/:day',
-      builder: (_, state) => KeepScreenOn(
-        child: EyeComfortOverlay(
-          child: StudyScreen(
-            day: int.tryParse(state.pathParameters['day'] ?? '') ?? 1,
-          ),
+      builder: (_, state) => EyeComfortOverlay(
+        child: StudyScreen(
+          day: int.tryParse(state.pathParameters['day'] ?? '') ?? 1,
         ),
       ),
     ),
@@ -106,38 +98,26 @@ GoRouter createAppRouter({String initialLocation = '/'}) => GoRouter(
     ),
     GoRoute(
       path: '/grammar',
-      builder: (_, _) => const KeepScreenOn(
-        child: EyeComfortOverlay(child: GrammarListScreen()),
-      ),
+      builder: (_, _) => const EyeComfortOverlay(child: GrammarListScreen()),
     ),
     GoRoute(
       path: '/grammar/detail/:id',
-      builder: (_, state) => KeepScreenOn(
-        child: EyeComfortOverlay(
-          child: GrammarDetailScreen(
-            grammarId: state.pathParameters['id'] ?? '',
-          ),
-        ),
+      builder: (_, state) => EyeComfortOverlay(
+        child: GrammarDetailScreen(grammarId: state.pathParameters['id'] ?? ''),
       ),
     ),
     GoRoute(
       path: '/grammar/tutor/:id',
-      builder: (_, state) => KeepScreenOn(
-        child: EyeComfortOverlay(
-          child: GrammarTutorScreen(
-            grammarId: state.pathParameters['id'] ?? '',
-          ),
-        ),
+      builder: (_, state) => EyeComfortOverlay(
+        child: GrammarTutorScreen(grammarId: state.pathParameters['id'] ?? ''),
       ),
     ),
     GoRoute(
       path: '/grammar/part/:level/:part',
-      builder: (_, state) => KeepScreenOn(
-        child: EyeComfortOverlay(
-          child: GrammarPartTutorScreen(
-            level: state.pathParameters['level'] ?? 'N5',
-            part: int.tryParse(state.pathParameters['part'] ?? '') ?? 1,
-          ),
+      builder: (_, state) => EyeComfortOverlay(
+        child: GrammarPartTutorScreen(
+          level: state.pathParameters['level'] ?? 'N5',
+          part: int.tryParse(state.pathParameters['part'] ?? '') ?? 1,
         ),
       ),
     ),
@@ -150,32 +130,27 @@ GoRouter createAppRouter({String initialLocation = '/'}) => GoRouter(
     GoRoute(path: '/quiz/result', builder: (_, _) => const QuizResultScreen()),
     GoRoute(
       path: '/test/practice/:level',
-      builder: (_, state) => KeepScreenOn(
-        child: QuestionTypeScreen(level: state.pathParameters['level'] ?? 'N5'),
-      ),
+      builder: (_, state) =>
+          QuestionTypeScreen(level: state.pathParameters['level'] ?? 'N5'),
     ),
     GoRoute(
       path: '/test/practice/:level/:section',
-      builder: (_, state) => KeepScreenOn(
-        child: LevelPracticeTestScreen(
-          level: state.pathParameters['level'] ?? 'N5',
-          section:
-              sectionFromPathSegment(state.pathParameters['section'] ?? '') ??
-              ProblemSection.reading,
-        ),
+      builder: (_, state) => LevelPracticeTestScreen(
+        level: state.pathParameters['level'] ?? 'N5',
+        section:
+            sectionFromPathSegment(state.pathParameters['section'] ?? '') ??
+            ProblemSection.reading,
       ),
     ),
     GoRoute(
       path: '/test/practice/:level/:section/:practiceId',
-      builder: (_, state) => KeepScreenOn(
-        child: PracticeTestScreen(
-          level: state.pathParameters['level'] ?? 'N5',
-          section:
-              sectionFromPathSegment(state.pathParameters['section'] ?? '') ??
-              ProblemSection.vocabulary,
-          practiceNumber: practiceSetNumber(
-            state.pathParameters['practiceId'] ?? '',
-          ),
+      builder: (_, state) => PracticeTestScreen(
+        level: state.pathParameters['level'] ?? 'N5',
+        section:
+            sectionFromPathSegment(state.pathParameters['section'] ?? '') ??
+            ProblemSection.vocabulary,
+        practiceNumber: practiceSetNumber(
+          state.pathParameters['practiceId'] ?? '',
         ),
       ),
     ),
@@ -185,10 +160,8 @@ GoRouter createAppRouter({String initialLocation = '/'}) => GoRouter(
         final level = state.pathParameters['level'] ?? 'N5';
         final section = state.pathParameters['section'] ?? '';
         final practiceId = state.pathParameters['practiceId'] ?? '';
-        return KeepScreenOn(
-          child: MockTestResultScreen(
-            retryPath: '/test/practice/$level/$section/$practiceId',
-          ),
+        return MockTestResultScreen(
+          retryPath: '/test/practice/$level/$section/$practiceId',
         );
       },
     ),
