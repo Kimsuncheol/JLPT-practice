@@ -120,12 +120,6 @@ class DashboardScreen extends ConsumerWidget {
                           Row(
                             children: [
                               _OnPrimaryMetric(
-                                icon: Icons.replay_rounded,
-                                value: '${state.dueVocabulary.length}',
-                                label: strings('reviewsDue'),
-                              ),
-                              const SizedBox(width: 22),
-                              _OnPrimaryMetric(
                                 icon: Icons.local_fire_department_rounded,
                                 value: '${state.currentStreak}',
                                 label: strings('streak'),
@@ -145,27 +139,12 @@ class DashboardScreen extends ConsumerWidget {
                       onTap: () => context.push('/study'),
                     ),
                     const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _SmallAction(
-                            icon: Icons.replay_circle_filled_rounded,
-                            title: strings('startReview'),
-                            badge: '${state.dueVocabulary.length}',
-                            onTap: () => context.push('/review'),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: _SmallAction(
-                            icon: Icons.quiz_rounded,
-                            title: strings('startQuiz'),
-                            badge:
-                                '${state.selectedVocabulary.where((word) => word.hasExample).length}',
-                            onTap: () => context.push('/quiz'),
-                          ),
-                        ),
-                      ],
+                    _SmallAction(
+                      icon: Icons.quiz_rounded,
+                      title: strings('startQuiz'),
+                      badge:
+                          '${state.selectedVocabulary.where((word) => word.hasExample).length}',
+                      onTap: () => context.push('/quiz'),
                     ),
                     const SizedBox(height: 24),
                     Text(

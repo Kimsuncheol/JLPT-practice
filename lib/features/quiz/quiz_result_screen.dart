@@ -104,37 +104,6 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen> {
                         ),
                       ],
                     ),
-                    if (result.incorrectIds.isNotEmpty) ...[
-                      const SizedBox(height: 18),
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(18),
-                        decoration: BoxDecoration(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.secondaryContainer,
-                          borderRadius: BorderRadius.circular(22),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.psychology_alt_rounded),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                '${result.incorrectIds.length} ${context.strings('reviewsDue').toLowerCase()}',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                            IconButton(
-                              onPressed: () => context.go('/review'),
-                              icon: const Icon(Icons.arrow_forward_rounded),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
                     const SizedBox(height: 26),
                     FilledButton.icon(
                       onPressed: () => context.go('/quiz'),

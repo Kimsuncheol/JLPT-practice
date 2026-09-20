@@ -92,27 +92,6 @@ class AppController extends AsyncNotifier<AppState> {
     unawaited(ref.read(cloudSyncProvider).syncProfile(next));
   }
 
-  Future<void> rateVocabulary(String vocabularyId, ReviewRating rating) async {
-    final vocabulary = _value.vocabulary.firstWhere(
-      (item) => item.id == vocabularyId,
-    );
-    final progress = {..._value.progress};
-    final scheduled = ref
-        .read(srsSchedulerProvider)
-        .schedule(
-          vocabularyId: vocabularyId,
-          jlptLevel: vocabulary.jlptLevel,
-          rating: rating,
-          current: progress[vocabularyId],
-        );
-    progress[vocabularyId] = scheduled;
-    var next = _value.copyWith(progress: progress);
-    next = await _withRecordedActivity(next);
-    state = AsyncData(next);
-    await _store.saveProgress(progress);
-    unawaited(ref.read(cloudSyncProvider).syncProgress(scheduled));
-  }
-
   Future<void> recordQuizResult(
     QuizResult result,
     List<QuizQuestion> questions,

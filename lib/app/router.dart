@@ -3,7 +3,6 @@ import 'package:jlpt_practice/features/dashboard/home_shell.dart';
 import 'package:jlpt_practice/features/onboarding/onboarding_screen.dart';
 import 'package:jlpt_practice/features/quiz/quiz_result_screen.dart';
 import 'package:jlpt_practice/features/quiz/quiz_screen.dart';
-import 'package:jlpt_practice/features/review/review_screen.dart';
 import 'package:jlpt_practice/features/settings/languages_screen.dart';
 import 'package:jlpt_practice/features/settings/levels_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/day_selection_screen.dart';
@@ -30,6 +29,5 @@ final appRouter = GoRouter(
     ),
     GoRoute(path: '/quiz', builder: (_, _) => const QuizScreen()),
     GoRoute(path: '/quiz/result', builder: (_, _) => const QuizResultScreen()),
-    GoRoute(path: '/review', builder: (_, _) => const ReviewScreen()),
   ],
 );

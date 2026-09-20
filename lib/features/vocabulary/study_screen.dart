@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/core/utils/study_batches.dart';
-import 'package:jlpt_practice/data/models/review_progress.dart';
 import 'package:jlpt_practice/data/models/vocabulary.dart';
 
 class StudyScreen extends ConsumerStatefulWidget {
@@ -66,18 +65,6 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
                     },
                     onSpeak: () =>
                         ref.read(ttsServiceProvider).speak(word.word),
-                    onReview: () async {
-                      await ref
-                          .read(appControllerProvider.notifier)
-                          .rateVocabulary(word.id, ReviewRating.again);
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(context.strings('markReview')),
-                          ),
-                        );
-                      }
-                    },
                   ),
                 );
               },
@@ -106,7 +93,6 @@ class _StudyCard extends StatelessWidget {
     required this.showFurigana,
     required this.onToggleFurigana,
     required this.onSpeak,
-    required this.onReview,
   });
 
   final Vocabulary vocabulary;
@@ -114,7 +100,6 @@ class _StudyCard extends StatelessWidget {
   final bool showFurigana;
   final VoidCallback onToggleFurigana;
   final VoidCallback onSpeak;
-  final VoidCallback onReview;
 
   @override
   Widget build(BuildContext context) {
@@ -232,11 +217,6 @@ class _StudyCard extends StatelessWidget {
                       ? context.strings('hideReading')
                       : context.strings('showReading'),
                   onTap: onToggleFurigana,
-                ),
-                _CardAction(
-                  icon: Icons.bookmark_add_outlined,
-                  label: context.strings('markReview'),
-                  onTap: onReview,
                 ),
               ],
             ),

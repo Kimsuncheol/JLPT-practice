@@ -48,20 +48,6 @@ class AppState {
           .toList(growable: false)
         ..sort((a, b) => a.rank.compareTo(b.rank));
 
-  List<Vocabulary> get dueVocabulary {
-    final due = vocabulary.where((item) {
-      final itemProgress = progress[item.id];
-      return itemProgress != null &&
-          itemProgress.jlptLevel == selectedLevel &&
-          itemProgress.isDue;
-    }).toList();
-    due.sort(
-      (a, b) =>
-          progress[a.id]!.nextReviewAt.compareTo(progress[b.id]!.nextReviewAt),
-    );
-    return due;
-  }
-
   int get learnedCount =>
       progress.values.where((item) => item.isLearned).length;
   int get studiedCount => progress.length;

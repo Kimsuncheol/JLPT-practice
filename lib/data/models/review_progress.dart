@@ -64,7 +64,6 @@ class ReviewProgress {
   final ReviewRating lastRating;
   final DateTime updatedAt;
 
-  bool get isDue => !nextReviewAt.isAfter(DateTime.now());
   bool get isLearned =>
       state == LearningState.review || state == LearningState.mastered;
 
