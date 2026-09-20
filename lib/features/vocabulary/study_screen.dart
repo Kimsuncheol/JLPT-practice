@@ -185,34 +185,32 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
     );
   }
 
-  /// Switches auto review on or off. On a day that is not finished it is
-  /// shown semi-transparent and does nothing.
+  /// Switches auto review on or off. Only offered on a finished day.
   Widget _autoReviewTab(AppState state) => _CardAction(
     icon: _autoReviewActive(state)
         ? Icons.play_circle_rounded
         : Icons.play_circle_outline_rounded,
     label: context.strings('autoReview'),
-    onTap: _dayFinished(state)
-        ? () => unawaited(
-            ref
-                .read(appControllerProvider.notifier)
-                .setAutoReviewEnabled(!state.autoReviewEnabled),
-          )
-        : null,
+    onTap: () => unawaited(
+      ref
+          .read(appControllerProvider.notifier)
+          .setAutoReviewEnabled(!state.autoReviewEnabled),
+    ),
   );
 
   Widget _actionPage(List<Widget> actions) => Row(
+    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
     crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      ...actions,
-      for (var index = actions.length; index < 3; index++) const Spacer(),
-    ],
+    children: [for (final action in actions) Flexible(child: action)],
   );
 
   Widget _buildActionArea(AppState state, Vocabulary word) {
     // The combined word/reading control leaves room for Auto review on the
-    // primary page, so a duplicate second page would serve no purpose.
-    if (word.word == word.reading) return _primaryActionPage(state, word);
+    // primary page, so a duplicate second page would serve no purpose. With
+    // auto review unavailable there is nothing for a second page to show.
+    if (word.word == word.reading || !_dayFinished(state)) {
+      return _primaryActionPage(state, word);
+    }
     return PageView.builder(
       key: const ValueKey('study-action-carousel'),
       controller: _actionPageController,
@@ -237,7 +235,9 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
     }
 
     final actions = _manualActions(state, word);
-    if (word.word == word.reading) actions.add(_autoReviewTab(state));
+    if (word.word == word.reading && _dayFinished(state)) {
+      actions.add(_autoReviewTab(state));
+    }
     return _actionPage(actions);
   }
 
@@ -517,8 +517,8 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   }
 
   /// Auto review only runs on days already finished; a day still being
-  /// studied for the first time keeps the manual controls and shows the
-  /// auto review tab dimmed.
+  /// studied for the first time keeps the manual controls and hides the
+  /// auto review tab.
   bool _dayFinished(AppState state) =>
       state.completedStudyDays[state.selectedLevel]?.contains(widget.day) ??
       false;
@@ -901,29 +901,27 @@ class _CardAction extends StatelessWidget {
   final VoidCallback? onTap;
 
   @override
-  Widget build(BuildContext context) => Expanded(
-    child: Opacity(
-      opacity: onTap == null ? 0.38 : 1,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        splashFactory: NoSplash.splashFactory,
-        highlightColor: Colors.transparent,
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 3),
-          child: Column(
-            children: [
-              Icon(icon),
-              const SizedBox(height: 6),
-              Text(
-                label,
-                maxLines: 2,
-                textAlign: TextAlign.center,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.labelSmall,
-              ),
-            ],
-          ),
+  Widget build(BuildContext context) => Opacity(
+    opacity: onTap == null ? 0.38 : 1,
+    child: InkWell(
+      borderRadius: BorderRadius.circular(16),
+      splashFactory: NoSplash.splashFactory,
+      highlightColor: Colors.transparent,
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+        child: Column(
+          children: [
+            Icon(icon),
+            const SizedBox(height: 6),
+            Text(
+              label,
+              maxLines: 2,
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.labelSmall,
+            ),
+          ],
         ),
       ),
     ),
