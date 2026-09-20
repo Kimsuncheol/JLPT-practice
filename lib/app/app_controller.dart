@@ -17,7 +17,7 @@ import 'package:jlpt_practice/data/models/quiz.dart';
 import 'package:jlpt_practice/data/models/review_progress.dart';
 import 'package:jlpt_practice/data/models/study_preferences.dart';
 import 'package:jlpt_practice/data/models/study_session.dart';
-import 'package:jlpt_practice/core/services/kiwi_morpheme_analyzer.dart';
+import 'package:jlpt_practice/core/services/korean_morpheme_analyzer.dart';
 import 'package:jlpt_practice/core/services/meaning_mask_service.dart';
 import 'package:jlpt_practice/data/repositories/quiz_repository.dart';
 import 'package:jlpt_practice/data/repositories/vocabulary_repository.dart';
@@ -30,7 +30,7 @@ final quizRepositoryProvider = Provider((ref) => QuizRepository());
 final srsSchedulerProvider = Provider((ref) => const SrsScheduler());
 final cloudSyncProvider = Provider((ref) => const CloudSyncService());
 final meaningMaskServiceProvider = Provider((ref) {
-  final service = MeaningMaskService(KiwiMorphemeAnalyzer());
+  final service = MeaningMaskService(KoreanMorphemeAnalyzer());
   ref.onDispose(service.close);
   return service;
 });

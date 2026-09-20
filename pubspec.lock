@@ -486,14 +486,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_kiwi_nlp:
-    dependency: "direct main"
-    description:
-      name: flutter_kiwi_nlp
-      sha256: "218d4f6fbdb61a29ccfaf899b9ce2ea2155c54330b9195291d23d203d425cd68"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2026.7.24"
   flutter_lints:
     dependency: "direct dev"
     description:

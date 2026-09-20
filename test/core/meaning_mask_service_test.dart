@@ -1,7 +1,5 @@
-import 'dart:io';
-
 import 'package:flutter_test/flutter_test.dart';
-import 'package:jlpt_practice/core/services/kiwi_morpheme_analyzer.dart';
+import 'package:jlpt_practice/core/services/korean_morpheme_analyzer.dart';
 import 'package:jlpt_practice/core/services/meaning_mask_service.dart';
 
 import 'kiwi_fixtures.dart';
@@ -95,19 +93,14 @@ void main() {
     });
   });
 
-  // Runs the real Kiwi model through the isolate wrapper. Point
-  // FLUTTER_KIWI_NLP_MODEL_PATH at a model directory (kiwi-models/cong/base).
-  final modelPath = Platform.environment['FLUTTER_KIWI_NLP_MODEL_PATH'];
-  group('KiwiMorphemeAnalyzer', () {
+  group('KoreanMorphemeAnalyzer', () {
     for (final (meaning, sentence, expected) in _examples) {
       test('$meaning in "$sentence"', () async {
-        final analyzer = KiwiMorphemeAnalyzer(
-          modelDirectory: () async => modelPath!,
-        );
+        final analyzer = KoreanMorphemeAnalyzer();
         addTearDown(analyzer.close);
         final service = MeaningMaskService(analyzer);
         expect(await service.findMaskSpans(meaning, sentence), expected);
       });
     }
-  }, skip: modelPath == null ? 'FLUTTER_KIWI_NLP_MODEL_PATH is not set' : null);
+  });
 }
