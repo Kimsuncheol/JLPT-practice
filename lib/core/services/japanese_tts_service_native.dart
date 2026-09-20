@@ -3,16 +3,14 @@ import 'dart:io';
 import 'dart:isolate';
 
 import 'package:archive/archive_io.dart';
-import 'package:audio_session/audio_session.dart';
-import 'package:audioplayers/audioplayers.dart' hide AVAudioSessionCategory;
+import 'package:audioplayers/audioplayers.dart';
 import 'package:crypto/crypto.dart';
 import 'package:jlpt_practice/core/services/japanese_tts_voice.dart';
 import 'package:jlpt_practice/core/services/tts_service.dart';
-import 'package:jlpt_practice/data/models/study_preferences.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:sherpa_onnx/sherpa_onnx.dart' as sherpa_onnx;
-import 'package:volume_controller/volume_controller.dart';
+import 'package:jlpt_practice/core/services/flutter_tts_engine.dart';
 
 const _modelName = 'sherpa-onnx-supertonic-3-tts-int8-2026-05-11';
 const _modelUrl =
@@ -21,21 +19,34 @@ const _modelArchiveBytes = 128774318;
 const _modelArchiveSha256 =
     '82fa96f91c4ef8abaae3a14a3f4153facf88bed821d1f7331cec2700f432c427';
 
-class JapaneseTtsService implements TtsService {
-  JapaneseTtsService({
-    required TtsVolumePreference Function() volumePreference,
-    required this.voiceId,
-  }) : _volumePreference = volumePreference,
-       _fallback = TtsService(volumePreference: volumePreference);
+class SherpaTtsEngine
+    implements
+        DeferredFocusTtsEngine,
+        DialogueTtsEngine,
+        DeferredFocusDialogueTtsEngine {
+  SherpaTtsEngine({required this.voiceId}) {
+    _playerReady = _player.setAudioContext(
+      AudioContext(
+        android: const AudioContextAndroid(
+          contentType: AndroidContentType.speech,
+          usageType: AndroidUsageType.assistanceNavigationGuidance,
+          audioFocus: AndroidAudioFocus.none,
+        ),
+        iOS: AudioContextIOS(
+          category: AVAudioSessionCategory.playback,
+          options: const {
+            AVAudioSessionOptions.interruptSpokenAudioAndMixWithOthers,
+          },
+        ),
+      ),
+    );
+  }
 
-  final TtsVolumePreference Function() _volumePreference;
   final String Function() voiceId;
-  final TtsService _fallback;
   final AudioPlayer _player = AudioPlayer();
+  late final Future<void> _playerReady;
 
   Future<_JapaneseTtsWorker>? _worker;
-  AudioSession? _audioSession;
-  double? _systemVolumeToRestore;
   Completer<void>? _playbackCancelled;
   int _speechRequest = 0;
   bool _disposed = false;
@@ -61,14 +72,25 @@ class JapaneseTtsService implements TtsService {
   }
 
   @override
-  Future<void> speak(String text) => speakWithVoice(text, voiceId());
+  Future<void> speak(String text, {String lang = 'ja-JP'}) =>
+      speakWithPlaybackGate(text, beforePlayback: () async => true);
 
-  Future<void> speakWithVoice(String text, String voiceId) async {
+  @override
+  Future<void> speakWithPlaybackGate(
+    String text, {
+    String lang = 'ja-JP',
+    required Future<bool> Function() beforePlayback,
+  }) => speakWithVoice(text, voiceId(), beforePlayback: beforePlayback);
+
+  Future<void> speakWithVoice(
+    String text,
+    String voiceId, {
+    Future<bool> Function()? beforePlayback,
+  }) async {
     final speechText = prepareJapaneseTextForSpeech(text).trim();
     if (speechText.isEmpty || _disposed) return;
     if (_worker == null && !await _JapaneseTtsModelManager.isInstalled()) {
-      await _fallback.speak(speechText);
-      return;
+      throw StateError('The Sherpa TTS model is not installed.');
     }
     final request = ++_speechRequest;
     _cancelPlaybackWait();
@@ -83,23 +105,25 @@ class JapaneseTtsService implements TtsService {
         await _deleteGeneratedFile(wavPath);
         return;
       }
-      await _play(wavPath, request);
+      await _play(wavPath, request, beforePlayback ?? () async => true);
     } catch (_) {
-      // A missing network connection on first use, unsupported native target,
-      // or corrupt model must not make pronunciation unusable.
       _worker = null;
-      if (request == _speechRequest && !_disposed) {
-        await _fallback.speak(speechText);
-      }
+      rethrow;
     }
   }
 
   @override
-  Future<void> speakDialogue(List<DialogueTurn> turns) async {
+  Future<void> speakDialogue(List<DialogueTurn> turns) =>
+      speakDialogueWithPlaybackGate(turns, beforePlayback: () async => true);
+
+  @override
+  Future<void> speakDialogueWithPlaybackGate(
+    List<DialogueTurn> turns, {
+    required Future<bool> Function() beforePlayback,
+  }) async {
     if (turns.isEmpty || _disposed) return;
     if (_worker == null && !await _JapaneseTtsModelManager.isInstalled()) {
-      await _fallback.speakDialogue(turns);
-      return;
+      throw StateError('The Sherpa TTS model is not installed.');
     }
     final request = ++_speechRequest;
     _cancelPlaybackWait();
@@ -120,40 +144,26 @@ class JapaneseTtsService implements TtsService {
           await _deleteGeneratedFile(wavPath);
           return;
         }
-        await _play(wavPath, request);
+        await _play(wavPath, request, beforePlayback);
       }
     } catch (_) {
       _worker = null;
-      if (request == _speechRequest && !_disposed) {
-        await _fallback.speakDialogue(turns);
-      }
+      rethrow;
     }
   }
 
-  Future<void> _play(String wavPath, int request) async {
-    final session = _audioSession ??= await AudioSession.instance;
-    await session.configure(
-      AudioSessionConfiguration(
-        avAudioSessionCategory: AVAudioSessionCategory.playback,
-        avAudioSessionCategoryOptions:
-            AVAudioSessionCategoryOptions.duckOthers |
-            AVAudioSessionCategoryOptions.interruptSpokenAudioAndMixWithOthers,
-        avAudioSessionMode: AVAudioSessionMode.spokenAudio,
-        androidAudioAttributes: const AndroidAudioAttributes(
-          contentType: AndroidAudioContentType.speech,
-          usage: AndroidAudioUsage.assistanceNavigationGuidance,
-        ),
-        androidAudioFocusGainType: AndroidAudioFocusGainType.gainTransient,
-      ),
-    );
-    final active = await session.setActive(true);
-    if (!active || request != _speechRequest) {
+  Future<void> _play(
+    String wavPath,
+    int request,
+    Future<bool> Function() beforePlayback,
+  ) async {
+    if (!await beforePlayback() || request != _speechRequest) {
       await _deleteGeneratedFile(wavPath);
       return;
     }
 
     try {
-      await _applyVolumePreference();
+      await _playerReady;
       final completed = _player.onPlayerComplete.first;
       final cancelled = Completer<void>();
       _playbackCancelled = cancelled;
@@ -164,44 +174,14 @@ class JapaneseTtsService implements TtsService {
       }
     } finally {
       await _deleteGeneratedFile(wavPath);
-      if (request == _speechRequest) await _releaseAudioFocus();
     }
-  }
-
-  Future<void> _applyVolumePreference() async {
-    final preference = _volumePreference();
-    await _player.setVolume(1);
-    if (preference.mode != TtsVolumeMode.slider) return;
-    try {
-      final controller = VolumeController.instance..showSystemUI = false;
-      _systemVolumeToRestore ??= await controller.getVolume();
-      await controller.setVolume(preference.level.clamp(0.0, 1.0));
-    } catch (_) {}
-  }
-
-  Future<void> _releaseAudioFocus() async {
-    final previous = _systemVolumeToRestore;
-    _systemVolumeToRestore = null;
-    if (previous != null) {
-      try {
-        await (VolumeController.instance..showSystemUI = false).setVolume(
-          previous,
-        );
-      } catch (_) {}
-    }
-    await _audioSession?.setActive(
-      false,
-      avAudioSessionSetActiveOptions:
-          AVAudioSessionSetActiveOptions.notifyOthersOnDeactivation,
-    );
   }
 
   @override
   Future<void> stop() async {
     ++_speechRequest;
     _cancelPlaybackWait();
-    await Future.wait([_player.stop(), _fallback.stop()]);
-    await _releaseAudioFocus();
+    await _player.stop();
   }
 
   void _cancelPlaybackWait() {
@@ -216,7 +196,6 @@ class JapaneseTtsService implements TtsService {
     _disposed = true;
     await stop();
     await _player.dispose();
-    await _fallback.dispose();
     final worker = _worker;
     if (worker != null) {
       try {
@@ -224,6 +203,122 @@ class JapaneseTtsService implements TtsService {
       } catch (_) {}
     }
   }
+}
+
+/// Native facade used by the app. The router prefers Sherpa when its model is
+/// installed and otherwise uses the OS engine, while [TtsService] owns focus.
+class JapaneseTtsService extends AudioFocusTtsService {
+  factory JapaneseTtsService({
+    required TtsVolumePreference Function() volumePreference,
+    required String Function() voiceId,
+  }) {
+    final sherpa = SherpaTtsEngine(voiceId: voiceId);
+    final flutter = FlutterTtsEngine();
+    final router = _JapaneseEngineRouter(sherpa: sherpa, fallback: flutter);
+    return JapaneseTtsService._(
+      router: router,
+      volumePreference: volumePreference,
+    );
+  }
+
+  JapaneseTtsService._({
+    required _JapaneseEngineRouter router,
+    required TtsVolumePreference Function() volumePreference,
+  }) : _router = router,
+       super(
+         audioSessionController: SystemTtsAudioSession.initialized,
+         engineSelector: () => router,
+         volumePreference: volumePreference,
+       );
+
+  final _JapaneseEngineRouter _router;
+
+  Future<void> prepare() => _router.sherpa.prepare();
+  Future<bool> get isOfflineModelInstalled =>
+      _router.sherpa.isOfflineModelInstalled;
+
+  Future<void> speakWithVoice(String text, String voiceId) {
+    _router.nextVoiceId = voiceId;
+    return speak(text);
+  }
+
+  @override
+  Future<void> dispose() async {
+    await super.dispose();
+    await _router.dispose();
+  }
+}
+
+class _JapaneseEngineRouter
+    implements
+        DeferredFocusTtsEngine,
+        DialogueTtsEngine,
+        DeferredFocusDialogueTtsEngine {
+  _JapaneseEngineRouter({required this.sherpa, required this.fallback});
+
+  final SherpaTtsEngine sherpa;
+  final FlutterTtsEngine fallback;
+  String? nextVoiceId;
+
+  @override
+  Future<void> speak(String text, {String lang = 'ja-JP'}) =>
+      speakWithPlaybackGate(text, lang: lang, beforePlayback: () async => true);
+
+  @override
+  Future<void> speakWithPlaybackGate(
+    String text, {
+    String lang = 'ja-JP',
+    required Future<bool> Function() beforePlayback,
+  }) async {
+    if (await sherpa.isOfflineModelInstalled) {
+      try {
+        final voice = nextVoiceId;
+        nextVoiceId = null;
+        if (voice == null) {
+          await sherpa.speakWithPlaybackGate(
+            text,
+            lang: lang,
+            beforePlayback: beforePlayback,
+          );
+        } else {
+          await sherpa.speakWithVoice(
+            text,
+            voice,
+            beforePlayback: beforePlayback,
+          );
+        }
+        return;
+      } catch (_) {}
+    }
+    if (await beforePlayback()) await fallback.speak(text, lang: lang);
+  }
+
+  @override
+  Future<void> speakDialogue(List<DialogueTurn> turns) =>
+      speakDialogueWithPlaybackGate(turns, beforePlayback: () async => true);
+
+  @override
+  Future<void> speakDialogueWithPlaybackGate(
+    List<DialogueTurn> turns, {
+    required Future<bool> Function() beforePlayback,
+  }) async {
+    if (await sherpa.isOfflineModelInstalled) {
+      try {
+        await sherpa.speakDialogueWithPlaybackGate(
+          turns,
+          beforePlayback: beforePlayback,
+        );
+        return;
+      } catch (_) {}
+    }
+    if (await beforePlayback()) await fallback.speakDialogue(turns);
+  }
+
+  @override
+  Future<void> stop() => Future.wait([sherpa.stop(), fallback.stop()]);
+
+  @override
+  Future<void> dispose() => Future.wait([sherpa.dispose(), fallback.dispose()]);
 }
 
 Future<void> _deleteGeneratedFile(String filename) async {
