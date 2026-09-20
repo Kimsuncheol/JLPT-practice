@@ -32,7 +32,18 @@ class FirebaseBootstrap {
       final auth = FirebaseAuth.instance;
       updateUser(auth.currentUser);
       isAvailable = true;
-      if (userId != null) await ensureUserDocument();
+      if (userId != null) {
+        try {
+          await ensureUserDocument();
+        } on Object catch (error, stackTrace) {
+          // Authentication is still usable when the profile document cannot
+          // be refreshed (for example while the device is offline).
+          if (kDebugMode) {
+            debugPrint('Could not refresh the Firebase user document: $error');
+            debugPrintStack(stackTrace: stackTrace);
+          }
+        }
+      }
       auth.userChanges().listen(updateUser);
     } catch (error, stackTrace) {
       isAvailable = false;
@@ -48,12 +59,16 @@ class FirebaseBootstrap {
   }
 
   static Future<void> ensureUserDocument() async {
-    final id = userId;
-    if (id == null) return;
+    final user = FirebaseAuth.instance.currentUser;
+    final id = user?.uid;
+    if (user == null || id == null) return;
     final reference = FirebaseFirestore.instance.collection('users').doc(id);
     await FirebaseFirestore.instance.runTransaction((transaction) async {
       final snapshot = await transaction.get(reference);
       transaction.set(reference, {
+        // Firestore rules require this field on create and update. Omitting it
+        // made a successful first sign-in fail while creating the profile.
+        'isAnonymous': user.isAnonymous,
         'updatedAt': FieldValue.serverTimestamp(),
         if (!snapshot.exists) 'createdAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));

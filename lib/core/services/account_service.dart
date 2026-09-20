@@ -101,6 +101,16 @@ class AccountService {
 
   Future<void> _afterAuthentication(User? user) async {
     FirebaseBootstrap.updateUser(user);
-    await FirebaseBootstrap.ensureUserDocument();
+    try {
+      await FirebaseBootstrap.ensureUserDocument();
+    } on Object catch (error, stackTrace) {
+      // Signing in and syncing the optional cloud profile are separate
+      // operations. A transient Firestore/App Check failure must not make a
+      // valid Firebase Authentication session look like a rejected login.
+      if (kDebugMode) {
+        debugPrint('Signed in, but could not sync the user profile: $error');
+        debugPrintStack(stackTrace: stackTrace);
+      }
+    }
   }
 }
