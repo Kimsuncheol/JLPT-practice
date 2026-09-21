@@ -1,7 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/features/offline_ai/offline_ai_screen.dart';
 import 'package:jlpt_practice/features/auth/auth_gate_screen.dart';
-import 'package:jlpt_practice/features/dashboard/choose_study_screen.dart';
 import 'package:jlpt_practice/features/dashboard/home_shell.dart';
 import 'package:jlpt_practice/features/grammar/grammar_detail_screen.dart';
 import 'package:jlpt_practice/features/grammar/grammar_list_screen.dart';
@@ -63,10 +62,6 @@ GoRouter createAppRouter({String initialLocation = '/'}) => GoRouter(
       builder: (_, _) => const LearningLanguageScreen(),
     ),
     GoRoute(path: '/settings/levels', builder: (_, _) => const LevelsScreen()),
-    GoRoute(
-      path: '/study/choose',
-      builder: (_, _) => const ChooseStudyScreen(),
-    ),
     GoRoute(path: '/study', builder: (_, _) => const DaySelectionScreen()),
     GoRoute(
       path: '/settings/offline-ai',

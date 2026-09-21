@@ -12,7 +12,6 @@ import 'package:jlpt_practice/data/models/app_state.dart';
 import 'package:jlpt_practice/data/models/grammar_study_session.dart';
 import 'package:jlpt_practice/data/models/study_session.dart';
 import 'package:jlpt_practice/data/models/vocabulary.dart';
-import 'package:jlpt_practice/features/dashboard/choose_study_screen.dart';
 import 'package:jlpt_practice/features/dashboard/dashboard_screen.dart';
 import 'package:jlpt_practice/features/settings/levels_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/study_finish_screen.dart';
@@ -956,10 +955,6 @@ GoRouter _createRouter({String initialLocation = '/'}) => GoRouter(
     GoRoute(
       path: '/home',
       builder: (_, _) => const Scaffold(body: Text('Home')),
-    ),
-    GoRoute(
-      path: '/study/choose',
-      builder: (_, _) => const ChooseStudyScreen(),
     ),
     GoRoute(
       path: '/study',
