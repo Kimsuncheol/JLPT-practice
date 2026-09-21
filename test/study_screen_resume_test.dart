@@ -14,6 +14,7 @@ import 'package:jlpt_practice/data/models/study_session.dart';
 import 'package:jlpt_practice/data/models/vocabulary.dart';
 import 'package:jlpt_practice/features/dashboard/choose_study_screen.dart';
 import 'package:jlpt_practice/features/dashboard/dashboard_screen.dart';
+import 'package:jlpt_practice/features/settings/levels_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/study_finish_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_tape.dart';
 import 'package:jlpt_practice/features/vocabulary/study_screen.dart';
@@ -22,48 +23,57 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
-  testWidgets(
-    'leaving day 6 shows recent study below streak and reopens day 6',
-    (tester) async {
-      final container = _createContainer();
-      addTearDown(container.dispose);
-      await container.read(appControllerProvider.future);
-      final router = _createRouter();
-      addTearDown(router.dispose);
-      await tester.pumpWidget(
-        UncontrolledProviderScope(
-          container: container,
-          child: MaterialApp.router(
-            theme: AppTheme.light(),
-            routerConfig: router,
-          ),
+  testWidgets('leaving day 6 shows recent study below streak and reopens day 6', (
+    tester,
+  ) async {
+    final container = _createContainer();
+    addTearDown(container.dispose);
+    await container.read(appControllerProvider.future);
+    final router = _createRouter();
+    addTearDown(router.dispose);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp.router(
+          theme: AppTheme.light(),
+          routerConfig: router,
         ),
-      );
-      await tester.pumpAndSettle();
-      router.push('/study/day/6');
-      await tester.pumpAndSettle();
-      final pageView = find.byType(PageView);
-      await tester.drag(pageView, Offset(-tester.getSize(pageView).width, 0));
-      await tester.pumpAndSettle();
-      await tester.tap(find.byIcon(Icons.close_rounded));
-      await tester.pumpAndSettle();
+      ),
+    );
+    await tester.pumpAndSettle();
+    router.push('/study/day/6');
+    await tester.pumpAndSettle();
+    final pageView = find.byType(PageView);
+    await tester.drag(pageView, Offset(-tester.getSize(pageView).width, 0));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.close_rounded));
+    await tester.pumpAndSettle();
 
-      expect(find.text('Words · N5'), findsOneWidget);
-      expect(find.text('Day 6'), findsOneWidget);
-      expect(find.text('2 of 5 words'), findsOneWidget);
-      expect(
-        tester.getTopLeft(find.text('RECENT STUDY')).dy,
-        greaterThan(tester.getBottomLeft(find.text('0 day streak')).dy),
-      );
-      await tester.tap(find.byKey(const ValueKey('recent-study-/study/day/6')));
-      await tester.pumpAndSettle();
-      expect(tester.widget<StudyScreen>(find.byType(StudyScreen)).day, 6);
-      await tester.tap(find.text('Continue'));
-      await tester.pumpAndSettle();
-      expect(find.text('単語27'), findsOneWidget);
-      expect(find.text('2 / 5'), findsOneWidget);
-    },
-  );
+    expect(find.text('Leave word study?'), findsOneWidget);
+    expect(
+      find.text(
+        'Your place will be saved, but hidden words and meanings will reset when you return.',
+      ),
+      findsOneWidget,
+    );
+    await tester.tap(find.widgetWithText(FilledButton, 'Leave'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Words · N5'), findsOneWidget);
+    expect(find.text('Day 6'), findsOneWidget);
+    expect(find.text('2 of 5 words'), findsOneWidget);
+    expect(
+      tester.getTopLeft(find.text('RECENT STUDY')).dy,
+      greaterThan(tester.getBottomLeft(find.text('0 day streak')).dy),
+    );
+    await tester.tap(find.byKey(const ValueKey('recent-study-/study/day/6')));
+    await tester.pumpAndSettle();
+    expect(tester.widget<StudyScreen>(find.byType(StudyScreen)).day, 6);
+    await tester.tap(find.text('Continue'));
+    await tester.pumpAndSettle();
+    expect(find.text('単語27'), findsOneWidget);
+    expect(find.text('2 / 5'), findsOneWidget);
+  });
 
   for (final kind in GrammarStudyKind.values) {
     testWidgets('recent grammar opens saved ${kind.name} screen', (
@@ -356,6 +366,46 @@ void main() {
     expect(find.text('Show reading'), findsOneWidget);
     expect(find.text('Show word'), findsOneWidget);
     expect(find.text('Show meanings'), findsOneWidget);
+  });
+
+  testWidgets('system back asks before leaving and cancel keeps hide state', (
+    tester,
+  ) async {
+    final container = _createContainer();
+    addTearDown(container.dispose);
+    await container.read(appControllerProvider.future);
+    final router = _createRouter();
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp.router(routerConfig: router),
+      ),
+    );
+    router.push('/study/day/2');
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Hide word'));
+    await tester.pumpAndSettle();
+    expect(find.text('単語6'), findsNothing);
+
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(find.text('Leave word study?'), findsOneWidget);
+
+    await tester.tap(find.widgetWithText(TextButton, 'Cancel'));
+    await tester.pumpAndSettle();
+    expect(find.text('Leave word study?'), findsNothing);
+    expect(find.text('単語6'), findsNothing);
+    expect(find.text('Show word'), findsOneWidget);
+
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Leave'));
+    await tester.pumpAndSettle();
+    expect(find.byType(StudyScreen), findsNothing);
+    expect(find.text('Ready for today?'), findsOneWidget);
   });
 
   testWidgets('identical word and reading use one combined hide control', (
@@ -753,6 +803,52 @@ void main() {
     expect(find.text('Great work!'), findsOneWidget);
   });
 
+  testWidgets('finishing every word in a level offers another JLPT level', (
+    tester,
+  ) async {
+    final container = _createContainer();
+    addTearDown(container.dispose);
+    await container.read(appControllerProvider.future);
+    final controller =
+        container.read(appControllerProvider.notifier) as _ResumeAppController;
+    for (var day = 1; day < 6; day++) {
+      await controller.completeStudySession('N5', day);
+    }
+    final router = _createRouter(initialLocation: '/study/day/6/finish');
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp.router(routerConfig: router),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('N5 vocabulary complete!'), findsOneWidget);
+    expect(
+      find.text('You studied all 30 words across 6 study days.'),
+      findsOneWidget,
+    );
+    expect(find.text('Choose another JLPT level'), findsOneWidget);
+    expect(find.text('Back to study days'), findsOneWidget);
+    expect(find.text('Take an N5 vocabulary quiz'), findsOneWidget);
+    expect(find.text('Finish this session'), findsNothing);
+
+    await tester.tap(find.text('Choose another JLPT level'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(LevelsScreen), findsOneWidget);
+    expect(find.text('Levels'), findsOneWidget);
+    expect(
+      container
+          .read(appControllerProvider)
+          .requireValue
+          .completedStudyDays['N5'],
+      containsAll([1, 2, 3, 4, 5, 6]),
+    );
+  });
+
   for (final alreadyCompleted in [false, true]) {
     testWidgets(
       'finishing day 6 returns to day selection (completed: $alreadyCompleted)',
@@ -868,6 +964,11 @@ GoRouter _createRouter({String initialLocation = '/'}) => GoRouter(
     GoRoute(
       path: '/study',
       builder: (_, _) => const Scaffold(body: Text('Day selection')),
+    ),
+    GoRoute(path: '/settings/levels', builder: (_, _) => const LevelsScreen()),
+    GoRoute(
+      path: '/quiz',
+      builder: (_, _) => const Scaffold(body: Text('Level quiz')),
     ),
     GoRoute(
       path: '/study/day/:day',

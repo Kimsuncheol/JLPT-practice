@@ -3,7 +3,6 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:jlpt_practice/core/services/cloud_sync_service.dart';
 import 'package:jlpt_practice/core/services/day_block_access.dart';
 import 'package:jlpt_practice/core/services/local_store.dart';
@@ -11,6 +10,7 @@ import 'package:jlpt_practice/core/services/notification_service.dart';
 import 'package:jlpt_practice/core/services/srs_scheduler.dart';
 import 'package:jlpt_practice/core/services/tts_service.dart';
 import 'package:jlpt_practice/core/services/flutter_tts_engine.dart';
+import 'package:jlpt_practice/core/utils/streak_tracker.dart';
 import 'package:jlpt_practice/data/models/app_state.dart';
 import 'package:jlpt_practice/data/models/mock_test.dart';
 import 'package:jlpt_practice/data/models/quiz.dart';
@@ -268,23 +268,22 @@ class AppController extends AsyncNotifier<AppState> {
   }
 
   Future<AppState> _withRecordedActivity(AppState current) async {
-    final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
-    if (_store.lastStudyDate == today) return current;
-    final yesterday = DateFormat(
-      'yyyy-MM-dd',
-    ).format(DateTime.now().subtract(const Duration(days: 1)));
-    final streak = _store.lastStudyDate == yesterday
-        ? current.currentStreak + 1
-        : 1;
-    final longest = streak > current.longestStreak
-        ? streak
-        : current.longestStreak;
+    final update = recordDailyActivity(
+      now: DateTime.now(),
+      lastActivityDate: _store.lastStudyDate,
+      currentStreak: current.currentStreak,
+      longestStreak: current.longestStreak,
+    );
+    if (!update.changed) return current;
     await Future.wait([
-      _store.setValue('lastStudyDate', today),
-      _store.setValue('currentStreak', streak),
-      _store.setValue('longestStreak', longest),
+      _store.setValue('lastStudyDate', update.date),
+      _store.setValue('currentStreak', update.current),
+      _store.setValue('longestStreak', update.longest),
     ]);
-    return current.copyWith(currentStreak: streak, longestStreak: longest);
+    return current.copyWith(
+      currentStreak: update.current,
+      longestStreak: update.longest,
+    );
   }
 
   Future<void> setLevel(String value) =>
@@ -441,12 +440,13 @@ class AppController extends AsyncNotifier<AppState> {
       ..._value.completedStudyDays,
       level: {...?_value.completedStudyDays[level], day},
     };
-    state = AsyncData(
+    final next = await _withRecordedActivity(
       _value.copyWith(
         studySessions: sessions,
         completedStudyDays: completedStudyDays,
       ),
     );
+    state = AsyncData(next);
     await Future.wait([
       _persistStudySessions(sessions),
       _store.saveCompletedStudyDays(completedStudyDays),

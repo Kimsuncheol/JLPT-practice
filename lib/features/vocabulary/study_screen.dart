@@ -29,7 +29,7 @@ class StudyScreen extends ConsumerStatefulWidget {
 
 class _StudyScreenState extends ConsumerState<StudyScreen>
     with ImmersiveStudyMode<StudyScreen> {
-  static const _resumeDialogBarrierColor = Colors.black54;
+  static const _dialogBarrierColor = Colors.black54;
 
   int _index = 0;
   final Map<String, _CardVisibility> _cardVisibility = {};
@@ -37,6 +37,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   TtsService? _ttsService;
   bool _resumeDecisionPending = false;
   bool _resumeDialogVisible = false;
+  bool _leaveDialogVisible = false;
   bool _suppressAutoAudio = false;
   int _pageChangeRequest = 0;
   int _readingsRequest = 0;
@@ -54,8 +55,8 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   Widget build(BuildContext context) {
     final asyncState = ref.watch(appControllerProvider);
     final scaffoldBackgroundColor = Theme.of(context).scaffoldBackgroundColor;
-    final systemBarColor = _resumeDialogVisible
-        ? Color.alphaBlend(_resumeDialogBarrierColor, scaffoldBackgroundColor)
+    final systemBarColor = _resumeDialogVisible || _leaveDialogVisible
+        ? Color.alphaBlend(_dialogBarrierColor, scaffoldBackgroundColor)
         : scaffoldBackgroundColor;
     return wrapImmersive(
       asyncState.when(
@@ -82,75 +83,124 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
       );
     }
     _initializePage(words, state);
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: context.pop,
-          icon: const Icon(Icons.close_rounded),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) unawaited(_confirmLeave());
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            onPressed: _confirmLeave,
+            icon: const Icon(Icons.close_rounded),
+          ),
+          actions: [
+            IconButton(
+              onPressed: () => context.push('/settings/learning'),
+              icon: const Icon(Icons.settings_rounded),
+            ),
+          ],
         ),
-        actions: [
-          IconButton(
-            onPressed: () => context.push('/settings/learning'),
-            icon: const Icon(Icons.settings_rounded),
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: PageView.builder(
-              controller: _pageController,
-              itemCount: words.length + 1,
-              onPageChanged: (index) => unawaited(
-                _handlePageChanged(index: index, words: words, state: state),
-              ),
-              itemBuilder: (context, index) {
-                if (index == words.length) return const SizedBox.shrink();
-                final word = words[index];
-                final visibility = _visibilityFor(word, state);
-                final showFurigana = visibility.showFurigana;
-                final hideWord =
-                    visibility.hideWord ||
-                    (!showFurigana && word.reading == word.word);
-                final meaningsHidden = visibility.hideMeanings;
-                return Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 14),
-                  child: _StudyCard(
-                    vocabulary: word,
-                    language: state.meaningLanguage,
-                    showFurigana: showFurigana,
-                    hideWord: hideWord,
-                    hideMeaning: meaningsHidden,
-                    maskMeaningInTranslation: meaningsHidden,
-                    onSpeakWord: () =>
-                        _speakIfAudible(word.reading, word: word),
-                    onSpeakExample: () =>
-                        _speakIfAudible(word.example.sentence),
-                  ),
-                );
-              },
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: SizedBox(
-              height: 82,
-              child: _buildActionArea(state, words[_index]),
-            ),
-          ),
-          SafeArea(
-            top: false,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 30, 20, 20),
-              child: Text(
-                '${_index + 1} / ${words.length}',
-                style: const TextStyle(fontWeight: FontWeight.w700),
+        body: Column(
+          children: [
+            Expanded(
+              child: PageView.builder(
+                controller: _pageController,
+                itemCount: words.length + 1,
+                onPageChanged: (index) => unawaited(
+                  _handlePageChanged(index: index, words: words, state: state),
+                ),
+                itemBuilder: (context, index) {
+                  if (index == words.length) return const SizedBox.shrink();
+                  final word = words[index];
+                  final visibility = _visibilityFor(word, state);
+                  final showFurigana = visibility.showFurigana;
+                  final hideWord =
+                      visibility.hideWord ||
+                      (!showFurigana && word.reading == word.word);
+                  final meaningsHidden = visibility.hideMeanings;
+                  return Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 8, 20, 14),
+                    child: _StudyCard(
+                      vocabulary: word,
+                      language: state.meaningLanguage,
+                      showFurigana: showFurigana,
+                      hideWord: hideWord,
+                      hideMeaning: meaningsHidden,
+                      maskMeaningInTranslation: meaningsHidden,
+                      onSpeakWord: () =>
+                          _speakIfAudible(word.reading, word: word),
+                      onSpeakExample: () =>
+                          _speakIfAudible(word.example.sentence),
+                    ),
+                  );
+                },
               ),
             ),
-          ),
-        ],
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: SizedBox(
+                height: 82,
+                child: _buildActionArea(state, words[_index]),
+              ),
+            ),
+            SafeArea(
+              top: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 30, 20, 20),
+                child: Text(
+                  '${_index + 1} / ${words.length}',
+                  style: const TextStyle(fontWeight: FontWeight.w700),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
+  }
+
+  Future<void> _confirmLeave() async {
+    if (_leaveDialogVisible || _resumeDialogVisible) return;
+    final dimmedBackground = Color.alphaBlend(
+      _dialogBarrierColor,
+      Theme.of(context).scaffoldBackgroundColor,
+    );
+    setImmersiveOuterBackgroundColor(dimmedBackground);
+    setState(() => _leaveDialogVisible = true);
+    bool shouldLeave = false;
+    try {
+      final dialogResult = showDialog<bool>(
+        context: context,
+        barrierColor: _dialogBarrierColor,
+        builder: (dialogContext) => wrapImmersiveSystemBarGesture(
+          AlertDialog(
+            title: Text(dialogContext.strings('leaveStudyTitle')),
+            content: Text(dialogContext.strings('leaveStudyBody')),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext, false),
+                child: Text(dialogContext.strings('cancel')),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(dialogContext, true),
+                child: Text(dialogContext.strings('leave')),
+              ),
+            ],
+          ),
+        ),
+      );
+      _applySystemBarColorAfterFrame(modalVisible: true);
+      shouldLeave = await dialogResult ?? false;
+    } finally {
+      if (mounted) {
+        setImmersiveOuterBackgroundColor(null);
+        setState(() => _leaveDialogVisible = false);
+        reassertImmersiveMode();
+        _applySystemBarColorAfterFrame(modalVisible: false);
+      }
+    }
+    if (mounted && shouldLeave) context.pop();
   }
 
   Widget _actionPage(List<Widget> actions) => Row(
@@ -273,7 +323,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
     );
     setImmersiveOuterBackgroundColor(
       Color.alphaBlend(
-        _resumeDialogBarrierColor,
+        _dialogBarrierColor,
         Theme.of(context).scaffoldBackgroundColor,
       ),
     );
@@ -282,7 +332,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
     try {
       final dialogResult = showDialog<bool>(
         context: context,
-        barrierColor: _resumeDialogBarrierColor,
+        barrierColor: _dialogBarrierColor,
         barrierDismissible: false,
         builder: (dialogContext) => wrapImmersiveSystemBarGesture(
           PopScope(
@@ -335,10 +385,13 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
 
   void _applySystemBarColorAfterFrame({required bool modalVisible}) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted || _resumeDialogVisible != modalVisible) return;
+      if (!mounted ||
+          (_resumeDialogVisible || _leaveDialogVisible) != modalVisible) {
+        return;
+      }
       final scaffoldBackgroundColor = Theme.of(context).scaffoldBackgroundColor;
       final color = modalVisible
-          ? Color.alphaBlend(_resumeDialogBarrierColor, scaffoldBackgroundColor)
+          ? Color.alphaBlend(_dialogBarrierColor, scaffoldBackgroundColor)
           : scaffoldBackgroundColor;
       applyImmersiveSystemBarColor(color);
     });

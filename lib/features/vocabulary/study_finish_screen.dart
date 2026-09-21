@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
+import 'package:jlpt_practice/core/utils/study_batches.dart';
 
 class StudyFinishScreen extends ConsumerWidget {
   const StudyFinishScreen({required this.day, super.key});
@@ -11,6 +12,34 @@ class StudyFinishScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final asyncState = ref.watch(appControllerProvider);
+    if (asyncState.isLoading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+    if (asyncState.hasError) {
+      return Scaffold(body: Center(child: Text('${asyncState.error}')));
+    }
+    final state = asyncState.requireValue;
+    final level = state.selectedLevel;
+    final wordCount = state.selectedVocabulary.length;
+    final dayCount = StudyBatches.count(wordCount, state.dailyGoal);
+    final completedDays = state.completedStudyDays[level] ?? const <int>{};
+    final completesLevel =
+        dayCount > 0 &&
+        day == dayCount &&
+        !completedDays.contains(day) &&
+        List.generate(dayCount, (index) => index + 1).every(
+          (candidate) => candidate == day || completedDays.contains(candidate),
+        );
+    final strings = context.strings;
+    final title = completesLevel
+        ? strings('levelVocabularyComplete').replaceAll('{level}', level)
+        : strings('studyComplete');
+    final body = completesLevel
+        ? strings('levelVocabularyCompleteBody')
+              .replaceAll('{words}', '$wordCount')
+              .replaceAll('{days}', '$dayCount')
+        : strings('studyCompleteBody');
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -32,12 +61,13 @@ class StudyFinishScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 22),
                     Text(
-                      context.strings('studyComplete'),
+                      title,
+                      textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.headlineMedium,
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      context.strings('studyCompleteBody'),
+                      body,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -46,28 +76,97 @@ class StudyFinishScreen extends ConsumerWidget {
                   ],
                 ),
               ),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton.icon(
-                  onPressed: () => _finish(context, ref),
-                  icon: const Icon(Icons.check_rounded),
-                  label: Text(context.strings('finishSession')),
+              if (completesLevel) ...[
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: () => _completeLevel(
+                      context,
+                      ref,
+                      level: level,
+                      destination: _LevelCompletionDestination.levels,
+                    ),
+                    icon: const Icon(Icons.swap_horiz_rounded),
+                    label: Text(strings('chooseAnotherLevel')),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 10),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  onPressed: () => context.push('/quiz/day/$day'),
-                  icon: const Icon(Icons.quiz_rounded),
-                  label: Text(context.strings('startQuiz')),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () => _completeLevel(
+                      context,
+                      ref,
+                      level: level,
+                      destination: _LevelCompletionDestination.days,
+                    ),
+                    icon: const Icon(Icons.grid_view_rounded),
+                    label: Text(strings('backToStudyDays')),
+                  ),
                 ),
-              ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () => _completeLevel(
+                      context,
+                      ref,
+                      level: level,
+                      destination: _LevelCompletionDestination.quiz,
+                    ),
+                    icon: const Icon(Icons.quiz_rounded),
+                    label: Text(
+                      strings(
+                        'takeLevelVocabularyQuiz',
+                      ).replaceAll('{level}', level),
+                    ),
+                  ),
+                ),
+              ] else ...[
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: () => _finish(context, ref),
+                    icon: const Icon(Icons.check_rounded),
+                    label: Text(strings('finishSession')),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () => context.push('/quiz/day/$day'),
+                    icon: const Icon(Icons.quiz_rounded),
+                    label: Text(strings('startQuiz')),
+                  ),
+                ),
+              ],
             ],
           ),
         ),
       ),
     );
+  }
+
+  Future<void> _completeLevel(
+    BuildContext context,
+    WidgetRef ref, {
+    required String level,
+    required _LevelCompletionDestination destination,
+  }) async {
+    await ref
+        .read(appControllerProvider.notifier)
+        .completeStudySession(level, day);
+    if (!context.mounted) return;
+    context.go('/home');
+    switch (destination) {
+      case _LevelCompletionDestination.levels:
+        context.push('/settings/levels');
+      case _LevelCompletionDestination.days:
+        context.push('/study');
+      case _LevelCompletionDestination.quiz:
+        context.push('/quiz');
+    }
   }
 
   Future<void> _finish(BuildContext context, WidgetRef ref) async {
@@ -107,3 +206,5 @@ class StudyFinishScreen extends ConsumerWidget {
     context.push('/study');
   }
 }
+
+enum _LevelCompletionDestination { levels, days, quiz }
