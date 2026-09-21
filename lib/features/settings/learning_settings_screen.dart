@@ -66,17 +66,6 @@ class LearningSettingsScreen extends ConsumerWidget {
                   ),
                 ],
               ),
-              _GroupLabel(strings('groupReview')),
-              _Group(
-                children: [
-                  ListTile(
-                    leading: const Icon(Icons.layers_clear_rounded),
-                    title: Text(strings('recallCover')),
-                    trailing: const Icon(Icons.chevron_right_rounded),
-                    onTap: () => context.push('/settings/recall-cover'),
-                  ),
-                ],
-              ),
               _GroupLabel(strings('groupDisplay')),
               _Group(
                 children: [

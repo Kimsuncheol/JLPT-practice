@@ -354,24 +354,7 @@ class AppStrings {
     'off': 'Off',
     'groupLanguage': 'Language',
     'groupReadingAudio': 'Reading & pronunciation',
-    'groupReview': 'Review',
     'groupDisplay': 'Display',
-    'recallCover': 'Hide and recall',
-    'recallCoverHint':
-        'Cover words and meanings with tape, then say them from memory. The buttons at the bottom of the study screen turn covers on and off.',
-    'coverWordBody':
-        'Covers the word, including where it appears in the example sentence.',
-    'coverMeaningsTitle': 'Meanings',
-    'coverMeaningsBody':
-        'Covers the meaning and the matching meaning words in the example translation.',
-    'coverMeaningAndTranslation': 'Meanings and translations',
-    'coverMeaningAndTranslationBody':
-        'Covers the meaning and the example translation.',
-    'coverMeaningOnly': 'Meanings only',
-    'coverMeaningOnlyBody':
-        'Covers the meaning, and its wording inside the example translation.',
-    'coverTranslationOnly': 'Translations only',
-    'coverTranslationOnlyBody': 'Covers only the example translation.',
     'ttsVolume': 'Pronunciation volume',
     'ttsVolumeHint':
         'Choose where the volume of spoken pronunciation comes from.',
@@ -708,20 +691,7 @@ class AppStrings {
     'off': '꺼짐',
     'groupLanguage': '언어',
     'groupReadingAudio': '읽기 및 발음',
-    'groupReview': '복습',
     'groupDisplay': '화면',
-    'recallCover': '가리고 떠올리기',
-    'recallCoverHint':
-        '단어와 뜻을 테이프로 가리고 기억나는 대로 말해 보세요. 학습 화면 아래 버튼으로 바로 켜고 끌 수 있습니다.',
-    'coverWordBody': '단어를 가립니다. 예문 속 같은 단어도 함께 가려집니다.',
-    'coverMeaningsTitle': '뜻',
-    'coverMeaningsBody': '뜻과 예문 번역에서 해당 뜻에 해당하는 부분을 가립니다.',
-    'coverMeaningAndTranslation': '뜻 + 번역',
-    'coverMeaningAndTranslationBody': '뜻과 예문 번역을 모두 가립니다.',
-    'coverMeaningOnly': '뜻만',
-    'coverMeaningOnlyBody': '뜻을 가리고, 예문 번역 속 해당 뜻도 함께 가립니다.',
-    'coverTranslationOnly': '번역만',
-    'coverTranslationOnlyBody': '예문 번역만 가립니다.',
     'ttsVolume': '발음 볼륨',
     'ttsVolumeHint': '발음 재생 볼륨을 어디에서 가져올지 선택하세요.',
     'volumeSystem': '시스템 볼륨',

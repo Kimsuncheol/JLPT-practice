@@ -9,7 +9,6 @@ import 'package:jlpt_practice/data/models/study_preferences.dart';
 import 'package:jlpt_practice/features/settings/eye_comfort_screen.dart';
 import 'package:jlpt_practice/features/settings/learning_language_screen.dart';
 import 'package:jlpt_practice/features/settings/learning_settings_screen.dart';
-import 'package:jlpt_practice/features/settings/recall_cover_screen.dart';
 import 'package:jlpt_practice/features/settings/tts_volume_screen.dart';
 import 'package:jlpt_practice/shared/eye_comfort_overlay.dart';
 
@@ -33,10 +32,6 @@ void main() {
         GoRoute(
           path: '/settings/learning-language',
           builder: (_, _) => const LearningLanguageScreen(),
-        ),
-        GoRoute(
-          path: '/settings/recall-cover',
-          builder: (_, _) => const RecallCoverScreen(),
         ),
         GoRoute(
           path: '/settings/tts-volume',
@@ -64,15 +59,12 @@ void main() {
 
   testWidgets('settings are labeled by group', (tester) async {
     await pump(tester, const LearningSettingsScreen());
-    for (final label in [
-      'Language',
-      'Reading & pronunciation',
-      'Review',
-      'Display',
-    ]) {
+    for (final label in ['Language', 'Reading & pronunciation', 'Display']) {
       expect(find.text(label), findsOneWidget, reason: label);
     }
     expect(find.text('Auto review'), findsNothing);
+    expect(find.text('Review'), findsNothing);
+    expect(find.text('Hide and recall'), findsNothing);
   });
 
   testWidgets('opens the learning language screen', (tester) async {
@@ -104,14 +96,11 @@ void main() {
     );
   });
 
-  testWidgets('wires to recall, volume and eye comfort screens', (
-    tester,
-  ) async {
+  testWidgets('wires to volume and eye comfort screens', (tester) async {
     await pump(tester, const LearningSettingsScreen());
     expect(find.byType(Slider), findsNothing);
 
     for (final (tile, screen) in [
-      ('Hide and recall', RecallCoverScreen),
       ('Pronunciation volume', TtsVolumeScreen),
       ('Eye comfort mode', EyeComfortScreen),
     ]) {
@@ -122,20 +111,6 @@ void main() {
       await tester.pageBack();
       await tester.pumpAndSettle();
     }
-  });
-
-  testWidgets('recall cover screen edits word and meaning covers', (
-    tester,
-  ) async {
-    final container = await pump(tester, const RecallCoverScreen());
-    AppState state() => container.read(appControllerProvider).requireValue;
-
-    await tester.tap(find.text('Hide word'));
-    await tester.tap(find.text('Hide meanings'));
-    await tester.pumpAndSettle();
-    expect(state().hideWord, isTrue);
-    expect(state().hideMeanings, isTrue);
-    expect(find.byType(RadioListTile<MeaningCoverMode>), findsNothing);
   });
 
   testWidgets('volume screen switches between system and slider', (

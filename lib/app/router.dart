@@ -17,7 +17,6 @@ import 'package:jlpt_practice/features/settings/languages_screen.dart';
 import 'package:jlpt_practice/features/settings/learning_language_screen.dart';
 import 'package:jlpt_practice/features/settings/learning_settings_screen.dart';
 import 'package:jlpt_practice/features/settings/levels_screen.dart';
-import 'package:jlpt_practice/features/settings/recall_cover_screen.dart';
 import 'package:jlpt_practice/features/settings/tts_volume_screen.dart';
 import 'package:jlpt_practice/data/models/mock_test_problem.dart';
 import 'package:jlpt_practice/features/test/level_practice_test_screen.dart';
@@ -50,10 +49,6 @@ GoRouter createAppRouter({String initialLocation = '/'}) => GoRouter(
       path: '/settings/learning',
       builder: (_, _) =>
           const EyeComfortOverlay(child: LearningSettingsScreen()),
-    ),
-    GoRoute(
-      path: '/settings/recall-cover',
-      builder: (_, _) => const EyeComfortOverlay(child: RecallCoverScreen()),
     ),
     GoRoute(
       path: '/settings/tts-volume',
