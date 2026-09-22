@@ -17,6 +17,7 @@ import 'package:jlpt_practice/data/models/vocabulary.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_masking.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_tape.dart';
 import 'package:jlpt_practice/features/vocabulary/masked_translation.dart';
+import 'package:jlpt_practice/shared/volume_warning_toast.dart';
 
 class StudyScreen extends ConsumerStatefulWidget {
   const StudyScreen({required this.day, super.key});
@@ -475,9 +476,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
     }
     if (warningKey != null) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(context.strings(warningKey))));
+      showVolumeWarningToast(context, context.strings(warningKey));
       if (playbackBlocked) return;
     }
     if (!mounted) return;
@@ -738,13 +737,18 @@ class _StudyCard extends StatelessWidget {
             ),
           ),
         ),
-        if (showFurigana) ...[
+        if (vocabulary.example.reading.isNotEmpty) ...[
           const SizedBox(height: 6),
           _speechTarget(
             onTap: onSpeakExample,
-            child: Text(
-              _withRolePlayLineBreaks(vocabulary.example.reading),
-              textAlign: TextAlign.center,
+            child: KeyedSubtree(
+              key: const ValueKey('example-furigana'),
+              child: _maskedText(
+                _withRolePlayLineBreaks(vocabulary.example.reading),
+                style: null,
+                targets: showFurigana ? const [] : _readingMaskTargets(),
+                glyphWidth: 1,
+              ),
             ),
           ),
         ],
@@ -782,6 +786,18 @@ class _StudyCard extends StatelessWidget {
           : const [],
       glyphWidth: 0.55,
     );
+  }
+
+  List<String> _readingMaskTargets() {
+    final reading = vocabulary.reading.trim();
+    if (reading.isEmpty) return const [];
+    final targets = <String>[reading];
+    // If the written form has an inflecting kana ending (食べる, 読む, ...),
+    // also cover its reading stem in examples such as たべます or よみます.
+    if (wordMaskTargets(vocabulary.word).length > 1 && reading.length > 1) {
+      targets.add(reading.substring(0, reading.length - 1));
+    }
+    return targets;
   }
 
   /// Renders [text] centered, laying tape over every run matching [targets].

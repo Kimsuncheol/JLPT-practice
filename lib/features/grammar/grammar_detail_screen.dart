@@ -7,6 +7,7 @@ import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/core/services/tts_service.dart';
 import 'package:jlpt_practice/core/services/volume_service.dart';
+import 'package:jlpt_practice/shared/volume_warning_toast.dart';
 import 'package:jlpt_practice/data/models/grammar_point.dart';
 import 'package:jlpt_practice/data/models/grammar_study_session.dart';
 import 'package:jlpt_practice/features/grammar/grammar_providers.dart';
@@ -89,9 +90,7 @@ class _GrammarDetailsState extends ConsumerState<_GrammarDetails> {
       final warningKey = volumeStatus == SystemVolumeStatus.muted
           ? 'mutedSystemVolumeBody'
           : 'lowSystemVolumeBody';
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(context.strings(warningKey))));
+      showVolumeWarningToast(context, context.strings(warningKey));
       if (volumeStatus == SystemVolumeStatus.muted) return;
     }
     _speak(text);

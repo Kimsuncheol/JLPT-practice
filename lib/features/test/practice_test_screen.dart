@@ -13,6 +13,7 @@ import 'package:jlpt_practice/data/models/quiz.dart';
 import 'package:jlpt_practice/features/test/mock_test_providers.dart';
 import 'package:jlpt_practice/features/test/practice_ai_tutor_sheet.dart';
 import 'package:jlpt_practice/features/test/practice_test_generator.dart';
+import 'package:jlpt_practice/shared/volume_warning_toast.dart';
 
 TestSectionType _sectionType(ProblemSection section) => switch (section) {
   ProblemSection.vocabulary => TestSectionType.vocabulary,
@@ -59,9 +60,7 @@ class _PracticeTestScreenState extends ConsumerState<PracticeTestScreen> {
       final warningKey = volumeStatus == SystemVolumeStatus.muted
           ? 'mutedSystemVolumeBody'
           : 'lowSystemVolumeBody';
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(context.strings(warningKey))));
+      showVolumeWarningToast(context, context.strings(warningKey));
       if (volumeStatus == SystemVolumeStatus.muted) return;
     }
     _ttsService ??= ref.read(ttsServiceProvider);

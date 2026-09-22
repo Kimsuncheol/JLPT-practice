@@ -63,6 +63,38 @@ void main() {
     expect(tile, findsOneWidget);
     expect(tester.widget<ListTile>(tile).subtitle, isNull);
   });
+
+  testWidgets('level chip opens level selection', (tester) async {
+    final router = GoRouter(
+      initialLocation: '/home',
+      routes: [
+        GoRoute(path: '/home', builder: (_, _) => const HomeShell()),
+        GoRoute(
+          path: '/settings/levels',
+          builder: (_, _) => const Scaffold(body: Text('Level selection')),
+        ),
+      ],
+    );
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          appControllerProvider.overrideWith(() => _FakeAppController()),
+        ],
+        child: MaterialApp.router(
+          theme: AppTheme.light(),
+          routerConfig: router,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.widgetWithText(ActionChip, 'N5'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Level selection'), findsOneWidget);
+  });
 }
 
 class _FakeAppController extends AppController {

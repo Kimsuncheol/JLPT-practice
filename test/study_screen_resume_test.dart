@@ -208,10 +208,22 @@ void main() {
         await tester.pumpAndSettle();
 
         await tester.tap(find.text('単語6'));
-        await tester.pumpAndSettle();
+        await tester.pump();
 
         expect(find.text(scenario.message), findsOneWidget);
+        expect(
+          find.byKey(const ValueKey('volume-warning-toast')),
+          findsOneWidget,
+        );
+        expect(find.byType(SnackBar), findsNothing);
         expect(speech.spoken, scenario.muted ? isEmpty : ['たんご']);
+
+        await tester.pump(const Duration(seconds: 3));
+        await tester.pump(const Duration(milliseconds: 151));
+        expect(
+          find.byKey(const ValueKey('volume-warning-toast')),
+          findsNothing,
+        );
       },
     );
   }
@@ -309,6 +321,23 @@ void main() {
     await tester.tap(find.text('Hide reading'));
     await tester.pumpAndSettle();
     expect(find.text('たんご'), findsNothing);
+    // The example furigana remains; only the studied pronunciation is taped.
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('example-furigana')),
+        matching: find.byType(CoverTape),
+      ),
+      findsOneWidget,
+    );
+    final exampleFurigana = tester.widget<Text>(
+      find.descendant(
+        of: find.byKey(const ValueKey('example-furigana')),
+        matching: find.byType(Text),
+      ),
+    );
+    final visibleReading = exampleFurigana.textSpan!.toPlainText();
+    expect(visibleReading, startsWith('まいにち '));
+    expect(visibleReading, endsWith('を つかいます。'));
 
     await tester.tap(find.text('Show word'));
     await tester.tap(find.text('Show meanings'));
@@ -706,11 +735,7 @@ void main() {
 
       await tester.drag(find.byType(ListView), const Offset(0, -300));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Study'));
-      await tester.pumpAndSettle();
-
-      expect(find.text('Resume learning'), findsOneWidget);
-      await tester.tap(find.text('Resume learning'));
+      await tester.tap(find.byKey(const ValueKey('recent-study-/study/day/1')));
       await tester.pumpAndSettle();
 
       expect(find.text('Continue your recent session?'), findsOneWidget);
@@ -1095,7 +1120,7 @@ Vocabulary _word(int index, [bool withExample = false]) => Vocabulary(
   example: withExample
       ? VocabularyExample(
           sentence: '毎日単語${index + 1}を使います。',
-          reading: 'まいにち',
+          reading: 'まいにち たんごを つかいます。',
           translations: const {'en': 'I use the word every day.'},
           quizSentence: '',
           answer: '',

@@ -46,9 +46,10 @@ class DashboardScreen extends ConsumerWidget {
                           ),
                         ),
                         const Spacer(),
-                        Chip(
+                        ActionChip(
                           avatar: const Icon(Icons.school_rounded, size: 18),
                           label: Text(state.selectedLevel),
+                          onPressed: () => context.push('/settings/levels'),
                         ),
                       ],
                     ),
