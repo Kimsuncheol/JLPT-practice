@@ -33,7 +33,7 @@ class OfflineAiController extends ChangeNotifier with WidgetsBindingObserver {
     ModelDownload? downloader,
     this.models = OfflineAiModel.catalog,
   }) : probe = probe ?? DeviceAiProbe(),
-       engine = engine ?? LlamaLocalInference(),
+       engine = engine ?? GemmaLocalInference(),
        downloader = downloader ?? ModelDownload() {
     selected = models.first;
     WidgetsBinding.instance.addObserver(this);

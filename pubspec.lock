@@ -49,6 +49,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.2.4"
+  background_downloader:
+    dependency: transitive
+    description:
+      name: background_downloader
+      sha256: f82729d0458f58e888f235bc0e0c0b94d9381362852e57b0b614b96199fb6ed0
+      url: "https://pub.dev"
+    source: hosted
+    version: "9.6.2"
   boolean_selector:
     dependency: transitive
     description:
@@ -129,6 +137,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.1.12"
+  code_assets:
+    dependency: transitive
+    description:
+      name: code_assets
+      sha256: bf394f466ba9205f1812a0433b392d6af280f155f56651eda7c18cc32ed493b8
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.2.1"
   collection:
     dependency: transitive
     description:
@@ -169,6 +185,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.15.1"
+  cross_file:
+    dependency: transitive
+    description:
+      name: cross_file
+      sha256: f141ea4f277af142a0356955707f6556f37b03947d39d55585981a06ca437bd6
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.5+5"
   crypto:
     dependency: "direct main"
     description:
@@ -193,6 +217,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.13"
+  decimal:
+    dependency: transitive
+    description:
+      name: decimal
+      sha256: "2c3c8b74f2948066d3f42585477aec9cfc48fefd7a723a4d4274a6c71a5c0df7"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.2.6"
+  email_validator:
+    dependency: transitive
+    description:
+      name: email_validator
+      sha256: b19aa5d92fdd76fbc65112060c94d45ba855105a28bb6e462de7ff03b12fa1fb
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.0"
   equatable:
     dependency: transitive
     description:
@@ -414,6 +454,22 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_gemma:
+    dependency: "direct main"
+    description:
+      name: flutter_gemma
+      sha256: "729183ef16740ea55860289862f04bb188b94b70ae8aa97ded61b20675c0891c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.9.0"
+  flutter_gemma_litertlm:
+    dependency: "direct main"
+    description:
+      name: flutter_gemma_litertlm
+      sha256: d8dd950d684d291e307732189a729753ab213fd9ad02e33d764fcc75c17400b4
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.8.0"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -517,6 +573,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.0"
+  genai_primitives:
+    dependency: transitive
+    description:
+      name: genai_primitives
+      sha256: "5a1e8c7ae9caf01aa609f59c54de47b73f51bf1ae95e0f679b7c7ab6948c4d9d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.4"
   glob:
     dependency: transitive
     description:
@@ -589,6 +653,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.3"
+  hooks:
+    dependency: transitive
+    description:
+      name: hooks
+      sha256: eaac480a35ec0814146c2c48d96aaa829e0e44a7662c88ae84c9edf4bc35651f
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.0"
   http:
     dependency: "direct main"
     description:
@@ -629,6 +701,46 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.5"
+  jni:
+    dependency: transitive
+    description:
+      name: jni
+      sha256: f038e58b4dc2c9037f50e233175086337e0b305e356d28211bf55f21c504cbd3
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.3"
+  jni_flutter:
+    dependency: transitive
+    description:
+      name: jni_flutter
+      sha256: b2310cdd4c18c65c081ab141a41efa94aa26c65431803703ece51996f174f351
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.3"
+  jni_util:
+    dependency: transitive
+    description:
+      name: jni_util
+      sha256: "1ba86da04a5f2bf18fde2edb235587e70c5b0fc5bd4ba955f46b00942c3fc35f"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
+  json_schema_builder:
+    dependency: transitive
+    description:
+      name: json_schema_builder
+      sha256: "657db3229ba10305c48e8686e8b3aca16e12e639c3a7b96687a6eeb7836b6e1b"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.7"
+  large_file_handler:
+    dependency: transitive
+    description:
+      name: large_file_handler
+      sha256: "44bdb88d9d6803177ce0feb0ad3bab22ed1d328895284a59095b859b2672a305"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.5.2"
   leak_tracker:
     dependency: transitive
     description:
@@ -653,78 +765,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.2"
-  lib_llama_cpp:
-    dependency: "direct main"
-    description:
-      name: lib_llama_cpp
-      sha256: "94cb9dd4cae4e3138be5fb4a666b565f9030d4d053298520628290dcbdf277c6"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.7.3"
-  lib_llama_cpp_android:
-    dependency: transitive
-    description:
-      name: lib_llama_cpp_android
-      sha256: "2f3f8c185df3eb4ac8e1634706b293f7cf96ea25c97ef43c9f1642d7111d9ba7"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.7.3"
-  lib_llama_cpp_ffi:
-    dependency: transitive
-    description:
-      name: lib_llama_cpp_ffi
-      sha256: "75352b6b23416150f8c57e4259b053cc704e406c4627beb1d1fd216d1de90c4c"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.7.3"
-  lib_llama_cpp_ios:
-    dependency: transitive
-    description:
-      name: lib_llama_cpp_ios
-      sha256: f159c87e864e8c5199d4966cc690b29d451e2461d94cea13f1e66ab274205dcc
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.7.3"
-  lib_llama_cpp_linux:
-    dependency: transitive
-    description:
-      name: lib_llama_cpp_linux
-      sha256: f427d653742c2b1d8b38247d4fece8d4cea7e46024b18c271e914e4b4e8c5eef
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.7.3"
-  lib_llama_cpp_macos:
-    dependency: transitive
-    description:
-      name: lib_llama_cpp_macos
-      sha256: e70100333ce0c573117187e95dbcd2dc0bae122a5aaa37919b971086e8ac94f6
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.7.3"
-  lib_llama_cpp_platform_interface:
-    dependency: "direct dev"
-    description:
-      name: lib_llama_cpp_platform_interface
-      sha256: "34347118906c7065aa9ac93746dfc60d61b88aa31cb23c6764dde810b7f1e1e6"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.7.3"
-  lib_llama_cpp_server:
-    dependency: transitive
-    description:
-      name: lib_llama_cpp_server
-      sha256: "082b5e658a7dbca42331ddabe81140da1208f8157528b34f24a56f16b51d5aa1"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.7.3"
-  lib_llama_cpp_windows:
-    dependency: transitive
-    description:
-      name: lib_llama_cpp_windows
-      sha256: cd7250985c38d973e635e8e6c7559c9fd1c72334d44d54d453e28cd7b3e915e6
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.7.3"
   lints:
     dependency: transitive
     description:
@@ -781,6 +821,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
+  mutex:
+    dependency: transitive
+    description:
+      name: mutex
+      sha256: "8827da25de792088eb33e572115a5eb0d61d61a3c01acbc8bcbe76ed78f1a1f2"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.1.0"
   nm:
     dependency: transitive
     description:
@@ -797,6 +845,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.2"
+  objective_c:
+    dependency: transitive
+    description:
+      name: objective_c
+      sha256: b7fb95a6d9a4f009edd63dc5ac69f07420b23a16161c6dd8660290b59c602e8e
+      url: "https://pub.dev"
+    source: hosted
+    version: "9.5.0"
   package_config:
     dependency: transitive
     description:
@@ -829,6 +885,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.9.1"
+  path_provider:
+    dependency: transitive
+    description:
+      name: path_provider
+      sha256: a7f4874f987173da295a61c181b8ee71dab59b332a486b391babf26a1b884825
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.6"
+  path_provider_android:
+    dependency: transitive
+    description:
+      name: path_provider_android
+      sha256: "69cbd515a62b94d32a7944f086b2f82b4ac40a1d45bebfc00813a430ab2dabcd"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.3.1"
+  path_provider_foundation:
+    dependency: transitive
+    description:
+      name: path_provider_foundation
+      sha256: "2a376b7d6392d80cd3705782d2caa734ca4727776db0b6ec36ef3f1855197699"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.6.0"
   path_provider_linux:
     dependency: transitive
     description:
@@ -893,6 +973,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.0"
+  rational:
+    dependency: transitive
+    description:
+      name: rational
+      sha256: cb808fb6f1a839e6fc5f7d8cb3b0a10e1db48b3be102de73938c627f0b636336
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.3"
+  record_use:
+    dependency: transitive
+    description:
+      name: record_use
+      sha256: "1cb8564af8d43b464294411db9217f5ec04891c6f22ee2c32d73ae05e88a6bd2"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.1"
   riverpod:
     dependency: transitive
     description:
@@ -1267,5 +1363,5 @@ packages:
     source: hosted
     version: "3.1.3"
 sdks:
-  dart: ">=3.12.2 <4.0.0"
-  flutter: ">=3.44.0"
+  dart: ">=3.13.0 <4.0.0"
+  flutter: ">=3.47.0"

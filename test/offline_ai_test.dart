@@ -22,7 +22,7 @@ import 'package:jlpt_practice/features/offline_ai/offline_ai_screen.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   late Directory directory;
-  final bytes = utf8.encode('GGUF-test-model-fixture');
+  final bytes = utf8.encode('LiteRT-test-model-fixture');
   late OfflineAiModel model;
 
   setUp(() async {
@@ -355,8 +355,8 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(find.text('Offline grammar AI'), findsOneWidget);
-    expect(find.textContaining('0.81 GB'), findsOneWidget);
-    expect(find.textContaining('2.02 GB'), findsOneWidget);
+    expect(find.textContaining('2.59 GB'), findsOneWidget);
+    expect(find.textContaining('3.66 GB'), findsOneWidget);
     await tester.scrollUntilVisible(find.text('Download model'), 250);
     expect(find.text('Download model'), findsOneWidget);
     expect(tester.takeException(), isNull);

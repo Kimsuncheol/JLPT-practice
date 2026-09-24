@@ -133,7 +133,7 @@ class AppStrings {
     'offlinePartial': 'Saved download',
     'offlineWifiOnly': 'Download on Wi-Fi only',
     'offlineQualityNote':
-        'Experimental feedback may be inaccurate, especially for Japanese and Korean. Compare it with the lesson explanation. Keep this screen open during download. Built with Llama.',
+        'Experimental feedback may be inaccurate, especially for Japanese and Korean. Compare it with the lesson explanation. Keep this screen open during download. Built with Gemma.',
     'offlineChecking': 'Checking your device…',
     'offlineDownloading': 'Downloading model…',
     'offlineVerifying': 'Verifying model…',
@@ -510,7 +510,7 @@ class AppStrings {
     'offlinePartial': '저장된 다운로드',
     'offlineWifiOnly': 'Wi-Fi에서만 다운로드',
     'offlineQualityNote':
-        '실험적 기능으로 일본어·한국어 피드백이 부정확할 수 있어요. 학습 해설과 함께 확인해 주세요. 다운로드 중에는 이 화면을 열어 두세요. Built with Llama.',
+        '실험적 기능으로 일본어·한국어 피드백이 부정확할 수 있어요. 학습 해설과 함께 확인해 주세요. 다운로드 중에는 이 화면을 열어 두세요. Built with Gemma.',
     'offlineChecking': '기기를 확인하는 중…',
     'offlineDownloading': '모델 다운로드 중…',
     'offlineVerifying': '모델 검증 중…',
