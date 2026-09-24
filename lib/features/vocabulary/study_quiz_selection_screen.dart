@@ -93,6 +93,7 @@ class StudyQuizSelectionScreen extends StatelessWidget {
                           style: Theme.of(context).textTheme.bodyLarge
                               ?.copyWith(
                                 fontSize: 20,
+                                letterSpacing: 0,
                                 fontWeight: FontWeight.w600,
                                 color: scheme.onSurfaceVariant,
                               ),
