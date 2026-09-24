@@ -1,6 +1,6 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_gen_ai_chat_ui/flutter_gen_ai_chat_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/data/models/grammar_point.dart';
@@ -22,12 +22,6 @@ Future<void> showGrammarQaChatSheet(
   );
 }
 
-class _ChatMessage {
-  const _ChatMessage({required this.text, required this.fromUser});
-  final String text;
-  final bool fromUser;
-}
-
 class _GrammarQaChatSheet extends ConsumerStatefulWidget {
   const _GrammarQaChatSheet({
     required this.grammar,
@@ -43,73 +37,55 @@ class _GrammarQaChatSheet extends ConsumerStatefulWidget {
 }
 
 class _GrammarQaChatSheetState extends ConsumerState<_GrammarQaChatSheet> {
-  final _controller = TextEditingController();
-  final _scrollController = ScrollController();
-  final List<_ChatMessage> _messages = [];
+  static const _user = ChatUser(id: 'user', firstName: 'You');
+  static const _assistant = ChatUser(id: 'ai', firstName: 'AI');
+  final _messages = ChatMessagesController();
   bool _asking = false;
 
   @override
   void dispose() {
-    _controller.dispose();
-    _scrollController.dispose();
+    _messages.dispose();
     super.dispose();
   }
 
-  Future<void> _send([String? preset]) async {
-    final text = (preset ?? _controller.text).trim();
-    if (text.isEmpty || _asking) return;
-    setState(() {
-      _messages.add(_ChatMessage(text: text, fromUser: true));
-      _controller.clear();
-      _asking = true;
-    });
-    _scrollToEnd();
+  Future<void> _send(ChatMessage message) async {
+    final question = message.text.trim();
+    if (question.isEmpty || question.length > 300 || _asking) return;
+    _messages.addMessage(
+      ChatMessage(text: question, user: _user, createdAt: DateTime.now()),
+    );
+    setState(() => _asking = true);
     try {
       final service = await ref.read(grammarQaServiceProvider.future);
       final answer = await service.ask(
         grammar: widget.grammar,
-        question: text,
+        question: question,
         languageCode: widget.languageCode,
       );
       if (!mounted) return;
-      setState(
-        () => _messages.add(_ChatMessage(text: answer, fromUser: false)),
-      );
+      _addAnswer(answer);
     } catch (error) {
       if (!mounted) return;
       final key = error is OfflineAiException
           ? error.key
           : 'offlineInferenceError';
-      setState(
-        () => _messages.add(
-          _ChatMessage(text: context.strings(key), fromUser: false),
-        ),
-      );
+      _addAnswer(context.strings(key));
     } finally {
       if (mounted) setState(() => _asking = false);
-      _scrollToEnd();
     }
   }
 
-  void _scrollToEnd() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!_scrollController.hasClients) return;
-      unawaited(
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOut,
-        ),
-      );
-    });
+  void _addAnswer(String answer) {
+    _messages.addMessage(
+      ChatMessage(text: answer, user: _assistant, createdAt: DateTime.now()),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final viewInsets = MediaQuery.viewInsetsOf(context);
     final colors = Theme.of(context).colorScheme;
     return Padding(
-      padding: EdgeInsets.only(bottom: viewInsets.bottom),
+      padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
       child: SizedBox(
         height: MediaQuery.sizeOf(context).height * 0.85,
         child: Column(
@@ -142,198 +118,39 @@ class _GrammarQaChatSheetState extends ConsumerState<_GrammarQaChatSheet> {
             ),
             const Divider(height: 1),
             Expanded(
-              child: _messages.isEmpty && !_asking
-                  ? _EmptyState(onSuggestion: _send)
-                  : ListView.builder(
-                      controller: _scrollController,
-                      padding: const EdgeInsets.all(16),
-                      itemCount: _messages.length + (_asking ? 1 : 0),
-                      itemBuilder: (context, index) {
-                        if (index == _messages.length) {
-                          return const Align(
-                            alignment: Alignment.centerLeft,
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(vertical: 4),
-                              child: _TypingIndicator(),
-                            ),
-                          );
-                        }
-                        final message = _messages[index];
-                        return _MessageBubble(
-                          text: message.text,
-                          fromUser: message.fromUser,
-                        );
-                      },
-                    ),
-            ),
-            SafeArea(
-              top: false,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _controller,
-                        enabled: !_asking,
-                        minLines: 1,
-                        maxLines: 4,
-                        maxLength: 300,
-                        decoration: InputDecoration(
-                          hintText: context.strings('askAboutThisGrammarHint'),
-                        ),
-                        onSubmitted: (_) => _send(),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    IconButton.filled(
-                      onPressed: _asking ? null : () => _send(),
-                      icon: const Icon(Icons.arrow_upward_rounded),
-                    ),
-                  ],
+              child: AiChatWidget(
+                currentUser: _user,
+                aiUser: _assistant,
+                controller: _messages,
+                onSendMessage: _send,
+                readOnly: _asking,
+                loadingConfig: LoadingConfig(isLoading: _asking),
+                inputOptions: InputOptions(
+                  decoration: InputDecoration(
+                    hintText: context.strings('askAboutThisGrammarHint'),
+                  ),
+                  inputFormatters: [LengthLimitingTextInputFormatter(300)],
+                  sendButtonTooltip: context.strings('sendMessage'),
                 ),
+                welcomeMessageConfig: const WelcomeMessageConfig(
+                  title: '',
+                  questionsSectionTitle: '',
+                  centerVertically: true,
+                ),
+                exampleQuestions: [
+                  ExampleQuestion(
+                    question: context.strings('askSuggestionWhenToUse'),
+                  ),
+                  ExampleQuestion(
+                    question: context.strings('askSuggestionMoreExamples'),
+                  ),
+                  ExampleQuestion(
+                    question: context.strings('askSuggestionDifference'),
+                  ),
+                ],
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _EmptyState extends StatelessWidget {
-  const _EmptyState({required this.onSuggestion});
-
-  final void Function(String suggestion) onSuggestion;
-
-  @override
-  Widget build(BuildContext context) => Center(
-    child: Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.chat_bubble_outline_rounded,
-            size: 40,
-            color: Theme.of(context).colorScheme.primary,
-          ),
-          const SizedBox(height: 16),
-          Wrap(
-            alignment: WrapAlignment.center,
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              for (final suggestion in [
-                context.strings('askSuggestionWhenToUse'),
-                context.strings('askSuggestionMoreExamples'),
-                context.strings('askSuggestionDifference'),
-              ])
-                ActionChip(
-                  label: Text(suggestion),
-                  backgroundColor: Theme.of(
-                    context,
-                  ).colorScheme.primaryContainer,
-                  labelStyle: TextStyle(
-                    color: Theme.of(context).colorScheme.onPrimaryContainer,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  side: BorderSide.none,
-                  onPressed: () => onSuggestion(suggestion),
-                ),
-            ],
-          ),
-        ],
-      ),
-    ),
-  );
-}
-
-class _MessageBubble extends StatelessWidget {
-  const _MessageBubble({required this.text, required this.fromUser});
-
-  final String text;
-  final bool fromUser;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    return Align(
-      alignment: fromUser ? Alignment.centerRight : Alignment.centerLeft,
-      child: Container(
-        constraints: BoxConstraints(
-          maxWidth: MediaQuery.sizeOf(context).width * 0.78,
-        ),
-        margin: const EdgeInsets.symmetric(vertical: 4),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        decoration: BoxDecoration(
-          color: fromUser ? colors.primary : colors.surfaceContainerHigh,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: SelectableText(
-          text,
-          style: TextStyle(
-            color: fromUser ? colors.onPrimary : colors.onSurface,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _TypingIndicator extends StatefulWidget {
-  const _TypingIndicator();
-
-  @override
-  State<_TypingIndicator> createState() => _TypingIndicatorState();
-}
-
-class _TypingIndicatorState extends State<_TypingIndicator>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 900),
-  )..repeat();
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final color = Theme.of(context).colorScheme.onSurfaceVariant;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHigh,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: SizedBox(
-        width: 32,
-        height: 8,
-        child: AnimatedBuilder(
-          animation: _controller,
-          builder: (context, _) => Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: List.generate(3, (index) {
-              final t = (_controller.value - index * 0.2) % 1.0;
-              final bounce = 1 - (2 * t - 1).abs();
-              return Opacity(
-                opacity: 0.35 + 0.65 * bounce.clamp(0.0, 1.0),
-                child: Container(
-                  width: 6,
-                  height: 6,
-                  decoration: BoxDecoration(
-                    color: color,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-              );
-            }),
-          ),
         ),
       ),
     );

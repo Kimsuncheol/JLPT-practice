@@ -161,10 +161,7 @@ void main() {
     expect(find.byKey(const ValueKey('practice_ai_continue')), findsOneWidget);
 
     const question = 'Can you explain that more simply?';
-    await tester.enterText(
-      find.byKey(const ValueKey('practice_ai_chat_input')),
-      question,
-    );
+    await tester.enterText(find.byType(TextField).last, question);
     await tester.tap(find.byKey(const ValueKey('practice_ai_chat_send')));
     await tester.pumpAndSettle();
 
@@ -173,10 +170,7 @@ void main() {
     expect(tutor.histories.single, isEmpty);
 
     const secondQuestion = 'What should I notice first?';
-    await tester.enterText(
-      find.byKey(const ValueKey('practice_ai_chat_input')),
-      secondQuestion,
-    );
+    await tester.enterText(find.byType(TextField).last, secondQuestion);
     await tester.tap(find.byKey(const ValueKey('practice_ai_chat_send')));
     await tester.pumpAndSettle();
 
@@ -192,10 +186,7 @@ void main() {
 
     expect(find.text(question), findsNothing);
     expect(find.text(secondQuestion), findsNothing);
-    expect(
-      find.byKey(const ValueKey('practice_ai_chat_input')),
-      findsOneWidget,
-    );
+    expect(find.byType(TextField), findsOneWidget);
     expect(
       find.text('This conversation is deleted when you close it.'),
       findsOneWidget,
