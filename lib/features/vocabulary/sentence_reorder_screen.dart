@@ -24,8 +24,6 @@ class _SentenceReorderScreenState extends ConsumerState<SentenceReorderScreen> {
   final List<SentenceToken> _selected = [];
   QuizAttemptResult? _attempt;
   int _index = 0;
-  bool _showMeaning = false;
-  bool _meaningInitialized = false;
   bool _leaveDialogOpen = false;
   Timer? _autoAdvanceTimer;
 
@@ -73,21 +71,11 @@ class _SentenceReorderScreenState extends ConsumerState<SentenceReorderScreen> {
   void _advance() {
     _autoAdvanceTimer?.cancel();
     if (!mounted) return;
-    final state = ref.read(appControllerProvider).value;
     setState(() {
       _index++;
       _selected.clear();
       _attempt = null;
-      _showMeaning = !(state?.hideMeanings ?? false);
     });
-  }
-
-  Future<void> _playAudio(SentenceReorderQuiz quiz) async {
-    try {
-      await playQuizSentenceAudio(quiz, ref.read(ttsServiceProvider));
-    } catch (error) {
-      debugPrint('Sentence reorder audio unavailable: $error');
-    }
   }
 
   void _retry(List<VocabEntry> words) => setState(() {
@@ -120,10 +108,6 @@ class _SentenceReorderScreenState extends ConsumerState<SentenceReorderScreen> {
         ),
       ),
       data: (state) {
-        if (!_meaningInitialized) {
-          _showMeaning = !state.hideMeanings;
-          _meaningInitialized = true;
-        }
         final words = StudyBatches.wordsForDay(
           state.selectedVocabulary,
           day: widget.day,
@@ -181,127 +165,169 @@ class _SentenceReorderScreenState extends ConsumerState<SentenceReorderScreen> {
               title: Text(strings('sentenceReordering')),
             ),
             body: SafeArea(
-              child: ListView(
-                padding: const EdgeInsets.all(20),
+              top: false,
+              child: Column(
                 children: [
-                  Text(
-                    '${_index + 1} / ${set.actualCount}',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(child: Text(strings('reorderPrompt'))),
-                      IconButton(
-                        tooltip: strings('playAudio'),
-                        onPressed: () => unawaited(_playAudio(quiz)),
-                        icon: const Icon(Icons.volume_up_rounded),
-                      ),
-                    ],
-                  ),
-                  TextButton.icon(
-                    onPressed: () =>
-                        setState(() => _showMeaning = !_showMeaning),
-                    icon: Icon(
-                      _showMeaning ? Icons.visibility_off : Icons.visibility,
-                    ),
-                    label: Text(
-                      _showMeaning
-                          ? strings('hideMeanings')
-                          : strings('showMeanings'),
-                    ),
-                  ),
-                  if (_showMeaning) Text(translation),
-                  const SizedBox(height: 24),
-                  Text(strings('yourSentence')),
-                  const SizedBox(height: 8),
-                  Container(
-                    constraints: const BoxConstraints(minHeight: 86),
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Theme.of(context).colorScheme.outline,
-                      ),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(22, 6, 22, 0),
+                    child: Row(
                       children: [
-                        for (final (position, tile) in _selected.indexed)
-                          InputChip(
-                            key: ValueKey('selected-${tile.id}'),
-                            label: Text(tile.text),
-                            backgroundColor:
-                                _attempt?.wrongPositions.contains(position) ==
-                                    true
-                                ? Theme.of(context).colorScheme.errorContainer
-                                : null,
-                            onPressed: _attempt == null
-                                ? () => setState(() => _selected.remove(tile))
-                                : null,
+                        Expanded(
+                          child: LinearProgressIndicator(
+                            value: (_index + 1) / set.actualCount,
+                            minHeight: 8,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        const SizedBox(width: 14),
+                        Text(
+                          '${_index + 1}/${set.actualCount}',
+                          style: const TextStyle(fontWeight: FontWeight.w700),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: ListView(
+                      padding: const EdgeInsets.all(20),
+                      children: [
+                        Text(strings('reorderPrompt')),
+                        const SizedBox(height: 24),
+                        Container(
+                          key: const ValueKey('reorder-answer-container'),
+                          constraints: const BoxConstraints(minHeight: 86),
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                ? const Color(0xFF292C2E)
+                                : const Color(0xFFE8EAEB),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: [
+                                  for (final (position, tile)
+                                      in _selected.indexed)
+                                    InputChip(
+                                      key: ValueKey('selected-${tile.id}'),
+                                      label: Text(tile.text),
+                                      backgroundColor:
+                                          _attempt?.wrongPositions.contains(
+                                                position,
+                                              ) ==
+                                              true
+                                          ? Theme.of(
+                                              context,
+                                            ).colorScheme.errorContainer
+                                          : null,
+                                      onPressed: _attempt == null
+                                          ? () => setState(
+                                              () => _selected.remove(tile),
+                                            )
+                                          : null,
+                                    ),
+                                ],
+                              ),
+                              if (_selected.isNotEmpty)
+                                const SizedBox(height: 14),
+                              Text(
+                                translation,
+                                style: TextStyle(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            for (final tile in remaining)
+                              ActionChip(
+                                key: ValueKey('available-${tile.id}'),
+                                label: Text(tile.text),
+                                onPressed: _attempt == null
+                                    ? () => setState(() => _selected.add(tile))
+                                    : null,
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                        if (_attempt != null) ...[
+                          Text(
+                            _attempt!.isCorrect
+                                ? strings('correct')
+                                : strings('incorrect'),
+                          ),
+                          Text(
+                            quiz.entry.example.sentence,
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                          Text(quiz.entry.example.reading),
+                          const SizedBox(height: 16),
+                        ],
+                        if (_attempt == null) ...[
+                          OutlinedButton(
+                            style: OutlinedButton.styleFrom(
+                              minimumSize: const Size.fromHeight(54),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            onPressed: _selected.isEmpty
+                                ? null
+                                : () => setState(_selected.clear),
+                            child: Text(strings('reset')),
+                          ),
+                          const SizedBox(height: 12),
+                          FilledButton(
+                            style: FilledButton.styleFrom(
+                              minimumSize: const Size.fromHeight(54),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            onPressed:
+                                _selected.length != quiz.correctOrder.length
+                                ? null
+                                : () {
+                                    final result = submitAnswer(
+                                      quiz,
+                                      _selected
+                                          .map((tile) => tile.text)
+                                          .toList(),
+                                    );
+                                    setState(() {
+                                      _attempt = result;
+                                      _summary.add(quiz, result);
+                                    });
+                                    _scheduleAutoAdvance();
+                                  },
+                            child: Text(strings('checkAnswer')),
+                          ),
+                        ] else
+                          FilledButton(
+                            style: FilledButton.styleFrom(
+                              minimumSize: const Size.fromHeight(54),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            onPressed: _advance,
+                            child: Text(strings('continue')),
                           ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 24),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: [
-                      for (final tile in remaining)
-                        ActionChip(
-                          key: ValueKey('available-${tile.id}'),
-                          label: Text(tile.text),
-                          onPressed: _attempt == null
-                              ? () => setState(() => _selected.add(tile))
-                              : null,
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-                  if (_attempt != null) ...[
-                    Text(
-                      _attempt!.isCorrect
-                          ? strings('correct')
-                          : strings('incorrect'),
-                    ),
-                    Text(
-                      quiz.entry.example.sentence,
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    Text(quiz.entry.example.reading),
-                    Text(translation),
-                    const SizedBox(height: 16),
-                  ],
-                  if (_attempt == null) ...[
-                    OutlinedButton(
-                      onPressed: _selected.isEmpty
-                          ? null
-                          : () => setState(_selected.clear),
-                      child: Text(strings('reset')),
-                    ),
-                    FilledButton(
-                      onPressed: _selected.length != quiz.correctOrder.length
-                          ? null
-                          : () {
-                              final result = submitAnswer(
-                                quiz,
-                                _selected.map((tile) => tile.text).toList(),
-                              );
-                              setState(() {
-                                _attempt = result;
-                                _summary.add(quiz, result);
-                              });
-                              _scheduleAutoAdvance();
-                            },
-                      child: Text(strings('checkAnswer')),
-                    ),
-                  ] else
-                    FilledButton(
-                      onPressed: _advance,
-                      child: Text(strings('continue')),
-                    ),
                 ],
               ),
             ),

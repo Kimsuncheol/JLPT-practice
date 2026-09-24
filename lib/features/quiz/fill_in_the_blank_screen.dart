@@ -9,18 +9,19 @@ import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/core/utils/study_batches.dart';
 import 'package:jlpt_practice/data/models/quiz.dart';
 
-class QuizScreen extends ConsumerStatefulWidget {
-  const QuizScreen({this.day, super.key});
+class FillInTheBlankScreen extends ConsumerStatefulWidget {
+  const FillInTheBlankScreen({this.day, super.key});
 
   /// When set, the quiz is scoped to that study day's vocabulary instead of
   /// the whole selected level.
   final int? day;
 
   @override
-  ConsumerState<QuizScreen> createState() => _QuizScreenState();
+  ConsumerState<FillInTheBlankScreen> createState() =>
+      _FillInTheBlankScreenState();
 }
 
-class _QuizScreenState extends ConsumerState<QuizScreen> {
+class _FillInTheBlankScreenState extends ConsumerState<FillInTheBlankScreen> {
   List<QuizQuestion>? _questions;
   int _index = 0;
   String? _selected;
@@ -125,7 +126,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
             onPressed: _confirmLeave,
             icon: const Icon(Icons.close_rounded),
           ),
-          title: Text(context.strings('startQuiz')),
+          title: Text(context.strings('fillInTheBlankTitle')),
         ),
         body: SafeArea(
           top: false,

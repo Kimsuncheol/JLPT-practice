@@ -9,7 +9,7 @@ import 'package:jlpt_practice/features/grammar/grammar_tutor_screen.dart';
 import 'package:jlpt_practice/features/kana/kana_chart_screen.dart';
 import 'package:jlpt_practice/features/onboarding/onboarding_screen.dart';
 import 'package:jlpt_practice/features/quiz/quiz_result_screen.dart';
-import 'package:jlpt_practice/features/quiz/quiz_screen.dart';
+import 'package:jlpt_practice/features/quiz/fill_in_the_blank_screen.dart';
 import 'package:jlpt_practice/features/settings/appearance_screen.dart';
 import 'package:jlpt_practice/features/settings/eye_comfort_screen.dart';
 import 'package:jlpt_practice/features/settings/languages_screen.dart';
@@ -123,11 +123,12 @@ GoRouter createAppRouter({String initialLocation = '/'}) => GoRouter(
         ),
       ),
     ),
-    GoRoute(path: '/quiz', builder: (_, _) => const QuizScreen()),
+    GoRoute(path: '/quiz', builder: (_, _) => const FillInTheBlankScreen()),
     GoRoute(
       path: '/quiz/day/:day',
-      builder: (_, state) =>
-          QuizScreen(day: int.tryParse(state.pathParameters['day'] ?? '')),
+      builder: (_, state) => FillInTheBlankScreen(
+        day: int.tryParse(state.pathParameters['day'] ?? ''),
+      ),
     ),
     GoRoute(path: '/quiz/result', builder: (_, _) => const QuizResultScreen()),
     GoRoute(

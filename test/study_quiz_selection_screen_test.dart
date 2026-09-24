@@ -20,7 +20,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Fill-in-the-blank game'), findsOneWidget);
+    expect(find.text('Fill in the blank game'), findsOneWidget);
     expect(find.text('Sentence Reordering'), findsOneWidget);
     expect(
       find.text('Pick how you want to practice today’s words.'),

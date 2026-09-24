@@ -26,17 +26,75 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('문장 뜻'), findsNothing);
+    expect(find.text('문장 뜻'), findsOneWidget);
+    expect(find.text('Your sentence'), findsNothing);
+    expect(find.text('Hide meanings'), findsNothing);
+    expect(find.byIcon(Icons.volume_up_rounded), findsNothing);
+    final answerContainer = find.byKey(
+      const ValueKey('reorder-answer-container'),
+    );
+    final answerDecoration =
+        tester.widget<Container>(answerContainer).decoration as BoxDecoration;
+    expect(answerDecoration.color, const Color(0xFFE8EAEB));
+    expect(answerDecoration.border, isNull);
+    expect(
+      find.descendant(of: answerContainer, matching: find.text('문장 뜻')),
+      findsOneWidget,
+    );
+    final progress = tester.widget<LinearProgressIndicator>(
+      find.byType(LinearProgressIndicator),
+    );
+    expect(progress.value, 1);
+    expect(progress.minHeight, 8);
+    expect(
+      tester.getSize(find.widgetWithText(OutlinedButton, 'Reset')).height,
+      tester.getSize(find.widgetWithText(FilledButton, 'Check answer')).height,
+    );
     for (var index = 0; index < 3; index++) {
       await tester.tap(find.byKey(ValueKey('available-$index')));
       await tester.pump();
     }
+    expect(
+      find.descendant(
+        of: answerContainer,
+        matching: find.byKey(const ValueKey('selected-0')),
+      ),
+      findsOneWidget,
+    );
     await tester.tap(find.text('Check answer'));
     await tester.pump();
     expect(find.text('Correct'), findsOneWidget);
     await tester.tap(find.text('Continue'));
     await tester.pump();
     expect(find.text('1 / 1'), findsOneWidget);
+  });
+
+  testWidgets('answer area uses dark gray in dark mode', (tester) async {
+    final container = ProviderContainer(
+      overrides: [
+        appControllerProvider.overrideWith(_ReorderTestController.new),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container.read(appControllerProvider.future);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp(
+          theme: ThemeData.dark(),
+          home: const SentenceReorderScreen(day: 1),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final answerContainer = find.byKey(
+      const ValueKey('reorder-answer-container'),
+    );
+    final decoration =
+        tester.widget<Container>(answerContainer).decoration as BoxDecoration;
+    expect(decoration.color, const Color(0xFF292C2E));
+    expect(decoration.border, isNull);
   });
 
   testWidgets('X asks before leaving and cancel keeps the game', (

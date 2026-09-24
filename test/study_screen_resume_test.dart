@@ -894,11 +894,19 @@ void main() {
     expect(find.text('Choose a quiz game'), findsOneWidget);
     expect(find.text('Take a quick quiz'), findsNothing);
     expect(find.text('Sentence Reordering'), findsNothing);
+    expect(
+      tester
+          .getSize(find.widgetWithText(OutlinedButton, 'Choose a quiz game'))
+          .height,
+      tester
+          .getSize(find.widgetWithText(FilledButton, 'Finish this session'))
+          .height,
+    );
     await tester.tap(find.text('Choose a quiz game'));
     await tester.pumpAndSettle();
     final fillButton = find.widgetWithText(
       FilledButton,
-      'Fill-in-the-blank game',
+      'Fill in the blank game',
     );
     final reorderButton = find.widgetWithText(
       FilledButton,
@@ -915,7 +923,10 @@ void main() {
       tester.getTopLeft(fillButton).dx,
       lessThan(tester.getTopLeft(reorderButton).dx),
     );
-    expect(tester.getSize(fillButton).width, tester.getSize(fillButton).height);
+    expect(
+      tester.getSize(fillButton).height,
+      greaterThan(tester.getSize(fillButton).width),
+    );
     expect(
       tester
           .getTopLeft(
@@ -925,7 +936,7 @@ void main() {
             ),
           )
           .dy,
-      lessThan(tester.getTopLeft(find.text('Fill-in-the-blank game')).dy),
+      lessThan(tester.getTopLeft(find.text('Fill in the blank game')).dy),
     );
     final fillColor = tester
         .widget<FilledButton>(fillButton)
@@ -949,12 +960,15 @@ void main() {
         .foregroundColor!
         .resolve({});
     expect(fillTextColor, isNot(reorderTextColor));
-    final bodyHeading = tester
-        .widgetList<Text>(find.text('Choose a quiz game'))
-        .first;
-    expect(bodyHeading.style?.fontWeight, FontWeight.w400);
-    expect(bodyHeading.style?.fontSize, 18);
-    final bodyHeadingFinder = find.text('Choose a quiz game').first;
+    final bodyHeadingFinder = find.byWidgetPredicate(
+      (widget) =>
+          widget is Text &&
+          widget.data == 'Choose a quiz game' &&
+          widget.style?.fontWeight == FontWeight.w600,
+    );
+    final bodyHeading = tester.widget<Text>(bodyHeadingFinder);
+    expect(bodyHeading.style?.fontWeight, FontWeight.w600);
+    expect(bodyHeading.style?.fontSize, 20);
     expect(
       tester.getTopLeft(bodyHeadingFinder).dx,
       tester.getTopLeft(fillButton).dx,
@@ -962,7 +976,7 @@ void main() {
     expect(
       tester.getTopLeft(fillButton).dy -
           tester.getBottomLeft(bodyHeadingFinder).dy,
-      12,
+      greaterThan(12),
     );
     final bodySafeArea = find
         .ancestor(of: fillButton, matching: find.byType(SafeArea))
@@ -973,7 +987,7 @@ void main() {
         2;
     expect(groupCenterY, closeTo(tester.getCenter(bodySafeArea).dy, 1));
 
-    await tester.tap(find.text('Fill-in-the-blank game'));
+    await tester.tap(find.text('Fill in the blank game'));
     await tester.pumpAndSettle();
     expect(find.text('Day quiz 1'), findsOneWidget);
     router.pop();
@@ -1011,8 +1025,8 @@ void main() {
 
     await tester.tap(find.text('Choose a quiz game'));
     await tester.pumpAndSettle();
-    expect(find.text('Fill-in-the-blank game'), findsOneWidget);
-    await tester.tap(find.text('Fill-in-the-blank game'));
+    expect(find.text('Fill in the blank game'), findsOneWidget);
+    await tester.tap(find.text('Fill in the blank game'));
     await tester.pumpAndSettle();
     expect(find.text('Level quiz'), findsOneWidget);
     expect(

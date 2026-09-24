@@ -108,6 +108,9 @@ class StudyFinishScreen extends ConsumerWidget {
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(54),
+                    ),
                     onPressed: () => _completeLevel(
                       context,
                       ref,
@@ -122,6 +125,9 @@ class StudyFinishScreen extends ConsumerWidget {
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton.icon(
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size.fromHeight(54),
+                    ),
                     onPressed: () => _finish(context, ref),
                     icon: const Icon(Icons.check_rounded),
                     label: Text(strings('finishSession')),
@@ -131,6 +137,9 @@ class StudyFinishScreen extends ConsumerWidget {
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(54),
+                    ),
                     onPressed: () =>
                         context.push('/study/day/$day/quiz-selection'),
                     icon: const Icon(Icons.quiz_rounded),
