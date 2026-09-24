@@ -62,6 +62,21 @@ void main() {
           .every((chip) => chip.onPressed == null),
       isTrue,
     );
+    final chat = tester.widget<AiChatWidget>(find.byType(AiChatWidget));
+    final loadingBubble = tester.widget<Container>(
+      find.byKey(const ValueKey('chat_ai_loading_bubble')),
+    );
+    final decoration = loadingBubble.decoration! as BoxDecoration;
+    expect(decoration.color, chat.messageOptions!.bubbleStyle!.aiBubbleColor);
+    expect(
+      decoration.borderRadius,
+      const BorderRadius.only(
+        topLeft: Radius.circular(2),
+        topRight: Radius.circular(22),
+        bottomLeft: Radius.circular(22),
+        bottomRight: Radius.circular(22),
+      ),
+    );
     pending.complete('Write a sentence using A が いちばん～.');
     await tester.pumpAndSettle();
     expect(

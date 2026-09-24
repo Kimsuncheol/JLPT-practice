@@ -4,6 +4,8 @@ import 'package:flutter_gen_ai_chat_ui/flutter_gen_ai_chat_ui.dart';
 /// Chat colors follow the app's active light or dark ColorScheme.
 class ChatUiStyle {
   ChatUiStyle._();
+  static const _aiTopLeftRadius = 2.0;
+  static const _aiOtherRadius = 22.0;
 
   static MessageOptions messages(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
@@ -13,10 +15,37 @@ class ChatUiStyle {
       bubbleStyle: BubbleStyle(
         userBubbleColor: colors.primaryContainer,
         aiBubbleColor: colors.surfaceContainerHigh,
+        aiBubbleTopLeftRadius: _aiTopLeftRadius,
+        aiBubbleTopRightRadius: _aiOtherRadius,
+        bottomLeftRadius: _aiOtherRadius,
+        bottomRightRadius: _aiOtherRadius,
         enableShadow: false,
       ),
       userTextColor: colors.onPrimaryContainer,
       aiTextColor: colors.onSurface,
+    );
+  }
+
+  /// Shows three animated dots in an AI-styled bubble until streaming starts.
+  static LoadingConfig loading(BuildContext context, bool isLoading) {
+    final colors = Theme.of(context).colorScheme;
+    return LoadingConfig(
+      isLoading: isLoading,
+      loadingIndicator: Container(
+        key: const ValueKey('chat_ai_loading_bubble'),
+        margin: const EdgeInsets.only(left: 8),
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+        decoration: BoxDecoration(
+          color: colors.surfaceContainerHigh,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(_aiTopLeftRadius),
+            topRight: Radius.circular(_aiOtherRadius),
+            bottomLeft: Radius.circular(_aiOtherRadius),
+            bottomRight: Radius.circular(_aiOtherRadius),
+          ),
+        ),
+        child: _TypingDots(color: colors.onSurfaceVariant),
+      ),
     );
   }
 
@@ -129,4 +158,53 @@ class ChatUiStyle {
       ),
     );
   }
+}
+
+class _TypingDots extends StatefulWidget {
+  const _TypingDots({required this.color});
+
+  final Color color;
+
+  @override
+  State<_TypingDots> createState() => _TypingDotsState();
+}
+
+class _TypingDotsState extends State<_TypingDots>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1200),
+  )..repeat();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+    animation: _controller,
+    builder: (context, _) => Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (var i = 0; i < 3; i++) ...[
+          if (i > 0) const SizedBox(width: 5),
+          Opacity(
+            opacity: 0.35 + 0.65 * _pulse((_controller.value - i * 0.2) % 1),
+            child: Container(
+              width: 8,
+              height: 8,
+              decoration: BoxDecoration(
+                color: widget.color,
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+        ],
+      ],
+    ),
+  );
+
+  static double _pulse(double t) => t < 0.5 ? t * 2 : (1 - t) * 2;
 }

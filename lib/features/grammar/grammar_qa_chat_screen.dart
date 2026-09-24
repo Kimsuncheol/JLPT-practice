@@ -6,6 +6,7 @@ import 'package:jlpt_practice/data/models/grammar_point.dart';
 import 'package:jlpt_practice/features/grammar/grammar_qa_service.dart';
 import 'package:jlpt_practice/features/offline_ai/offline_ai_model.dart';
 import 'package:jlpt_practice/shared/chat_ui_style.dart';
+import 'package:jlpt_practice/shared/streaming_chat_reply.dart';
 
 Future<void> showGrammarQaChatScreen(
   BuildContext context, {
@@ -41,6 +42,7 @@ class _GrammarQaChatScreenState extends ConsumerState<GrammarQaChatScreen> {
   final _messages = ChatMessagesController();
   final _input = TextEditingController();
   bool _asking = false;
+  bool _waiting = false;
   bool _hasAnswer = false;
 
   @override
@@ -65,32 +67,41 @@ class _GrammarQaChatScreenState extends ConsumerState<GrammarQaChatScreen> {
     _messages.addMessage(
       ChatMessage(text: question, user: _user, createdAt: DateTime.now()),
     );
-    setState(() => _asking = true);
+    setState(() {
+      _asking = true;
+      _waiting = true;
+    });
+    final reply = StreamingChatReply(_messages, _assistant);
     try {
       final service = await ref.read(grammarQaServiceProvider.future);
       final answer = await service.ask(
         grammar: widget.grammar,
         question: question,
         languageCode: widget.languageCode,
+        onPartial: (text) {
+          if (!mounted) return;
+          if (_waiting) setState(() => _waiting = false);
+          reply.update(text);
+        },
       );
       if (!mounted) return;
-      _addAnswer(answer);
+      reply.finish(answer);
+      setState(() => _hasAnswer = true);
     } catch (error) {
       if (!mounted) return;
       final key = error is OfflineAiException
           ? error.key
           : 'offlineInferenceError';
-      _addAnswer(context.strings(key));
+      reply.finish(context.strings(key));
+      setState(() => _hasAnswer = true);
     } finally {
-      if (mounted) setState(() => _asking = false);
+      if (mounted) {
+        setState(() {
+          _asking = false;
+          _waiting = false;
+        });
+      }
     }
-  }
-
-  void _addAnswer(String answer) {
-    _messages.addMessage(
-      ChatMessage(text: answer, user: _assistant, createdAt: DateTime.now()),
-    );
-    setState(() => _hasAnswer = true);
   }
 
   @override
@@ -122,7 +133,7 @@ class _GrammarQaChatScreenState extends ConsumerState<GrammarQaChatScreen> {
                     controller: _messages,
                     onSendMessage: _send,
                     readOnly: true,
-                    loadingConfig: LoadingConfig(isLoading: _asking),
+                    loadingConfig: ChatUiStyle.loading(context, _waiting),
                     messageOptions: ChatUiStyle.messages(context),
                   ),
                   if (!_hasAnswer && !_asking)

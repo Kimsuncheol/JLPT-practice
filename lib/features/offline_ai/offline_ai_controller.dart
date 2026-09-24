@@ -274,6 +274,39 @@ class OfflineAiController extends ChangeNotifier with WidgetsBindingObserver {
     }
   }
 
+  Stream<String> generateStream(String system, String input) async* {
+    if (busy) throw const OfflineAiException('offlineBusy');
+    if (!ready && !await prepare()) {
+      throw OfflineAiException(errorKey ?? 'offlineSetupRequired');
+    }
+    final epoch = _epoch;
+    phase = OfflineAiPhase.generating;
+    _notify();
+    try {
+      capacity = await probe.read();
+      if (capacity!.hot) throw const OfflineAiException('offlineTooHot');
+      if (capacity!.availableRam < 256 * 1024 * 1024) {
+        throw const OfflineAiException('offlineLowMemory');
+      }
+      await for (final chunk in engine.generateStream(system, input)) {
+        if (epoch != _epoch) {
+          throw OfflineAiException(errorKey ?? 'offlinePaused');
+        }
+        yield chunk;
+      }
+      if (epoch != _epoch) {
+        throw OfflineAiException(errorKey ?? 'offlinePaused');
+      }
+      phase = OfflineAiPhase.ready;
+    } catch (_) {
+      await _unload();
+      phase = OfflineAiPhase.idle;
+      rethrow;
+    } finally {
+      _notify();
+    }
+  }
+
   void pause([String reason = 'offlinePaused']) {
     ++_epoch;
     errorKey = reason;

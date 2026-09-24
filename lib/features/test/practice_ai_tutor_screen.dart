@@ -7,6 +7,7 @@ import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/data/models/mock_test_problem.dart';
 import 'package:jlpt_practice/features/test/practice_ai_tutor_service.dart';
 import 'package:jlpt_practice/shared/chat_ui_style.dart';
+import 'package:jlpt_practice/shared/streaming_chat_reply.dart';
 
 Future<void> showPracticeAiTutorScreen({
   required BuildContext context,
@@ -55,9 +56,12 @@ class _PracticeAiTutorScreenState extends ConsumerState<PracticeAiTutorScreen> {
   final _input = TextEditingController();
   final List<PracticeTutorMessage> _messages = [];
   PracticeTutorFeedback? _feedback;
+  final _streamedFeedback = ValueNotifier<PracticeTutorFeedback?>(null);
+  bool _feedbackMessageAdded = false;
   Object? _error;
   bool _loading = true;
   bool _sending = false;
+  bool _waiting = false;
   bool _feedbackSent = false;
 
   @override
@@ -69,6 +73,7 @@ class _PracticeAiTutorScreenState extends ConsumerState<PracticeAiTutorScreen> {
   @override
   void dispose() {
     _chatController.dispose();
+    _streamedFeedback.dispose();
     _input.dispose();
     super.dispose();
   }
@@ -84,11 +89,12 @@ class _PracticeAiTutorScreenState extends ConsumerState<PracticeAiTutorScreen> {
         problem: widget.problem,
         selectedAnswer: widget.selectedAnswer,
         explanationLanguage: widget.explanationLanguage,
+        onPartial: (partial) {
+          if (mounted) _showFeedback(partial);
+        },
       );
       if (!mounted) return;
-      _chatController.addMessage(
-        ChatMessage.widget(user: _assistant, builder: _buildFeedbackContent),
-      );
+      _showFeedback(feedback);
       setState(() => _feedback = feedback);
     } catch (error, stackTrace) {
       if (kDebugMode) {
@@ -101,6 +107,15 @@ class _PracticeAiTutorScreenState extends ConsumerState<PracticeAiTutorScreen> {
     } finally {
       if (mounted) setState(() => _loading = false);
     }
+  }
+
+  void _showFeedback(PracticeTutorFeedback feedback) {
+    _streamedFeedback.value = feedback;
+    if (_feedbackMessageAdded) return;
+    _feedbackMessageAdded = true;
+    _chatController.addMessage(
+      ChatMessage.widget(user: _assistant, builder: _buildFeedbackContent),
+    );
   }
 
   Future<void> _sendQuestion(String questionText) async {
@@ -119,7 +134,9 @@ class _PracticeAiTutorScreenState extends ConsumerState<PracticeAiTutorScreen> {
     setState(() {
       _messages.add(PracticeTutorMessage(isUser: true, text: question));
       _sending = true;
+      _waiting = true;
     });
+    final streamedReply = StreamingChatReply(_chatController, _assistant);
 
     try {
       final evaluator = await ref.read(practiceAiTutorProvider.future);
@@ -129,26 +146,26 @@ class _PracticeAiTutorScreenState extends ConsumerState<PracticeAiTutorScreen> {
         explanationLanguage: widget.explanationLanguage,
         history: history,
         question: question,
+        onPartial: (text) {
+          if (!mounted) return;
+          if (_waiting) setState(() => _waiting = false);
+          streamedReply.update(text);
+        },
       );
       if (!mounted) return;
-      _chatController.addMessage(
-        ChatMessage(text: reply, user: _assistant, createdAt: DateTime.now()),
-      );
+      streamedReply.finish(reply);
       setState(() {
         _messages.add(PracticeTutorMessage(isUser: false, text: reply));
       });
     } catch (_) {
       if (!mounted) return;
-      _chatController.addMessage(
-        ChatMessage(
-          text: context.strings('aiReplyError'),
-          user: _assistant,
-          createdAt: DateTime.now(),
-        ),
-      );
+      streamedReply.finish(context.strings('aiReplyError'));
     } finally {
       if (mounted) {
-        setState(() => _sending = false);
+        setState(() {
+          _sending = false;
+          _waiting = false;
+        });
         if (_questionCount >= _maxQuestions) {
           _chatController.addMessage(
             ChatMessage(
@@ -264,19 +281,7 @@ class _PracticeAiTutorScreenState extends ConsumerState<PracticeAiTutorScreen> {
   }
 
   Widget _body() {
-    if (_loading && _feedback == null) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const CircularProgressIndicator(),
-            const SizedBox(height: 16),
-            Text(context.strings('askingAiTutor')),
-          ],
-        ),
-      );
-    }
-    if (_error != null && _feedback == null) {
+    if (_error != null && !_feedbackMessageAdded) {
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(28),
@@ -310,7 +315,10 @@ class _PracticeAiTutorScreenState extends ConsumerState<PracticeAiTutorScreen> {
       controller: _chatController,
       onSendMessage: (message) => _sendQuestion(message.text),
       readOnly: true,
-      loadingConfig: LoadingConfig(isLoading: _sending),
+      loadingConfig: ChatUiStyle.loading(
+        context,
+        _waiting || (_loading && !_feedbackMessageAdded),
+      ),
       messageOptions: ChatUiStyle.messages(context),
     );
   }
@@ -321,18 +329,31 @@ class _PracticeAiTutorScreenState extends ConsumerState<PracticeAiTutorScreen> {
     _questionChip(context.strings('giveExample')),
   ];
 
-  Widget _buildFeedbackContent(BuildContext context) {
-    final feedback = _feedback!;
+  Widget _buildFeedbackContent(BuildContext context) =>
+      ValueListenableBuilder<PracticeTutorFeedback?>(
+        valueListenable: _streamedFeedback,
+        builder: (context, feedback, _) => feedback == null
+            ? const SizedBox.shrink()
+            : _feedbackContent(context, feedback),
+      );
+
+  Widget _feedbackContent(
+    BuildContext context,
+    PracticeTutorFeedback feedback,
+  ) {
+    final done = _feedback != null;
     return Padding(
       padding: const EdgeInsets.fromLTRB(4, 8, 4, 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _TutorSection(title: null, body: feedback.summary),
-          _TutorSection(
-            title: context.strings('whyCorrect'),
-            body: feedback.whyCorrect,
-          ),
+          if (feedback.summary.isNotEmpty)
+            _TutorSection(title: null, body: feedback.summary),
+          if (feedback.whyCorrect.isNotEmpty)
+            _TutorSection(
+              title: context.strings('whyCorrect'),
+              body: feedback.whyCorrect,
+            ),
           if (feedback.whySelectedIsWrong?.trim().isNotEmpty == true)
             _TutorSection(
               title: context.strings('whyWrong'),
@@ -349,30 +370,32 @@ class _PracticeAiTutorScreenState extends ConsumerState<PracticeAiTutorScreen> {
               title: context.strings('learningPoints'),
               items: feedback.learningPoints,
             ),
-          const SizedBox(height: 20),
-          Text(
-            context.strings('aiGeneratedNotice'),
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
+          if (done) ...[
+            const SizedBox(height: 20),
+            Text(
+              context.strings('aiGeneratedNotice'),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
-          ),
-          const SizedBox(height: 14),
-          if (_feedbackSent)
-            Text(context.strings('thanksFeedback'))
-          else
-            Row(
-              children: [
-                Text(context.strings('wasHelpful')),
-                IconButton(
-                  onPressed: () => setState(() => _feedbackSent = true),
-                  icon: const Icon(Icons.thumb_up_outlined),
-                ),
-                IconButton(
-                  onPressed: () => setState(() => _feedbackSent = true),
-                  icon: const Icon(Icons.thumb_down_outlined),
-                ),
-              ],
-            ),
+            const SizedBox(height: 14),
+            if (_feedbackSent)
+              Text(context.strings('thanksFeedback'))
+            else
+              Row(
+                children: [
+                  Text(context.strings('wasHelpful')),
+                  IconButton(
+                    onPressed: () => setState(() => _feedbackSent = true),
+                    icon: const Icon(Icons.thumb_up_outlined),
+                  ),
+                  IconButton(
+                    onPressed: () => setState(() => _feedbackSent = true),
+                    icon: const Icon(Icons.thumb_down_outlined),
+                  ),
+                ],
+              ),
+          ],
         ],
       ),
     );

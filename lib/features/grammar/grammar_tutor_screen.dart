@@ -11,6 +11,7 @@ import 'package:jlpt_practice/features/grammar/grammar_practice_service.dart';
 import 'package:jlpt_practice/features/grammar/grammar_study_session_provider.dart';
 import 'package:jlpt_practice/features/offline_ai/offline_ai_model.dart';
 import 'package:jlpt_practice/shared/chat_ui_style.dart';
+import 'package:jlpt_practice/shared/streaming_chat_reply.dart';
 
 class GrammarTutorScreen extends ConsumerStatefulWidget {
   const GrammarTutorScreen({required this.grammarId, super.key});
@@ -28,6 +29,7 @@ class _GrammarTutorScreenState extends ConsumerState<GrammarTutorScreen>
   final List<GrammarPracticeTurn> _history = [];
   final _input = TextEditingController();
   bool _asking = false;
+  bool _waiting = false;
   bool _hasAnswer = false;
 
   @override
@@ -55,7 +57,11 @@ class _GrammarTutorScreenState extends ConsumerState<GrammarTutorScreen>
     _messages.addMessage(
       ChatMessage(text: question, user: _user, createdAt: DateTime.now()),
     );
-    setState(() => _asking = true);
+    setState(() {
+      _asking = true;
+      _waiting = true;
+    });
+    final reply = StreamingChatReply(_messages, _assistant);
     try {
       final service = await ref.read(grammarPracticeServiceProvider.future);
       final answer = await service.reply(
@@ -64,28 +70,33 @@ class _GrammarTutorScreenState extends ConsumerState<GrammarTutorScreen>
         languageCode: languageCode,
         history: List.of(_history),
         practiceTask: practiceTask,
+        onPartial: (text) {
+          if (!mounted) return;
+          if (_waiting) setState(() => _waiting = false);
+          reply.update(text);
+        },
       );
       if (!mounted) return;
       _history.add(GrammarPracticeTurn(isUser: true, text: question));
       _history.add(GrammarPracticeTurn(isUser: false, text: answer));
-      _addAnswer(answer);
+      reply.finish(answer);
+      setState(() => _hasAnswer = true);
     } catch (error) {
       if (!mounted) return;
-      _addAnswer(
+      reply.finish(
         context.strings(
           error is OfflineAiException ? error.key : 'offlineInferenceError',
         ),
       );
+      setState(() => _hasAnswer = true);
     } finally {
-      if (mounted) setState(() => _asking = false);
+      if (mounted) {
+        setState(() {
+          _asking = false;
+          _waiting = false;
+        });
+      }
     }
-  }
-
-  void _addAnswer(String answer) {
-    _messages.addMessage(
-      ChatMessage(text: answer, user: _assistant, createdAt: DateTime.now()),
-    );
-    setState(() => _hasAnswer = true);
   }
 
   List<Widget> _suggestions(GrammarPoint grammar, String languageCode) => [
@@ -172,7 +183,7 @@ class _GrammarTutorScreenState extends ConsumerState<GrammarTutorScreen>
                   onSendMessage: (message) =>
                       _ask(grammar, languageCode, message.text),
                   readOnly: true,
-                  loadingConfig: LoadingConfig(isLoading: _asking),
+                  loadingConfig: ChatUiStyle.loading(context, _waiting),
                   messageOptions: ChatUiStyle.messages(context),
                 ),
                 if (!_hasAnswer && !_asking)

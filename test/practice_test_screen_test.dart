@@ -222,6 +222,7 @@ class _FakePracticeAiTutorEvaluator implements PracticeAiTutorEvaluator {
     required String selectedAnswer,
     required String explanationLanguage,
     PracticeTutorFocus focus = PracticeTutorFocus.overview,
+    void Function(PracticeTutorFeedback partial)? onPartial,
   }) async => const PracticeTutorFeedback(
     summary: 'The passage explicitly gives the time.',
     whyCorrect: 'The person wakes at 7.',
@@ -237,6 +238,7 @@ class _FakePracticeAiTutorEvaluator implements PracticeAiTutorEvaluator {
     required String explanationLanguage,
     required List<PracticeTutorMessage> history,
     required String question,
+    void Function(String text)? onPartial,
   }) async {
     histories.add(List<PracticeTutorMessage>.of(history));
     final pending = nextReply;
