@@ -1,8 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app.dart';
 
 void main() {
+  test('visible route is available before the router builds', () {
+    final router = GoRouter(
+      initialLocation: '/home',
+      routes: [GoRoute(path: '/home', builder: (_, _) => const SizedBox())],
+    );
+    addTearDown(router.dispose);
+
+    expect(visibleRoutePath(router), '/home');
+  });
+
   test('stable system insets preserve landscape cutout padding', () {
     const landscapeInsets = EdgeInsets.fromLTRB(44, 0, 28, 12);
     const mediaQuery = MediaQueryData(

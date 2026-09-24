@@ -92,10 +92,16 @@ class StudyQuizSelectionScreen extends StatelessWidget {
                           textAlign: TextAlign.left,
                           style: Theme.of(context).textTheme.bodyLarge
                               ?.copyWith(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w400,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
                                 color: scheme.onSurfaceVariant,
                               ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          strings('chooseQuizGameSubtitle'),
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: scheme.onSurfaceVariant),
                         ),
                         const SizedBox(height: 12),
                         Row(
@@ -190,7 +196,7 @@ class _QuizChoiceButton extends StatelessWidget {
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontSize: compact ? 12 : 15,
+                      fontSize: compact ? 14 : 18,
                       height: 1.15,
                       fontWeight: FontWeight.w700,
                     ),

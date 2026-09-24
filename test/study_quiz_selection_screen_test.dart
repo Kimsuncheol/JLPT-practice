@@ -23,6 +23,10 @@ void main() {
     expect(find.text('Fill-in-the-blank game'), findsOneWidget);
     expect(find.text('Sentence Reordering'), findsOneWidget);
     expect(
+      find.text('Pick how you want to practice today’s words.'),
+      findsOneWidget,
+    );
+    expect(
       tester.widget<Scaffold>(find.byType(Scaffold)).backgroundColor,
       AppTheme.light().scaffoldBackgroundColor,
     );

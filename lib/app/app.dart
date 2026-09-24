@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/app/router.dart';
 import 'package:jlpt_practice/app/theme/app_theme.dart';
@@ -62,7 +63,7 @@ class JlptPracticeApp extends ConsumerWidget {
                     ListenableBuilder(
                       listenable: appRouter.routerDelegate,
                       builder: (context, _) {
-                        final path = appRouter.routerDelegate.state.uri.path;
+                        final path = visibleRoutePath(appRouter);
                         final isQuizSelection = RegExp(
                           r'^/study/day/\d+/quiz-selection$',
                         ).hasMatch(path);
@@ -98,6 +99,11 @@ class JlptPracticeApp extends ConsumerWidget {
     );
   }
 }
+
+String visibleRoutePath(GoRouter router) =>
+    router.routerDelegate.currentConfiguration.isEmpty
+    ? router.routeInformationProvider.value.uri.path
+    : router.routerDelegate.state.uri.path;
 
 MediaQueryData mediaQueryWithStableSystemInsets(
   MediaQueryData mediaQuery,
