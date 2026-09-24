@@ -11,7 +11,7 @@ import 'package:jlpt_practice/data/models/mock_test.dart';
 import 'package:jlpt_practice/data/models/mock_test_problem.dart';
 import 'package:jlpt_practice/data/models/quiz.dart';
 import 'package:jlpt_practice/features/test/mock_test_providers.dart';
-import 'package:jlpt_practice/features/test/practice_ai_tutor_sheet.dart';
+import 'package:jlpt_practice/features/test/practice_ai_tutor_screen.dart';
 import 'package:jlpt_practice/features/test/practice_test_generator.dart';
 import 'package:jlpt_practice/shared/volume_warning_toast.dart';
 
@@ -289,7 +289,7 @@ class _PracticeTestScreenState extends ConsumerState<PracticeTestScreen> {
                                 const SizedBox(height: 12),
                                 FilledButton.tonalIcon(
                                   key: const ValueKey('practice_ask_ai_tutor'),
-                                  onPressed: () => showPracticeAiTutorSheet(
+                                  onPressed: () => showPracticeAiTutorScreen(
                                     context: context,
                                     problem: item,
                                     selectedAnswer: _selected!,

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -155,10 +157,13 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('practice_ask_ai_tutor')));
     await tester.pumpAndSettle();
 
-    expect(find.text('AI Tutor'), findsOneWidget);
+    expect(find.text('Practice Tutor'), findsOneWidget);
     expect(find.text('The passage explicitly gives the time.'), findsOneWidget);
     expect(find.text('“7じ”'), findsOneWidget);
     expect(find.byKey(const ValueKey('practice_ai_continue')), findsOneWidget);
+    expect(find.byType(BottomSheet), findsNothing);
+    expect(find.byIcon(Icons.close_rounded), findsOneWidget);
+    expect(find.byType(ActionChip), findsNWidgets(3));
 
     const question = 'Can you explain that more simply?';
     await tester.enterText(find.byType(TextField).last, question);
@@ -168,11 +173,24 @@ void main() {
     expect(find.text(question), findsOneWidget);
     expect(find.text('Here is a simpler chat reply.'), findsOneWidget);
     expect(tutor.histories.single, isEmpty);
+    expect(find.byType(ActionChip), findsNWidgets(3));
 
     const secondQuestion = 'What should I notice first?';
+    final pendingReply = Completer<String>();
+    tutor.nextReply = pendingReply;
     await tester.enterText(find.byType(TextField).last, secondQuestion);
     await tester.tap(find.byKey(const ValueKey('practice_ai_chat_send')));
+    await tester.pump();
+    expect(find.byType(ActionChip), findsNWidgets(3));
+    expect(
+      tester
+          .widgetList<ActionChip>(find.byType(ActionChip))
+          .every((chip) => chip.onPressed == null),
+      isTrue,
+    );
+    pendingReply.complete('Here is a simpler chat reply.');
     await tester.pumpAndSettle();
+    expect(find.byType(ActionChip), findsNWidgets(3));
 
     expect(tutor.histories, hasLength(2));
     expect(tutor.histories.last, hasLength(2));
@@ -196,6 +214,7 @@ void main() {
 
 class _FakePracticeAiTutorEvaluator implements PracticeAiTutorEvaluator {
   final List<List<PracticeTutorMessage>> histories = [];
+  Completer<String>? nextReply;
 
   @override
   Future<PracticeTutorFeedback> explain({
@@ -220,7 +239,9 @@ class _FakePracticeAiTutorEvaluator implements PracticeAiTutorEvaluator {
     required String question,
   }) async {
     histories.add(List<PracticeTutorMessage>.of(history));
-    return 'Here is a simpler chat reply.';
+    final pending = nextReply;
+    nextReply = null;
+    return pending == null ? 'Here is a simpler chat reply.' : pending.future;
   }
 }
 

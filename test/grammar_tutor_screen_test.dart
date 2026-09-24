@@ -1,23 +1,30 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_gen_ai_chat_ui/flutter_gen_ai_chat_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jlpt_practice/core/services/local_store.dart';
 import 'package:jlpt_practice/data/models/grammar_point.dart';
 import 'package:jlpt_practice/features/grammar/grammar_part_tutor_screen.dart';
+import 'package:jlpt_practice/features/grammar/grammar_practice_service.dart';
 import 'package:jlpt_practice/features/grammar/grammar_providers.dart';
 import 'package:jlpt_practice/features/grammar/grammar_tutor_screen.dart';
+import 'package:jlpt_practice/features/offline_ai/offline_ai_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('rank tutor moves through understanding and recognition', (
-    tester,
-  ) async {
+  testWidgets('rank tutor opens Gemma-backed practice chat', (tester) async {
     SharedPreferences.setMockInitialValues({});
+    final service = _PracticeService();
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [grammarCatalogProvider.overrideWith((_) async => _items)],
+        overrides: [
+          grammarCatalogProvider.overrideWith((_) async => _items),
+          grammarPracticeServiceProvider.overrideWith((_) async => service),
+        ],
         child: const MaterialApp(home: GrammarTutorScreen(grammarId: 'N5_1')),
       ),
     );
@@ -27,24 +34,59 @@ void main() {
       (await LocalStore.create()).loadGrammarStudySessions()['N5']!.route,
       '/grammar/tutor/N5_1',
     );
-    expect(find.text('Understand'), findsOneWidget);
-    expect(find.text(_target.explanation), findsOneWidget);
-    expect(find.text(_target.formation), findsOneWidget);
-
-    await tester.tap(find.text('Check my understanding'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('Apply'), findsOneWidget);
+    expect(find.text('Practise with AI'), findsOneWidget);
+    expect(find.byType(AiChatWidget), findsOneWidget);
+    expect(find.text('Check my understanding'), findsNothing);
+    expect(find.text(_target.explanation), findsNothing);
+    expect(find.text(_target.formation), findsNothing);
     expect(
-      find.text('Which sentence uses this grammar point?'),
+      find.byKey(const ValueKey('chat_suggestions_container')),
       findsOneWidget,
     );
 
-    await tester.tap(find.text(_target.examples.first.japanese));
+    final pending = Completer<String>();
+    service.nextAnswer = pending;
+    await tester.tap(find.text('Give me a practice task'));
     await tester.pump();
+    expect(
+      find.byKey(const ValueKey('chat_suggestions_container')),
+      findsNothing,
+    );
+    expect(
+      find.byKey(const ValueKey('chat_suggestions_scroll')),
+      findsOneWidget,
+    );
+    expect(
+      tester
+          .widgetList<ActionChip>(find.byType(ActionChip))
+          .every((chip) => chip.onPressed == null),
+      isTrue,
+    );
+    pending.complete('Write a sentence using A が いちばん～.');
+    await tester.pumpAndSettle();
+    expect(
+      tester
+          .widget<AiChatWidget>(find.byType(AiChatWidget))
+          .controller
+          .messages
+          .map((message) => message.text),
+      contains('Write a sentence using A が いちばん～.'),
+    );
 
-    expect(find.text('Correct'), findsOneWidget);
-    expect(find.text('Next'), findsOneWidget);
+    await tester.enterText(find.byType(TextField), '寿司が一番好きです。');
+    await tester.tap(find.byKey(const ValueKey('grammar_practice_send')));
+    await tester.pumpAndSettle();
+    expect(service.messages, ['Give me a practice task', '寿司が一番好きです。']);
+    expect(service.practiceTaskRequests, [true, false]);
+    expect(service.histories.last, hasLength(2));
+    expect(
+      tester
+          .widget<AiChatWidget>(find.byType(AiChatWidget))
+          .controller
+          .messages
+          .map((message) => message.text),
+      contains('Practice reply'),
+    );
   });
 
   testWidgets('part checkpoint diagnoses multiple ranks', (tester) async {
@@ -79,6 +121,33 @@ void main() {
     expect(find.text('Strong'), findsOneWidget);
   });
 }
+
+class _PracticeService extends GrammarPracticeService {
+  _PracticeService() : super(_UnusedOfflineAiController());
+
+  final List<String> messages = [];
+  final List<bool> practiceTaskRequests = [];
+  final List<List<GrammarPracticeTurn>> histories = [];
+  Completer<String>? nextAnswer;
+
+  @override
+  Future<String> reply({
+    required GrammarPoint grammar,
+    required String message,
+    required String languageCode,
+    required List<GrammarPracticeTurn> history,
+    bool practiceTask = false,
+  }) async {
+    messages.add(message);
+    practiceTaskRequests.add(practiceTask);
+    histories.add(history);
+    final pending = nextAnswer;
+    nextAnswer = null;
+    return pending?.future ?? 'Practice reply';
+  }
+}
+
+class _UnusedOfflineAiController extends Fake implements OfflineAiController {}
 
 const _items = [_target, _distractor];
 

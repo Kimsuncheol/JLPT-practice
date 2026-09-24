@@ -1,21 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen_ai_chat_ui/flutter_gen_ai_chat_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/core/utils/immersive_study_mode.dart';
 import 'package:jlpt_practice/data/models/grammar_point.dart';
 import 'package:jlpt_practice/data/models/grammar_study_session.dart';
 import 'package:jlpt_practice/features/grammar/grammar_providers.dart';
+import 'package:jlpt_practice/features/grammar/grammar_practice_service.dart';
 import 'package:jlpt_practice/features/grammar/grammar_study_session_provider.dart';
-import 'package:jlpt_practice/features/grammar/grammar_tutor_ai_service.dart';
-import 'package:jlpt_practice/features/grammar/grammar_tutor_models.dart';
-import 'package:jlpt_practice/features/grammar/grammar_tutor_providers.dart';
 import 'package:jlpt_practice/features/offline_ai/offline_ai_model.dart';
+import 'package:jlpt_practice/shared/chat_ui_style.dart';
 
 class GrammarTutorScreen extends ConsumerStatefulWidget {
   const GrammarTutorScreen({required this.grammarId, super.key});
-
   final String grammarId;
 
   @override
@@ -24,20 +22,90 @@ class GrammarTutorScreen extends ConsumerStatefulWidget {
 
 class _GrammarTutorScreenState extends ConsumerState<GrammarTutorScreen>
     with ImmersiveStudyMode<GrammarTutorScreen> {
-  final _sentenceController = TextEditingController();
-  int _step = 0;
-  int _correct = 0;
-  bool? _lastCorrect;
-  bool _evaluating = false;
-  bool _saved = false;
-  GrammarTutorFeedback? _feedback;
-  String? _error;
+  static const _user = ChatUser(id: 'user', firstName: 'You');
+  static const _assistant = ChatUser(id: 'ai', firstName: 'AI');
+  final _messages = ChatMessagesController();
+  final List<GrammarPracticeTurn> _history = [];
+  final _input = TextEditingController();
+  bool _asking = false;
+  bool _hasAnswer = false;
 
   @override
   void dispose() {
-    _sentenceController.dispose();
+    _messages.dispose();
+    _input.dispose();
     super.dispose();
   }
+
+  void _sendInput(GrammarPoint grammar, String languageCode) {
+    final question = _input.text.trim();
+    if (question.isEmpty || _asking) return;
+    _input.clear();
+    _ask(grammar, languageCode, question);
+  }
+
+  Future<void> _ask(
+    GrammarPoint grammar,
+    String languageCode,
+    String text, {
+    bool practiceTask = false,
+  }) async {
+    final question = text.trim();
+    if (question.isEmpty || question.length > 300 || _asking) return;
+    _messages.addMessage(
+      ChatMessage(text: question, user: _user, createdAt: DateTime.now()),
+    );
+    setState(() => _asking = true);
+    try {
+      final service = await ref.read(grammarPracticeServiceProvider.future);
+      final answer = await service.reply(
+        grammar: grammar,
+        message: question,
+        languageCode: languageCode,
+        history: List.of(_history),
+        practiceTask: practiceTask,
+      );
+      if (!mounted) return;
+      _history.add(GrammarPracticeTurn(isUser: true, text: question));
+      _history.add(GrammarPracticeTurn(isUser: false, text: answer));
+      _addAnswer(answer);
+    } catch (error) {
+      if (!mounted) return;
+      _addAnswer(
+        context.strings(
+          error is OfflineAiException ? error.key : 'offlineInferenceError',
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _asking = false);
+    }
+  }
+
+  void _addAnswer(String answer) {
+    _messages.addMessage(
+      ChatMessage(text: answer, user: _assistant, createdAt: DateTime.now()),
+    );
+    setState(() => _hasAnswer = true);
+  }
+
+  List<Widget> _suggestions(GrammarPoint grammar, String languageCode) => [
+    for (final key in [
+      'practicePromptSuggestion',
+      'practiceExampleSuggestion',
+      'practiceUsageSuggestion',
+    ])
+      ChatUiStyle.suggestion(
+        context.strings(key),
+        _asking
+            ? null
+            : () => _ask(
+                grammar,
+                languageCode,
+                context.strings(key),
+                practiceTask: key == 'practicePromptSuggestion',
+              ),
+      ),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -48,421 +116,92 @@ class _GrammarTutorScreenState extends ConsumerState<GrammarTutorScreen>
             const Scaffold(body: Center(child: CircularProgressIndicator())),
         error: (error, _) => Scaffold(body: Center(child: Text('$error'))),
         data: (items) {
-          final grammar = items.where((item) => item.id == widget.grammarId);
-          if (grammar.isEmpty) {
+          final matches = items.where((item) => item.id == widget.grammarId);
+          if (matches.isEmpty) {
             return Scaffold(
-              appBar: AppBar(
-                surfaceTintColor: Colors.transparent,
-                scrolledUnderElevation: 0,
-              ),
+              appBar: AppBar(),
               body: Center(child: Text(context.strings('noGrammarResults'))),
             );
           }
-          final item = grammar.first;
+          final grammar = matches.first;
+          final languageCode =
+              ref.watch(appControllerProvider).value?.meaningLanguage ??
+              Localizations.localeOf(context).languageCode;
           return TrackGrammarStudy(
-            key: ValueKey(item.id),
+            key: ValueKey(grammar.id),
             session: GrammarStudySession(
-              level: item.level,
-              part: (item.rank - 1) ~/ 10 + 1,
+              level: grammar.level,
+              part: (grammar.rank - 1) ~/ 10 + 1,
               kind: GrammarStudyKind.tutor,
-              grammarId: item.id,
-              title: item.title,
+              grammarId: grammar.id,
+              title: grammar.title,
               updatedAt: DateTime.now(),
             ),
-            child: _buildLesson(item, items),
+            child: _buildChat(grammar, languageCode),
           );
         },
       ),
     );
   }
 
-  Widget _buildLesson(GrammarPoint grammar, List<GrammarPoint> catalog) {
-    final meaningLanguage = ref
-        .watch(appControllerProvider)
-        .value
-        ?.meaningLanguage;
-    final language =
-        meaningLanguage ?? Localizations.localeOf(context).languageCode;
-    final part = grammarPartForRank(grammar.rank);
-    return Scaffold(
-      appBar: AppBar(
-        surfaceTintColor: Colors.transparent,
-        scrolledUnderElevation: 0,
-        title: Text(
-          '${context.strings('part')} ${part.number} · #${grammar.rank}',
-        ),
-        actions: [
-          IconButton(
-            onPressed: () => context.push('/settings/learning'),
-            icon: const Icon(Icons.settings_rounded),
-          ),
-        ],
-      ),
-      body: SafeArea(
-        top: false,
-        child: Column(
-          children: [
-            LinearProgressIndicator(value: (_step + 1) / 4),
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.fromLTRB(20, 22, 20, 24),
-                children: [
-                  _LessonHeader(grammar: grammar, step: _step),
-                  const SizedBox(height: 20),
-                  switch (_step) {
-                    0 => _understandStep(grammar, language),
-                    1 => _exampleStep(grammar, catalog),
-                    2 => _productionStep(grammar),
-                    _ => _resultStep(grammar),
-                  },
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _understandStep(GrammarPoint grammar, String language) => Column(
-    crossAxisAlignment: CrossAxisAlignment.stretch,
-    children: [
-      _LessonCard(
-        icon: Icons.lightbulb_outline_rounded,
-        title: context.strings('meaning'),
-        child: Text(grammar.localizedExplanation(language)),
-      ),
-      const SizedBox(height: 14),
-      _LessonCard(
-        icon: Icons.account_tree_outlined,
-        title: context.strings('formation'),
-        child: Text(grammar.localizedFormation(language)),
-      ),
-      const SizedBox(height: 22),
-      FilledButton(
-        onPressed: () => setState(() => _step = 1),
-        child: Text(context.strings('checkUnderstanding')),
-      ),
-    ],
-  );
-
-  Widget _exampleStep(GrammarPoint grammar, List<GrammarPoint> catalog) {
-    final candidates = _nearbyGrammar(
-      grammar,
-      catalog,
-    ).where((item) => item.examples.isNotEmpty).toList();
-    final correctExample = grammar.examples.isEmpty
-        ? grammar.title
-        : grammar.examples.first.japanese;
-    final choices = <String>[
-      correctExample,
-      ...candidates
-          .where((item) => item.id != grammar.id)
-          .take(2)
-          .map((item) => item.examples.first.japanese),
-    ];
-    return _QuestionCard(
-      question: context.strings('chooseGrammarExample'),
-      choices: choices,
-      correctChoice: correctExample,
-      enabled: _lastCorrect == null,
-      onChoice: (choice) => _answer(choice == correctExample),
-      feedback: _answerFeedback(),
-      onNext: _lastCorrect == null ? null : _next,
-    );
-  }
-
-  Widget _productionStep(GrammarPoint grammar) => Column(
-    crossAxisAlignment: CrossAxisAlignment.stretch,
-    children: [
-      Text(
-        context.strings('writeOwnSentence'),
-        style: Theme.of(context).textTheme.titleLarge,
-      ),
-      const SizedBox(height: 8),
-      Text(context.strings('useTargetGrammar')),
-      const SizedBox(height: 16),
-      TextField(
-        controller: _sentenceController,
-        maxLength: 300,
-        enabled: !_evaluating,
-        minLines: 3,
-        maxLines: 5,
-        autofocus: true,
-        decoration: InputDecoration(
-          hintText: grammar.examples.isEmpty
-              ? grammar.title
-              : grammar.examples.first.japanese,
-        ),
-      ),
-      if (_error != null) ...[
-        const SizedBox(height: 10),
-        Text(
-          _error!,
-          style: TextStyle(color: Theme.of(context).colorScheme.error),
+  Widget _buildChat(GrammarPoint grammar, String languageCode) => Scaffold(
+    appBar: AppBar(
+      automaticallyImplyLeading: false,
+      title: Text(context.strings('practiceWithAi')),
+      actions: [
+        IconButton(
+          key: const ValueKey('grammar_practice_close'),
+          tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+          onPressed: () => Navigator.of(context).pop(),
+          icon: const Icon(Icons.close_rounded),
         ),
       ],
-      const SizedBox(height: 20),
-      FilledButton.icon(
-        onPressed: _evaluating ? null : () => _evaluate(grammar),
-        icon: _evaluating
-            ? const SizedBox(
-                width: 18,
-                height: 18,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              )
-            : const Icon(Icons.auto_awesome),
-        label: Text(context.strings('checkWithAi')),
-      ),
-    ],
-  );
-
-  Widget _resultStep(GrammarPoint grammar) {
-    final feedback = _feedback;
-    if (!_saved) {
-      _saved = true;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ref
-            .read(grammarProgressProvider.notifier)
-            .record(
-              grammarId: grammar.id,
-              correct: _correct + (feedback?.score == 2 ? 1 : 0),
-              attempts: 3,
-              productionScore: feedback?.score ?? 0,
-              mistake: feedback?.isCorrect == false ? feedback?.feedback : null,
-            );
-      });
-    }
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Icon(
-          feedback?.isCorrect == true
-              ? Icons.celebration_rounded
-              : Icons.school_rounded,
-          size: 56,
-          color: Theme.of(context).colorScheme.primary,
-        ),
-        const SizedBox(height: 14),
-        Text(
-          context.strings('lessonComplete'),
-          textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.headlineSmall,
-        ),
-        const SizedBox(height: 20),
-        if (feedback != null)
-          _LessonCard(
-            icon: Icons.auto_awesome,
-            title: context.strings('aiFeedback'),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    ),
+    body: SafeArea(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Divider(height: 1),
+          Expanded(
+            child: Stack(
               children: [
-                Text(feedback.feedback),
-                if (feedback.correctedSentence.isNotEmpty) ...[
-                  const SizedBox(height: 12),
-                  Text(
-                    feedback.correctedSentence,
-                    style: Theme.of(context).textTheme.titleMedium,
+                AiChatWidget(
+                  currentUser: _user,
+                  aiUser: _assistant,
+                  controller: _messages,
+                  onSendMessage: (message) =>
+                      _ask(grammar, languageCode, message.text),
+                  readOnly: true,
+                  loadingConfig: LoadingConfig(isLoading: _asking),
+                  messageOptions: ChatUiStyle.messages(context),
+                ),
+                if (!_hasAnswer && !_asking)
+                  ChatUiStyle.suggestions(
+                    context: context,
+                    centered: true,
+                    chips: _suggestions(grammar, languageCode),
                   ),
-                ],
               ],
             ),
           ),
-        const SizedBox(height: 20),
-        FilledButton(
-          onPressed: () => context.pop(),
-          child: Text(context.strings('finish')),
-        ),
-        TextButton(
-          onPressed: () => setState(() {
-            _step = 0;
-            _correct = 0;
-            _lastCorrect = null;
-            _feedback = null;
-            _saved = false;
-            _sentenceController.clear();
-          }),
-          child: Text(context.strings('practiceAgain')),
-        ),
-      ],
-    );
-  }
-
-  void _answer(bool correct) {
-    setState(() {
-      _lastCorrect = correct;
-      if (correct) _correct++;
-    });
-  }
-
-  Widget? _answerFeedback() => _lastCorrect == null
-      ? null
-      : Text(
-          context.strings(_lastCorrect! ? 'correct' : 'incorrect'),
-          style: TextStyle(
-            color: _lastCorrect!
-                ? Colors.green
-                : Theme.of(context).colorScheme.error,
-            fontWeight: FontWeight.w700,
-          ),
-        );
-
-  void _next() => setState(() {
-    _step++;
-    _lastCorrect = null;
-  });
-
-  Future<void> _evaluate(GrammarPoint grammar) async {
-    final sentence = _sentenceController.text.trim();
-    if (sentence.isEmpty) {
-      setState(() => _error = context.strings('enterSentence'));
-      return;
-    }
-    setState(() {
-      _evaluating = true;
-      _error = null;
-    });
-    final meaningLanguage =
-        ref.read(appControllerProvider).value?.meaningLanguage ??
-        Localizations.localeOf(context).languageCode;
-    final language = meaningLanguage == 'ko' ? 'Korean' : 'English';
-    try {
-      final evaluator = await ref.read(grammarTutorEvaluatorProvider.future);
-      final feedback = await evaluator.evaluate(
-        grammar: grammar,
-        sentence: sentence,
-        explanationLanguage: language,
-      );
-      if (!mounted) return;
-      setState(() {
-        _feedback = feedback;
-        _step = 3;
-      });
-    } catch (error) {
-      if (!mounted) return;
-      setState(
-        () => _error = context.strings(
-          error is OfflineAiException ? error.key : 'offlineInferenceError',
-        ),
-      );
-    } finally {
-      if (mounted) setState(() => _evaluating = false);
-    }
-  }
-}
-
-List<GrammarPoint> _nearbyGrammar(
-  GrammarPoint target,
-  List<GrammarPoint> catalog,
-) {
-  final sameLevel =
-      catalog
-          .where((item) => item.level == target.level && item.id != target.id)
-          .toList()
-        ..sort((a, b) {
-          final distanceA = (a.rank - target.rank).abs();
-          final distanceB = (b.rank - target.rank).abs();
-          return distanceA.compareTo(distanceB);
-        });
-  return [target, ...sameLevel.take(2)]
-    ..sort((a, b) => a.title.compareTo(b.title));
-}
-
-class _LessonHeader extends StatelessWidget {
-  const _LessonHeader({required this.grammar, required this.step});
-  final GrammarPoint grammar;
-  final int step;
-
-  @override
-  Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(
-        context.strings(['understand', 'apply', 'produce', 'result'][step]),
-        style: Theme.of(context).textTheme.labelLarge?.copyWith(
-          color: Theme.of(context).colorScheme.primary,
-        ),
-      ),
-      const SizedBox(height: 6),
-      Text(grammar.title, style: Theme.of(context).textTheme.headlineSmall),
-    ],
-  );
-}
-
-class _LessonCard extends StatelessWidget {
-  const _LessonCard({
-    required this.icon,
-    required this.title,
-    required this.child,
-  });
-  final IconData icon;
-  final String title;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(18),
-    decoration: BoxDecoration(
-      color: Theme.of(context).colorScheme.surfaceContainerLow,
-      borderRadius: BorderRadius.circular(20),
-      border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Icon(icon, size: 20),
-            const SizedBox(width: 8),
-            Text(title, style: Theme.of(context).textTheme.titleMedium),
-          ],
-        ),
-        const SizedBox(height: 10),
-        child,
-      ],
-    ),
-  );
-}
-
-class _QuestionCard extends StatelessWidget {
-  const _QuestionCard({
-    required this.question,
-    required this.choices,
-    required this.correctChoice,
-    required this.enabled,
-    required this.onChoice,
-    required this.feedback,
-    required this.onNext,
-  });
-  final String question;
-  final List<String> choices;
-  final String correctChoice;
-  final bool enabled;
-  final ValueChanged<String> onChoice;
-  final Widget? feedback;
-  final VoidCallback? onNext;
-
-  @override
-  Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.stretch,
-    children: [
-      Text(question, style: Theme.of(context).textTheme.titleLarge),
-      const SizedBox(height: 16),
-      for (final choice in choices)
-        Padding(
-          padding: const EdgeInsets.only(bottom: 10),
-          child: OutlinedButton(
-            onPressed: enabled ? () => onChoice(choice) : null,
-            style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.all(16),
-              alignment: Alignment.centerLeft,
+          if (_hasAnswer || _asking)
+            ChatUiStyle.suggestions(
+              context: context,
+              centered: false,
+              chips: _suggestions(grammar, languageCode),
             ),
-            child: Text(choice),
+          ChatUiStyle.composer(
+            context: context,
+            controller: _input,
+            hint: context.strings('practiceChatHint'),
+            sendTooltip: context.strings('sendMessage'),
+            enabled: !_asking,
+            maxLength: 300,
+            onSend: () => _sendInput(grammar, languageCode),
+            sendKey: const ValueKey('grammar_practice_send'),
           ),
-        ),
-      if (feedback != null) ...[feedback!, const SizedBox(height: 12)],
-      if (onNext != null)
-        FilledButton(onPressed: onNext, child: Text(context.strings('next'))),
-    ],
+        ],
+      ),
+    ),
   );
 }
