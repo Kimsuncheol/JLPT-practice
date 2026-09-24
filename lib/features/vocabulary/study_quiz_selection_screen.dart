@@ -161,7 +161,7 @@ class _QuizChoiceButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AspectRatio(
-    aspectRatio: 1,
+    aspectRatio: 0.78,
     child: FilledButton(
       onPressed: onPressed,
       style: FilledButton.styleFrom(
@@ -176,7 +176,9 @@ class _QuizChoiceButton extends StatelessWidget {
           final compact = constraints.maxWidth < 125;
           final badgeSize = compact ? 38.0 : 56.0;
           return Column(
+            mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
                 width: badgeSize,
@@ -189,19 +191,15 @@ class _QuizChoiceButton extends StatelessWidget {
                 child: Icon(icon, size: compact ? 22 : 30),
               ),
               SizedBox(height: compact ? 6 : 12),
-              Flexible(
-                child: Center(
-                  child: Text(
-                    label,
-                    textAlign: TextAlign.center,
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: compact ? 14 : 18,
-                      height: 1.15,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
+              Text(
+                label,
+                textAlign: TextAlign.center,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: compact ? 14 : 18,
+                  height: 1.15,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ],
