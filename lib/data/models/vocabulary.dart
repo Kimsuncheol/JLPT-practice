@@ -5,6 +5,8 @@ class VocabularyExample {
     required this.translations,
     required this.quizSentence,
     required this.answer,
+    this.tokens,
+    this.distractors = const [],
   });
 
   factory VocabularyExample.fromJson(Map<String, dynamic> json) {
@@ -16,6 +18,9 @@ class VocabularyExample {
       ),
       quizSentence: json['quizSentence'] as String? ?? '',
       answer: json['answer'] as String? ?? '',
+      tokens: (json['tokens'] as List<dynamic>?)?.cast<String>(),
+      distractors:
+          (json['distractors'] as List<dynamic>?)?.cast<String>() ?? const [],
     );
   }
 
@@ -24,6 +29,21 @@ class VocabularyExample {
   final Map<String, String> translations;
   final String quizSentence;
   final String answer;
+  final List<String>? tokens;
+  final List<String> distractors;
+
+  VocabularyExample withReorderData(VocabularyExample catalog) =>
+      VocabularyExample(
+        sentence: sentence,
+        reading: reading,
+        translations: translations,
+        quizSentence: quizSentence,
+        answer: answer,
+        tokens: catalog.sentence == sentence ? catalog.tokens : null,
+        distractors: catalog.sentence == sentence
+            ? catalog.distractors
+            : const [],
+      );
 
   String translation(String language) =>
       translations[language] ?? translations['en'] ?? '';
@@ -181,7 +201,9 @@ class Vocabulary {
       partOfSpeech: source.partOfSpeech,
       jlptLevel: jlptLevel,
       tags: {...tags, ...source.tags}.toList(),
-      example: source.hasExample ? source.example : example,
+      example: source.hasExample
+          ? source.example.withReorderData(example)
+          : example,
       rank: rank,
       isCommon: source.isCommon,
     );

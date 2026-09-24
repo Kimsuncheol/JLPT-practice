@@ -85,6 +85,29 @@ void main() {
       ['A', 'B'],
     );
   });
+
+  test('migrated reorder tiles reconstruct every example', () {
+    var awaitingReview = 0;
+    for (final word in catalog) {
+      final example = word['example'] as Map<String, dynamic>;
+      if (example['tokens'] == null) {
+        awaitingReview++;
+        continue;
+      }
+      final tokens = (example['tokens'] as List<dynamic>).cast<String>();
+      expect(tokens, isNotEmpty, reason: '${word['level']} #${word['rank']}');
+      final sentence = (example['sentence'] as String).replaceAll(
+        RegExp(r'[。、！？!?，,．.：:；;「」『』（）()・…〜～\s]'),
+        '',
+      );
+      expect(
+        tokens.join(),
+        sentence,
+        reason: '${word['level']} #${word['rank']}',
+      );
+    }
+    expect(awaitingReview, 54);
+  });
 }
 
 String _compact(String value) => value.replaceAll(RegExp(r'[\s\u3000]'), '');

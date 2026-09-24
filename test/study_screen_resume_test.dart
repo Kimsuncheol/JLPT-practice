@@ -15,6 +15,7 @@ import 'package:jlpt_practice/data/models/vocabulary.dart';
 import 'package:jlpt_practice/features/dashboard/dashboard_screen.dart';
 import 'package:jlpt_practice/features/settings/levels_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/study_finish_screen.dart';
+import 'package:jlpt_practice/features/vocabulary/study_quiz_selection_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_tape.dart';
 import 'package:jlpt_practice/features/vocabulary/study_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -856,7 +857,8 @@ void main() {
     );
     expect(find.text('Choose another JLPT level'), findsOneWidget);
     expect(find.text('Back to study days'), findsOneWidget);
-    expect(find.text('Take an N5 vocabulary quiz'), findsOneWidget);
+    expect(find.text('Choose a quiz game'), findsOneWidget);
+    expect(find.text('Take an N5 vocabulary quiz'), findsNothing);
     expect(find.text('Finish this session'), findsNothing);
 
     await tester.tap(find.text('Choose another JLPT level'));
@@ -864,6 +866,155 @@ void main() {
 
     expect(find.byType(LevelsScreen), findsOneWidget);
     expect(find.text('Levels'), findsOneWidget);
+    expect(
+      container
+          .read(appControllerProvider)
+          .requireValue
+          .completedStudyDays['N5'],
+      containsAll([1, 2, 3, 4, 5, 6]),
+    );
+  });
+
+  testWidgets('study finish opens quiz selection and both game routes', (
+    tester,
+  ) async {
+    final container = _createContainer();
+    addTearDown(container.dispose);
+    await container.read(appControllerProvider.future);
+    final router = _createRouter(initialLocation: '/study/day/1/finish');
+    addTearDown(router.dispose);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp.router(routerConfig: router),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Choose a quiz game'), findsOneWidget);
+    expect(find.text('Take a quick quiz'), findsNothing);
+    expect(find.text('Sentence Reordering'), findsNothing);
+    await tester.tap(find.text('Choose a quiz game'));
+    await tester.pumpAndSettle();
+    final fillButton = find.widgetWithText(
+      FilledButton,
+      'Fill-in-the-blank game',
+    );
+    final reorderButton = find.widgetWithText(
+      FilledButton,
+      'Sentence Reordering',
+    );
+    expect(fillButton, findsOneWidget);
+    expect(reorderButton, findsOneWidget);
+    expect(find.byIcon(Icons.close_rounded), findsOneWidget);
+    expect(
+      tester.getTopLeft(fillButton).dy,
+      tester.getTopLeft(reorderButton).dy,
+    );
+    expect(
+      tester.getTopLeft(fillButton).dx,
+      lessThan(tester.getTopLeft(reorderButton).dx),
+    );
+    expect(tester.getSize(fillButton).width, tester.getSize(fillButton).height);
+    expect(
+      tester
+          .getTopLeft(
+            find.descendant(
+              of: fillButton,
+              matching: find.byIcon(Icons.quiz_rounded),
+            ),
+          )
+          .dy,
+      lessThan(tester.getTopLeft(find.text('Fill-in-the-blank game')).dy),
+    );
+    final fillColor = tester
+        .widget<FilledButton>(fillButton)
+        .style!
+        .backgroundColor!
+        .resolve({});
+    final reorderColor = tester
+        .widget<FilledButton>(reorderButton)
+        .style!
+        .backgroundColor!
+        .resolve({});
+    expect(fillColor, isNot(reorderColor));
+    final fillTextColor = tester
+        .widget<FilledButton>(fillButton)
+        .style!
+        .foregroundColor!
+        .resolve({});
+    final reorderTextColor = tester
+        .widget<FilledButton>(reorderButton)
+        .style!
+        .foregroundColor!
+        .resolve({});
+    expect(fillTextColor, isNot(reorderTextColor));
+    final bodyHeading = tester
+        .widgetList<Text>(find.text('Choose a quiz game'))
+        .first;
+    expect(bodyHeading.style?.fontWeight, FontWeight.w400);
+    expect(bodyHeading.style?.fontSize, 18);
+    final bodyHeadingFinder = find.text('Choose a quiz game').first;
+    expect(
+      tester.getTopLeft(bodyHeadingFinder).dx,
+      tester.getTopLeft(fillButton).dx,
+    );
+    expect(
+      tester.getTopLeft(fillButton).dy -
+          tester.getBottomLeft(bodyHeadingFinder).dy,
+      12,
+    );
+    final bodySafeArea = find
+        .ancestor(of: fillButton, matching: find.byType(SafeArea))
+        .first;
+    final groupCenterY =
+        (tester.getTopLeft(bodyHeadingFinder).dy +
+            tester.getBottomLeft(fillButton).dy) /
+        2;
+    expect(groupCenterY, closeTo(tester.getCenter(bodySafeArea).dy, 1));
+
+    await tester.tap(find.text('Fill-in-the-blank game'));
+    await tester.pumpAndSettle();
+    expect(find.text('Day quiz 1'), findsOneWidget);
+    router.pop();
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Sentence Reordering'));
+    await tester.pumpAndSettle();
+    expect(find.text('Sentence reorder 1'), findsOneWidget);
+    router.pop();
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.close_rounded));
+    await tester.pumpAndSettle();
+    expect(find.text('Great work!'), findsOneWidget);
+  });
+
+  testWidgets('level completion selection keeps the full-level quiz', (
+    tester,
+  ) async {
+    final container = _createContainer();
+    addTearDown(container.dispose);
+    await container.read(appControllerProvider.future);
+    final controller =
+        container.read(appControllerProvider.notifier) as _ResumeAppController;
+    for (var day = 1; day < 6; day++) {
+      await controller.completeStudySession('N5', day);
+    }
+    final router = _createRouter(initialLocation: '/study/day/6/finish');
+    addTearDown(router.dispose);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp.router(routerConfig: router),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Choose a quiz game'));
+    await tester.pumpAndSettle();
+    expect(find.text('Fill-in-the-blank game'), findsOneWidget);
+    await tester.tap(find.text('Fill-in-the-blank game'));
+    await tester.pumpAndSettle();
+    expect(find.text('Level quiz'), findsOneWidget);
     expect(
       container
           .read(appControllerProvider)
@@ -999,6 +1150,24 @@ GoRouter _createRouter({String initialLocation = '/'}) => GoRouter(
       path: '/study/day/:day/finish',
       builder: (_, state) =>
           StudyFinishScreen(day: int.parse(state.pathParameters['day']!)),
+    ),
+    GoRoute(
+      path: '/study/day/:day/quiz-selection',
+      builder: (_, state) => StudyQuizSelectionScreen(
+        day: int.parse(state.pathParameters['day']!),
+        levelComplete: state.uri.queryParameters['level'] == 'true',
+      ),
+    ),
+    GoRoute(
+      path: '/quiz/day/:day',
+      builder: (_, state) =>
+          Scaffold(body: Text('Day quiz ${state.pathParameters['day']}')),
+    ),
+    GoRoute(
+      path: '/study/day/:day/reorder',
+      builder: (_, state) => Scaffold(
+        body: Text('Sentence reorder ${state.pathParameters['day']}'),
+      ),
     ),
   ],
 );

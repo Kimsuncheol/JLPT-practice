@@ -26,6 +26,8 @@ import 'package:jlpt_practice/features/test/question_type_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/day_selection_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/study_finish_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/study_screen.dart';
+import 'package:jlpt_practice/features/vocabulary/sentence_reorder_screen.dart';
+import 'package:jlpt_practice/features/vocabulary/study_quiz_selection_screen.dart';
 import 'package:jlpt_practice/shared/bootstrap_screen.dart';
 import 'package:jlpt_practice/shared/eye_comfort_overlay.dart';
 
@@ -79,6 +81,21 @@ GoRouter createAppRouter({String initialLocation = '/'}) => GoRouter(
       path: '/study/day/:day/finish',
       builder: (_, state) => StudyFinishScreen(
         day: int.tryParse(state.pathParameters['day'] ?? '') ?? 1,
+      ),
+    ),
+    GoRoute(
+      path: '/study/day/:day/quiz-selection',
+      builder: (_, state) => StudyQuizSelectionScreen(
+        day: int.tryParse(state.pathParameters['day'] ?? '') ?? 1,
+        levelComplete: state.uri.queryParameters['level'] == 'true',
+      ),
+    ),
+    GoRoute(
+      path: '/study/day/:day/reorder',
+      builder: (_, state) => EyeComfortOverlay(
+        child: SentenceReorderScreen(
+          day: int.tryParse(state.pathParameters['day'] ?? '') ?? 1,
+        ),
       ),
     ),
     GoRoute(

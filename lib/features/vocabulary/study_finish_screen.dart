@@ -112,14 +112,10 @@ class StudyFinishScreen extends ConsumerWidget {
                       context,
                       ref,
                       level: level,
-                      destination: _LevelCompletionDestination.quiz,
+                      destination: _LevelCompletionDestination.quizSelection,
                     ),
                     icon: const Icon(Icons.quiz_rounded),
-                    label: Text(
-                      strings(
-                        'takeLevelVocabularyQuiz',
-                      ).replaceAll('{level}', level),
-                    ),
+                    label: Text(strings('chooseQuizGame')),
                   ),
                 ),
               ] else ...[
@@ -135,9 +131,10 @@ class StudyFinishScreen extends ConsumerWidget {
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton.icon(
-                    onPressed: () => context.push('/quiz/day/$day'),
+                    onPressed: () =>
+                        context.push('/study/day/$day/quiz-selection'),
                     icon: const Icon(Icons.quiz_rounded),
-                    label: Text(strings('startQuiz')),
+                    label: Text(strings('chooseQuizGame')),
                   ),
                 ),
               ],
@@ -164,8 +161,8 @@ class StudyFinishScreen extends ConsumerWidget {
         context.push('/settings/levels');
       case _LevelCompletionDestination.days:
         context.push('/study');
-      case _LevelCompletionDestination.quiz:
-        context.push('/quiz');
+      case _LevelCompletionDestination.quizSelection:
+        context.push('/study/day/$day/quiz-selection?level=true');
     }
   }
 
@@ -207,4 +204,4 @@ class StudyFinishScreen extends ConsumerWidget {
   }
 }
 
-enum _LevelCompletionDestination { levels, days, quiz }
+enum _LevelCompletionDestination { levels, days, quizSelection }

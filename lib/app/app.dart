@@ -59,13 +59,24 @@ class JlptPracticeApp extends ConsumerWidget {
               child: ValueListenableBuilder<Color?>(
                 valueListenable: SystemBarMetrics.outerBackgroundColor,
                 builder: (context, outerBackgroundColor, appChild) =>
-                    ColoredBox(
-                      color:
-                          outerBackgroundColor ??
-                          Theme.of(context).scaffoldBackgroundColor,
-                      child: SafeArea(
-                        child: appChild ?? const SizedBox.shrink(),
-                      ),
+                    ListenableBuilder(
+                      listenable: appRouter.routerDelegate,
+                      builder: (context, _) {
+                        final path = appRouter.routerDelegate.state.uri.path;
+                        final isQuizSelection = RegExp(
+                          r'^/study/day/\d+/quiz-selection$',
+                        ).hasMatch(path);
+                        final theme = Theme.of(context);
+                        return ColoredBox(
+                          color: isQuizSelection
+                              ? theme.scaffoldBackgroundColor
+                              : outerBackgroundColor ??
+                                    theme.scaffoldBackgroundColor,
+                          child: SafeArea(
+                            child: appChild ?? const SizedBox.shrink(),
+                          ),
+                        );
+                      },
                     ),
                 child: child ?? const SizedBox.shrink(),
               ),
