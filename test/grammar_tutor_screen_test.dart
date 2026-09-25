@@ -103,12 +103,40 @@ void main() {
     await tester.enterText(find.byType(TextField), '寿司が一番好きです。');
     await tester.tap(find.byKey(const ValueKey('grammar_practice_send')));
     await tester.pump();
-    session.responses.last.add('Practice reply');
-    await session.responses.last.close();
+    expect(tester.widget<TextField>(find.byType(TextField)).enabled, isTrue);
+    await tester.enterText(find.byType(TextField), 'もう一つの文です。');
+    await tester.tap(find.byKey(const ValueKey('grammar_practice_send')));
+    await tester.pump();
+    await tester.enterText(find.byType(TextField), '三番目の文です。');
+    await tester.tap(find.byKey(const ValueKey('grammar_practice_send')));
+    await tester.pump();
+    expect(session.queries, hasLength(2));
+    expect(find.textContaining('2 waiting'), findsOneWidget);
+    expect(
+      tester
+          .widget<AiChatWidget>(find.byType(AiChatWidget))
+          .controller
+          .messages
+          .map((message) => message.text),
+      contains('もう一つの文です。'),
+    );
+    session.responses[1].add('Practice reply');
+    await session.responses[1].close();
+    await tester.pump();
+    expect(session.queries, hasLength(3));
+    expect(jsonDecode(session.queries.last)['message'], 'もう一つの文です。');
+    expect(find.textContaining('1 waiting'), findsOneWidget);
+    session.responses[2].add('Second reply');
+    await session.responses[2].close();
+    await tester.pump();
+    expect(session.queries, hasLength(4));
+    expect(jsonDecode(session.queries.last)['message'], '三番目の文です。');
+    expect(find.textContaining('1 waiting'), findsNothing);
+    session.responses[3].add('Third reply');
+    await session.responses[3].close();
     await tester.pumpAndSettle();
     expect(service.model.sessions, hasLength(1));
-    expect(session.queries, hasLength(2));
-    expect(jsonDecode(session.queries.last)['message'], '寿司が一番好きです。');
+    expect(session.queries, hasLength(4));
     expect(
       tester
           .widget<AiChatWidget>(find.byType(AiChatWidget))
@@ -116,6 +144,22 @@ void main() {
           .messages
           .map((message) => message.text),
       contains('Practice reply'),
+    );
+    expect(
+      tester
+          .widget<AiChatWidget>(find.byType(AiChatWidget))
+          .controller
+          .messages
+          .map((message) => message.text),
+      contains('Second reply'),
+    );
+    expect(
+      tester
+          .widget<AiChatWidget>(find.byType(AiChatWidget))
+          .controller
+          .messages
+          .map((message) => message.text),
+      contains('Third reply'),
     );
   });
 
@@ -137,6 +181,12 @@ void main() {
       await tester.pump();
       final oldSession = service.model.sessions.single;
       expect(find.byType(ActionChip), findsNothing);
+      expect(tester.widget<TextField>(find.byType(TextField)).enabled, isTrue);
+      await tester.enterText(find.byType(TextField), '寿司が一番好きです。');
+      await tester.tap(find.byKey(const ValueKey('grammar_practice_send')));
+      await tester.pump();
+      expect(find.textContaining('1 waiting'), findsOneWidget);
+      expect(oldSession.queries, hasLength(1));
       expect(
         find.byKey(const ValueKey('chat_ai_loading_bubble')),
         findsOneWidget,
@@ -152,6 +202,7 @@ void main() {
         findsOneWidget,
       );
       expect(find.byType(ActionChip), findsNothing);
+      expect(find.textContaining('waiting'), findsNothing);
       expect(service.model.sessions, hasLength(2));
       expect(service.model.sessions.last, isNot(same(oldSession)));
       expect(service.model.sessions.last.queries, hasLength(1));
@@ -181,7 +232,7 @@ void main() {
       find.textContaining('The local model could not finish'),
       findsWidgets,
     );
-    expect(tester.widget<TextField>(find.byType(TextField)).enabled, isFalse);
+    expect(tester.widget<TextField>(find.byType(TextField)).enabled, isTrue);
     expect(find.text('Try again'), findsOneWidget);
     expect(find.byType(ActionChip), findsNothing);
   });

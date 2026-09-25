@@ -83,9 +83,26 @@ void main() {
               .every((chip) => chip.onPressed == null),
           isTrue,
         );
+        expect(
+          tester.widget<TextField>(find.byType(TextField)).enabled,
+          isTrue,
+        );
+        await tester.enterText(find.byType(TextField), 'Can I use it here?');
+        await tester.tap(find.byTooltip('Send'));
+        await tester.pump();
+        expect(service.questions, ['When do I use this?']);
+        expect(find.textContaining('1 waiting'), findsOneWidget);
+        expect(
+          chat.controller.messages.map((message) => message.text),
+          contains('Can I use it here?'),
+        );
         firstAnswer.complete('Use it for superlatives.');
         await tester.pumpAndSettle();
-        expect(service.questions, ['When do I use this?']);
+        expect(service.questions, [
+          'When do I use this?',
+          'Can I use it here?',
+        ]);
+        expect(find.textContaining('1 waiting'), findsNothing);
         expect(find.byType(ActionChip), findsNWidgets(3));
         expect(
           find.byKey(const ValueKey('chat_suggestions_scroll')),
@@ -120,6 +137,7 @@ void main() {
         await tester.pumpAndSettle();
         expect(service.questions, [
           'When do I use this?',
+          'Can I use it here?',
           'Give me another example',
           'Another example?',
         ]);
@@ -144,6 +162,7 @@ class _GrammarService extends GrammarQaService {
     required GrammarPoint grammar,
     required String question,
     required String languageCode,
+    void Function(String text)? onPartial,
   }) async {
     questions.add(question);
     final pending = nextAnswer;

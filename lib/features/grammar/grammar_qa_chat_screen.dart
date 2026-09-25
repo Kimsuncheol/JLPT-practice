@@ -41,32 +41,45 @@ class _GrammarQaChatScreenState extends ConsumerState<GrammarQaChatScreen> {
   static const _assistant = ChatUser(id: 'ai', firstName: 'AI');
   final _messages = ChatMessagesController();
   final _input = TextEditingController();
+  final List<String> _pendingMessages = [];
   bool _asking = false;
   bool _waiting = false;
   bool _hasAnswer = false;
 
   @override
   void dispose() {
+    _pendingMessages.clear();
     _messages.dispose();
     _input.dispose();
     super.dispose();
   }
 
-  Future<void> _send(ChatMessage message) => _ask(message.text);
+  Future<void> _send(ChatMessage message) async => _queueQuestion(message.text);
 
   void _sendInput() {
     final question = _input.text.trim();
-    if (question.isEmpty || _asking) return;
+    if (question.isEmpty || question.length > 300) return;
     _input.clear();
-    _ask(question);
+    _queueQuestion(question);
   }
 
-  Future<void> _ask(String text) async {
+  void _queueQuestion(String text) {
     final question = text.trim();
-    if (question.isEmpty || question.length > 300 || _asking) return;
+    if (question.isEmpty || question.length > 300) return;
     _messages.addMessage(
       ChatMessage(text: question, user: _user, createdAt: DateTime.now()),
     );
+    setState(() => _pendingMessages.add(question));
+    _startNextQuestion();
+  }
+
+  void _startNextQuestion() {
+    if (!mounted || _asking || _pendingMessages.isEmpty) return;
+    final question = _pendingMessages.removeAt(0);
+    _generate(question);
+  }
+
+  Future<void> _generate(String question) async {
     setState(() {
       _asking = true;
       _waiting = true;
@@ -100,6 +113,7 @@ class _GrammarQaChatScreenState extends ConsumerState<GrammarQaChatScreen> {
           _asking = false;
           _waiting = false;
         });
+        _startNextQuestion();
       }
     }
   }
@@ -145,7 +159,7 @@ class _GrammarQaChatScreenState extends ConsumerState<GrammarQaChatScreen> {
                           context.strings('askSuggestionWhenToUse'),
                           _asking
                               ? null
-                              : () => _ask(
+                              : () => _queueQuestion(
                                   context.strings('askSuggestionWhenToUse'),
                                 ),
                         ),
@@ -153,7 +167,7 @@ class _GrammarQaChatScreenState extends ConsumerState<GrammarQaChatScreen> {
                           context.strings('askSuggestionMoreExamples'),
                           _asking
                               ? null
-                              : () => _ask(
+                              : () => _queueQuestion(
                                   context.strings('askSuggestionMoreExamples'),
                                 ),
                         ),
@@ -161,7 +175,7 @@ class _GrammarQaChatScreenState extends ConsumerState<GrammarQaChatScreen> {
                           context.strings('askSuggestionDifference'),
                           _asking
                               ? null
-                              : () => _ask(
+                              : () => _queueQuestion(
                                   context.strings('askSuggestionDifference'),
                                 ),
                         ),
@@ -182,7 +196,9 @@ class _GrammarQaChatScreenState extends ConsumerState<GrammarQaChatScreen> {
                   ])
                     ChatUiStyle.suggestion(
                       context.strings(key),
-                      _asking ? null : () => _ask(context.strings(key)),
+                      _asking
+                          ? null
+                          : () => _queueQuestion(context.strings(key)),
                     ),
                 ],
               ),
@@ -191,10 +207,25 @@ class _GrammarQaChatScreenState extends ConsumerState<GrammarQaChatScreen> {
               controller: _input,
               hint: context.strings('askAboutThisGrammarHint'),
               sendTooltip: context.strings('sendMessage'),
-              enabled: !_asking,
+              enabled: true,
               maxLength: 300,
               onSend: _sendInput,
             ),
+            if (_pendingMessages.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                child: Row(
+                  children: [
+                    const Icon(Icons.schedule_rounded, size: 16),
+                    const SizedBox(width: 6),
+                    Text(
+                      context
+                          .strings('queuedChatMessages')
+                          .replaceAll('{count}', '${_pendingMessages.length}'),
+                    ),
+                  ],
+                ),
+              ),
           ],
         ),
       ),
