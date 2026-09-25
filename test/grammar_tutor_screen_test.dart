@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_gemma/flutter_gemma.dart';
 import 'package:flutter_gen_ai_chat_ui/flutter_gen_ai_chat_ui.dart';
+import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jlpt_practice/core/services/local_store.dart';
@@ -77,8 +78,21 @@ void main() {
         bottomRight: Radius.circular(22),
       ),
     );
-    session.responses.first.add('Write a sentence using A が いちばん～.');
+    session.responses.first.add('**Write');
     await tester.pump();
+    expect(tester.takeException(), isNull);
+    expect(find.byType(MarkdownBody), findsOneWidget);
+    session.responses.first.add(
+      ' a sentence** using A が いちばん～.\n- Example with `が`',
+    );
+    await tester.pump();
+    expect(tester.takeException(), isNull);
+    session.responses.first.add('\n```text\nA が いちばん');
+    await tester.pump();
+    expect(tester.takeException(), isNull);
+    session.responses.first.add('\n```');
+    await tester.pump();
+    expect(tester.takeException(), isNull);
     expect(find.byType(ActionChip), findsNothing);
     expect(
       tester
@@ -97,12 +111,27 @@ void main() {
           .controller
           .messages
           .map((message) => message.text),
-      contains('Write a sentence using A が いちばん～.'),
+      contains(
+        '**Write a sentence** using A が いちばん～.\n- Example with `が`'
+        '\n```text\nA が いちばん\n```',
+      ),
+    );
+    expect(
+      chat.controller.messages
+          .where((message) => message.user.id == 'ai')
+          .every((message) => message.isMarkdown),
+      isTrue,
     );
 
     await tester.enterText(find.byType(TextField), '寿司が一番好きです。');
     await tester.tap(find.byKey(const ValueKey('grammar_practice_send')));
     await tester.pump();
+    expect(
+      chat.controller.messages
+          .where((message) => message.user.id == 'user')
+          .every((message) => !message.isMarkdown),
+      isTrue,
+    );
     expect(tester.widget<TextField>(find.byType(TextField)).enabled, isTrue);
     await tester.enterText(find.byType(TextField), 'もう一つの文です。');
     await tester.tap(find.byKey(const ValueKey('grammar_practice_send')));

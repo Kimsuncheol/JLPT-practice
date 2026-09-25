@@ -194,7 +194,12 @@ class _PracticeAiTutorScreenState extends ConsumerState<PracticeAiTutorScreen> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: Text(context.strings('practiceChatTitle')),
+        scrolledUnderElevation: 0,
+        title: ChatUiStyle.appBarTitle(
+          context,
+          Icons.school_rounded,
+          context.strings('practiceChatTitle'),
+        ),
         actions: [
           IconButton(
             key: const ValueKey('practice_ai_close'),
@@ -229,7 +234,7 @@ class _PracticeAiTutorScreenState extends ConsumerState<PracticeAiTutorScreen> {
                 ],
               ),
             ),
-            const Divider(height: 1),
+            ChatUiStyle.appBarDivider(context),
             Expanded(
               child: Stack(
                 children: [

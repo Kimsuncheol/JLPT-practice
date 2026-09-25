@@ -169,18 +169,12 @@ class _GrammarDetailsState extends ConsumerState<_GrammarDetails> {
           color: Theme.of(context).colorScheme.surface,
           border: Border(
             top: BorderSide(
-              color: Theme.of(context).colorScheme.outlineVariant,
-            ),
-          ),
-          boxShadow: [
-            BoxShadow(
               color: Theme.of(
                 context,
-              ).colorScheme.shadow.withValues(alpha: 0.12),
-              blurRadius: 16,
-              offset: const Offset(0, -4),
+              ).colorScheme.outlineVariant.withValues(alpha: 0.5),
+              width: 0.5,
             ),
-          ],
+          ),
         ),
         child: SafeArea(
           top: false,

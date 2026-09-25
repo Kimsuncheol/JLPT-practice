@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen_ai_chat_ui/flutter_gen_ai_chat_ui.dart';
+import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 /// Chat colors follow the app's active light or dark ColorScheme.
 class ChatUiStyle {
@@ -7,8 +9,45 @@ class ChatUiStyle {
   static const _aiTopLeftRadius = 2.0;
   static const _aiOtherRadius = 22.0;
 
+  static Widget appBarTitle(BuildContext context, IconData icon, String title) {
+    final theme = Theme.of(context);
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 22, color: theme.colorScheme.primary),
+        const SizedBox(width: 9),
+        Flexible(
+          child: Text(
+            title,
+            overflow: TextOverflow.ellipsis,
+            style: GoogleFonts.notoSansKr(
+              textStyle:
+                  theme.appBarTheme.titleTextStyle ??
+                  theme.textTheme.titleLarge,
+              color: theme.colorScheme.onSurface,
+              fontSize: 21,
+              fontWeight: FontWeight.w700,
+              letterSpacing: -0.5,
+              height: 1.15,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  static Widget appBarDivider(BuildContext context) => Divider(
+    height: 0.5,
+    thickness: 0.5,
+    color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.5),
+  );
+
   static MessageOptions messages(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final body =
+        theme.textTheme.bodyMedium?.copyWith(color: colors.onSurface) ??
+        TextStyle(color: colors.onSurface);
     return MessageOptions(
       showTime: false,
       showUserName: false,
@@ -23,6 +62,48 @@ class ChatUiStyle {
       ),
       userTextColor: colors.onPrimaryContainer,
       aiTextColor: colors.onSurface,
+      markdownStyleSheet: MarkdownStyleSheet.fromTheme(theme).copyWith(
+        p: body,
+        pPadding: EdgeInsets.zero,
+        strong: body.copyWith(fontWeight: FontWeight.bold),
+        listBullet: body,
+        code: body.copyWith(
+          fontFamily: 'monospace',
+          backgroundColor: colors.surfaceContainerHighest,
+        ),
+        codeblockDecoration: BoxDecoration(
+          color: colors.surfaceContainerHighest,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        h1: body.copyWith(
+          fontSize: (body.fontSize ?? 14) + 6,
+          fontWeight: FontWeight.bold,
+        ),
+        h2: body.copyWith(
+          fontSize: (body.fontSize ?? 14) + 4,
+          fontWeight: FontWeight.bold,
+        ),
+        h3: body.copyWith(
+          fontSize: (body.fontSize ?? 14) + 2,
+          fontWeight: FontWeight.bold,
+        ),
+        blockquote: body,
+        blockquoteDecoration: BoxDecoration(
+          color: colors.surfaceContainerHighest,
+          border: Border(left: BorderSide(color: colors.primary, width: 3)),
+        ),
+        a: body.copyWith(
+          color: colors.primary,
+          decoration: TextDecoration.underline,
+        ),
+      ),
+      markdownBuilder: (_, data, style, _) => MarkdownBody(
+        data: data,
+        styleSheet: style,
+        shrinkWrap: true,
+        softLineBreak: true,
+        // Links are intentionally inert until chat has an external-link flow.
+      ),
     );
   }
 

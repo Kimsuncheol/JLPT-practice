@@ -123,7 +123,12 @@ class _GrammarQaChatScreenState extends ConsumerState<GrammarQaChatScreen> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: Text(context.strings('grammarChatTitle')),
+        scrolledUnderElevation: 0,
+        title: ChatUiStyle.appBarTitle(
+          context,
+          Icons.question_answer_rounded,
+          context.strings('grammarChatTitle'),
+        ),
         actions: [
           IconButton(
             key: const ValueKey('grammar_chat_close'),
@@ -137,7 +142,7 @@ class _GrammarQaChatScreenState extends ConsumerState<GrammarQaChatScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Divider(height: 1),
+            ChatUiStyle.appBarDivider(context),
             Expanded(
               child: Stack(
                 children: [

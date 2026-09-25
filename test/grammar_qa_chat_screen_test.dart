@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_gen_ai_chat_ui/flutter_gen_ai_chat_ui.dart';
+import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jlpt_practice/app/theme/app_theme.dart';
@@ -44,6 +45,14 @@ void main() {
         await tester.tap(find.text('Open chat'));
         await tester.pumpAndSettle();
         expect(find.byType(GrammarQaChatScreen), findsOneWidget);
+        final title = tester.widget<Text>(find.text('Grammar Tutor'));
+        expect(title.style?.fontFamily, startsWith('NotoSansKR'));
+        expect(
+          title.style?.color,
+          (brightness == Brightness.light ? AppTheme.light() : AppTheme.dark())
+              .colorScheme
+              .onSurface,
+        );
         expect(find.byType(BottomSheet), findsNothing);
         expect(find.byIcon(Icons.close_rounded), findsOneWidget);
         expect(find.byType(ActionChip), findsNWidgets(3));
@@ -115,6 +124,25 @@ void main() {
         expect(
           chat.controller.messages.map((message) => message.text),
           contains('Use it for superlatives.'),
+        );
+        expect(find.byType(MarkdownBody), findsWidgets);
+        expect(
+          tester
+              .widgetList<MarkdownBody>(find.byType(MarkdownBody))
+              .every((body) => body.shrinkWrap && body.softLineBreak),
+          isTrue,
+        );
+        expect(
+          chat.controller.messages
+              .where((message) => message.user.id == 'ai')
+              .every((message) => message.isMarkdown),
+          isTrue,
+        );
+        expect(
+          chat.controller.messages
+              .where((message) => message.user.id == 'user')
+              .every((message) => !message.isMarkdown),
+          isTrue,
         );
 
         final pendingAnswer = Completer<String>();

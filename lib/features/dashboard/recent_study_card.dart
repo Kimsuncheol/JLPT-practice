@@ -167,7 +167,11 @@ class RecentStudyCard extends ConsumerWidget {
               ),
             ),
             if (previous != null) ...[
-              Divider(height: 1, color: colors.outlineVariant),
+              Divider(
+                height: 0.5,
+                thickness: 0.5,
+                color: colors.outlineVariant.withValues(alpha: 0.5),
+              ),
               InkWell(
                 key: ValueKey('recent-study-${previous.route}'),
                 onTap: () => _openEntry(context, previous),

@@ -532,7 +532,7 @@ packages:
     source: sdk
     version: "0.0.0"
   flutter_markdown_plus:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: flutter_markdown_plus
       sha256: fce641d6c2106cc495de1cd603f97a4f9d615a97a64011928ded380dbdade935
@@ -638,7 +638,7 @@ packages:
     source: hosted
     version: "17.4.0"
   google_fonts:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: google_fonts
       sha256: e3cb3ee6b47fd2472c23de6da5744796a4da195137759ddb3fbcc9467b7b3c7d

@@ -67,6 +67,8 @@ dependencies:
   flutter_gemma: ^1.9.0
   flutter_gemma_litertlm: ^1.8.0
   flutter_gen_ai_chat_ui: ^2.19.1
+  flutter_markdown_plus: ^1.0.12
+  google_fonts: ^8.2.1
 
 dev_dependencies:
   flutter_test:
@@ -91,6 +93,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/data/
+    - assets/fonts/
     - assets/offline_ai/
 
   # To add assets to your application, add an assets section, like this:

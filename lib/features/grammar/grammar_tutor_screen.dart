@@ -291,7 +291,12 @@ class _GrammarTutorScreenState extends ConsumerState<GrammarTutorScreen>
   Widget _buildChat(GrammarPoint grammar, String languageCode) => Scaffold(
     appBar: AppBar(
       automaticallyImplyLeading: false,
-      title: Text(context.strings('practiceWithAi')),
+      scrolledUnderElevation: 0,
+      title: ChatUiStyle.appBarTitle(
+        context,
+        Icons.auto_awesome_rounded,
+        context.strings('practiceWithAi'),
+      ),
       actions: [
         IconButton(
           key: const ValueKey('grammar_practice_close'),
@@ -305,7 +310,7 @@ class _GrammarTutorScreenState extends ConsumerState<GrammarTutorScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Divider(height: 1),
+          ChatUiStyle.appBarDivider(context),
           Expanded(
             child: AiChatWidget(
               currentUser: _user,
