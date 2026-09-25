@@ -81,7 +81,6 @@ class RecentStudyCard extends ConsumerWidget {
         color: colors.surface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(22),
-          side: BorderSide(color: colors.outlineVariant.withValues(alpha: 0.6)),
         ),
         clipBehavior: Clip.antiAlias,
         child: Column(
@@ -167,11 +166,6 @@ class RecentStudyCard extends ConsumerWidget {
               ),
             ),
             if (previous != null) ...[
-              Divider(
-                height: 0.5,
-                thickness: 0.5,
-                color: colors.outlineVariant.withValues(alpha: 0.5),
-              ),
               InkWell(
                 key: ValueKey('recent-study-${previous.route}'),
                 onTap: () => _openEntry(context, previous),
