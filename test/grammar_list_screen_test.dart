@@ -41,6 +41,11 @@ void main() {
           builder: (_, state) =>
               GrammarDetailScreen(grammarId: state.pathParameters['id']!),
         ),
+        GoRoute(
+          path: '/grammar/tutor/:id',
+          builder: (_, state) =>
+              Scaffold(body: Text('Practice ${state.pathParameters['id']}')),
+        ),
       ],
     );
     addTearDown(router.dispose);
@@ -73,6 +78,36 @@ void main() {
       expect(find.text(example.reading), findsOneWidget);
       expect(find.text(example.english), findsOneWidget);
     }
+    final actions = find.byKey(const ValueKey('grammar_detail_actions'));
+    final practiceButton = find.byKey(
+      const ValueKey('grammar_detail_practice_with_ai'),
+    );
+    final tutorButton = find.byKey(const ValueKey('grammar_detail_tutor'));
+    expect(actions, findsOneWidget);
+    expect(find.byType(FloatingActionButton), findsNothing);
+    expect(
+      find.descendant(of: actions, matching: practiceButton),
+      findsOneWidget,
+    );
+    expect(find.descendant(of: actions, matching: tutorButton), findsOneWidget);
+    expect(find.text('Practise with AI'), findsOneWidget);
+    expect(find.text('Grammar Tutor'), findsOneWidget);
+    expect(
+      tester.getTopLeft(practiceButton).dy,
+      lessThan(tester.getTopLeft(tutorButton).dy),
+    );
+    expect(
+      tester.getBottomLeft(actions).dy,
+      closeTo(tester.getSize(find.byType(Scaffold).last).height, 1),
+    );
+    await tester.tap(practiceButton);
+    await tester.pumpAndSettle();
+    expect(find.text('Practice N5_1'), findsOneWidget);
+    router.pop();
+    await tester.pumpAndSettle();
+    await tester.tap(tutorButton);
+    await tester.pumpAndSettle();
+    expect(find.text('Grammar Tutor'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -99,6 +134,15 @@ void main() {
     expect(find.text(_n5.summaryKo), findsOneWidget);
     expect(find.text(_n5.explanationKo), findsOneWidget);
     expect(find.text(_n5.formationKo), findsOneWidget);
+    final actions = find.byKey(const ValueKey('grammar_detail_actions'));
+    expect(
+      find.descendant(of: actions, matching: find.text('AI로 연습하기')),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(of: actions, matching: find.text('문법 튜터')),
+      findsOneWidget,
+    );
     for (final example in _n5.examples) {
       await tester.scrollUntilVisible(
         find.text(example.korean),

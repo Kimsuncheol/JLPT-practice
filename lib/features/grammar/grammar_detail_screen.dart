@@ -131,12 +131,6 @@ class _GrammarDetailsState extends ConsumerState<_GrammarDetails> {
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
-          const SizedBox(height: 18),
-          FilledButton.icon(
-            onPressed: () => context.push('/grammar/tutor/${grammar.id}'),
-            icon: const Icon(Icons.auto_awesome),
-            label: Text(context.strings('practiceWithAi')),
-          ),
           const SizedBox(height: 24),
           _DetailSection(
             title: context.strings('formation'),
@@ -169,16 +163,62 @@ class _GrammarDetailsState extends ConsumerState<_GrammarDetails> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        shape: const CircleBorder(),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Theme.of(context).colorScheme.onPrimary,
-        onPressed: () => showGrammarQaChatScreen(
-          context,
-          grammar: grammar,
-          languageCode: language,
+      bottomNavigationBar: Container(
+        key: const ValueKey('grammar_detail_actions'),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          border: Border(
+            top: BorderSide(
+              color: Theme.of(context).colorScheme.outlineVariant,
+            ),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Theme.of(
+                context,
+              ).colorScheme.shadow.withValues(alpha: 0.12),
+              blurRadius: 16,
+              offset: const Offset(0, -4),
+            ),
+          ],
         ),
-        child: const Icon(Icons.auto_awesome),
+        child: SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                FilledButton.icon(
+                  key: const ValueKey('grammar_detail_practice_with_ai'),
+                  onPressed: () => context.push(
+                    '/grammar/tutor/${Uri.encodeComponent(grammar.id)}',
+                  ),
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size.fromHeight(52),
+                  ),
+                  icon: const Icon(Icons.auto_awesome_rounded),
+                  label: Text(context.strings('practiceWithAi')),
+                ),
+                const SizedBox(height: 10),
+                FilledButton.tonalIcon(
+                  key: const ValueKey('grammar_detail_tutor'),
+                  onPressed: () => showGrammarQaChatScreen(
+                    context,
+                    grammar: grammar,
+                    languageCode: language,
+                  ),
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size.fromHeight(52),
+                  ),
+                  icon: const Icon(Icons.question_answer_rounded),
+                  label: Text(context.strings('grammarChatTitle')),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
