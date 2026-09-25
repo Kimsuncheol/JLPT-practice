@@ -6,28 +6,14 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 typedef KeepScreenOnOperation = Future<void> Function();
 
 class KeepScreenOnController {
-  KeepScreenOnController({
-    KeepScreenOnOperation? enable,
-    KeepScreenOnOperation? disable,
-  }) : _enable = enable ?? WakelockPlus.enable,
-       _disable = disable ?? WakelockPlus.disable;
+  KeepScreenOnController({KeepScreenOnOperation? enable})
+    : _enable = enable ?? WakelockPlus.enable;
 
   static final instance = KeepScreenOnController();
 
   final KeepScreenOnOperation _enable;
-  final KeepScreenOnOperation _disable;
-  int _activeScreens = 0;
 
-  void acquire() {
-    _activeScreens++;
-    if (_activeScreens == 1) unawaited(_run(_enable));
-  }
-
-  void release() {
-    if (_activeScreens == 0) return;
-    _activeScreens--;
-    if (_activeScreens == 0) unawaited(_run(_disable));
-  }
+  void enable() => unawaited(_run(_enable));
 
   Future<void> _run(KeepScreenOnOperation operation) async {
     try {
@@ -48,14 +34,16 @@ class KeepScreenOn extends StatefulWidget {
   State<KeepScreenOn> createState() => _KeepScreenOnState();
 }
 
-class _KeepScreenOnState extends State<KeepScreenOn> {
+class _KeepScreenOnState extends State<KeepScreenOn>
+    with WidgetsBindingObserver {
   late KeepScreenOnController _controller;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _controller = widget.controller ?? KeepScreenOnController.instance;
-    _controller.acquire();
+    _controller.enable();
   }
 
   @override
@@ -63,15 +51,19 @@ class _KeepScreenOnState extends State<KeepScreenOn> {
     super.didUpdateWidget(oldWidget);
     final nextController = widget.controller ?? KeepScreenOnController.instance;
     if (identical(_controller, nextController)) return;
-    _controller.release();
     _controller = nextController;
-    _controller.acquire();
+    _controller.enable();
   }
 
   @override
   void dispose() {
-    _controller.release();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) _controller.enable();
   }
 
   @override

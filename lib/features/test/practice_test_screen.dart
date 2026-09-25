@@ -11,8 +11,9 @@ import 'package:jlpt_practice/data/models/mock_test.dart';
 import 'package:jlpt_practice/data/models/mock_test_problem.dart';
 import 'package:jlpt_practice/data/models/quiz.dart';
 import 'package:jlpt_practice/features/test/mock_test_providers.dart';
-import 'package:jlpt_practice/features/test/practice_ai_tutor_sheet.dart';
+import 'package:jlpt_practice/features/test/practice_ai_tutor_screen.dart';
 import 'package:jlpt_practice/features/test/practice_test_generator.dart';
+import 'package:jlpt_practice/shared/volume_warning_toast.dart';
 
 TestSectionType _sectionType(ProblemSection section) => switch (section) {
   ProblemSection.vocabulary => TestSectionType.vocabulary,
@@ -53,12 +54,14 @@ class _PracticeTestScreenState extends ConsumerState<PracticeTestScreen> {
   }
 
   Future<void> _playDialogue(String passage) async {
-    if (await isSystemVolumeTooLow()) {
+    final volumeStatus = await getSystemVolumeStatus();
+    if (volumeStatus != SystemVolumeStatus.audible) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(context.strings('lowVolumeBody'))));
-      return;
+      final warningKey = volumeStatus == SystemVolumeStatus.muted
+          ? 'mutedSystemVolumeBody'
+          : 'lowSystemVolumeBody';
+      showVolumeWarningToast(context, context.strings(warningKey));
+      if (volumeStatus == SystemVolumeStatus.muted) return;
     }
     _ttsService ??= ref.read(ttsServiceProvider);
     unawaited(_ttsService!.speakDialogue(parseDialogueScript(passage)));
@@ -286,7 +289,7 @@ class _PracticeTestScreenState extends ConsumerState<PracticeTestScreen> {
                                 const SizedBox(height: 12),
                                 FilledButton.tonalIcon(
                                   key: const ValueKey('practice_ask_ai_tutor'),
-                                  onPressed: () => showPracticeAiTutorSheet(
+                                  onPressed: () => showPracticeAiTutorScreen(
                                     context: context,
                                     problem: item,
                                     selectedAnswer: _selected!,

@@ -10,12 +10,12 @@ import 'package:jlpt_practice/core/services/tts_service.dart';
 import 'package:jlpt_practice/core/utils/system_bar_metrics.dart';
 import 'package:jlpt_practice/data/models/app_state.dart';
 import 'package:jlpt_practice/data/models/grammar_study_session.dart';
-import 'package:jlpt_practice/data/models/study_preferences.dart';
 import 'package:jlpt_practice/data/models/study_session.dart';
 import 'package:jlpt_practice/data/models/vocabulary.dart';
-import 'package:jlpt_practice/features/dashboard/choose_study_screen.dart';
 import 'package:jlpt_practice/features/dashboard/dashboard_screen.dart';
+import 'package:jlpt_practice/features/settings/levels_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/study_finish_screen.dart';
+import 'package:jlpt_practice/features/vocabulary/study_quiz_selection_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_tape.dart';
 import 'package:jlpt_practice/features/vocabulary/study_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -23,48 +23,57 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
-  testWidgets(
-    'leaving day 6 shows recent study below streak and reopens day 6',
-    (tester) async {
-      final container = _createContainer();
-      addTearDown(container.dispose);
-      await container.read(appControllerProvider.future);
-      final router = _createRouter();
-      addTearDown(router.dispose);
-      await tester.pumpWidget(
-        UncontrolledProviderScope(
-          container: container,
-          child: MaterialApp.router(
-            theme: AppTheme.light(),
-            routerConfig: router,
-          ),
+  testWidgets('leaving day 6 shows recent study below streak and reopens day 6', (
+    tester,
+  ) async {
+    final container = _createContainer();
+    addTearDown(container.dispose);
+    await container.read(appControllerProvider.future);
+    final router = _createRouter();
+    addTearDown(router.dispose);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp.router(
+          theme: AppTheme.light(),
+          routerConfig: router,
         ),
-      );
-      await tester.pumpAndSettle();
-      router.push('/study/day/6');
-      await tester.pumpAndSettle();
-      final pageView = find.byType(PageView);
-      await tester.drag(pageView, Offset(-tester.getSize(pageView).width, 0));
-      await tester.pumpAndSettle();
-      await tester.tap(find.byIcon(Icons.close_rounded));
-      await tester.pumpAndSettle();
+      ),
+    );
+    await tester.pumpAndSettle();
+    router.push('/study/day/6');
+    await tester.pumpAndSettle();
+    final pageView = find.byType(PageView);
+    await tester.drag(pageView, Offset(-tester.getSize(pageView).width, 0));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.close_rounded));
+    await tester.pumpAndSettle();
 
-      expect(find.text('Words · N5'), findsOneWidget);
-      expect(find.text('Day 6'), findsOneWidget);
-      expect(find.text('2 of 5 words'), findsOneWidget);
-      expect(
-        tester.getTopLeft(find.text('RECENT STUDY')).dy,
-        greaterThan(tester.getBottomLeft(find.text('0 day streak')).dy),
-      );
-      await tester.tap(find.byKey(const ValueKey('recent-study-/study/day/6')));
-      await tester.pumpAndSettle();
-      expect(tester.widget<StudyScreen>(find.byType(StudyScreen)).day, 6);
-      await tester.tap(find.text('Continue'));
-      await tester.pumpAndSettle();
-      expect(find.text('単語27'), findsOneWidget);
-      expect(find.text('2 / 5'), findsOneWidget);
-    },
-  );
+    expect(find.text('Leave word study?'), findsOneWidget);
+    expect(
+      find.text(
+        'Your place will be saved, but hidden words and meanings will reset when you return.',
+      ),
+      findsOneWidget,
+    );
+    await tester.tap(find.widgetWithText(FilledButton, 'Leave'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Words · N5'), findsOneWidget);
+    expect(find.text('Day 6'), findsOneWidget);
+    expect(find.text('2 of 5 words'), findsOneWidget);
+    expect(
+      tester.getTopLeft(find.text('RECENT STUDY')).dy,
+      greaterThan(tester.getBottomLeft(find.text('0 day streak')).dy),
+    );
+    await tester.tap(find.byKey(const ValueKey('recent-study-/study/day/6')));
+    await tester.pumpAndSettle();
+    expect(tester.widget<StudyScreen>(find.byType(StudyScreen)).day, 6);
+    await tester.tap(find.text('Continue'));
+    await tester.pumpAndSettle();
+    expect(find.text('単語27'), findsOneWidget);
+    expect(find.text('2 / 5'), findsOneWidget);
+  });
 
   for (final kind in GrammarStudyKind.values) {
     testWidgets('recent grammar opens saved ${kind.name} screen', (
@@ -149,6 +158,76 @@ void main() {
     }
     expect(speech.spoken, ['たんご', 'たんご', 'たんご']);
   });
+
+  for (final scenario in [
+    (
+      muted: false,
+      volume: 0.02,
+      message:
+          'Your device is unmuted, but its volume is too low. Turn it up to hear the pronunciation.',
+    ),
+    (
+      muted: true,
+      volume: 0.8,
+      message: 'Your device is muted. Unmute it to hear the pronunciation.',
+    ),
+  ]) {
+    testWidgets(
+      'system volume warning distinguishes ${scenario.muted ? 'muted' : 'unmuted low'} volume',
+      (tester) async {
+        const volumeChannel = MethodChannel(
+          'com.kurenai7968.volume_controller.method',
+        );
+        tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+          volumeChannel,
+          (call) async =>
+              call.method == 'isMuted' ? scenario.muted : scenario.volume,
+        );
+        addTearDown(
+          () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+            volumeChannel,
+            null,
+          ),
+        );
+        final speech = _RecordingTtsService();
+        final container = ProviderContainer(
+          overrides: [
+            appControllerProvider.overrideWith(
+              () => _ResumeAppController('word_0', 0),
+            ),
+            ttsServiceProvider.overrideWithValue(speech),
+          ],
+        );
+        addTearDown(container.dispose);
+        await container.read(appControllerProvider.future);
+        await tester.pumpWidget(
+          UncontrolledProviderScope(
+            container: container,
+            child: const MaterialApp(home: StudyScreen(day: 2)),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('単語6'));
+        await tester.pump();
+
+        expect(find.text(scenario.message), findsOneWidget);
+        expect(
+          find.byKey(const ValueKey('volume-warning-toast')),
+          findsOneWidget,
+        );
+        expect(find.byType(SnackBar), findsNothing);
+        expect(speech.spoken, scenario.muted ? isEmpty : ['たんご']);
+
+        await tester.pump(const Duration(seconds: 3));
+        await tester.pump(const Duration(milliseconds: 151));
+        expect(
+          find.byKey(const ValueKey('volume-warning-toast')),
+          findsNothing,
+        );
+      },
+    );
+  }
 
   testWidgets('automatic pronunciation reads the first word of a new day', (
     tester,
@@ -243,6 +322,23 @@ void main() {
     await tester.tap(find.text('Hide reading'));
     await tester.pumpAndSettle();
     expect(find.text('たんご'), findsNothing);
+    // The example furigana remains; only the studied pronunciation is taped.
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('example-furigana')),
+        matching: find.byType(CoverTape),
+      ),
+      findsOneWidget,
+    );
+    final exampleFurigana = tester.widget<Text>(
+      find.descendant(
+        of: find.byKey(const ValueKey('example-furigana')),
+        matching: find.byType(Text),
+      ),
+    );
+    final visibleReading = exampleFurigana.textSpan!.toPlainText();
+    expect(visibleReading, startsWith('まいにち '));
+    expect(visibleReading, endsWith('を つかいます。'));
 
     await tester.tap(find.text('Show word'));
     await tester.tap(find.text('Show meanings'));
@@ -291,6 +387,7 @@ void main() {
     expect(find.text('Hide reading'), findsOneWidget);
     expect(find.text('Hide word'), findsOneWidget);
     expect(find.text('Hide meanings'), findsOneWidget);
+    expect(find.text('Auto review'), findsNothing);
 
     await tester.drag(pageView, Offset(tester.getSize(pageView).width, 0));
     await tester.pumpAndSettle();
@@ -298,6 +395,46 @@ void main() {
     expect(find.text('Show reading'), findsOneWidget);
     expect(find.text('Show word'), findsOneWidget);
     expect(find.text('Show meanings'), findsOneWidget);
+  });
+
+  testWidgets('system back asks before leaving and cancel keeps hide state', (
+    tester,
+  ) async {
+    final container = _createContainer();
+    addTearDown(container.dispose);
+    await container.read(appControllerProvider.future);
+    final router = _createRouter();
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp.router(routerConfig: router),
+      ),
+    );
+    router.push('/study/day/2');
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Hide word'));
+    await tester.pumpAndSettle();
+    expect(find.text('単語6'), findsNothing);
+
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(find.text('Leave word study?'), findsOneWidget);
+
+    await tester.tap(find.widgetWithText(TextButton, 'Cancel'));
+    await tester.pumpAndSettle();
+    expect(find.text('Leave word study?'), findsNothing);
+    expect(find.text('単語6'), findsNothing);
+    expect(find.text('Show word'), findsOneWidget);
+
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Leave'));
+    await tester.pumpAndSettle();
+    expect(find.byType(StudyScreen), findsNothing);
+    expect(find.text('Ready for today?'), findsOneWidget);
   });
 
   testWidgets('identical word and reading use one combined hide control', (
@@ -325,6 +462,7 @@ void main() {
     expect(find.text('Hide reading'), findsNothing);
     expect(find.text('Hide word'), findsNothing);
     expect(find.text('Hide word & reading'), findsOneWidget);
+    expect(find.byKey(const ValueKey('study-action-carousel')), findsNothing);
 
     await tester.tap(find.text('Hide word & reading'));
     await tester.pumpAndSettle();
@@ -338,221 +476,6 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('ことば'), findsOneWidget);
     expect(find.text('kotoba'), findsOneWidget);
-  });
-
-  testWidgets('action groups loop between hide controls and auto review', (
-    tester,
-  ) async {
-    final container = ProviderContainer(
-      overrides: [
-        appControllerProvider.overrideWith(
-          () => _ResumeAppController('word_0', 0),
-        ),
-      ],
-    );
-    addTearDown(container.dispose);
-    await container.read(appControllerProvider.future);
-    await tester.pumpWidget(
-      UncontrolledProviderScope(
-        container: container,
-        child: const MaterialApp(home: StudyScreen(day: 2)),
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    expect(find.text('Hide word').hitTestable(), findsOneWidget);
-    await _showAutoReviewActions(tester);
-    expect(find.text('Auto review').hitTestable(), findsOneWidget);
-    await _showHideActions(tester);
-    expect(find.text('Hide word').hitTestable(), findsOneWidget);
-
-    // Continuing in the other direction reaches auto review again rather
-    // than stopping at an edge.
-    await _swipeActionCarousel(tester, -1);
-    expect(find.text('Auto review').hitTestable(), findsOneWidget);
-  });
-
-  testWidgets('auto review reveals each element in the chosen order', (
-    tester,
-  ) async {
-    final container = ProviderContainer(
-      overrides: [
-        appControllerProvider.overrideWith(
-          () => _ResumeAppController(
-            'word_0',
-            0,
-            autoReviewOrder: const AutoReviewOrder([
-              ReviewElement.meanings,
-              ReviewElement.word,
-              ReviewElement.reading,
-            ]),
-            completedDays: {2},
-          ),
-        ),
-      ],
-    );
-    addTearDown(container.dispose);
-    await container.read(appControllerProvider.future);
-    await tester.pumpWidget(
-      UncontrolledProviderScope(
-        container: container,
-        child: const MaterialApp(home: StudyScreen(day: 2)),
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    // Step 1: only the meanings are shown.
-    expect(find.text('word'), findsOneWidget);
-    expect(find.text('単語6'), findsNothing);
-    expect(find.text('たんご'), findsNothing);
-    expect(find.byType(CoverTape), findsWidgets);
-
-    // Step 2: the word joins them.
-    await tester.pump(const Duration(seconds: 2));
-    expect(find.text('word'), findsOneWidget);
-    expect(find.text('単語6'), findsOneWidget);
-    expect(find.text('たんご'), findsNothing);
-
-    // Step 3: the reading completes the card.
-    await tester.pump(const Duration(seconds: 2));
-    expect(find.text('単語6'), findsOneWidget);
-    expect(find.text('たんご'), findsOneWidget);
-
-    // Then the next card starts over at its first element.
-    await tester.pump(const Duration(seconds: 2));
-    await tester.pumpAndSettle();
-    expect(find.text('単語7'), findsNothing);
-    expect(find.text('word'), findsOneWidget);
-    expect(find.text('2 / 5'), findsOneWidget);
-  });
-
-  testWidgets('auto review leaves a day that is not finished alone', (
-    tester,
-  ) async {
-    final container = ProviderContainer(
-      overrides: [
-        appControllerProvider.overrideWith(
-          () => _ResumeAppController(
-            'word_0',
-            0,
-            autoReviewOrder: AutoReviewOrder.defaultOrder,
-            completedDays: {1},
-          ),
-        ),
-      ],
-    );
-    addTearDown(container.dispose);
-    await container.read(appControllerProvider.future);
-    await tester.pumpWidget(
-      UncontrolledProviderScope(
-        container: container,
-        child: const MaterialApp(home: StudyScreen(day: 2)),
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    // The auto review tab is shown semi-transparent and does nothing.
-    await _showAutoReviewActions(tester);
-    final tabOpacity = find.ancestor(
-      of: find.text('Auto review').hitTestable(),
-      matching: find.byType(Opacity),
-    );
-    expect(tester.widget<Opacity>(tabOpacity).opacity, lessThan(1));
-    await tester.tap(find.text('Auto review').hitTestable());
-    await tester.pump();
-    expect(
-      container.read(appControllerProvider).requireValue.autoReviewEnabled,
-      isTrue,
-    );
-
-    // Everything is shown and the manual buttons are back; nothing advances.
-    await _showHideActions(tester);
-    expect(find.text('単語6'), findsOneWidget);
-    expect(find.text('word'), findsOneWidget);
-    expect(find.text('Pause').hitTestable(), findsNothing);
-    expect(find.text('Hide word').hitTestable(), findsOneWidget);
-    await tester.pump(const Duration(seconds: 30));
-    expect(find.text('1 / 5'), findsOneWidget);
-  });
-
-  testWidgets(
-    'the auto review tab switches auto review on for a finished day',
-    (tester) async {
-      final container = ProviderContainer(
-        overrides: [
-          appControllerProvider.overrideWith(
-            () => _ResumeAppController('word_0', 0, completedDays: {2}),
-          ),
-        ],
-      );
-      addTearDown(container.dispose);
-      await container.read(appControllerProvider.future);
-      await tester.pumpWidget(
-        UncontrolledProviderScope(
-          container: container,
-          child: const MaterialApp(home: StudyScreen(day: 2)),
-        ),
-      );
-      await tester.pumpAndSettle();
-      expect(find.text('Hide word'), findsOneWidget);
-      await _showAutoReviewActions(tester);
-      final tabOpacity = find.ancestor(
-        of: find.text('Auto review').hitTestable(),
-        matching: find.byType(Opacity),
-      );
-      expect(tester.widget<Opacity>(tabOpacity).opacity, 1);
-
-      await tester.tap(find.text('Auto review').hitTestable());
-      await tester.pumpAndSettle();
-      await _showHideActions(tester);
-      expect(find.text('Pause').hitTestable(), findsOneWidget);
-      expect(find.text('Hide word').hitTestable(), findsNothing);
-      expect(find.text('word'), findsNothing);
-
-      await _showAutoReviewActions(tester);
-      await tester.tap(find.text('Auto review').hitTestable());
-      await tester.pumpAndSettle();
-      await _showHideActions(tester);
-      expect(find.text('Pause').hitTestable(), findsNothing);
-      expect(find.text('Hide word').hitTestable(), findsOneWidget);
-    },
-  );
-
-  testWidgets('auto review can be paused and resumed', (tester) async {
-    final container = ProviderContainer(
-      overrides: [
-        appControllerProvider.overrideWith(
-          () => _ResumeAppController(
-            'word_0',
-            0,
-            autoReviewOrder: AutoReviewOrder.defaultOrder,
-            completedDays: {2},
-          ),
-        ),
-      ],
-    );
-    addTearDown(container.dispose);
-    await container.read(appControllerProvider.future);
-    await tester.pumpWidget(
-      UncontrolledProviderScope(
-        container: container,
-        child: const MaterialApp(home: StudyScreen(day: 2)),
-      ),
-    );
-    await tester.pumpAndSettle();
-    expect(find.text('単語6'), findsOneWidget);
-    expect(find.text('word'), findsNothing);
-
-    await tester.tap(find.text('Pause'));
-    await tester.pump();
-    await tester.pump(const Duration(seconds: 10));
-    expect(find.text('word'), findsNothing);
-    expect(find.text('Resume'), findsOneWidget);
-
-    await tester.tap(find.text('Resume'));
-    await tester.pump();
-    await tester.pump(const Duration(seconds: 2));
-    expect(find.text('word'), findsOneWidget);
   });
 
   testWidgets('hide meanings only tapes meaning words in the translation', (
@@ -813,11 +736,7 @@ void main() {
 
       await tester.drag(find.byType(ListView), const Offset(0, -300));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Study'));
-      await tester.pumpAndSettle();
-
-      expect(find.text('Resume learning'), findsOneWidget);
-      await tester.tap(find.text('Resume learning'));
+      await tester.tap(find.byKey(const ValueKey('recent-study-/study/day/1')));
       await tester.pumpAndSettle();
 
       expect(find.text('Continue your recent session?'), findsOneWidget);
@@ -909,6 +828,216 @@ void main() {
     expect(find.text('Great work!'), findsOneWidget);
   });
 
+  testWidgets('finishing every word in a level offers another JLPT level', (
+    tester,
+  ) async {
+    final container = _createContainer();
+    addTearDown(container.dispose);
+    await container.read(appControllerProvider.future);
+    final controller =
+        container.read(appControllerProvider.notifier) as _ResumeAppController;
+    for (var day = 1; day < 6; day++) {
+      await controller.completeStudySession('N5', day);
+    }
+    final router = _createRouter(initialLocation: '/study/day/6/finish');
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp.router(routerConfig: router),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('N5 vocabulary complete!'), findsOneWidget);
+    expect(
+      find.text('You studied all 30 words across 6 study days.'),
+      findsOneWidget,
+    );
+    expect(find.text('Choose another JLPT level'), findsOneWidget);
+    expect(find.text('Back to study days'), findsOneWidget);
+    expect(find.text('Choose a quiz game'), findsOneWidget);
+    expect(find.text('Take an N5 vocabulary quiz'), findsNothing);
+    expect(find.text('Finish this session'), findsNothing);
+
+    await tester.tap(find.text('Choose another JLPT level'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(LevelsScreen), findsOneWidget);
+    expect(find.text('Levels'), findsOneWidget);
+    expect(
+      container
+          .read(appControllerProvider)
+          .requireValue
+          .completedStudyDays['N5'],
+      containsAll([1, 2, 3, 4, 5, 6]),
+    );
+  });
+
+  testWidgets('study finish opens quiz selection and both game routes', (
+    tester,
+  ) async {
+    final container = _createContainer();
+    addTearDown(container.dispose);
+    await container.read(appControllerProvider.future);
+    final router = _createRouter(initialLocation: '/study/day/1/finish');
+    addTearDown(router.dispose);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp.router(routerConfig: router),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Choose a quiz game'), findsOneWidget);
+    expect(find.text('Take a quick quiz'), findsNothing);
+    expect(find.text('Sentence Reordering'), findsNothing);
+    expect(
+      tester
+          .getSize(find.widgetWithText(OutlinedButton, 'Choose a quiz game'))
+          .height,
+      tester
+          .getSize(find.widgetWithText(FilledButton, 'Finish this session'))
+          .height,
+    );
+    await tester.tap(find.text('Choose a quiz game'));
+    await tester.pumpAndSettle();
+    final fillButton = find.widgetWithText(
+      FilledButton,
+      'Fill in the blank game',
+    );
+    final reorderButton = find.widgetWithText(
+      FilledButton,
+      'Sentence Reordering',
+    );
+    expect(fillButton, findsOneWidget);
+    expect(reorderButton, findsOneWidget);
+    expect(find.byIcon(Icons.close_rounded), findsOneWidget);
+    expect(
+      tester.getTopLeft(fillButton).dy,
+      tester.getTopLeft(reorderButton).dy,
+    );
+    expect(
+      tester.getTopLeft(fillButton).dx,
+      lessThan(tester.getTopLeft(reorderButton).dx),
+    );
+    expect(
+      tester.getSize(fillButton).height,
+      greaterThan(tester.getSize(fillButton).width),
+    );
+    expect(
+      tester
+          .getTopLeft(
+            find.descendant(
+              of: fillButton,
+              matching: find.byIcon(Icons.quiz_rounded),
+            ),
+          )
+          .dy,
+      lessThan(tester.getTopLeft(find.text('Fill in the blank game')).dy),
+    );
+    final fillColor = tester
+        .widget<FilledButton>(fillButton)
+        .style!
+        .backgroundColor!
+        .resolve({});
+    final reorderColor = tester
+        .widget<FilledButton>(reorderButton)
+        .style!
+        .backgroundColor!
+        .resolve({});
+    expect(fillColor, isNot(reorderColor));
+    final fillTextColor = tester
+        .widget<FilledButton>(fillButton)
+        .style!
+        .foregroundColor!
+        .resolve({});
+    final reorderTextColor = tester
+        .widget<FilledButton>(reorderButton)
+        .style!
+        .foregroundColor!
+        .resolve({});
+    expect(fillTextColor, isNot(reorderTextColor));
+    final bodyHeadingFinder = find.byWidgetPredicate(
+      (widget) =>
+          widget is Text &&
+          widget.data == 'Choose a quiz game' &&
+          widget.style?.fontWeight == FontWeight.w600,
+    );
+    final bodyHeading = tester.widget<Text>(bodyHeadingFinder);
+    expect(bodyHeading.style?.fontWeight, FontWeight.w600);
+    expect(bodyHeading.style?.fontSize, 20);
+    expect(
+      tester.getTopLeft(bodyHeadingFinder).dx,
+      tester.getTopLeft(fillButton).dx,
+    );
+    expect(
+      tester.getTopLeft(fillButton).dy -
+          tester.getBottomLeft(bodyHeadingFinder).dy,
+      greaterThan(12),
+    );
+    final bodySafeArea = find
+        .ancestor(of: fillButton, matching: find.byType(SafeArea))
+        .first;
+    final groupCenterY =
+        (tester.getTopLeft(bodyHeadingFinder).dy +
+            tester.getBottomLeft(fillButton).dy) /
+        2;
+    expect(groupCenterY, closeTo(tester.getCenter(bodySafeArea).dy, 1));
+
+    await tester.tap(find.text('Fill in the blank game'));
+    await tester.pumpAndSettle();
+    expect(find.text('Day quiz 1'), findsOneWidget);
+    router.pop();
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Sentence Reordering'));
+    await tester.pumpAndSettle();
+    expect(find.text('Sentence reorder 1'), findsOneWidget);
+    router.pop();
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.close_rounded));
+    await tester.pumpAndSettle();
+    expect(find.text('Great work!'), findsOneWidget);
+  });
+
+  testWidgets('level completion selection keeps the full-level quiz', (
+    tester,
+  ) async {
+    final container = _createContainer();
+    addTearDown(container.dispose);
+    await container.read(appControllerProvider.future);
+    final controller =
+        container.read(appControllerProvider.notifier) as _ResumeAppController;
+    for (var day = 1; day < 6; day++) {
+      await controller.completeStudySession('N5', day);
+    }
+    final router = _createRouter(initialLocation: '/study/day/6/finish');
+    addTearDown(router.dispose);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp.router(routerConfig: router),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Choose a quiz game'));
+    await tester.pumpAndSettle();
+    expect(find.text('Fill in the blank game'), findsOneWidget);
+    await tester.tap(find.text('Fill in the blank game'));
+    await tester.pumpAndSettle();
+    expect(find.text('Level quiz'), findsOneWidget);
+    expect(
+      container
+          .read(appControllerProvider)
+          .requireValue
+          .completedStudyDays['N5'],
+      containsAll([1, 2, 3, 4, 5, 6]),
+    );
+  });
+
   for (final alreadyCompleted in [false, true]) {
     testWidgets(
       'finishing day 6 returns to day selection (completed: $alreadyCompleted)',
@@ -955,21 +1084,6 @@ void main() {
       },
     );
   }
-}
-
-Future<void> _showAutoReviewActions(WidgetTester tester) =>
-    _swipeActionCarousel(tester, 1);
-
-Future<void> _showHideActions(WidgetTester tester) =>
-    _swipeActionCarousel(tester, -1);
-
-Future<void> _swipeActionCarousel(WidgetTester tester, double direction) async {
-  final carousel = find.byKey(const ValueKey('study-action-carousel'));
-  await tester.drag(
-    carousel,
-    Offset(tester.getSize(carousel).width * direction, 0),
-  );
-  await tester.pumpAndSettle();
 }
 
 class _RecordingTtsService implements TtsService {
@@ -1033,12 +1147,13 @@ GoRouter _createRouter({String initialLocation = '/'}) => GoRouter(
       builder: (_, _) => const Scaffold(body: Text('Home')),
     ),
     GoRoute(
-      path: '/study/choose',
-      builder: (_, _) => const ChooseStudyScreen(),
-    ),
-    GoRoute(
       path: '/study',
       builder: (_, _) => const Scaffold(body: Text('Day selection')),
+    ),
+    GoRoute(path: '/settings/levels', builder: (_, _) => const LevelsScreen()),
+    GoRoute(
+      path: '/quiz',
+      builder: (_, _) => const Scaffold(body: Text('Level quiz')),
     ),
     GoRoute(
       path: '/study/day/:day',
@@ -1049,6 +1164,24 @@ GoRouter _createRouter({String initialLocation = '/'}) => GoRouter(
       path: '/study/day/:day/finish',
       builder: (_, state) =>
           StudyFinishScreen(day: int.parse(state.pathParameters['day']!)),
+    ),
+    GoRoute(
+      path: '/study/day/:day/quiz-selection',
+      builder: (_, state) => StudyQuizSelectionScreen(
+        day: int.parse(state.pathParameters['day']!),
+        levelComplete: state.uri.queryParameters['level'] == 'true',
+      ),
+    ),
+    GoRoute(
+      path: '/quiz/day/:day',
+      builder: (_, state) =>
+          Scaffold(body: Text('Day quiz ${state.pathParameters['day']}')),
+    ),
+    GoRoute(
+      path: '/study/day/:day/reorder',
+      builder: (_, state) => Scaffold(
+        body: Text('Sentence reorder ${state.pathParameters['day']}'),
+      ),
     ),
   ],
 );
@@ -1072,8 +1205,6 @@ class _ResumeAppController extends AppController {
     this.hideMeanings = false,
     this.withExamples = false,
     this.sameWordAndReading = false,
-    this.autoReviewOrder,
-    this.completedDays = const {},
   });
 
   final String wordId;
@@ -1082,9 +1213,6 @@ class _ResumeAppController extends AppController {
   final bool hideMeanings;
   final bool withExamples;
   final bool sameWordAndReading;
-  final AutoReviewOrder? autoReviewOrder;
-  final Set<int> completedDays;
-  final int autoReviewSeconds = 2;
   final List<StudySession> savedSessions = [];
 
   @override
@@ -1106,10 +1234,6 @@ class _ResumeAppController extends AppController {
       showFurigana: true,
       autoPlayAudio: autoPlayAudio,
       hideMeanings: hideMeanings,
-      autoReviewEnabled: autoReviewOrder != null,
-      autoReviewOrder: autoReviewOrder ?? AutoReviewOrder.defaultOrder,
-      autoReviewSeconds: autoReviewSeconds,
-      completedStudyDays: {'N5': completedDays},
       themeMode: ThemeMode.system,
       notificationsEnabled: false,
       studySeconds: 0,
@@ -1129,10 +1253,6 @@ class _ResumeAppController extends AppController {
       },
     );
   }
-
-  @override
-  Future<void> setAutoReviewEnabled(bool value) async =>
-      state = AsyncData(state.requireValue.copyWith(autoReviewEnabled: value));
 
   @override
   Future<void> setHideWord(bool value) async =>
@@ -1183,7 +1303,7 @@ Vocabulary _word(int index, [bool withExample = false]) => Vocabulary(
   example: withExample
       ? VocabularyExample(
           sentence: '毎日単語${index + 1}を使います。',
-          reading: 'まいにち',
+          reading: 'まいにち たんごを つかいます。',
           translations: const {'en': 'I use the word every day.'},
           quizSentence: '',
           answer: '',
@@ -1217,4 +1337,5 @@ Vocabulary _sameReadingWord(int index) => Vocabulary(
     quizSentence: '',
     answer: '',
   ),
+  rank: index + 1,
 );

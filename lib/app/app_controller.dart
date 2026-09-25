@@ -3,19 +3,22 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:jlpt_practice/core/services/cloud_sync_service.dart';
 import 'package:jlpt_practice/core/services/day_block_access.dart';
 import 'package:jlpt_practice/core/services/local_store.dart';
 import 'package:jlpt_practice/core/services/notification_service.dart';
 import 'package:jlpt_practice/core/services/srs_scheduler.dart';
 import 'package:jlpt_practice/core/services/tts_service.dart';
+import 'package:jlpt_practice/core/services/flutter_tts_engine.dart';
+import 'package:jlpt_practice/core/utils/streak_tracker.dart';
 import 'package:jlpt_practice/data/models/app_state.dart';
 import 'package:jlpt_practice/data/models/mock_test.dart';
 import 'package:jlpt_practice/data/models/quiz.dart';
 import 'package:jlpt_practice/data/models/review_progress.dart';
 import 'package:jlpt_practice/data/models/study_preferences.dart';
 import 'package:jlpt_practice/data/models/study_session.dart';
+import 'package:jlpt_practice/core/services/korean_morpheme_analyzer.dart';
+import 'package:jlpt_practice/core/services/meaning_mask_service.dart';
 import 'package:jlpt_practice/data/repositories/quiz_repository.dart';
 import 'package:jlpt_practice/data/repositories/vocabulary_repository.dart';
 import 'package:jlpt_practice/features/grammar/grammar_study_session_provider.dart';
@@ -26,8 +29,16 @@ final vocabularyRepositoryProvider = Provider(
 final quizRepositoryProvider = Provider((ref) => QuizRepository());
 final srsSchedulerProvider = Provider((ref) => const SrsScheduler());
 final cloudSyncProvider = Provider((ref) => const CloudSyncService());
-final ttsServiceProvider = Provider((ref) {
-  final service = TtsService(
+final meaningMaskServiceProvider = Provider((ref) {
+  final service = MeaningMaskService(KoreanMorphemeAnalyzer());
+  ref.onDispose(service.close);
+  return service;
+});
+final Provider<TtsService> ttsServiceProvider = Provider((ref) {
+  final engine = FlutterTtsEngine();
+  final service = AudioFocusTtsService(
+    audioSessionController: SystemTtsAudioSession.initialized,
+    engineSelector: () => engine,
     volumePreference: () {
       final state = ref.read(appControllerProvider).value;
       return TtsVolumePreference(
@@ -36,7 +47,15 @@ final ttsServiceProvider = Provider((ref) {
       );
     },
   );
-  ref.onDispose(service.dispose);
+  ref.onDispose(() {
+    unawaited(() async {
+      try {
+        await service.dispose();
+      } finally {
+        await engine.dispose();
+      }
+    }());
+  });
   return service;
 });
 
@@ -87,9 +106,6 @@ class AppController extends AsyncNotifier<AppState> {
       meaningCoverMode: settings.meaningCoverMode,
       ttsVolumeMode: settings.ttsVolumeMode,
       ttsVolume: settings.ttsVolume,
-      autoReviewEnabled: settings.autoReviewEnabled,
-      autoReviewOrder: settings.autoReviewOrder,
-      autoReviewSeconds: settings.autoReviewSeconds,
       notificationsEnabled: notificationsEnabled,
       reminderHour: settings.reminderHour,
       reminderMinute: settings.reminderMinute,
@@ -252,23 +268,22 @@ class AppController extends AsyncNotifier<AppState> {
   }
 
   Future<AppState> _withRecordedActivity(AppState current) async {
-    final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
-    if (_store.lastStudyDate == today) return current;
-    final yesterday = DateFormat(
-      'yyyy-MM-dd',
-    ).format(DateTime.now().subtract(const Duration(days: 1)));
-    final streak = _store.lastStudyDate == yesterday
-        ? current.currentStreak + 1
-        : 1;
-    final longest = streak > current.longestStreak
-        ? streak
-        : current.longestStreak;
+    final update = recordDailyActivity(
+      now: DateTime.now(),
+      lastActivityDate: _store.lastStudyDate,
+      currentStreak: current.currentStreak,
+      longestStreak: current.longestStreak,
+    );
+    if (!update.changed) return current;
     await Future.wait([
-      _store.setValue('lastStudyDate', today),
-      _store.setValue('currentStreak', streak),
-      _store.setValue('longestStreak', longest),
+      _store.setValue('lastStudyDate', update.date),
+      _store.setValue('currentStreak', update.current),
+      _store.setValue('longestStreak', update.longest),
     ]);
-    return current.copyWith(currentStreak: streak, longestStreak: longest);
+    return current.copyWith(
+      currentStreak: update.current,
+      longestStreak: update.longest,
+    );
   }
 
   Future<void> setLevel(String value) =>
@@ -412,21 +427,6 @@ class AppController extends AsyncNotifier<AppState> {
     });
   }
 
-  Future<void> setAutoReviewEnabled(bool value) =>
-      _updatePreference('autoReviewEnabled', value, (current) {
-        return current.copyWith(autoReviewEnabled: value);
-      });
-
-  Future<void> setAutoReviewOrder(AutoReviewOrder value) =>
-      _updatePreference('autoReviewOrder', value.id, (current) {
-        return current.copyWith(autoReviewOrder: value);
-      });
-
-  Future<void> setAutoReviewSeconds(int value) =>
-      _updatePreference('autoReviewSeconds', value, (current) {
-        return current.copyWith(autoReviewSeconds: value);
-      });
-
   Future<void> saveStudySession(StudySession session) async {
     final sessions = {..._value.studySessions, session.level: session};
     state = AsyncData(_value.copyWith(studySessions: sessions));
@@ -440,12 +440,13 @@ class AppController extends AsyncNotifier<AppState> {
       ..._value.completedStudyDays,
       level: {...?_value.completedStudyDays[level], day},
     };
-    state = AsyncData(
+    final next = await _withRecordedActivity(
       _value.copyWith(
         studySessions: sessions,
         completedStudyDays: completedStudyDays,
       ),
     );
+    state = AsyncData(next);
     await Future.wait([
       _persistStudySessions(sessions),
       _store.saveCompletedStudyDays(completedStudyDays),

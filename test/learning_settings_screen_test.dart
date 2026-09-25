@@ -6,12 +6,9 @@ import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/app/theme/app_theme.dart';
 import 'package:jlpt_practice/data/models/app_state.dart';
 import 'package:jlpt_practice/data/models/study_preferences.dart';
-import 'package:jlpt_practice/data/models/study_session.dart';
-import 'package:jlpt_practice/features/settings/auto_review_screen.dart';
 import 'package:jlpt_practice/features/settings/eye_comfort_screen.dart';
 import 'package:jlpt_practice/features/settings/learning_language_screen.dart';
 import 'package:jlpt_practice/features/settings/learning_settings_screen.dart';
-import 'package:jlpt_practice/features/settings/recall_cover_screen.dart';
 import 'package:jlpt_practice/features/settings/tts_volume_screen.dart';
 import 'package:jlpt_practice/shared/eye_comfort_overlay.dart';
 
@@ -35,14 +32,6 @@ void main() {
         GoRoute(
           path: '/settings/learning-language',
           builder: (_, _) => const LearningLanguageScreen(),
-        ),
-        GoRoute(
-          path: '/settings/recall-cover',
-          builder: (_, _) => const RecallCoverScreen(),
-        ),
-        GoRoute(
-          path: '/settings/auto-review',
-          builder: (_, _) => const AutoReviewScreen(),
         ),
         GoRoute(
           path: '/settings/tts-volume',
@@ -70,74 +59,12 @@ void main() {
 
   testWidgets('settings are labeled by group', (tester) async {
     await pump(tester, const LearningSettingsScreen());
-    for (final label in [
-      'Language',
-      'Reading & pronunciation',
-      'Review',
-      'Display',
-    ]) {
+    for (final label in ['Language', 'Reading & pronunciation', 'Display']) {
       expect(find.text(label), findsOneWidget, reason: label);
     }
-  });
-
-  testWidgets('auto review screen picks the reveal order and speed', (
-    tester,
-  ) async {
-    final container = await pump(tester, const LearningSettingsScreen());
-    ProviderContainer read() => container;
-    AppState state() => read().read(appControllerProvider).requireValue;
-    expect(find.text('Off'), findsWidgets);
-
-    await tester.tap(find.text('Auto review'));
-    await tester.pumpAndSettle();
-    expect(find.byType(AutoReviewScreen), findsOneWidget);
-    // All 3! = 6 ordered combinations are offered, the first being
-    // word -> meanings -> reading.
-    expect(find.byType(RadioListTile<AutoReviewOrder>), findsNWidgets(6));
-    expect(find.text('Word → Meanings → Reading'), findsOneWidget);
-    expect(find.text('Reading → Meanings → Word'), findsOneWidget);
-
-    await tester.tap(find.text('Use auto review'));
-    await tester.scrollUntilVisible(
-      find.text('Reading → Word → Meanings'),
-      200,
-    );
-    await tester.tap(find.text('Reading → Word → Meanings'));
-    await tester.scrollUntilVisible(find.text('5 sec'), 200);
-    await tester.tap(find.text('5 sec'));
-    await tester.pumpAndSettle();
-    expect(state().autoReviewEnabled, isTrue);
-    expect(state().autoReviewOrder.id, 'reading-word-meanings');
-    expect(state().autoReviewSeconds, 5);
-  });
-
-  testWidgets('auto review is disabled while a study day is unfinished', (
-    tester,
-  ) async {
-    await pump(
-      tester,
-      const LearningSettingsScreen(),
-      controller: _FakeAppController(
-        studySession: StudySession(
-          level: 'N5',
-          day: 2,
-          wordId: 'word_0',
-          indexFallback: 0,
-          dailyGoal: 10,
-          updatedAt: DateTime(2026),
-        ),
-      ),
-    );
-
-    final tile = find.widgetWithText(ListTile, 'Auto review');
-    expect(tester.widget<ListTile>(tile).enabled, isFalse);
-    final opacity = find.ancestor(of: tile, matching: find.byType(Opacity));
-    expect(tester.widget<Opacity>(opacity).opacity, lessThan(1));
-
-    await tester.tap(find.text('Auto review'));
-    await tester.pumpAndSettle();
-    expect(find.byType(LearningSettingsScreen), findsOneWidget);
-    expect(find.byType(AutoReviewScreen), findsNothing);
+    expect(find.text('Auto review'), findsNothing);
+    expect(find.text('Review'), findsNothing);
+    expect(find.text('Hide and recall'), findsNothing);
   });
 
   testWidgets('opens the learning language screen', (tester) async {
@@ -169,14 +96,11 @@ void main() {
     );
   });
 
-  testWidgets('wires to the recall cover, volume and eye comfort screens', (
-    tester,
-  ) async {
+  testWidgets('wires to volume and eye comfort screens', (tester) async {
     await pump(tester, const LearningSettingsScreen());
     expect(find.byType(Slider), findsNothing);
 
     for (final (tile, screen) in [
-      ('Hide and recall', RecallCoverScreen),
       ('Pronunciation volume', TtsVolumeScreen),
       ('Eye comfort mode', EyeComfortScreen),
     ]) {
@@ -187,20 +111,6 @@ void main() {
       await tester.pageBack();
       await tester.pumpAndSettle();
     }
-  });
-
-  testWidgets('recall cover screen edits word and meaning covers', (
-    tester,
-  ) async {
-    final container = await pump(tester, const RecallCoverScreen());
-    AppState state() => container.read(appControllerProvider).requireValue;
-
-    await tester.tap(find.text('Hide word'));
-    await tester.tap(find.text('Hide meanings'));
-    await tester.pumpAndSettle();
-    expect(state().hideWord, isTrue);
-    expect(state().hideMeanings, isTrue);
-    expect(find.byType(RadioListTile<MeaningCoverMode>), findsNothing);
   });
 
   testWidgets('volume screen switches between system and slider', (
@@ -274,10 +184,6 @@ void main() {
 }
 
 class _FakeAppController extends AppController {
-  _FakeAppController({this.studySession});
-
-  final StudySession? studySession;
-
   @override
   Future<AppState> build() async => AppState(
     vocabulary: [],
@@ -297,7 +203,6 @@ class _FakeAppController extends AppController {
     quizCorrect: 0,
     currentStreak: 0,
     longestStreak: 0,
-    studySessions: studySession == null ? const {} : {'N5': studySession!},
   );
 
   @override
@@ -333,21 +238,6 @@ class _FakeAppController extends AppController {
   @override
   Future<void> setTtsVolume(double value) async {
     state = AsyncData(state.requireValue.copyWith(ttsVolume: value));
-  }
-
-  @override
-  Future<void> setAutoReviewEnabled(bool value) async {
-    state = AsyncData(state.requireValue.copyWith(autoReviewEnabled: value));
-  }
-
-  @override
-  Future<void> setAutoReviewOrder(AutoReviewOrder value) async {
-    state = AsyncData(state.requireValue.copyWith(autoReviewOrder: value));
-  }
-
-  @override
-  Future<void> setAutoReviewSeconds(int value) async {
-    state = AsyncData(state.requireValue.copyWith(autoReviewSeconds: value));
   }
 
   @override

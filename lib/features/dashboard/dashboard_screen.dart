@@ -46,9 +46,10 @@ class DashboardScreen extends ConsumerWidget {
                           ),
                         ),
                         const Spacer(),
-                        Chip(
+                        ActionChip(
                           avatar: const Icon(Icons.school_rounded, size: 18),
                           label: Text(state.selectedLevel),
+                          onPressed: () => context.push('/settings/levels'),
                         ),
                       ],
                     ),
@@ -146,8 +147,22 @@ class DashboardScreen extends ConsumerWidget {
                             context,
                           ).colorScheme.secondaryContainer,
                           icon: Icons.menu_book_rounded,
-                          title: strings('study'),
-                          onTap: () => context.push('/study/choose'),
+                          title: strings('voca'),
+                          onTap: () => context.push('/study'),
+                        ),
+                        _GridActionTile(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.secondaryContainer,
+                          icon: Icons.auto_stories_rounded,
+                          title: strings('grammar'),
+                          onTap: () => context.push('/grammar'),
+                        ),
+                        _GridActionTile(
+                          color: Theme.of(context).colorScheme.primaryContainer,
+                          icon: Icons.grid_view_rounded,
+                          title: strings('kanaChartTile'),
+                          onTap: () => context.push('/kana'),
                         ),
                         _GridActionTile(
                           color: Theme.of(
@@ -158,12 +173,6 @@ class DashboardScreen extends ConsumerWidget {
                           onTap: () => context.push(
                             '/test/practice/${state.selectedLevel}',
                           ),
-                        ),
-                        _GridActionTile(
-                          color: Theme.of(context).colorScheme.primaryContainer,
-                          icon: Icons.grid_view_rounded,
-                          title: strings('kanaChartTile'),
-                          onTap: () => context.push('/kana'),
                         ),
                       ],
                     ),

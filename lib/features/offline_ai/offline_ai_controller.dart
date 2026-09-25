@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter_gemma/flutter_gemma.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -33,7 +34,7 @@ class OfflineAiController extends ChangeNotifier with WidgetsBindingObserver {
     ModelDownload? downloader,
     this.models = OfflineAiModel.catalog,
   }) : probe = probe ?? DeviceAiProbe(),
-       engine = engine ?? LlamaLocalInference(),
+       engine = engine ?? GemmaLocalInference(),
        downloader = downloader ?? ModelDownload() {
     selected = models.first;
     WidgetsBinding.instance.addObserver(this);
@@ -83,6 +84,16 @@ class OfflineAiController extends ChangeNotifier with WidgetsBindingObserver {
     _ => false,
   };
   bool get ready => _loadedId == selected.id && phase == OfflineAiPhase.ready;
+
+  Future<InferenceModel> getLoadedModel() async {
+    if (_loadedId != selected.id || engine.model == null) {
+      if (!await prepare()) {
+        throw OfflineAiException(errorKey ?? 'offlineSetupRequired');
+      }
+    }
+    return engine.model!;
+  }
+
   String modelPath(OfflineAiModel model) =>
       '${capacity!.directory}/${model.filename}';
   bool _unmetered(List<ConnectivityResult> values) =>
@@ -265,6 +276,39 @@ class OfflineAiController extends ChangeNotifier with WidgetsBindingObserver {
       }
       phase = OfflineAiPhase.ready;
       return output;
+    } catch (_) {
+      await _unload();
+      phase = OfflineAiPhase.idle;
+      rethrow;
+    } finally {
+      _notify();
+    }
+  }
+
+  Stream<String> generateStream(String system, String input) async* {
+    if (busy) throw const OfflineAiException('offlineBusy');
+    if (!ready && !await prepare()) {
+      throw OfflineAiException(errorKey ?? 'offlineSetupRequired');
+    }
+    final epoch = _epoch;
+    phase = OfflineAiPhase.generating;
+    _notify();
+    try {
+      capacity = await probe.read();
+      if (capacity!.hot) throw const OfflineAiException('offlineTooHot');
+      if (capacity!.availableRam < 256 * 1024 * 1024) {
+        throw const OfflineAiException('offlineLowMemory');
+      }
+      await for (final chunk in engine.generateStream(system, input)) {
+        if (epoch != _epoch) {
+          throw OfflineAiException(errorKey ?? 'offlinePaused');
+        }
+        yield chunk;
+      }
+      if (epoch != _epoch) {
+        throw OfflineAiException(errorKey ?? 'offlinePaused');
+      }
+      phase = OfflineAiPhase.ready;
     } catch (_) {
       await _unload();
       phase = OfflineAiPhase.idle;

@@ -16,6 +16,8 @@ import 'package:jlpt_practice/data/models/study_session.dart';
 import 'package:jlpt_practice/data/models/vocabulary.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_masking.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_tape.dart';
+import 'package:jlpt_practice/features/vocabulary/masked_translation.dart';
+import 'package:jlpt_practice/shared/volume_warning_toast.dart';
 
 class StudyScreen extends ConsumerStatefulWidget {
   const StudyScreen({required this.day, super.key});
@@ -28,31 +30,24 @@ class StudyScreen extends ConsumerStatefulWidget {
 
 class _StudyScreenState extends ConsumerState<StudyScreen>
     with ImmersiveStudyMode<StudyScreen> {
-  static const _resumeDialogBarrierColor = Colors.black54;
+  static const _dialogBarrierColor = Colors.black54;
 
   int _index = 0;
   final Map<String, _CardVisibility> _cardVisibility = {};
   PageController? _pageController;
-  final PageController _actionPageController = PageController(
-    initialPage: 10000,
-  );
   TtsService? _ttsService;
   bool _resumeDecisionPending = false;
   bool _resumeDialogVisible = false;
+  bool _leaveDialogVisible = false;
   bool _suppressAutoAudio = false;
   int _pageChangeRequest = 0;
-
-  /// Auto review: how many of the order's elements are revealed on the
-  /// current card, the timer that reveals the next one, and the pause switch.
-  Timer? _autoTimer;
-  int _autoRevealed = 1;
-  bool _autoPaused = false;
+  int _readingsRequest = 0;
+  static const _readingGap = Duration(milliseconds: 500);
 
   @override
   void dispose() {
-    _autoTimer?.cancel();
     _pageController?.dispose();
-    _actionPageController.dispose();
+    _readingsRequest++;
     if (_ttsService != null) unawaited(_ttsService!.stop());
     super.dispose();
   }
@@ -60,19 +55,9 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   @override
   Widget build(BuildContext context) {
     final asyncState = ref.watch(appControllerProvider);
-    ref.listen(
-      appControllerProvider.select(
-        (state) => (
-          state.value == null ? null : _autoReviewActive(state.value!),
-          state.value?.autoReviewOrder,
-          state.value?.autoReviewSeconds,
-        ),
-      ),
-      (_, _) => _restartAutoReview(),
-    );
     final scaffoldBackgroundColor = Theme.of(context).scaffoldBackgroundColor;
-    final systemBarColor = _resumeDialogVisible
-        ? Color.alphaBlend(_resumeDialogBarrierColor, scaffoldBackgroundColor)
+    final systemBarColor = _resumeDialogVisible || _leaveDialogVisible
+        ? Color.alphaBlend(_dialogBarrierColor, scaffoldBackgroundColor)
         : scaffoldBackgroundColor;
     return wrapImmersive(
       asyncState.when(
@@ -99,131 +84,135 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
       );
     }
     _initializePage(words, state);
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: context.pop,
-          icon: const Icon(Icons.close_rounded),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) unawaited(_confirmLeave());
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            onPressed: _confirmLeave,
+            icon: const Icon(Icons.close_rounded),
+          ),
+          actions: [
+            IconButton(
+              onPressed: () => context.push('/settings/learning'),
+              icon: const Icon(Icons.settings_rounded),
+            ),
+          ],
         ),
-        actions: [
-          IconButton(
-            onPressed: () => context.push('/settings/learning'),
-            icon: const Icon(Icons.settings_rounded),
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: PageView.builder(
-              controller: _pageController,
-              itemCount: words.length + 1,
-              onPageChanged: (index) => unawaited(
-                _handlePageChanged(index: index, words: words, state: state),
-              ),
-              itemBuilder: (context, index) {
-                if (index == words.length) return const SizedBox.shrink();
-                final word = words[index];
-                final visibility = _visibilityFor(word, state);
-                final revealed = _autoReviewActive(state)
-                    ? state.autoReviewOrder.elements
-                          .take(index == _index ? _autoRevealed : 1)
-                          .toSet()
-                    : null;
-                final showFurigana = revealed == null
-                    ? visibility.showFurigana
-                    : revealed.contains(ReviewElement.reading);
-                final hideWord = revealed == null
-                    ? visibility.hideWord ||
-                          (!showFurigana && word.reading == word.word)
-                    : !revealed.contains(ReviewElement.word);
-                final meaningsHidden = revealed == null
-                    ? visibility.hideMeanings
-                    : !revealed.contains(ReviewElement.meanings);
-                return Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 14),
-                  child: _StudyCard(
-                    vocabulary: word,
-                    language: state.meaningLanguage,
-                    showFurigana: showFurigana,
-                    hideWord: hideWord,
-                    hideMeaning: meaningsHidden,
-                    maskMeaningInTranslation: meaningsHidden,
-                    onSpeakWord: () => _speakIfAudible(word.reading),
-                    onSpeakExample: () =>
-                        _speakIfAudible(word.example.sentence),
-                  ),
-                );
-              },
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: SizedBox(
-              height: 82,
+        body: Column(
+          children: [
+            Expanded(
               child: PageView.builder(
-                key: const ValueKey('study-action-carousel'),
-                controller: _actionPageController,
-                itemBuilder: (context, page) => page.isEven
-                    ? _actionPage(
-                        _autoReviewActive(state)
-                            ? [
-                                _CardAction(
-                                  icon: _autoPaused
-                                      ? Icons.play_arrow_rounded
-                                      : Icons.pause_rounded,
-                                  label: context.strings(
-                                    _autoPaused
-                                        ? 'resumeAutoReview'
-                                        : 'pauseAutoReview',
-                                  ),
-                                  onTap: _toggleAutoReviewPause,
-                                ),
-                              ]
-                            : _manualActions(state, words[_index]),
-                      )
-                    : _actionPage([_autoReviewTab(state)]),
+                controller: _pageController,
+                itemCount: words.length + 1,
+                onPageChanged: (index) => unawaited(
+                  _handlePageChanged(index: index, words: words, state: state),
+                ),
+                itemBuilder: (context, index) {
+                  if (index == words.length) return const SizedBox.shrink();
+                  final word = words[index];
+                  final visibility = _visibilityFor(word, state);
+                  final showFurigana = visibility.showFurigana;
+                  final hideWord =
+                      visibility.hideWord ||
+                      (!showFurigana && word.reading == word.word);
+                  final meaningsHidden = visibility.hideMeanings;
+                  return Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 8, 20, 14),
+                    child: _StudyCard(
+                      vocabulary: word,
+                      language: state.meaningLanguage,
+                      showFurigana: showFurigana,
+                      hideWord: hideWord,
+                      hideMeaning: meaningsHidden,
+                      maskMeaningInTranslation: meaningsHidden,
+                      onSpeakWord: () =>
+                          _speakIfAudible(word.reading, word: word),
+                      onSpeakExample: () =>
+                          _speakIfAudible(word.example.sentence),
+                    ),
+                  );
+                },
               ),
             ),
-          ),
-          SafeArea(
-            top: false,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 30, 20, 20),
-              child: Text(
-                '${_index + 1} / ${words.length}',
-                style: const TextStyle(fontWeight: FontWeight.w700),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: SizedBox(
+                height: 82,
+                child: _buildActionArea(state, words[_index]),
               ),
             ),
-          ),
-        ],
+            SafeArea(
+              top: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 30, 20, 20),
+                child: Text(
+                  '${_index + 1} / ${words.length}',
+                  style: const TextStyle(fontWeight: FontWeight.w700),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  /// Switches auto review on or off. On a day that is not finished it is
-  /// shown semi-transparent and does nothing.
-  Widget _autoReviewTab(AppState state) => _CardAction(
-    icon: _autoReviewActive(state)
-        ? Icons.play_circle_rounded
-        : Icons.play_circle_outline_rounded,
-    label: context.strings('autoReview'),
-    onTap: _dayFinished(state)
-        ? () => unawaited(
-            ref
-                .read(appControllerProvider.notifier)
-                .setAutoReviewEnabled(!state.autoReviewEnabled),
-          )
-        : null,
-  );
+  Future<void> _confirmLeave() async {
+    if (_leaveDialogVisible || _resumeDialogVisible) return;
+    final dimmedBackground = Color.alphaBlend(
+      _dialogBarrierColor,
+      Theme.of(context).scaffoldBackgroundColor,
+    );
+    setImmersiveOuterBackgroundColor(dimmedBackground);
+    setState(() => _leaveDialogVisible = true);
+    bool shouldLeave = false;
+    try {
+      final dialogResult = showDialog<bool>(
+        context: context,
+        barrierColor: _dialogBarrierColor,
+        builder: (dialogContext) => wrapImmersiveSystemBarGesture(
+          AlertDialog(
+            title: Text(dialogContext.strings('leaveStudyTitle')),
+            content: Text(dialogContext.strings('leaveStudyBody')),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext, false),
+                child: Text(dialogContext.strings('cancel')),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(dialogContext, true),
+                child: Text(dialogContext.strings('leave')),
+              ),
+            ],
+          ),
+        ),
+      );
+      _applySystemBarColorAfterFrame(modalVisible: true);
+      shouldLeave = await dialogResult ?? false;
+    } finally {
+      if (mounted) {
+        setImmersiveOuterBackgroundColor(null);
+        setState(() => _leaveDialogVisible = false);
+        reassertImmersiveMode();
+        _applySystemBarColorAfterFrame(modalVisible: false);
+      }
+    }
+    if (mounted && shouldLeave) context.pop();
+  }
 
   Widget _actionPage(List<Widget> actions) => Row(
+    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
     crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      ...actions,
-      for (var index = actions.length; index < 3; index++) const Spacer(),
-    ],
+    children: [for (final action in actions) Flexible(child: action)],
   );
+
+  Widget _buildActionArea(AppState state, Vocabulary word) {
+    return _actionPage(_manualActions(state, word));
+  }
 
   _CardVisibility _visibilityFor(Vocabulary word, AppState state) =>
       _cardVisibility.putIfAbsent(
@@ -322,7 +311,6 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
       } else {
         unawaited(_savePosition(state, words.first, 0));
         _autoPlayFirstWord(words.first);
-        _restartAutoReview();
       }
     });
   }
@@ -336,7 +324,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
     );
     setImmersiveOuterBackgroundColor(
       Color.alphaBlend(
-        _resumeDialogBarrierColor,
+        _dialogBarrierColor,
         Theme.of(context).scaffoldBackgroundColor,
       ),
     );
@@ -345,7 +333,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
     try {
       final dialogResult = showDialog<bool>(
         context: context,
-        barrierColor: _resumeDialogBarrierColor,
+        barrierColor: _dialogBarrierColor,
         barrierDismissible: false,
         builder: (dialogContext) => wrapImmersiveSystemBarGesture(
           PopScope(
@@ -390,7 +378,6 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
       // Resuming on the first word never changes the page, so the page-change
       // handler cannot play it.
       _autoPlayFirstWord(words.first);
-      _restartAutoReview();
       return;
     }
     _suppressAutoAudio = true;
@@ -399,10 +386,13 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
 
   void _applySystemBarColorAfterFrame({required bool modalVisible}) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted || _resumeDialogVisible != modalVisible) return;
+      if (!mounted ||
+          (_resumeDialogVisible || _leaveDialogVisible) != modalVisible) {
+        return;
+      }
       final scaffoldBackgroundColor = Theme.of(context).scaffoldBackgroundColor;
       final color = modalVisible
-          ? Color.alphaBlend(_resumeDialogBarrierColor, scaffoldBackgroundColor)
+          ? Color.alphaBlend(_dialogBarrierColor, scaffoldBackgroundColor)
           : scaffoldBackgroundColor;
       applyImmersiveSystemBarColor(color);
     });
@@ -428,89 +418,73 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   void _autoPlayFirstWord(Vocabulary word) {
     if (!mounted) return;
     if (ref.read(appControllerProvider).value?.autoPlayAudio ?? false) {
-      _speak(word.word);
+      _speakWord(word);
     }
   }
 
   void _speak(String text) {
     _ttsService ??= ref.read(ttsServiceProvider);
+    _readingsRequest++;
     unawaited(_ttsService!.speak(text));
   }
 
-  Future<void> _speakIfAudible(String text) async {
+  /// Words with several readings (`なん/なに`) are spoken one reading at a
+  /// time, [_readingGap] apart, so each pronunciation is heard on its own.
+  void _speakReadings(List<String> readings) {
+    final service = ref.read(ttsServiceProvider);
+    _ttsService ??= service;
+    final request = ++_readingsRequest;
+    unawaited(() async {
+      for (var i = 0; i < readings.length; i++) {
+        if (request != _readingsRequest || !mounted) return;
+        if (i > 0) {
+          await Future<void>.delayed(_readingGap);
+          if (request != _readingsRequest || !mounted) return;
+        }
+        await service.speak(readings[i]);
+      }
+    }());
+  }
+
+  void _speakWord(Vocabulary word) {
+    final readings = splitReadings(word.reading);
+    if (readings.length > 1) {
+      _speakReadings(readings);
+    } else {
+      _speak(word.word);
+    }
+  }
+
+  Future<void> _speakIfAudible(String text, {Vocabulary? word}) async {
     // Slider mode sets the device volume itself when speaking, so only the
     // level chosen there can make speech inaudible.
     final settings = ref.read(appControllerProvider).value;
-    final tooQuiet = settings?.ttsVolumeMode == TtsVolumeMode.slider
-        ? settings!.ttsVolume <= lowVolumeThreshold
-        : await isSystemVolumeTooLow();
-    if (tooQuiet) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(context.strings('lowVolumeBody'))));
-      return;
-    }
-    if (!mounted) return;
-    _speak(text);
-  }
-
-  /// Auto review only runs on days already finished; a day still being
-  /// studied for the first time keeps the manual controls and shows the
-  /// auto review tab dimmed.
-  bool _dayFinished(AppState state) =>
-      state.completedStudyDays[state.selectedLevel]?.contains(widget.day) ??
-      false;
-
-  bool _autoReviewActive(AppState state) =>
-      state.autoReviewEnabled && _dayFinished(state);
-
-  /// Starts the current card over at its first element and, unless paused or
-  /// waiting on the resume dialog, schedules the next reveal.
-  void _restartAutoReview() {
-    _autoTimer?.cancel();
-    if (!mounted) return;
-    if (_autoRevealed != 1) setState(() => _autoRevealed = 1);
-    _scheduleAutoStep();
-  }
-
-  void _scheduleAutoStep() {
-    _autoTimer?.cancel();
-    final state = ref.read(appControllerProvider).value;
-    if (state == null ||
-        !_autoReviewActive(state) ||
-        _autoPaused ||
-        _resumeDecisionPending) {
-      return;
-    }
-    _autoTimer = Timer(Duration(seconds: state.autoReviewSeconds), _onAutoStep);
-  }
-
-  void _onAutoStep() {
-    if (!mounted) return;
-    final state = ref.read(appControllerProvider).value;
-    if (state == null || !_autoReviewActive(state)) return;
-    if (_autoRevealed < state.autoReviewOrder.elements.length) {
-      setState(() => _autoRevealed++);
-      _scheduleAutoStep();
-      return;
-    }
-    // Everything is revealed: move on. Past the last word this reaches the
-    // trailing page, which finishes the session.
-    unawaited(
-      _pageController?.nextPage(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      ),
-    );
-  }
-
-  void _toggleAutoReviewPause() {
-    setState(() => _autoPaused = !_autoPaused);
-    if (_autoPaused) {
-      _autoTimer?.cancel();
+    String? warningKey;
+    var playbackBlocked = false;
+    if (settings?.ttsVolumeMode == TtsVolumeMode.slider) {
+      if (settings!.ttsVolume <= lowVolumeThreshold) {
+        warningKey = 'lowCustomVolumeBody';
+      }
     } else {
-      _scheduleAutoStep();
+      final volumeStatus = await getSystemVolumeStatus();
+      warningKey = switch (volumeStatus) {
+        SystemVolumeStatus.audible => null,
+        SystemVolumeStatus.muted => 'mutedSystemVolumeBody',
+        SystemVolumeStatus.low => 'lowSystemVolumeBody',
+      };
+      playbackBlocked = volumeStatus == SystemVolumeStatus.muted;
+    }
+    if (warningKey != null) {
+      if (!mounted) return;
+      showVolumeWarningToast(context, context.strings(warningKey));
+      if (playbackBlocked) return;
+    }
+    if (!mounted) return;
+    final readings = word == null ? const <String>[] : splitReadings(text);
+    if (readings.length > 1) {
+      _speakReadings(readings);
+    } else {
+      _speak(text);
     }
   }
 
@@ -529,10 +503,9 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
     }
     setState(() => _index = index);
     if (_resumeDecisionPending) return;
-    _restartAutoReview();
     unawaited(_savePosition(state, words[index], index));
     if (state.autoPlayAudio && !_suppressAutoAudio) {
-      _speak(words[index].word);
+      _speakWord(words[index]);
     }
     _suppressAutoAudio = false;
   }
@@ -599,6 +572,8 @@ class _StudyCard extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           _buildReading(context),
+          const SizedBox(height: 4),
+          _buildRomaji(context),
           const SizedBox(height: 6),
           _buildWord(context),
           const SizedBox(height: 10),
@@ -635,29 +610,41 @@ class _StudyCard extends StatelessWidget {
 
   Widget _buildReading(BuildContext context) {
     final hasReading = vocabulary.reading != vocabulary.word;
+    if (!hasReading) return const SizedBox.shrink();
     final titleLarge = Theme.of(context).textTheme.titleLarge;
-    return AnimatedOpacity(
-      opacity: hasReading ? 1 : 0,
-      duration: const Duration(milliseconds: 180),
-      child: IgnorePointer(
-        ignoring: !hasReading,
-        child: _speechTarget(
-          onTap: onSpeakWord,
-          child: showFurigana
-              ? Text(
-                  vocabulary.reading,
-                  style: titleLarge?.copyWith(
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                )
-              : coverTapeFor(
-                  characters: vocabulary.reading.length,
-                  fontSize: titleLarge?.fontSize ?? 22,
-                  maxWidth: 220,
-                  glyphWidth: 0.9,
-                ),
-        ),
-      ),
+    return _speechTarget(
+      onTap: onSpeakWord,
+      child: showFurigana
+          ? Text(
+              vocabulary.reading,
+              style: titleLarge?.copyWith(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            )
+          : coverTapeFor(
+              characters: vocabulary.reading.length,
+              fontSize: titleLarge?.fontSize ?? 22,
+              maxWidth: 220,
+              glyphWidth: 0.9,
+            ),
+    );
+  }
+
+  Widget _buildRomaji(BuildContext context) {
+    if (vocabulary.romaji.isEmpty) return const SizedBox.shrink();
+    final style = Theme.of(context).textTheme.bodyLarge?.copyWith(
+      color: Theme.of(context).colorScheme.onSurfaceVariant,
+    );
+    return _speechTarget(
+      onTap: onSpeakWord,
+      child: showFurigana
+          ? Text(vocabulary.romaji, style: style)
+          : coverTapeFor(
+              characters: vocabulary.romaji.length,
+              fontSize: style?.fontSize ?? 16,
+              maxWidth: 180,
+              glyphWidth: 0.6,
+            ),
     );
   }
 
@@ -750,13 +737,18 @@ class _StudyCard extends StatelessWidget {
             ),
           ),
         ),
-        if (showFurigana) ...[
+        if (vocabulary.example.reading.isNotEmpty) ...[
           const SizedBox(height: 6),
           _speechTarget(
             onTap: onSpeakExample,
-            child: Text(
-              _withRolePlayLineBreaks(vocabulary.example.reading),
-              textAlign: TextAlign.center,
+            child: KeyedSubtree(
+              key: const ValueKey('example-furigana'),
+              child: _maskedText(
+                _withRolePlayLineBreaks(vocabulary.example.reading),
+                style: null,
+                targets: showFurigana ? const [] : _readingMaskTargets(),
+                glyphWidth: 1,
+              ),
             ),
           ),
         ],
@@ -770,6 +762,18 @@ class _StudyCard extends StatelessWidget {
     final translation = _withRolePlayLineBreaks(
       vocabulary.example.translation(language),
     );
+    // Korean meanings are inflected inside Korean translations, so they are
+    // matched by lemma; other languages keep the plain substring mask.
+    final koreanMeanings = vocabulary.meanings['ko'];
+    if (language == 'ko' && koreanMeanings != null) {
+      return MaskedTranslation(
+        translation: translation,
+        meanings: koreanMeanings,
+        hideMeanings: maskMeaningInTranslation,
+        style: style,
+        glyphWidth: 0.55,
+      );
+    }
     return _maskedText(
       translation,
       style: style,
@@ -784,6 +788,18 @@ class _StudyCard extends StatelessWidget {
     );
   }
 
+  List<String> _readingMaskTargets() {
+    final reading = vocabulary.reading.trim();
+    if (reading.isEmpty) return const [];
+    final targets = <String>[reading];
+    // If the written form has an inflecting kana ending (食べる, 読む, ...),
+    // also cover its reading stem in examples such as たべます or よみます.
+    if (wordMaskTargets(vocabulary.word).length > 1 && reading.length > 1) {
+      targets.add(reading.substring(0, reading.length - 1));
+    }
+    return targets;
+  }
+
   /// Renders [text] centered, laying tape over every run matching [targets].
   Widget _maskedText(
     String text, {
@@ -794,26 +810,10 @@ class _StudyCard extends StatelessWidget {
     if (targets.isEmpty) {
       return Text(text, textAlign: TextAlign.center, style: style);
     }
-    final fontSize = style?.fontSize ?? 14;
-    return Text.rich(
-      TextSpan(
-        style: style,
-        children: [
-          for (final segment in maskSegments(text, targets))
-            if (segment.covered)
-              WidgetSpan(
-                alignment: PlaceholderAlignment.middle,
-                child: coverTapeFor(
-                  characters: segment.text.length,
-                  fontSize: fontSize,
-                  glyphWidth: glyphWidth,
-                ),
-              )
-            else
-              TextSpan(text: segment.text),
-        ],
-      ),
-      textAlign: TextAlign.center,
+    return MaskedSegmentsText(
+      segments: maskSegments(text, targets),
+      style: style,
+      glyphWidth: glyphWidth,
     );
   }
 }
@@ -836,29 +836,27 @@ class _CardAction extends StatelessWidget {
   final VoidCallback? onTap;
 
   @override
-  Widget build(BuildContext context) => Expanded(
-    child: Opacity(
-      opacity: onTap == null ? 0.38 : 1,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        splashFactory: NoSplash.splashFactory,
-        highlightColor: Colors.transparent,
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 3),
-          child: Column(
-            children: [
-              Icon(icon),
-              const SizedBox(height: 6),
-              Text(
-                label,
-                maxLines: 2,
-                textAlign: TextAlign.center,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.labelSmall,
-              ),
-            ],
-          ),
+  Widget build(BuildContext context) => Opacity(
+    opacity: onTap == null ? 0.38 : 1,
+    child: InkWell(
+      borderRadius: BorderRadius.circular(16),
+      splashFactory: NoSplash.splashFactory,
+      highlightColor: Colors.transparent,
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+        child: Column(
+          children: [
+            Icon(icon),
+            const SizedBox(height: 6),
+            Text(
+              label,
+              maxLines: 2,
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.labelSmall,
+            ),
+          ],
         ),
       ),
     ),

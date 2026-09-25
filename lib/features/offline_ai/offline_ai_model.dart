@@ -18,32 +18,32 @@ class OfflineAiModel {
   final String sha256;
   final int minimumRam;
   final int loadBudget;
-  String get filename => '$id.gguf';
+  String get filename => '$id.litertlm';
 
-  // Immutable Hugging Face revisions and LFS SHA-256 values, verified 2026-09-17.
-  // Memory limits are conservative eligibility heuristics, not guarantees.
+  // Immutable Hugging Face revisions and LFS SHA-256 values, verified 2026-09-24.
+  // Memory limits are eligibility heuristics, not guarantees.
   static const catalog = [
     OfflineAiModel(
-      id: 'llama32-1b-q4km-v1',
-      name: 'Llama 3.2 1B Instruct',
+      id: 'gemma4-e2b-litertlm-v1',
+      name: 'Gemma 4 E2B Instruct',
       url:
-          'https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF/resolve/067b946cf014b7c697f3654f621d577a3e3afd1c/Llama-3.2-1B-Instruct-Q4_K_M.gguf',
-      bytes: 807694464,
+          'https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/b3ca0d2f076785a8f4b2219ddbd2bdb99954eae1/gemma-4-E2B-it.litertlm',
+      bytes: 2588147712,
       sha256:
-          '6f85a640a97cf2bf5b8e764087b1e83da0fdb51d7c9fab7d0fece9385611df83',
-      minimumRam: 3758096384,
-      loadBudget: 1610612736,
+          '181938105e0eefd105961417e8da75903eacda102c4fce9ce90f50b97139a63c',
+      minimumRam: 4 * gib,
+      loadBudget: 2 * gib,
     ),
     OfflineAiModel(
-      id: 'llama32-3b-q4km-v1',
-      name: 'Llama 3.2 3B Instruct',
+      id: 'gemma4-e4b-litertlm-v1',
+      name: 'Gemma 4 E4B Instruct',
       url:
-          'https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF/resolve/5ab33fa94d1d04e903623ae72c95d1696f09f9e8/Llama-3.2-3B-Instruct-Q4_K_M.gguf',
-      bytes: 2019377696,
+          'https://huggingface.co/litert-community/gemma-4-E4B-it-litert-lm/resolve/2eee7ac325f20eb8c9ac1d0e972f7c84663062da/gemma-4-E4B-it.litertlm',
+      bytes: 3659530240,
       sha256:
-          '6c1a2b41161032677be168d354123594c0e6e67d2b9227c84f296ad037c728ff',
-      minimumRam: 5905580032,
-      loadBudget: 3221225472,
+          '0b2a8980ce155fd97673d8e820b4d29d9c7d99b8fa6806f425d969b145bd52e0',
+      minimumRam: 6 * gib,
+      loadBudget: 3 * gib,
     ),
   ];
 }

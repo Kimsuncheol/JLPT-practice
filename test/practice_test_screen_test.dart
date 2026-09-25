@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -155,30 +157,40 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('practice_ask_ai_tutor')));
     await tester.pumpAndSettle();
 
-    expect(find.text('AI Tutor'), findsOneWidget);
+    expect(find.text('Practice Tutor'), findsOneWidget);
     expect(find.text('The passage explicitly gives the time.'), findsOneWidget);
     expect(find.text('“7じ”'), findsOneWidget);
     expect(find.byKey(const ValueKey('practice_ai_continue')), findsOneWidget);
+    expect(find.byType(BottomSheet), findsNothing);
+    expect(find.byIcon(Icons.close_rounded), findsOneWidget);
+    expect(find.byType(ActionChip), findsNWidgets(3));
 
     const question = 'Can you explain that more simply?';
-    await tester.enterText(
-      find.byKey(const ValueKey('practice_ai_chat_input')),
-      question,
-    );
+    await tester.enterText(find.byType(TextField).last, question);
     await tester.tap(find.byKey(const ValueKey('practice_ai_chat_send')));
     await tester.pumpAndSettle();
 
     expect(find.text(question), findsOneWidget);
     expect(find.text('Here is a simpler chat reply.'), findsOneWidget);
     expect(tutor.histories.single, isEmpty);
+    expect(find.byType(ActionChip), findsNWidgets(3));
 
     const secondQuestion = 'What should I notice first?';
-    await tester.enterText(
-      find.byKey(const ValueKey('practice_ai_chat_input')),
-      secondQuestion,
-    );
+    final pendingReply = Completer<String>();
+    tutor.nextReply = pendingReply;
+    await tester.enterText(find.byType(TextField).last, secondQuestion);
     await tester.tap(find.byKey(const ValueKey('practice_ai_chat_send')));
+    await tester.pump();
+    expect(find.byType(ActionChip), findsNWidgets(3));
+    expect(
+      tester
+          .widgetList<ActionChip>(find.byType(ActionChip))
+          .every((chip) => chip.onPressed == null),
+      isTrue,
+    );
+    pendingReply.complete('Here is a simpler chat reply.');
     await tester.pumpAndSettle();
+    expect(find.byType(ActionChip), findsNWidgets(3));
 
     expect(tutor.histories, hasLength(2));
     expect(tutor.histories.last, hasLength(2));
@@ -192,10 +204,7 @@ void main() {
 
     expect(find.text(question), findsNothing);
     expect(find.text(secondQuestion), findsNothing);
-    expect(
-      find.byKey(const ValueKey('practice_ai_chat_input')),
-      findsOneWidget,
-    );
+    expect(find.byType(TextField), findsOneWidget);
     expect(
       find.text('This conversation is deleted when you close it.'),
       findsOneWidget,
@@ -205,6 +214,7 @@ void main() {
 
 class _FakePracticeAiTutorEvaluator implements PracticeAiTutorEvaluator {
   final List<List<PracticeTutorMessage>> histories = [];
+  Completer<String>? nextReply;
 
   @override
   Future<PracticeTutorFeedback> explain({
@@ -212,6 +222,7 @@ class _FakePracticeAiTutorEvaluator implements PracticeAiTutorEvaluator {
     required String selectedAnswer,
     required String explanationLanguage,
     PracticeTutorFocus focus = PracticeTutorFocus.overview,
+    void Function(PracticeTutorFeedback partial)? onPartial,
   }) async => const PracticeTutorFeedback(
     summary: 'The passage explicitly gives the time.',
     whyCorrect: 'The person wakes at 7.',
@@ -227,9 +238,12 @@ class _FakePracticeAiTutorEvaluator implements PracticeAiTutorEvaluator {
     required String explanationLanguage,
     required List<PracticeTutorMessage> history,
     required String question,
+    void Function(String text)? onPartial,
   }) async {
     histories.add(List<PracticeTutorMessage>.of(history));
-    return 'Here is a simpler chat reply.';
+    final pending = nextReply;
+    nextReply = null;
+    return pending == null ? 'Here is a simpler chat reply.' : pending.future;
   }
 }
 

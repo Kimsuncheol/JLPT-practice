@@ -7,10 +7,11 @@ import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/core/services/tts_service.dart';
 import 'package:jlpt_practice/core/services/volume_service.dart';
+import 'package:jlpt_practice/shared/volume_warning_toast.dart';
 import 'package:jlpt_practice/data/models/grammar_point.dart';
 import 'package:jlpt_practice/data/models/grammar_study_session.dart';
 import 'package:jlpt_practice/features/grammar/grammar_providers.dart';
-import 'package:jlpt_practice/features/grammar/grammar_qa_chat_sheet.dart';
+import 'package:jlpt_practice/features/grammar/grammar_qa_chat_screen.dart';
 import 'package:jlpt_practice/features/grammar/grammar_study_session_provider.dart';
 
 class GrammarDetailScreen extends ConsumerWidget {
@@ -83,12 +84,14 @@ class _GrammarDetailsState extends ConsumerState<_GrammarDetails> {
   }
 
   Future<void> _speakIfAudible(String text) async {
-    if (await isSystemVolumeTooLow()) {
+    final volumeStatus = await getSystemVolumeStatus();
+    if (volumeStatus != SystemVolumeStatus.audible) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(context.strings('lowVolumeBody'))));
-      return;
+      final warningKey = volumeStatus == SystemVolumeStatus.muted
+          ? 'mutedSystemVolumeBody'
+          : 'lowSystemVolumeBody';
+      showVolumeWarningToast(context, context.strings(warningKey));
+      if (volumeStatus == SystemVolumeStatus.muted) return;
     }
     _speak(text);
   }
@@ -170,7 +173,7 @@ class _GrammarDetailsState extends ConsumerState<_GrammarDetails> {
         shape: const CircleBorder(),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Theme.of(context).colorScheme.onPrimary,
-        onPressed: () => showGrammarQaChatSheet(
+        onPressed: () => showGrammarQaChatScreen(
           context,
           grammar: grammar,
           languageCode: language,

@@ -1,24 +1,26 @@
 import 'dart:async';
 
+import 'package:flutter_gemma/flutter_gemma.dart';
+import 'package:flutter_gemma_litertlm/flutter_gemma_litertlm.dart';
 import 'package:jlpt_practice/features/offline_ai/offline_ai_model.dart';
-import 'package:lib_llama_cpp/lib_llama_cpp.dart';
 
 abstract class LocalInference {
+  InferenceModel? get model => null;
   Future<void> load(String path);
   Future<String> generate(String system, String input);
+  Stream<String> generateStream(String system, String input) async* {
+    yield await generate(system, input);
+  }
+
   Future<void> unload();
 }
 
-/// One native worker at a time. Dispose is sent through the worker, so native
-/// model/context allocations are freed before its isolate exits.
-class LlamaLocalInference implements LocalInference {
-  LlamaLocalInference({LlamaEngine? engine})
-    : _engine = engine ?? const LibLlamaCpp();
-  final LlamaEngine _engine;
-  StreamController<LlamaCommand>? _commands;
-  Completer<void>? _pending;
-  Completer<void>? _closed;
-  StringBuffer _text = StringBuffer();
+/// Uses the verified app-owned model file without a second model-sized copy.
+class GemmaLocalInference implements LocalInference {
+  static Future<void>? _initialization;
+  InferenceModel? _model;
+  @override
+  InferenceModel? get model => _model;
   Future<void> _queue = Future.value();
 
   Future<T> _exclusive<T>(Future<T> Function() action) {
@@ -27,109 +29,105 @@ class LlamaLocalInference implements LocalInference {
     return result;
   }
 
+  Stream<T> _exclusiveStream<T>(Stream<T> Function() action) async* {
+    final previous = _queue;
+    final done = Completer<void>();
+    _queue = previous.then((_) => done.future);
+    await previous;
+    try {
+      yield* action();
+    } finally {
+      done.complete();
+    }
+  }
+
   @override
   Future<void> load(String path) => _exclusive(() async {
     await _unload();
-    _commands = StreamController<LlamaCommand>();
-    _closed = Completer<void>();
-    _engine
-        .transform(_commandSequence(_commands!.stream))
-        .listen(
-          (event) {
-            switch (event) {
-              case LlamaTokenResponse(:final text):
-                _text.write(text);
-              case LlamaErrorResponse():
-                _fail(const OfflineAiException('offlineInferenceError'));
-              default:
-                break;
-            }
-          },
-          onError: (Object error, StackTrace stack) {
-            _fail(const OfflineAiException('offlineInferenceError'));
-          },
-          onDone: () {
-            _fail(const OfflineAiException('offlineInferenceError'));
-            if (!_closed!.isCompleted) _closed!.complete();
-          },
-        );
     try {
-      await _send(
-        LlamaLoadModelCommand(
-          modelPath: path,
-          contextSize: 2048,
-          gpuLayerCount: 0,
-        ),
+      await (_initialization ??= FlutterGemma.initialize(
+        inferenceEngines: [LiteRtLmEngine()],
+      ));
+      await FlutterGemma.installModel(
+        modelType: ModelType.gemma4,
+        fileType: ModelFileType.litertlm,
+      ).fromFile(path).install();
+      _model = await FlutterGemma.getActiveModel(
+        maxTokens: 2048,
+        preferredBackend: PreferredBackend.cpu,
       );
     } catch (_) {
+      _initialization = null;
       await _unload();
-      rethrow;
+      throw const OfflineAiException('offlineInferenceError');
     }
   });
-
-  // The pinned engine consumes commands serially with await-for. Resuming this
-  // generator means its previous dispatch finished, even when generation emits
-  // no LlamaDoneResponse. Capture the completer before yielding to avoid races.
-  Stream<LlamaCommand> _commandSequence(Stream<LlamaCommand> input) async* {
-    await for (final command in input) {
-      final pending = _pending;
-      yield command;
-      if (pending != null && !pending.isCompleted) pending.complete();
-    }
-  }
 
   @override
   Future<String> generate(String system, String input) => _exclusive(() async {
-    if (_commands == null || _closed!.isCompleted) {
+    final model = _model;
+    if (model == null) {
       throw const OfflineAiException('offlineSetupRequired');
     }
-    _text = StringBuffer();
-    await _send(
-      LlamaGenerateMessagesCommand(
-        messages: [
-          LlamaMessage(role: 'system', content: system),
-          LlamaMessage(role: 'user', content: input),
-        ],
-        maxTokens: 320,
+    try {
+      final chat = await model.createChat(
+        systemInstruction: system,
         temperature: 0.1,
         topP: 0.9,
-      ),
-    );
-    return _text.toString();
-  });
-
-  Future<void> _send(LlamaCommand command) async {
-    if (_closed?.isCompleted ?? true) {
+        maxOutputTokens: 320,
+      );
+      try {
+        await chat.addQueryChunk(Message.text(text: input, isUser: true));
+        final response = await chat.generateChatResponse();
+        if (response is TextResponse) return response.token;
+        throw const OfflineAiException('offlineInferenceError');
+      } finally {
+        await chat.close();
+      }
+    } on OfflineAiException {
+      rethrow;
+    } catch (_) {
       throw const OfflineAiException('offlineInferenceError');
     }
-    final pending = Completer<void>();
-    _pending = pending;
-    _commands!.add(command);
-    await pending.future;
-  }
+  });
 
-  void _fail(Object error) {
-    if (_pending != null && !_pending!.isCompleted) {
-      _pending!.completeError(error);
-    }
-  }
+  @override
+  Stream<String> generateStream(String system, String input) =>
+      _exclusiveStream(() async* {
+        final model = _model;
+        if (model == null) {
+          throw const OfflineAiException('offlineSetupRequired');
+        }
+        try {
+          final chat = await model.createChat(
+            systemInstruction: system,
+            temperature: 0.1,
+            topP: 0.9,
+            maxOutputTokens: 320,
+          );
+          try {
+            await chat.addQueryChunk(Message.text(text: input, isUser: true));
+            await for (final response in chat.generateChatResponseAsync()) {
+              if (response is TextResponse && response.token.isNotEmpty) {
+                yield response.token;
+              }
+            }
+          } finally {
+            await chat.close();
+          }
+        } on OfflineAiException {
+          rethrow;
+        } catch (_) {
+          throw const OfflineAiException('offlineInferenceError');
+        }
+      });
 
   @override
   Future<void> unload() => _exclusive(_unload);
 
   Future<void> _unload() async {
-    final commands = _commands;
-    if (commands == null) return;
-    if (!_closed!.isCompleted) {
-      try {
-        await _send(const LlamaDisposeCommand());
-      } catch (_) {
-        // A failed worker still needs its input stream closed.
-      }
-    }
-    await commands.close();
-    await _closed!.future;
-    _commands = null;
-    _pending = null;
+    final model = _model;
+    _model = null;
+    if (model != null) await model.close();
   }
 }

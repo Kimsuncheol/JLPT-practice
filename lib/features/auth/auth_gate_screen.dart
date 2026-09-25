@@ -100,7 +100,17 @@ class _AuthGateScreenState extends ConsumerState<AuthGateScreen> {
   });
 
   Future<void> _finishAuthentication() async {
-    await ref.read(appControllerProvider.notifier).mergeCurrentAccount();
+    try {
+      await ref.read(appControllerProvider.notifier).mergeCurrentAccount();
+    } on Object catch (error, stackTrace) {
+      // Authentication has already succeeded. Keep the local state available
+      // and let normal background sync recover instead of trapping the user
+      // on the sign-in screen because cloud data is temporarily unavailable.
+      if (kDebugMode) {
+        debugPrint('Signed in, but initial cloud sync failed: $error');
+        debugPrintStack(stackTrace: stackTrace);
+      }
+    }
     ref.invalidate(grammarProgressProvider);
     ref.invalidate(grammarStudySessionsProvider);
     if (!mounted) return;

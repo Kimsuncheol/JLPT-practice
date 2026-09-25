@@ -60,7 +60,7 @@ class OfflineAiScreen extends ConsumerWidget {
                     title: Text(model.name),
                     subtitle: Text(
                       [
-                        '${_size(model.bytes)} · Q4_K_M',
+                        '${_size(model.bytes)} · LiteRT-LM',
                         strings(
                           model == OfflineAiModel.catalog.first
                               ? 'offlineSmallModel'
@@ -166,7 +166,7 @@ class OfflineAiScreen extends ConsumerWidget {
               TextButton(
                 onPressed: () async {
                   final license = await rootBundle.loadString(
-                    'assets/offline_ai/LLAMA_LICENSE.txt',
+                    'assets/offline_ai/GEMMA_LICENSE.txt',
                   );
                   final notice = await rootBundle.loadString(
                     'assets/offline_ai/NOTICE.txt',
@@ -175,7 +175,7 @@ class OfflineAiScreen extends ConsumerWidget {
                   showDialog<void>(
                     context: context,
                     builder: (context) => AlertDialog(
-                      title: const Text('Built with Llama'),
+                      title: const Text('Built with Gemma'),
                       content: SingleChildScrollView(
                         child: SelectableText('$notice\n\n$license'),
                       ),

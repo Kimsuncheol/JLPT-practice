@@ -66,4 +66,9 @@ void main() {
       expect(parseDialogueScript(''), isEmpty);
     });
   });
+
+  test('splitReadings separates alternative readings', () {
+    expect(splitReadings('なん/なに'), ['なん', 'なに']);
+    expect(splitReadings('なに'), ['なに']);
+  });
 }

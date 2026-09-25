@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/data/models/study_preferences.dart';
-import 'package:jlpt_practice/features/settings/auto_review_screen.dart';
 
 class LearningSettingsScreen extends ConsumerWidget {
   const LearningSettingsScreen({super.key});
@@ -20,17 +19,6 @@ class LearningSettingsScreen extends ConsumerWidget {
         data: (state) {
           final controller = ref.read(appControllerProvider.notifier);
           final strings = context.strings;
-          final studySession = state.studySessions[state.selectedLevel];
-          final hasUnfinishedStudyDay =
-              studySession != null &&
-              studySession.isCompatible(
-                level: state.selectedLevel,
-                dailyGoal: state.dailyGoal,
-              ) &&
-              !(state.completedStudyDays[state.selectedLevel]?.contains(
-                    studySession.day,
-                  ) ??
-                  false);
           return ListView(
             padding: const EdgeInsets.fromLTRB(20, 4, 20, 28),
             children: [
@@ -75,34 +63,6 @@ class LearningSettingsScreen extends ConsumerWidget {
                     ),
                     trailing: const Icon(Icons.chevron_right_rounded),
                     onTap: () => context.push('/settings/tts-volume'),
-                  ),
-                ],
-              ),
-              _GroupLabel(strings('groupReview')),
-              _Group(
-                children: [
-                  ListTile(
-                    leading: const Icon(Icons.layers_clear_rounded),
-                    title: Text(strings('recallCover')),
-                    trailing: const Icon(Icons.chevron_right_rounded),
-                    onTap: () => context.push('/settings/recall-cover'),
-                  ),
-                  Opacity(
-                    opacity: hasUnfinishedStudyDay ? 0.38 : 1,
-                    child: ListTile(
-                      enabled: !hasUnfinishedStudyDay,
-                      leading: const Icon(Icons.play_circle_outline_rounded),
-                      title: Text(strings('autoReview')),
-                      subtitle: Text(
-                        state.autoReviewEnabled
-                            ? '${autoReviewOrderLabel(context, state.autoReviewOrder)} · ${autoReviewSecondsLabel(context, state.autoReviewSeconds)}'
-                            : strings('off'),
-                      ),
-                      trailing: const Icon(Icons.chevron_right_rounded),
-                      onTap: hasUnfinishedStudyDay
-                          ? null
-                          : () => context.push('/settings/auto-review'),
-                    ),
                   ),
                 ],
               ),

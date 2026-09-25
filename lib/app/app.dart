@@ -3,12 +3,14 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/app/router.dart';
 import 'package:jlpt_practice/app/theme/app_theme.dart';
 import 'package:jlpt_practice/core/services/app_startup.dart';
 import 'package:jlpt_practice/core/services/notification_service.dart';
 import 'package:jlpt_practice/core/utils/system_bar_metrics.dart';
+import 'package:jlpt_practice/shared/eye_comfort_overlay.dart';
 import 'package:jlpt_practice/shared/network_status_screen.dart';
 
 class JlptPracticeApp extends ConsumerWidget {
@@ -52,16 +54,33 @@ class JlptPracticeApp extends ConsumerWidget {
         );
         return MediaQuery(
           data: stableMediaQuery,
-          child: NetworkStatusGate(
-            child: ValueListenableBuilder<Color?>(
-              valueListenable: SystemBarMetrics.outerBackgroundColor,
-              builder: (context, outerBackgroundColor, appChild) => ColoredBox(
-                color:
-                    outerBackgroundColor ??
-                    Theme.of(context).scaffoldBackgroundColor,
-                child: SafeArea(child: appChild ?? const SizedBox.shrink()),
+          child: EyeComfortSystemBarTint(
+            insets: stableMediaQuery.padding,
+            child: NetworkStatusGate(
+              child: ValueListenableBuilder<Color?>(
+                valueListenable: SystemBarMetrics.outerBackgroundColor,
+                builder: (context, outerBackgroundColor, appChild) =>
+                    ListenableBuilder(
+                      listenable: appRouter.routerDelegate,
+                      builder: (context, _) {
+                        final path = visibleRoutePath(appRouter);
+                        final isQuizSelection = RegExp(
+                          r'^/study/day/\d+/quiz-selection$',
+                        ).hasMatch(path);
+                        final theme = Theme.of(context);
+                        return ColoredBox(
+                          color: isQuizSelection
+                              ? theme.scaffoldBackgroundColor
+                              : outerBackgroundColor ??
+                                    theme.scaffoldBackgroundColor,
+                          child: SafeArea(
+                            child: appChild ?? const SizedBox.shrink(),
+                          ),
+                        );
+                      },
+                    ),
+                child: child ?? const SizedBox.shrink(),
               ),
-              child: child ?? const SizedBox.shrink(),
             ),
           ),
         );
@@ -80,6 +99,11 @@ class JlptPracticeApp extends ConsumerWidget {
     );
   }
 }
+
+String visibleRoutePath(GoRouter router) =>
+    router.routerDelegate.currentConfiguration.isEmpty
+    ? router.routeInformationProvider.value.uri.path
+    : router.routerDelegate.state.uri.path;
 
 MediaQueryData mediaQueryWithStableSystemInsets(
   MediaQueryData mediaQuery,
