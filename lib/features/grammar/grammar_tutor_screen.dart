@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_gemma/flutter_gemma.dart';
 import 'package:flutter_gen_ai_chat_ui/flutter_gen_ai_chat_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
@@ -26,14 +29,20 @@ class _GrammarTutorScreenState extends ConsumerState<GrammarTutorScreen>
   static const _user = ChatUser(id: 'user', firstName: 'You');
   static const _assistant = ChatUser(id: 'ai', firstName: 'AI');
   final _messages = ChatMessagesController();
-  final List<GrammarPracticeTurn> _history = [];
   final _input = TextEditingController();
-  bool _asking = false;
+  InferenceModelSession? _session;
+  StreamSubscription<String>? _sub;
+  bool _isBusy = false;
   bool _waiting = false;
   bool _hasAnswer = false;
 
   @override
   void dispose() {
+    final sub = _sub;
+    if (sub != null) unawaited(sub.cancel());
+    final session = _session;
+    // Canceling the Dart stream alone may leave native inference running.
+    if (session != null) unawaited(session.close());
     _messages.dispose();
     _input.dispose();
     super.dispose();
@@ -41,7 +50,7 @@ class _GrammarTutorScreenState extends ConsumerState<GrammarTutorScreen>
 
   void _sendInput(GrammarPoint grammar, String languageCode) {
     final question = _input.text.trim();
-    if (question.isEmpty || _asking) return;
+    if (question.isEmpty || _isBusy) return;
     _input.clear();
     _ask(grammar, languageCode, question);
   }
@@ -53,50 +62,98 @@ class _GrammarTutorScreenState extends ConsumerState<GrammarTutorScreen>
     bool practiceTask = false,
   }) async {
     final question = text.trim();
-    if (question.isEmpty || question.length > 300 || _asking) return;
+    if (question.isEmpty || question.length > 300 || _isBusy) return;
     _messages.addMessage(
       ChatMessage(text: question, user: _user, createdAt: DateTime.now()),
     );
     setState(() {
-      _asking = true;
+      _isBusy = true;
       _waiting = true;
     });
     final reply = StreamingChatReply(_messages, _assistant);
     try {
       final service = await ref.read(grammarPracticeServiceProvider.future);
-      final answer = await service.reply(
+      if (!mounted) return;
+      final request = service.buildRequest(
         grammar: grammar,
         message: question,
         languageCode: languageCode,
-        history: List.of(_history),
+        history: const [],
         practiceTask: practiceTask,
-        onPartial: (text) {
-          if (!mounted) return;
-          if (_waiting) setState(() => _waiting = false);
-          reply.update(text);
-        },
       );
-      if (!mounted) return;
-      _history.add(GrammarPracticeTurn(isUser: true, text: question));
-      _history.add(GrammarPracticeTurn(isUser: false, text: answer));
-      reply.finish(answer);
-      setState(() => _hasAnswer = true);
-    } catch (error) {
-      if (!mounted) return;
-      reply.finish(
-        context.strings(
-          error is OfflineAiException ? error.key : 'offlineInferenceError',
-        ),
-      );
-      setState(() => _hasAnswer = true);
-    } finally {
-      if (mounted) {
-        setState(() {
-          _asking = false;
-          _waiting = false;
-        });
+      var session = _session;
+      if (session == null) {
+        final model = await service.controller.getLoadedModel();
+        if (!mounted) return;
+        session = await model.openSession(
+          systemInstruction: request.system,
+          temperature: 0.1,
+          topP: 0.9,
+          maxOutputTokens: 320,
+        );
+        if (!mounted) {
+          await session.close();
+          return;
+        }
+        _session = session;
       }
+      await session.addQueryChunk(
+        Message.text(text: request.input, isUser: true),
+      );
+      if (!mounted) return;
+      final buffer = StringBuffer();
+      _sub = session.getResponseAsync().listen(
+        (token) {
+          if (!mounted) return;
+          buffer.write(token);
+          if (_waiting) setState(() => _waiting = false);
+          reply.update(buffer.toString());
+        },
+        onDone: () {
+          if (!mounted) return;
+          final answer = buffer.toString().trim();
+          if (answer.isEmpty || answer.length > 4000) {
+            _showError(
+              reply,
+              const OfflineAiException('offlineInvalidResponse'),
+            );
+            return;
+          }
+          reply.finish(answer);
+          setState(() {
+            _hasAnswer = true;
+            _isBusy = false;
+            _waiting = false;
+            _sub = null;
+          });
+        },
+        onError: (Object error, StackTrace stackTrace) {
+          if (mounted) _showError(reply, error);
+        },
+        cancelOnError: true,
+      );
+    } catch (error) {
+      if (mounted) _showError(reply, error);
     }
+  }
+
+  void _showError(StreamingChatReply reply, Object error) {
+    final sub = _sub;
+    if (sub != null) unawaited(sub.cancel());
+    final session = _session;
+    if (session != null) unawaited(session.close());
+    reply.finish(
+      context.strings(
+        error is OfflineAiException ? error.key : 'offlineInferenceError',
+      ),
+    );
+    setState(() {
+      _hasAnswer = true;
+      _isBusy = false;
+      _waiting = false;
+      _sub = null;
+      _session = null;
+    });
   }
 
   List<Widget> _suggestions(GrammarPoint grammar, String languageCode) => [
@@ -107,7 +164,7 @@ class _GrammarTutorScreenState extends ConsumerState<GrammarTutorScreen>
     ])
       ChatUiStyle.suggestion(
         context.strings(key),
-        _asking
+        _isBusy
             ? null
             : () => _ask(
                 grammar,
@@ -186,7 +243,7 @@ class _GrammarTutorScreenState extends ConsumerState<GrammarTutorScreen>
                   loadingConfig: ChatUiStyle.loading(context, _waiting),
                   messageOptions: ChatUiStyle.messages(context),
                 ),
-                if (!_hasAnswer && !_asking)
+                if (!_hasAnswer && !_isBusy)
                   ChatUiStyle.suggestions(
                     context: context,
                     centered: true,
@@ -195,7 +252,7 @@ class _GrammarTutorScreenState extends ConsumerState<GrammarTutorScreen>
               ],
             ),
           ),
-          if (_hasAnswer || _asking)
+          if (_hasAnswer || _isBusy)
             ChatUiStyle.suggestions(
               context: context,
               centered: false,
@@ -206,7 +263,7 @@ class _GrammarTutorScreenState extends ConsumerState<GrammarTutorScreen>
             controller: _input,
             hint: context.strings('practiceChatHint'),
             sendTooltip: context.strings('sendMessage'),
-            enabled: !_asking,
+            enabled: !_isBusy,
             maxLength: 300,
             onSend: () => _sendInput(grammar, languageCode),
             sendKey: const ValueKey('grammar_practice_send'),

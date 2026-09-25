@@ -5,6 +5,7 @@ import 'package:flutter_gemma_litertlm/flutter_gemma_litertlm.dart';
 import 'package:jlpt_practice/features/offline_ai/offline_ai_model.dart';
 
 abstract class LocalInference {
+  InferenceModel? get model => null;
   Future<void> load(String path);
   Future<String> generate(String system, String input);
   Stream<String> generateStream(String system, String input) async* {
@@ -18,6 +19,8 @@ abstract class LocalInference {
 class GemmaLocalInference implements LocalInference {
   static Future<void>? _initialization;
   InferenceModel? _model;
+  @override
+  InferenceModel? get model => _model;
   Future<void> _queue = Future.value();
 
   Future<T> _exclusive<T>(Future<T> Function() action) {

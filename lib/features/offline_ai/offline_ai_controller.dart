@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter_gemma/flutter_gemma.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -83,6 +84,16 @@ class OfflineAiController extends ChangeNotifier with WidgetsBindingObserver {
     _ => false,
   };
   bool get ready => _loadedId == selected.id && phase == OfflineAiPhase.ready;
+
+  Future<InferenceModel> getLoadedModel() async {
+    if (_loadedId != selected.id || engine.model == null) {
+      if (!await prepare()) {
+        throw OfflineAiException(errorKey ?? 'offlineSetupRequired');
+      }
+    }
+    return engine.model!;
+  }
+
   String modelPath(OfflineAiModel model) =>
       '${capacity!.directory}/${model.filename}';
   bool _unmetered(List<ConnectivityResult> values) =>

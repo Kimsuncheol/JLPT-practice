@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_gemma/flutter_gemma.dart';
 import 'package:flutter_gen_ai_chat_ui/flutter_gen_ai_chat_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -44,10 +46,12 @@ void main() {
       findsOneWidget,
     );
 
-    final pending = Completer<String>();
-    service.nextAnswer = pending;
     await tester.tap(find.text('Give me a practice task'));
     await tester.pump();
+    await tester.pump();
+    final session = service.model.sessions.single;
+    expect(session.queries, hasLength(1));
+    expect(jsonDecode(session.queries.first)['practiceTask'], isTrue);
     expect(
       find.byKey(const ValueKey('chat_suggestions_container')),
       findsNothing,
@@ -77,7 +81,8 @@ void main() {
         bottomRight: Radius.circular(22),
       ),
     );
-    pending.complete('Write a sentence using A が いちばん～.');
+    session.responses.first.add('Write a sentence using A が いちばん～.');
+    await session.responses.first.close();
     await tester.pumpAndSettle();
     expect(
       tester
@@ -90,10 +95,13 @@ void main() {
 
     await tester.enterText(find.byType(TextField), '寿司が一番好きです。');
     await tester.tap(find.byKey(const ValueKey('grammar_practice_send')));
+    await tester.pump();
+    session.responses.last.add('Practice reply');
+    await session.responses.last.close();
     await tester.pumpAndSettle();
-    expect(service.messages, ['Give me a practice task', '寿司が一番好きです。']);
-    expect(service.practiceTaskRequests, [true, false]);
-    expect(service.histories.last, hasLength(2));
+    expect(service.model.sessions, hasLength(1));
+    expect(session.queries, hasLength(2));
+    expect(jsonDecode(session.queries.last)['message'], '寿司が一番好きです。');
     expect(
       tester
           .widget<AiChatWidget>(find.byType(AiChatWidget))
@@ -102,6 +110,76 @@ void main() {
           .map((message) => message.text),
       contains('Practice reply'),
     );
+  });
+
+  testWidgets(
+    'leaving during generation closes the session and re-entry is idle',
+    (tester) async {
+      SharedPreferences.setMockInitialValues({});
+      final service = _PracticeService();
+      Widget screen() => ProviderScope(
+        overrides: [
+          grammarCatalogProvider.overrideWith((_) async => _items),
+          grammarPracticeServiceProvider.overrideWith((_) async => service),
+        ],
+        child: const MaterialApp(home: GrammarTutorScreen(grammarId: 'N5_1')),
+      );
+      await tester.pumpWidget(screen());
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Give me a practice task'));
+      await tester.pump();
+      await tester.pump();
+      final oldSession = service.model.sessions.single;
+      expect(
+        find.byKey(const ValueKey('chat_ai_loading_bubble')),
+        findsOneWidget,
+      );
+
+      await tester.pumpWidget(const MaterialApp(home: SizedBox()));
+      expect(oldSession.closed, isTrue);
+      await tester.pumpWidget(screen());
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const ValueKey('chat_ai_loading_bubble')),
+        findsNothing,
+      );
+      expect(
+        find.byKey(const ValueKey('chat_suggestions_container')),
+        findsOneWidget,
+      );
+      await tester.tap(find.text('Give me a practice task'));
+      await tester.pump();
+      await tester.pump();
+      expect(service.model.sessions, hasLength(2));
+      expect(service.model.sessions.last, isNot(same(oldSession)));
+    },
+  );
+
+  testWidgets('stream failure clears busy state', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    final service = _PracticeService();
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          grammarCatalogProvider.overrideWith((_) async => _items),
+          grammarPracticeServiceProvider.overrideWith((_) async => service),
+        ],
+        child: const MaterialApp(home: GrammarTutorScreen(grammarId: 'N5_1')),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Give me a practice task'));
+    await tester.pump();
+    await tester.pump();
+    service.model.sessions.single.responses.single.addError(
+      StateError('failed'),
+    );
+    await tester.pumpAndSettle();
+    expect(
+      find.textContaining('The local model could not finish'),
+      findsWidgets,
+    );
+    expect(tester.widget<TextField>(find.byType(TextField)).enabled, isTrue);
   });
 
   testWidgets('part checkpoint diagnoses multiple ranks', (tester) async {
@@ -138,31 +216,60 @@ void main() {
 }
 
 class _PracticeService extends GrammarPracticeService {
-  _PracticeService() : super(_UnusedOfflineAiController());
+  _PracticeService() : super(_FakeController());
+  _FakeModel get model => (controller as _FakeController).model;
+}
 
-  final List<String> messages = [];
-  final List<bool> practiceTaskRequests = [];
-  final List<List<GrammarPracticeTurn>> histories = [];
-  Completer<String>? nextAnswer;
-
+class _FakeController extends Fake implements OfflineAiController {
+  final model = _FakeModel();
   @override
-  Future<String> reply({
-    required GrammarPoint grammar,
-    required String message,
-    required String languageCode,
-    required List<GrammarPracticeTurn> history,
-    bool practiceTask = false,
+  Future<InferenceModel> getLoadedModel() async => model;
+}
+
+class _FakeModel extends Fake implements InferenceModel {
+  @override
+  final List<_FakeSession> sessions = [];
+  @override
+  Future<InferenceModelSession> openSession({
+    double temperature = .8,
+    int randomSeed = 1,
+    int topK = 1,
+    double? topP,
+    String? loraPath,
+    bool? enableVisionModality,
+    bool? enableAudioModality,
+    String? systemInstruction,
+    bool enableThinking = false,
+    List<Tool> tools = const [],
+    int? maxOutputTokens,
   }) async {
-    messages.add(message);
-    practiceTaskRequests.add(practiceTask);
-    histories.add(history);
-    final pending = nextAnswer;
-    nextAnswer = null;
-    return pending?.future ?? 'Practice reply';
+    final session = _FakeSession();
+    sessions.add(session);
+    return session;
   }
 }
 
-class _UnusedOfflineAiController extends Fake implements OfflineAiController {}
+class _FakeSession extends Fake implements InferenceModelSession {
+  final queries = <String>[];
+  final responses = <StreamController<String>>[];
+  bool closed = false;
+
+  @override
+  Future<void> addQueryChunk(Message message) async =>
+      queries.add(message.text);
+
+  @override
+  Stream<String> getResponseAsync() {
+    final response = StreamController<String>();
+    responses.add(response);
+    return response.stream;
+  }
+
+  @override
+  Future<void> close() async {
+    closed = true;
+  }
+}
 
 const _items = [_target, _distractor];
 

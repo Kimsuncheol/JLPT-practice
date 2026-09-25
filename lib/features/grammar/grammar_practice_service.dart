@@ -20,14 +20,13 @@ class GrammarPracticeService {
   const GrammarPracticeService(this.controller);
   final OfflineAiController controller;
 
-  Future<String> reply({
+  ({String system, String input}) buildRequest({
     required GrammarPoint grammar,
     required String message,
     required String languageCode,
     required List<GrammarPracticeTurn> history,
     bool practiceTask = false,
-    void Function(String text)? onPartial,
-  }) async {
+  }) {
     final trimmed = message.trim();
     if (trimmed.isEmpty || trimmed.length > 300) {
       throw const OfflineAiException('offlineQuestionLimit');
@@ -89,12 +88,33 @@ words, in plain text.
       'message': trimmed,
       'practiceTask': practiceTask,
     });
+    return (system: system, input: input);
+  }
+
+  Future<String> reply({
+    required GrammarPoint grammar,
+    required String message,
+    required String languageCode,
+    required List<GrammarPracticeTurn> history,
+    bool practiceTask = false,
+    void Function(String text)? onPartial,
+  }) async {
+    final request = buildRequest(
+      grammar: grammar,
+      message: message,
+      languageCode: languageCode,
+      history: history,
+      practiceTask: practiceTask,
+    );
     final String raw;
     if (onPartial == null) {
-      raw = await controller.generate(system, input);
+      raw = await controller.generate(request.system, request.input);
     } else {
       final buffer = StringBuffer();
-      await for (final chunk in controller.generateStream(system, input)) {
+      await for (final chunk in controller.generateStream(
+        request.system,
+        request.input,
+      )) {
         buffer.write(chunk);
         onPartial(buffer.toString());
       }
