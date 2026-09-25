@@ -42,6 +42,9 @@ class AppTheme {
       useMaterial3: true,
       colorScheme: scheme,
       fontFamily: 'SF Pro Display',
+      actionIconTheme: ActionIconThemeData(
+        backButtonIconBuilder: (context) => const Icon(Icons.close_rounded),
+      ),
       appBarTheme: AppBarTheme(
         elevation: 0,
         centerTitle: false,

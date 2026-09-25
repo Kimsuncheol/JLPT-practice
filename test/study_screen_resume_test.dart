@@ -76,7 +76,7 @@ void main() {
   });
 
   for (final kind in GrammarStudyKind.values) {
-    testWidgets('recent grammar opens saved ${kind.name} screen', (
+    testWidgets('recent grammar from ${kind.name} opens the expected screen', (
       tester,
     ) async {
       final session = GrammarStudySession(
@@ -110,7 +110,10 @@ void main() {
       expect(find.text('Previous'), findsOneWidget);
       await tester.tap(find.byKey(ValueKey('recent-study-${session.route}')));
       await tester.pumpAndSettle();
-      expect(find.text(session.route), findsOneWidget);
+      final expectedRoute = kind == GrammarStudyKind.tutor
+          ? '/grammar/detail/${session.grammarId}'
+          : session.route;
+      expect(find.text(expectedRoute), findsOneWidget);
       expect(find.text('Saved grammar screen'), findsOneWidget);
     });
   }

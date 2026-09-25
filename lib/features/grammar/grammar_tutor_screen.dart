@@ -28,16 +28,24 @@ class _GrammarTutorScreenState extends ConsumerState<GrammarTutorScreen>
     with ImmersiveStudyMode<GrammarTutorScreen> {
   static const _user = ChatUser(id: 'user', firstName: 'You');
   static const _assistant = ChatUser(id: 'ai', firstName: 'AI');
+  static const _introPrompt =
+      'Introduce this grammar point. Explain its meaning and formation, give '
+      'two Japanese example sentences with natural translations, then invite '
+      'me to write my own sentence using it.';
   final _messages = ChatMessagesController();
   final _input = TextEditingController();
+  final List<_PendingPracticeTurn> _pendingMessages = [];
   InferenceModelSession? _session;
   StreamSubscription<String>? _sub;
   bool _isBusy = false;
   bool _waiting = false;
-  bool _hasAnswer = false;
+  bool _hasSentIntro = false;
+  bool _introFinished = false;
+  bool _introFailed = false;
 
   @override
   void dispose() {
+    _pendingMessages.clear();
     final sub = _sub;
     if (sub != null) unawaited(sub.cancel());
     final session = _session;
@@ -50,25 +58,60 @@ class _GrammarTutorScreenState extends ConsumerState<GrammarTutorScreen>
 
   void _sendInput(GrammarPoint grammar, String languageCode) {
     final question = _input.text.trim();
-    if (question.isEmpty || _isBusy) return;
+    if (question.isEmpty || question.length > 300) return;
     _input.clear();
-    _ask(grammar, languageCode, question);
+    _queueQuestion(grammar, languageCode, question);
   }
 
-  Future<void> _ask(
+  void _queueQuestion(
     GrammarPoint grammar,
     String languageCode,
     String text, {
     bool practiceTask = false,
-  }) async {
+  }) {
     final question = text.trim();
-    if (question.isEmpty || question.length > 300 || _isBusy) return;
+    if (question.isEmpty || question.length > 300) return;
     _messages.addMessage(
       ChatMessage(text: question, user: _user, createdAt: DateTime.now()),
     );
+    setState(
+      () => _pendingMessages.add(
+        _PendingPracticeTurn(
+          grammar: grammar,
+          languageCode: languageCode,
+          question: question,
+          practiceTask: practiceTask,
+        ),
+      ),
+    );
+    _startNextQuestion();
+  }
+
+  void _startNextQuestion() {
+    if (!mounted || _isBusy || !_introFinished || _pendingMessages.isEmpty) {
+      return;
+    }
+    final next = _pendingMessages.removeAt(0);
+    _generate(
+      next.grammar,
+      next.languageCode,
+      next.question,
+      practiceTask: next.practiceTask,
+    );
+  }
+
+  Future<void> _generate(
+    GrammarPoint grammar,
+    String languageCode,
+    String text, {
+    bool practiceTask = false,
+    bool intro = false,
+  }) async {
+    final question = text.trim();
     setState(() {
       _isBusy = true;
       _waiting = true;
+      if (intro) _introFailed = false;
     });
     final reply = StreamingChatReply(_messages, _assistant);
     try {
@@ -116,44 +159,63 @@ class _GrammarTutorScreenState extends ConsumerState<GrammarTutorScreen>
             _showError(
               reply,
               const OfflineAiException('offlineInvalidResponse'),
+              intro: intro,
             );
             return;
           }
           reply.finish(answer);
           setState(() {
-            _hasAnswer = true;
+            if (intro) _introFinished = true;
             _isBusy = false;
             _waiting = false;
             _sub = null;
           });
+          _startNextQuestion();
         },
         onError: (Object error, StackTrace stackTrace) {
-          if (mounted) _showError(reply, error);
+          if (mounted) _showError(reply, error, intro: intro);
         },
         cancelOnError: true,
       );
     } catch (error) {
-      if (mounted) _showError(reply, error);
+      if (mounted) _showError(reply, error, intro: intro);
     }
   }
 
-  void _showError(StreamingChatReply reply, Object error) {
+  void _showError(
+    StreamingChatReply reply,
+    Object error, {
+    bool intro = false,
+  }) {
     final sub = _sub;
-    if (sub != null) unawaited(sub.cancel());
     final session = _session;
-    if (session != null) unawaited(session.close());
     reply.finish(
       context.strings(
         error is OfflineAiException ? error.key : 'offlineInferenceError',
       ),
     );
     setState(() {
-      _hasAnswer = true;
+      if (intro) _introFailed = true;
       _isBusy = false;
       _waiting = false;
       _sub = null;
       _session = null;
     });
+    unawaited(_releaseFailedSession(sub, session));
+  }
+
+  Future<void> _releaseFailedSession(
+    StreamSubscription<String>? sub,
+    InferenceModelSession? session,
+  ) async {
+    try {
+      await sub?.cancel();
+      await session?.close();
+    } catch (error) {
+      debugPrint('Failed to close the practice session: $error');
+    } finally {
+      if (mounted) _startNextQuestion();
+    }
   }
 
   List<Widget> _suggestions(GrammarPoint grammar, String languageCode) => [
@@ -166,7 +228,7 @@ class _GrammarTutorScreenState extends ConsumerState<GrammarTutorScreen>
         context.strings(key),
         _isBusy
             ? null
-            : () => _ask(
+            : () => _queueQuestion(
                 grammar,
                 languageCode,
                 context.strings(key),
@@ -195,6 +257,20 @@ class _GrammarTutorScreenState extends ConsumerState<GrammarTutorScreen>
           final languageCode =
               ref.watch(appControllerProvider).value?.meaningLanguage ??
               Localizations.localeOf(context).languageCode;
+          if (!_hasSentIntro) {
+            _hasSentIntro = true;
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) {
+                _generate(
+                  grammar,
+                  languageCode,
+                  _introPrompt,
+                  practiceTask: true,
+                  intro: true,
+                );
+              }
+            });
+          }
           return TrackGrammarStudy(
             key: ValueKey(grammar.id),
             session: GrammarStudySession(
@@ -215,7 +291,12 @@ class _GrammarTutorScreenState extends ConsumerState<GrammarTutorScreen>
   Widget _buildChat(GrammarPoint grammar, String languageCode) => Scaffold(
     appBar: AppBar(
       automaticallyImplyLeading: false,
-      title: Text(context.strings('practiceWithAi')),
+      scrolledUnderElevation: 0,
+      title: ChatUiStyle.appBarTitle(
+        context,
+        Icons.auto_awesome_rounded,
+        context.strings('practiceWithAi'),
+      ),
       actions: [
         IconButton(
           key: const ValueKey('grammar_practice_close'),
@@ -229,47 +310,79 @@ class _GrammarTutorScreenState extends ConsumerState<GrammarTutorScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Divider(height: 1),
+          ChatUiStyle.appBarDivider(context),
           Expanded(
-            child: Stack(
-              children: [
-                AiChatWidget(
-                  currentUser: _user,
-                  aiUser: _assistant,
-                  controller: _messages,
-                  onSendMessage: (message) =>
-                      _ask(grammar, languageCode, message.text),
-                  readOnly: true,
-                  loadingConfig: ChatUiStyle.loading(context, _waiting),
-                  messageOptions: ChatUiStyle.messages(context),
-                ),
-                if (!_hasAnswer && !_isBusy)
-                  ChatUiStyle.suggestions(
-                    context: context,
-                    centered: true,
-                    chips: _suggestions(grammar, languageCode),
-                  ),
-              ],
+            child: AiChatWidget(
+              currentUser: _user,
+              aiUser: _assistant,
+              controller: _messages,
+              onSendMessage: (message) =>
+                  _queueQuestion(grammar, languageCode, message.text),
+              readOnly: true,
+              loadingConfig: ChatUiStyle.loading(context, _waiting),
+              messageOptions: ChatUiStyle.messages(context),
             ),
           ),
-          if (_hasAnswer || _isBusy)
+          if (_introFinished)
             ChatUiStyle.suggestions(
               context: context,
               centered: false,
               chips: _suggestions(grammar, languageCode),
+            ),
+          if (_introFailed)
+            TextButton(
+              onPressed: _isBusy
+                  ? null
+                  : () => _generate(
+                      grammar,
+                      languageCode,
+                      _introPrompt,
+                      practiceTask: true,
+                      intro: true,
+                    ),
+              child: Text(context.strings('tryAgain')),
             ),
           ChatUiStyle.composer(
             context: context,
             controller: _input,
             hint: context.strings('practiceChatHint'),
             sendTooltip: context.strings('sendMessage'),
-            enabled: !_isBusy,
+            enabled: true,
             maxLength: 300,
             onSend: () => _sendInput(grammar, languageCode),
             sendKey: const ValueKey('grammar_practice_send'),
           ),
+          if (_pendingMessages.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+              child: Row(
+                children: [
+                  const Icon(Icons.schedule_rounded, size: 16),
+                  const SizedBox(width: 6),
+                  Text(
+                    context
+                        .strings('queuedChatMessages')
+                        .replaceAll('{count}', '${_pendingMessages.length}'),
+                  ),
+                ],
+              ),
+            ),
         ],
       ),
     ),
   );
+}
+
+class _PendingPracticeTurn {
+  const _PendingPracticeTurn({
+    required this.grammar,
+    required this.languageCode,
+    required this.question,
+    required this.practiceTask,
+  });
+
+  final GrammarPoint grammar;
+  final String languageCode;
+  final String question;
+  final bool practiceTask;
 }

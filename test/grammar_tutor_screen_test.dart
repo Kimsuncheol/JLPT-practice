@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_gemma/flutter_gemma.dart';
 import 'package:flutter_gen_ai_chat_ui/flutter_gen_ai_chat_ui.dart';
+import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jlpt_practice/core/services/local_store.dart';
@@ -30,7 +31,9 @@ void main() {
         child: const MaterialApp(home: GrammarTutorScreen(grammarId: 'N5_1')),
       ),
     );
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump();
+    await tester.pump();
 
     expect(
       (await LocalStore.create()).loadGrammarStudySessions()['N5']!.route,
@@ -41,31 +44,25 @@ void main() {
     expect(find.text('Check my understanding'), findsNothing);
     expect(find.text(_target.explanation), findsNothing);
     expect(find.text(_target.formation), findsNothing);
-    expect(
-      find.byKey(const ValueKey('chat_suggestions_container')),
-      findsOneWidget,
-    );
-
-    await tester.tap(find.text('Give me a practice task'));
-    await tester.pump();
-    await tester.pump();
+    expect(find.byType(ActionChip), findsNothing);
     final session = service.model.sessions.single;
     expect(session.queries, hasLength(1));
     expect(jsonDecode(session.queries.first)['practiceTask'], isTrue);
+    expect(jsonDecode(session.queries.first)['title'], _target.title);
+    await tester.pump();
+    expect(session.queries, hasLength(1));
+    expect(
+      tester
+          .widget<AiChatWidget>(find.byType(AiChatWidget))
+          .controller
+          .messages,
+      isEmpty,
+    );
     expect(
       find.byKey(const ValueKey('chat_suggestions_container')),
       findsNothing,
     );
-    expect(
-      find.byKey(const ValueKey('chat_suggestions_scroll')),
-      findsOneWidget,
-    );
-    expect(
-      tester
-          .widgetList<ActionChip>(find.byType(ActionChip))
-          .every((chip) => chip.onPressed == null),
-      isTrue,
-    );
+    expect(find.byKey(const ValueKey('chat_suggestions_scroll')), findsNothing);
     final chat = tester.widget<AiChatWidget>(find.byType(AiChatWidget));
     final loadingBubble = tester.widget<Container>(
       find.byKey(const ValueKey('chat_ai_loading_bubble')),
@@ -81,27 +78,94 @@ void main() {
         bottomRight: Radius.circular(22),
       ),
     );
-    session.responses.first.add('Write a sentence using A が いちばん～.');
+    session.responses.first.add('**Write');
+    await tester.pump();
+    expect(tester.takeException(), isNull);
+    expect(find.byType(MarkdownBody), findsOneWidget);
+    session.responses.first.add(
+      ' a sentence** using A が いちばん～.\n- Example with `が`',
+    );
+    await tester.pump();
+    expect(tester.takeException(), isNull);
+    session.responses.first.add('\n```text\nA が いちばん');
+    await tester.pump();
+    expect(tester.takeException(), isNull);
+    session.responses.first.add('\n```');
+    await tester.pump();
+    expect(tester.takeException(), isNull);
+    expect(find.byType(ActionChip), findsNothing);
+    expect(
+      tester
+          .widget<AiChatWidget>(find.byType(AiChatWidget))
+          .controller
+          .messages
+          .where((message) => message.user.id == 'user'),
+      isEmpty,
+    );
     await session.responses.first.close();
     await tester.pumpAndSettle();
+    expect(find.byType(ActionChip), findsNWidgets(3));
     expect(
       tester
           .widget<AiChatWidget>(find.byType(AiChatWidget))
           .controller
           .messages
           .map((message) => message.text),
-      contains('Write a sentence using A が いちばん～.'),
+      contains(
+        '**Write a sentence** using A が いちばん～.\n- Example with `が`'
+        '\n```text\nA が いちばん\n```',
+      ),
+    );
+    expect(
+      chat.controller.messages
+          .where((message) => message.user.id == 'ai')
+          .every((message) => message.isMarkdown),
+      isTrue,
     );
 
     await tester.enterText(find.byType(TextField), '寿司が一番好きです。');
     await tester.tap(find.byKey(const ValueKey('grammar_practice_send')));
     await tester.pump();
-    session.responses.last.add('Practice reply');
-    await session.responses.last.close();
+    expect(
+      chat.controller.messages
+          .where((message) => message.user.id == 'user')
+          .every((message) => !message.isMarkdown),
+      isTrue,
+    );
+    expect(tester.widget<TextField>(find.byType(TextField)).enabled, isTrue);
+    await tester.enterText(find.byType(TextField), 'もう一つの文です。');
+    await tester.tap(find.byKey(const ValueKey('grammar_practice_send')));
+    await tester.pump();
+    await tester.enterText(find.byType(TextField), '三番目の文です。');
+    await tester.tap(find.byKey(const ValueKey('grammar_practice_send')));
+    await tester.pump();
+    expect(session.queries, hasLength(2));
+    expect(find.textContaining('2 waiting'), findsOneWidget);
+    expect(
+      tester
+          .widget<AiChatWidget>(find.byType(AiChatWidget))
+          .controller
+          .messages
+          .map((message) => message.text),
+      contains('もう一つの文です。'),
+    );
+    session.responses[1].add('Practice reply');
+    await session.responses[1].close();
+    await tester.pump();
+    expect(session.queries, hasLength(3));
+    expect(jsonDecode(session.queries.last)['message'], 'もう一つの文です。');
+    expect(find.textContaining('1 waiting'), findsOneWidget);
+    session.responses[2].add('Second reply');
+    await session.responses[2].close();
+    await tester.pump();
+    expect(session.queries, hasLength(4));
+    expect(jsonDecode(session.queries.last)['message'], '三番目の文です。');
+    expect(find.textContaining('1 waiting'), findsNothing);
+    session.responses[3].add('Third reply');
+    await session.responses[3].close();
     await tester.pumpAndSettle();
     expect(service.model.sessions, hasLength(1));
-    expect(session.queries, hasLength(2));
-    expect(jsonDecode(session.queries.last)['message'], '寿司が一番好きです。');
+    expect(session.queries, hasLength(4));
     expect(
       tester
           .widget<AiChatWidget>(find.byType(AiChatWidget))
@@ -109,6 +173,22 @@ void main() {
           .messages
           .map((message) => message.text),
       contains('Practice reply'),
+    );
+    expect(
+      tester
+          .widget<AiChatWidget>(find.byType(AiChatWidget))
+          .controller
+          .messages
+          .map((message) => message.text),
+      contains('Second reply'),
+    );
+    expect(
+      tester
+          .widget<AiChatWidget>(find.byType(AiChatWidget))
+          .controller
+          .messages
+          .map((message) => message.text),
+      contains('Third reply'),
     );
   });
 
@@ -125,11 +205,17 @@ void main() {
         child: const MaterialApp(home: GrammarTutorScreen(grammarId: 'N5_1')),
       );
       await tester.pumpWidget(screen());
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Give me a practice task'));
+      await tester.pump();
       await tester.pump();
       await tester.pump();
       final oldSession = service.model.sessions.single;
+      expect(find.byType(ActionChip), findsNothing);
+      expect(tester.widget<TextField>(find.byType(TextField)).enabled, isTrue);
+      await tester.enterText(find.byType(TextField), '寿司が一番好きです。');
+      await tester.tap(find.byKey(const ValueKey('grammar_practice_send')));
+      await tester.pump();
+      expect(find.textContaining('1 waiting'), findsOneWidget);
+      expect(oldSession.queries, hasLength(1));
       expect(
         find.byKey(const ValueKey('chat_ai_loading_bubble')),
         findsOneWidget,
@@ -138,20 +224,17 @@ void main() {
       await tester.pumpWidget(const MaterialApp(home: SizedBox()));
       expect(oldSession.closed, isTrue);
       await tester.pumpWidget(screen());
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump();
       expect(
         find.byKey(const ValueKey('chat_ai_loading_bubble')),
-        findsNothing,
-      );
-      expect(
-        find.byKey(const ValueKey('chat_suggestions_container')),
         findsOneWidget,
       );
-      await tester.tap(find.text('Give me a practice task'));
-      await tester.pump();
-      await tester.pump();
+      expect(find.byType(ActionChip), findsNothing);
+      expect(find.textContaining('waiting'), findsNothing);
       expect(service.model.sessions, hasLength(2));
       expect(service.model.sessions.last, isNot(same(oldSession)));
+      expect(service.model.sessions.last.queries, hasLength(1));
     },
   );
 
@@ -167,8 +250,7 @@ void main() {
         child: const MaterialApp(home: GrammarTutorScreen(grammarId: 'N5_1')),
       ),
     );
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Give me a practice task'));
+    await tester.pump();
     await tester.pump();
     await tester.pump();
     service.model.sessions.single.responses.single.addError(
@@ -180,6 +262,8 @@ void main() {
       findsWidgets,
     );
     expect(tester.widget<TextField>(find.byType(TextField)).enabled, isTrue);
+    expect(find.text('Try again'), findsOneWidget);
+    expect(find.byType(ActionChip), findsNothing);
   });
 
   testWidgets('part checkpoint diagnoses multiple ranks', (tester) async {

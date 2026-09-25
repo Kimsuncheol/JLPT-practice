@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/core/utils/study_batches.dart';
 import 'package:jlpt_practice/data/models/app_state.dart';
+import 'package:jlpt_practice/data/models/grammar_study_session.dart';
 import 'package:jlpt_practice/features/grammar/grammar_study_session_provider.dart';
 
 class RecentStudyCard extends ConsumerWidget {
@@ -62,6 +63,7 @@ class RecentStudyCard extends ConsumerWidget {
               '${grammar.title == null ? '' : ' · ${grammar.title}'}',
           detail: context.strings('continueLesson'),
           route: grammar.route,
+          grammarSession: grammar,
           parentRoute: '/grammar',
           updatedAt: grammar.updatedAt,
           symbol: '文',
@@ -79,7 +81,6 @@ class RecentStudyCard extends ConsumerWidget {
         color: colors.surface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(22),
-          side: BorderSide(color: colors.outlineVariant.withValues(alpha: 0.6)),
         ),
         clipBehavior: Clip.antiAlias,
         child: Column(
@@ -87,10 +88,7 @@ class RecentStudyCard extends ConsumerWidget {
           children: [
             InkWell(
               key: ValueKey('recent-study-${primary.route}'),
-              onTap: () {
-                context.push(primary.parentRoute);
-                context.push(primary.route);
-              },
+              onTap: () => _openEntry(context, primary),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -168,13 +166,9 @@ class RecentStudyCard extends ConsumerWidget {
               ),
             ),
             if (previous != null) ...[
-              Divider(height: 1, color: colors.outlineVariant),
               InkWell(
                 key: ValueKey('recent-study-${previous.route}'),
-                onTap: () {
-                  context.push(previous.parentRoute);
-                  context.push(previous.route);
-                },
+                onTap: () => _openEntry(context, previous),
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 12, 12, 12),
                   child: Row(
@@ -209,6 +203,18 @@ class RecentStudyCard extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  void _openEntry(BuildContext context, _RecentStudyEntry entry) {
+    final grammar = entry.grammarSession;
+    final route =
+        grammar != null &&
+            grammar.kind == GrammarStudyKind.tutor &&
+            grammar.grammarId != null
+        ? '/grammar/detail/${Uri.encodeComponent(grammar.grammarId!)}'
+        : entry.route;
+    context.push(entry.parentRoute);
+    context.push(route);
   }
 }
 
@@ -249,6 +255,7 @@ class _RecentStudyEntry {
     required this.parentRoute,
     required this.updatedAt,
     required this.symbol,
+    this.grammarSession,
     this.progress,
   });
 
@@ -259,5 +266,6 @@ class _RecentStudyEntry {
   final String parentRoute;
   final DateTime updatedAt;
   final String symbol;
+  final GrammarStudySession? grammarSession;
   final double? progress;
 }

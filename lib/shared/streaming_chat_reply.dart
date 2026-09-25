@@ -16,6 +16,7 @@ class StreamingChatReply {
     text: text,
     user: assistant,
     createdAt: _createdAt,
+    isMarkdown: true,
     customProperties: {'id': _id, 'isStreaming': streaming},
   );
 
