@@ -59,6 +59,10 @@ class AppStrings {
     'chooseQuizGame': 'Choose a quiz game',
     'chooseQuizGameSubtitle': 'Pick how you want to practice today’s words.',
     'fillInBlankGame': 'Fill in the blank game',
+    'fillInBlankGameSubtitle':
+        'Complete each example sentence with the missing word.',
+    'sentenceReorderingSubtitle':
+        'Arrange short course examples into sentences.',
     'reorderPrompt': 'Put the sentence in order',
     'yourSentence': 'Your sentence',
     'chooseWordToBegin': 'Choose a word below to begin.',
@@ -432,6 +436,8 @@ class AppStrings {
     'chooseQuizGame': '퀴즈 게임 선택',
     'chooseQuizGameSubtitle': '오늘 배운 단어를 연습할 방법을 선택하세요.',
     'fillInBlankGame': '빈칸 채우기 게임',
+    'fillInBlankGameSubtitle': '예문에서 빠진 단어를 완성하세요.',
+    'sentenceReorderingSubtitle': '짧은 예문을 올바른 문장으로 배열하세요.',
     'reorderPrompt': '문장을 올바른 순서로 배열하세요',
     'yourSentence': '내 문장',
     'chooseWordToBegin': '아래 단어를 선택해 시작하세요.',
