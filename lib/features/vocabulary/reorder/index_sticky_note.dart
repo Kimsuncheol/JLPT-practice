@@ -63,7 +63,7 @@ class IndexStickyNote extends StatelessWidget {
                 color: labelTextColor,
                 fontSize: 13,
                 fontWeight: FontWeight.w800,
-                letterSpacing: 2.2,
+                letterSpacing: 0,
                 height: 1,
               ),
             ),
