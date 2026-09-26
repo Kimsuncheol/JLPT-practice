@@ -8,10 +8,12 @@ class ReorderTilePool extends StatelessWidget {
     required this.tiles,
     required this.enabled,
     required this.onSelect,
+    this.layoutTiles,
     super.key,
   });
 
   final List<SentenceToken> tiles;
+  final List<SentenceToken>? layoutTiles;
   final bool enabled;
   final ValueChanged<SentenceToken> onSelect;
 
@@ -31,54 +33,96 @@ class ReorderTilePool extends StatelessWidget {
     final chipBorderColor = isDark
         ? const Color(0xFF5B565E)
         : const Color(0xFF6F6A70);
+    final reservedTiles = layoutTiles ?? tiles;
 
-    return IndexStickyNote(
-      noteKey: const ValueKey('reorder-tile-pool-container'),
-      label: context.strings('words'),
-      labelColor: const Color(0xFF82D5EF),
-      labelTextColor: const Color(0xFF18323D),
-      surfaceColor: surfaceColor,
-      borderColor: borderColor,
-      child: CustomPaint(
-        painter: IndexNoteLinesPainter(
-          color: lineColor,
-          firstLineY: 72,
-          spacing: 52,
-        ),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: 90),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(24, 28, 24, 14),
-            child: Wrap(
-              spacing: 14,
-              runSpacing: 12,
-              children: [
-                for (final tile in tiles)
-                  ActionChip(
-                    key: ValueKey('available-${tile.id}'),
-                    label: Text(tile.text),
-                    labelStyle: const TextStyle(
-                      color: Color(0xFFF8F8F6),
-                      fontWeight: FontWeight.w700,
+    return SizedBox(
+      width: double.infinity,
+      child: IndexStickyNote(
+        noteKey: const ValueKey('reorder-tile-pool-container'),
+        label: context.strings('words'),
+        labelColor: const Color(0xFF82D5EF),
+        labelTextColor: const Color(0xFF18323D),
+        surfaceColor: surfaceColor,
+        borderColor: borderColor,
+        child: CustomPaint(
+          painter: IndexNoteLinesPainter(
+            color: lineColor,
+            firstLineY: 72,
+            spacing: 52,
+          ),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 90),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(24, 28, 24, 14),
+              child: Stack(
+                children: [
+                  Visibility(
+                    visible: false,
+                    maintainAnimation: true,
+                    maintainSize: true,
+                    maintainState: true,
+                    child: Wrap(
+                      spacing: 14,
+                      runSpacing: 12,
+                      children: [
+                        for (final tile in reservedTiles)
+                          _WordTile(tile: tile, borderColor: chipBorderColor),
+                      ],
                     ),
-                    backgroundColor: const Color(0xFF181818),
-                    disabledColor: const Color(0xFF242424),
-                    side: BorderSide(color: chipBorderColor),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    elevation: 0,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 9,
-                    ),
-                    onPressed: enabled ? () => onSelect(tile) : null,
                   ),
-              ],
+                  Positioned.fill(
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: Wrap(
+                        spacing: 14,
+                        runSpacing: 12,
+                        children: [
+                          for (final tile in tiles)
+                            _WordTile(
+                              key: ValueKey('available-${tile.id}'),
+                              tile: tile,
+                              borderColor: chipBorderColor,
+                              onPressed: enabled ? () => onSelect(tile) : null,
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
       ),
     );
   }
+}
+
+class _WordTile extends StatelessWidget {
+  const _WordTile({
+    required this.tile,
+    required this.borderColor,
+    this.onPressed,
+    super.key,
+  });
+
+  final SentenceToken tile;
+  final Color borderColor;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) => ActionChip(
+    label: Text(tile.text),
+    labelStyle: const TextStyle(
+      color: Color(0xFFF8F8F6),
+      fontWeight: FontWeight.w700,
+    ),
+    backgroundColor: const Color(0xFF181818),
+    disabledColor: const Color(0xFF242424),
+    side: BorderSide(color: borderColor),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+    elevation: 0,
+    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+    onPressed: onPressed,
+  );
 }

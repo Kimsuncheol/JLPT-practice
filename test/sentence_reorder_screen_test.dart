@@ -53,10 +53,19 @@ void main() {
       tester.getSize(find.widgetWithText(OutlinedButton, 'Reset')).height,
       tester.getSize(find.widgetWithText(FilledButton, 'Check answer')).height,
     );
+    final tilePool = find.byKey(const ValueKey('reorder-tile-pool-container'));
+    final initialTilePoolWidth = tester.getSize(tilePool).width;
+    final initialTilePoolHeight = tester.getSize(tilePool).height;
     for (var index = 0; index < 3; index++) {
       await tester.tap(find.byKey(ValueKey('available-$index')));
       await tester.pump();
     }
+    expect(tester.getSize(tilePool).width, initialTilePoolWidth);
+    expect(tester.getSize(tilePool).height, initialTilePoolHeight);
+    expect(
+      tester.getSize(tilePool).width,
+      tester.getSize(answerContainer).width,
+    );
     expect(
       find.descendant(
         of: answerContainer,

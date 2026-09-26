@@ -172,6 +172,7 @@ class _SentenceReorderScreenState extends ConsumerState<SentenceReorderScreen> {
                         const SizedBox(height: 24),
                         ReorderTilePool(
                           tiles: remaining,
+                          layoutTiles: quiz.shuffledTiles,
                           enabled: attempt == null,
                           onSelect: (tile) =>
                               setState(() => _selected.add(tile)),
