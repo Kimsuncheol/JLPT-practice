@@ -52,6 +52,10 @@ class AppStrings {
     'leaveStudyBody':
         'Your place will be saved, but hidden words and meanings will reset when you return.',
     'leave': 'Leave',
+    'startOverTitle': 'Start over?',
+    'startOverBody':
+        'This will take you back to the first word of today’s session.',
+    'startOver': 'Start over',
     'resumeConfirmBody': 'Resume from the word where you stopped?',
     'chooseAnotherDay': 'Choose another day',
     'finishSession': 'Finish this session',
@@ -429,6 +433,9 @@ class AppStrings {
     'leaveStudyTitle': '단어 학습을 나갈까요?',
     'leaveStudyBody': '학습 위치는 저장되지만, 가려 둔 단어와 뜻은 다시 들어오면 초기화됩니다.',
     'leave': '나가기',
+    'startOverTitle': '처음부터 다시 시작할까요?',
+    'startOverBody': '오늘 학습의 첫 번째 단어로 돌아갑니다.',
+    'startOver': '처음부터',
     'resumeConfirmBody': '마지막으로 보던 단어부터 이어서 학습할까요?',
     'chooseAnotherDay': '다른 날짜 선택',
     'finishSession': '이번 학습 마치기',

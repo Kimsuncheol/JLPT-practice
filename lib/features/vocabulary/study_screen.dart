@@ -17,6 +17,7 @@ import 'package:jlpt_practice/data/models/vocabulary.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_masking.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_tape.dart';
 import 'package:jlpt_practice/features/vocabulary/masked_translation.dart';
+import 'package:jlpt_practice/features/vocabulary/start_over_button.dart';
 import 'package:jlpt_practice/shared/volume_warning_toast.dart';
 
 class StudyScreen extends ConsumerStatefulWidget {
@@ -39,6 +40,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   bool _resumeDecisionPending = false;
   bool _resumeDialogVisible = false;
   bool _leaveDialogVisible = false;
+  bool _startOverDialogVisible = false;
   bool _suppressAutoAudio = false;
   int _pageChangeRequest = 0;
   int _readingsRequest = 0;
@@ -56,7 +58,8 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   Widget build(BuildContext context) {
     final asyncState = ref.watch(appControllerProvider);
     final scaffoldBackgroundColor = Theme.of(context).scaffoldBackgroundColor;
-    final systemBarColor = _resumeDialogVisible || _leaveDialogVisible
+    final systemBarColor =
+        _resumeDialogVisible || _leaveDialogVisible || _startOverDialogVisible
         ? Color.alphaBlend(_dialogBarrierColor, scaffoldBackgroundColor)
         : scaffoldBackgroundColor;
     return wrapImmersive(
@@ -96,6 +99,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
             icon: const Icon(Icons.close_rounded),
           ),
           actions: [
+            StartOverButton(onPressed: () => unawaited(_confirmStartOver(words))),
             IconButton(
               onPressed: () => context.push('/settings/learning'),
               icon: const Icon(Icons.settings_rounded),
@@ -162,7 +166,9 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   }
 
   Future<void> _confirmLeave() async {
-    if (_leaveDialogVisible || _resumeDialogVisible) return;
+    if (_leaveDialogVisible || _resumeDialogVisible || _startOverDialogVisible) {
+      return;
+    }
     final dimmedBackground = Color.alphaBlend(
       _dialogBarrierColor,
       Theme.of(context).scaffoldBackgroundColor,
@@ -202,6 +208,52 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
       }
     }
     if (mounted && shouldLeave) context.pop();
+  }
+
+  Future<void> _confirmStartOver(List<Vocabulary> words) async {
+    if (_leaveDialogVisible || _resumeDialogVisible || _startOverDialogVisible) {
+      return;
+    }
+    final dimmedBackground = Color.alphaBlend(
+      _dialogBarrierColor,
+      Theme.of(context).scaffoldBackgroundColor,
+    );
+    setImmersiveOuterBackgroundColor(dimmedBackground);
+    setState(() => _startOverDialogVisible = true);
+    bool shouldStartOver = false;
+    try {
+      final dialogResult = showDialog<bool>(
+        context: context,
+        barrierColor: _dialogBarrierColor,
+        builder: (dialogContext) => wrapImmersiveSystemBarGesture(
+          AlertDialog(
+            title: Text(dialogContext.strings('startOverTitle')),
+            content: Text(dialogContext.strings('startOverBody')),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext, false),
+                child: Text(dialogContext.strings('cancel')),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(dialogContext, true),
+                child: Text(dialogContext.strings('startOver')),
+              ),
+            ],
+          ),
+        ),
+      );
+      _applySystemBarColorAfterFrame(modalVisible: true);
+      shouldStartOver = await dialogResult ?? false;
+    } finally {
+      if (mounted) {
+        setImmersiveOuterBackgroundColor(null);
+        setState(() => _startOverDialogVisible = false);
+        reassertImmersiveMode();
+        _applySystemBarColorAfterFrame(modalVisible: false);
+      }
+    }
+    if (!mounted || !shouldStartOver || _pageController == null) return;
+    _pageController!.jumpToPage(0);
   }
 
   Widget _actionPage(List<Widget> actions) => Row(
@@ -387,7 +439,10 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   void _applySystemBarColorAfterFrame({required bool modalVisible}) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted ||
-          (_resumeDialogVisible || _leaveDialogVisible) != modalVisible) {
+          (_resumeDialogVisible ||
+                  _leaveDialogVisible ||
+                  _startOverDialogVisible) !=
+              modalVisible) {
         return;
       }
       final scaffoldBackgroundColor = Theme.of(context).scaffoldBackgroundColor;
