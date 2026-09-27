@@ -23,6 +23,11 @@ class StudyFinishScreen extends ConsumerWidget {
     final level = state.selectedLevel;
     final wordCount = state.selectedVocabulary.length;
     final dayCount = StudyBatches.count(wordCount, state.dailyGoal);
+    final todaysWords = StudyBatches.wordsForDay(
+      state.selectedVocabulary,
+      day: day,
+      dailyGoal: state.dailyGoal,
+    );
     final completedDays = state.completedStudyDays[level] ?? const <int>{};
     final completesLevel =
         dayCount > 0 &&
@@ -76,6 +81,27 @@ class StudyFinishScreen extends ConsumerWidget {
                   ],
                 ),
               ),
+              Expanded(
+                child: todaysWords.isEmpty
+                    ? const SizedBox.shrink()
+                    : SingleChildScrollView(
+                        child: Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          alignment: WrapAlignment.center,
+                          children: [
+                            for (final word in todaysWords)
+                              _WordChip(
+                                word: word.word,
+                                onTap: () => ref
+                                    .read(ttsServiceProvider)
+                                    .speak(word.word),
+                              ),
+                          ],
+                        ),
+                      ),
+              ),
+              const SizedBox(height: 16),
               if (completesLevel) ...[
                 SizedBox(
                   width: double.infinity,
@@ -140,8 +166,10 @@ class StudyFinishScreen extends ConsumerWidget {
                     style: OutlinedButton.styleFrom(
                       minimumSize: const Size.fromHeight(54),
                     ),
-                    onPressed: () =>
-                        context.push('/study/day/$day/quiz-selection'),
+                    onPressed: () {
+                      ref.read(ttsServiceProvider).stop();
+                      context.push('/study/day/$day/quiz-selection');
+                    },
                     icon: const Icon(Icons.quiz_rounded),
                     label: Text(strings('chooseQuizGame')),
                   ),
@@ -160,6 +188,7 @@ class StudyFinishScreen extends ConsumerWidget {
     required String level,
     required _LevelCompletionDestination destination,
   }) async {
+    ref.read(ttsServiceProvider).stop();
     await ref
         .read(appControllerProvider.notifier)
         .completeStudySession(level, day);
@@ -176,6 +205,7 @@ class StudyFinishScreen extends ConsumerWidget {
   }
 
   Future<void> _finish(BuildContext context, WidgetRef ref) async {
+    ref.read(ttsServiceProvider).stop();
     final state = ref.read(appControllerProvider).requireValue;
     final level = state.selectedLevel;
     final alreadyCompleted =
@@ -214,3 +244,30 @@ class StudyFinishScreen extends ConsumerWidget {
 }
 
 enum _LevelCompletionDestination { levels, days, quizSelection }
+
+class _WordChip extends StatelessWidget {
+  const _WordChip({required this.word, required this.onTap});
+
+  final String word;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final borderColor = Theme.of(context).colorScheme.outlineVariant;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(999),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: borderColor),
+        ),
+        child: Text(
+          word,
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+        ),
+      ),
+    );
+  }
+}
