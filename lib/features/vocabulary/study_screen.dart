@@ -99,7 +99,6 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
             icon: const Icon(Icons.close_rounded),
           ),
           actions: [
-            StartOverButton(onPressed: () => unawaited(_confirmStartOver(words))),
             IconButton(
               onPressed: () => context.push('/settings/learning'),
               icon: const Icon(Icons.settings_rounded),
@@ -146,7 +145,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: SizedBox(
                 height: 82,
-                child: _buildActionArea(state, words[_index]),
+                child: _buildActionArea(state, words, _index),
               ),
             ),
             SafeArea(
@@ -262,8 +261,18 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
     children: [for (final action in actions) Flexible(child: action)],
   );
 
-  Widget _buildActionArea(AppState state, Vocabulary word) {
-    return _actionPage(_manualActions(state, word));
+  Widget _buildActionArea(AppState state, List<Vocabulary> words, int index) {
+    final word = words[index];
+    final actions = _manualActions(state, word);
+    if (index == words.length - 1) {
+      actions.add(
+        StartOverButton(
+          label: context.strings('startOver'),
+          onPressed: () => unawaited(_confirmStartOver(words)),
+        ),
+      );
+    }
+    return _actionPage(actions);
   }
 
   _CardVisibility _visibilityFor(Vocabulary word, AppState state) =>
