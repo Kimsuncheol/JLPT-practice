@@ -26,6 +26,37 @@ void main() {
     expect(kanjiReadingForSpeech('いち'), 'いち');
   });
 
+  test('furigana markup splits into segments with and without readings', () {
+    expect(parseFurigana('りんごを{一|ひと}つください。'), const [
+      FuriganaSegment('りんごを'),
+      FuriganaSegment('一', 'ひと'),
+      FuriganaSegment('つください。'),
+    ]);
+    expect(parseFurigana('かな'), const [FuriganaSegment('かな')]);
+    expect(parseFurigana(''), isEmpty);
+  });
+
+  test('a sentence without readings is one plain segment', () {
+    final example = KanjiExample.fromJson({'sentence_jp': 'ある。'});
+    expect(example.sentenceSegments, const [FuriganaSegment('ある。')]);
+  });
+
+  test('every bundled example sentence has matching furigana', () {
+    final raw = jsonDecode(
+      File('assets/data/JLPT_Kanji.json').readAsStringSync(),
+    );
+    var checked = 0;
+    for (final item in raw as List<dynamic>) {
+      final kanji = Kanji.fromJson(item as Map<String, dynamic>);
+      for (final example in [...kanji.kunExamples, ...kanji.onExamples]) {
+        final plain = example.sentenceSegments.map((s) => s.text).join();
+        expect(plain, example.sentence, reason: kanji.character);
+        checked++;
+      }
+    }
+    expect(checked, greaterThan(9000));
+  });
+
   test('the bundled kanji data parses into every JLPT level', () {
     final raw = jsonDecode(
       File('assets/data/JLPT_Kanji.json').readAsStringSync(),
@@ -94,7 +125,7 @@ void main() {
     expect(_inBack(find.text('いつ')), findsOneWidget);
     expect(_inBack(find.text('一つ')), findsOneWidget);
     expect(_inBack(find.text('one thing')), findsOneWidget);
-    expect(_inBack(find.text('一部')), findsOneWidget);
+    expect(_inBack(find.text('一部')), findsWidgets);
     expect(_inBack(find.text('part')), findsOneWidget);
     expect(_inBack(find.text("Kun'yomi")), findsOneWidget);
     expect(_inBack(find.text("On'yomi")), findsOneWidget);
@@ -230,7 +261,7 @@ void main() {
     expect(_inBack(find.text('一つ')), findsOneWidget);
     // On'yomi stays visible until it is covered on its own.
     expect(_inBack(find.text('いつ')), findsOneWidget);
-    expect(_inBack(find.text('いちぶ')), findsOneWidget);
+    expect(_inBack(find.text('いちぶ')), findsWidgets);
 
     await tester.tap(find.byKey(const ValueKey('hide-back-on')));
     await tester.pumpAndSettle();
@@ -263,7 +294,7 @@ void main() {
     await tester.pumpAndSettle();
     await _flip(tester);
 
-    expect(_inBack(find.text('一')), findsOneWidget);
+    expect(_inBack(find.text('一')), findsWidgets);
   });
 
   testWidgets('settings button opens the study settings screen', (
@@ -358,7 +389,7 @@ void main() {
   ) async {
     await _pumpStudy(tester);
     await _flip(tester);
-    await tester.tap(_inBack(find.text('一')));
+    await tester.tap(_inBack(find.text('一')).first);
     await tester.pumpAndSettle();
 
     await _swipeForward(tester);
@@ -453,6 +484,140 @@ void main() {
         tester.getTopLeft(find.text('1 / 2')).dy -
         tester.getBottomLeft(find.byKey(const ValueKey('hide-group-front'))).dy;
     expect(gap, closeTo(screenHeight * 0.05, 6));
+  });
+
+  testWidgets('example sentences show furigana above their kanji', (
+    tester,
+  ) async {
+    await _pumpStudy(tester);
+    await _flip(tester);
+
+    for (final ruby in ['ひと', 'おく']) {
+      final finder = _inBack(find.text(ruby));
+      await tester.ensureVisible(finder);
+      await tester.pumpAndSettle();
+      final base = ruby == 'ひと' ? '一' : '遅';
+      final sentence = _inBack(
+        find.byKey(ValueKey('sentence-${ruby == 'ひと' ? '一つ' : '一部'}')),
+      );
+      expect(
+        find.descendant(of: sentence, matching: find.text(ruby)),
+        findsOneWidget,
+      );
+      expect(
+        tester.getBottomLeft(finder).dy,
+        lessThan(
+          tester
+                  .getTopLeft(
+                    find.descendant(of: sentence, matching: find.text(base)),
+                  )
+                  .dy +
+              4,
+        ),
+      );
+    }
+  });
+
+  testWidgets('hiding a reading type hides its sentence furigana too', (
+    tester,
+  ) async {
+    await _pumpStudy(tester);
+    await _flip(tester);
+    await tester.tap(find.byKey(const ValueKey('hide-back-kun')));
+    await tester.pumpAndSettle();
+
+    expect(_inBack(find.text('ひと')), findsNothing);
+    expect(_inBack(find.text('おく')), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('hide-back-on')));
+    await tester.pumpAndSettle();
+    expect(_inBack(find.text('おく')), findsNothing);
+  });
+
+  testWidgets('a divider separates kun and on yomi only when both exist', (
+    tester,
+  ) async {
+    await _pumpStudy(tester);
+    await _flip(tester);
+    expect(
+      _inBack(find.byKey(const ValueKey('kun-on-divider'))),
+      findsOneWidget,
+    );
+
+    await tester.tap(_inBack(find.text('一')).first);
+    await tester.pumpAndSettle();
+    await _swipeForward(tester);
+    await _flip(tester);
+    expect(_inBack(find.byKey(const ValueKey('kun-on-divider'))), findsNothing);
+  });
+
+  testWidgets('reading chips have no background color', (tester) async {
+    await _pumpStudy(tester);
+    await _flip(tester);
+
+    for (final scope in [_inFront, _inBack]) {
+      final chip = tester.widget<Material>(
+        scope(find.byKey(const ValueKey('reading-いち'))),
+      );
+      expect(chip.color, Colors.transparent);
+    }
+  });
+
+  testWidgets('the back scroll area reaches the hide group', (tester) async {
+    await _pumpStudy(tester);
+    await _flip(tester);
+
+    final scroll = tester.getBottomLeft(
+      _inBack(find.byType(SingleChildScrollView)),
+    );
+    final group = tester.getTopLeft(
+      find.byKey(const ValueKey('hide-group-back')),
+    );
+    expect(scroll.dy, closeTo(group.dy, 0.5));
+  });
+
+  testWidgets('the kun and on divider is dashed', (tester) async {
+    await _pumpStudy(tester);
+    await _flip(tester);
+
+    final divider = _inBack(find.byKey(const ValueKey('kun-on-divider')));
+    expect(
+      find.descendant(of: divider, matching: find.byType(CustomPaint)),
+      findsWidgets,
+    );
+    expect(
+      find.descendant(
+        of: _inBack(find.byType(Column)),
+        matching: find.byType(Divider),
+      ),
+      findsNothing,
+    );
+  });
+
+  testWidgets('front readings use the primary color', (tester) async {
+    await _pumpStudy(tester);
+
+    final primary = Theme.of(
+      tester.element(find.byType(PageView)),
+    ).colorScheme.primary;
+    for (final reading in ['ひと-', 'いち', 'いつ']) {
+      final text = tester.widget<Text>(_inFront(find.text(reading)));
+      expect(text.style?.color, primary, reason: reading);
+    }
+  });
+
+  testWidgets('the back scrolls from anywhere on the card', (tester) async {
+    await _pumpStudy(tester);
+    await _flip(tester);
+
+    expect(
+      tester.getSize(_inBack(find.byType(SingleChildScrollView))).width,
+      tester.getSize(find.byKey(const ValueKey('kanji-back'))).width,
+    );
+    expect(
+      tester.getTopLeft(_inBack(find.byType(SingleChildScrollView))),
+      tester.getTopLeft(find.byKey(const ValueKey('kanji-back'))),
+    );
   });
 
   testWidgets('the hide group has no background color', (tester) async {
@@ -699,6 +864,7 @@ final _catalog = [
         'meaning_ko': '하나',
         'meaning_en': 'one thing',
         'sentence_jp': 'りんごを一つください。',
+        'sentence_furigana': 'りんごを{一|ひと}つください。',
         'sentence_ko': '사과를 하나 주세요.',
       },
     ],
@@ -709,6 +875,7 @@ final _catalog = [
         'meaning_ko': '일부',
         'meaning_en': 'part',
         'sentence_jp': '一部が遅れた。',
+        'sentence_furigana': '{一部|いちぶ}が{遅|おく}れた。',
         'sentence_ko': '일부가 늦었다.',
       },
     ],

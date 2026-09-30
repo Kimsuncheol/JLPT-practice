@@ -1,3 +1,38 @@
+/// A run of a sentence, with the reading to print above it when it has one.
+class FuriganaSegment {
+  const FuriganaSegment(this.text, [this.ruby]);
+
+  final String text;
+  final String? ruby;
+
+  @override
+  bool operator ==(Object other) =>
+      other is FuriganaSegment && other.text == text && other.ruby == ruby;
+
+  @override
+  int get hashCode => Object.hash(text, ruby);
+}
+
+final _furiganaMarkup = RegExp(r'\{([^|}]+)\|([^}]+)\}');
+
+/// Splits sentence text marked up as `りんごを{一|ひと}つください。`, where
+/// `{base|reading}` is a word written with kanji, into segments.
+List<FuriganaSegment> parseFurigana(String marked) {
+  final segments = <FuriganaSegment>[];
+  var cursor = 0;
+  for (final match in _furiganaMarkup.allMatches(marked)) {
+    if (match.start > cursor) {
+      segments.add(FuriganaSegment(marked.substring(cursor, match.start)));
+    }
+    segments.add(FuriganaSegment(match.group(1)!, match.group(2)));
+    cursor = match.end;
+  }
+  if (cursor < marked.length) {
+    segments.add(FuriganaSegment(marked.substring(cursor)));
+  }
+  return segments;
+}
+
 /// A word that demonstrates one reading of a kanji.
 class KanjiExample {
   const KanjiExample({
@@ -6,6 +41,7 @@ class KanjiExample {
     required this.meanings,
     required this.sentence,
     required this.sentenceTranslations,
+    this.sentenceFurigana = '',
   });
 
   factory KanjiExample.fromJson(Map<String, dynamic> json) => KanjiExample(
@@ -17,6 +53,7 @@ class KanjiExample {
           language: json['meaning_$language'] as String,
     },
     sentence: json['sentence_jp'] as String? ?? '',
+    sentenceFurigana: json['sentence_furigana'] as String? ?? '',
     sentenceTranslations: {
       for (final language in const ['ko'])
         if ((json['sentence_$language'] as String?)?.isNotEmpty ?? false)
@@ -28,7 +65,15 @@ class KanjiExample {
   final String reading;
   final Map<String, String> meanings;
   final String sentence;
+
+  /// [sentence] marked up for [parseFurigana]; empty when no readings exist.
+  final String sentenceFurigana;
   final Map<String, String> sentenceTranslations;
+
+  /// The sentence in segments; without readings it is a single plain one.
+  List<FuriganaSegment> get sentenceSegments => sentenceFurigana.isEmpty
+      ? [FuriganaSegment(sentence)]
+      : parseFurigana(sentenceFurigana);
 
   String meaning(String language) => meanings[language] ?? meanings['en'] ?? '';
 
