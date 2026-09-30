@@ -77,7 +77,7 @@
     },
     {
         "word": "相対",
-        "reading": "あいたい",
+        "reading": "そうたい",
         "meaning": "confrontation, facing, between ourselves, no third party, tete-a-tete",
         "level": "N1",
         "rank": 5,
@@ -115,7 +115,7 @@
     },
     {
         "word": "愛憎",
-        "reading": "あいにく",
+        "reading": "あいぞう",
         "meaning": "likes and dislikes",
         "level": "N1",
         "rank": 7,
@@ -248,7 +248,7 @@
     },
     {
         "word": "銅",
-        "reading": "あかがね",
+        "reading": "どう",
         "meaning": "copper",
         "level": "N1",
         "rank": 14,
@@ -343,7 +343,7 @@
     },
     {
         "word": "明白",
-        "reading": "あからさま",
+        "reading": "めいはく",
         "meaning": "obvious, overt, plainly, frankly",
         "level": "N1",
         "rank": 19,
@@ -438,7 +438,7 @@
     },
     {
         "word": "商人",
-        "reading": "あきうど",
+        "reading": "しょうにん",
         "meaning": "trader, shopkeeper, merchant",
         "level": "N1",
         "rank": 24,
@@ -457,7 +457,7 @@
     },
     {
         "word": "空間",
-        "reading": "あきま",
+        "reading": "くうかん",
         "meaning": "vacancy, room for rent or lease",
         "level": "N1",
         "rank": 25,
@@ -533,7 +533,7 @@
     },
     {
         "word": "灰",
-        "reading": "あく",
+        "reading": "はい",
         "meaning": "puckery juice",
         "level": "N1",
         "rank": 29,
@@ -666,7 +666,7 @@
     },
     {
         "word": "明後日",
-        "reading": "あさって",
+        "reading": "みょうごにち",
         "meaning": "day after tomorrow",
         "level": "N1",
         "rank": 36,
@@ -723,7 +723,7 @@
     },
     {
         "word": "字",
-        "reading": "あざ",
+        "reading": "じ",
         "meaning": "section of village",
         "level": "N1",
         "rank": 39,
@@ -818,7 +818,7 @@
     },
     {
         "word": "東",
-        "reading": "あずま",
+        "reading": "ひがし",
         "meaning": "east, Eastern Japan",
         "level": "N1",
         "rank": 44,
@@ -856,7 +856,7 @@
     },
     {
         "word": "彼処",
-        "reading": "あそこ",
+        "reading": "あすこ",
         "meaning": "1. (uk) there, over there, that place, 2. (X) (col) genitals",
         "level": "N1",
         "rank": 46,
@@ -913,7 +913,7 @@
     },
     {
         "word": "私",
-        "reading": "あたし",
+        "reading": "わたくし",
         "meaning": "I (fem)",
         "level": "N1",
         "rank": 49,
@@ -970,7 +970,7 @@
     },
     {
         "word": "他人",
-        "reading": "あだびと",
+        "reading": "たにん",
         "meaning": "another person, unrelated person, outsider, stranger",
         "level": "N1",
         "rank": 52,
@@ -1008,7 +1008,7 @@
     },
     {
         "word": "彼方",
-        "reading": "あちら",
+        "reading": "かなた",
         "meaning": "1. there, yonder, that",
         "level": "N1",
         "rank": 54,
@@ -1084,7 +1084,7 @@
     },
     {
         "word": "悪口",
-        "reading": "あっこう",
+        "reading": "わるぐち",
         "meaning": "abuse, insult, slander, evil speaking",
         "level": "N1",
         "rank": 58,
@@ -1369,7 +1369,7 @@
     },
     {
         "word": "貴女",
-        "reading": "あなた",
+        "reading": "きじょ",
         "meaning": "you, lady",
         "level": "N1",
         "rank": 73,
@@ -1540,7 +1540,7 @@
     },
     {
         "word": "天",
-        "reading": "あまつ",
+        "reading": "てん",
         "meaning": "heavenly, imperial",
         "level": "N1",
         "rank": 82,
@@ -1578,7 +1578,7 @@
     },
     {
         "word": "天地",
-        "reading": "あめつち",
+        "reading": "てんち",
         "meaning": "heaven and earth, the universe, nature, top and bottom, realm, sphere, world",
         "level": "N1",
         "rank": 84,
@@ -2034,7 +2034,7 @@
     },
     {
         "word": "彼此",
-        "reading": "あれこれ",
+        "reading": "かれこれ",
         "meaning": "one thing or another, this and that, this or that",
         "level": "N1",
         "rank": 108,
@@ -2243,7 +2243,7 @@
     },
     {
         "word": "余り",
-        "reading": "あんまり",
+        "reading": "あまり",
         "meaning": "not very (this form only used as adverb), not much, remainder, rest, remnant, surplus, balance, excess, rema",
         "level": "N1",
         "rank": 119,
@@ -2281,7 +2281,7 @@
     },
     {
         "word": "良い",
-        "reading": "いい",
+        "reading": "よい",
         "meaning": "good",
         "level": "N1",
         "rank": 121,
@@ -2319,7 +2319,7 @@
     },
     {
         "word": "否",
-        "reading": "いいえ",
+        "reading": "いな",
         "meaning": "no, nay, yes, well",
         "level": "N1",
         "rank": 123,
@@ -2395,7 +2395,7 @@
     },
     {
         "word": "家主",
-        "reading": "いえぬし",
+        "reading": "やぬし",
         "meaning": "landlord",
         "level": "N1",
         "rank": 127,
@@ -2452,7 +2452,7 @@
     },
     {
         "word": "雷",
-        "reading": "いかずち",
+        "reading": "かみなり",
         "meaning": "thunder",
         "level": "N1",
         "rank": 130,
@@ -2528,7 +2528,7 @@
     },
     {
         "word": "怒る",
-        "reading": "いかる",
+        "reading": "おこる",
         "meaning": "to get angry, to be angry",
         "level": "N1",
         "rank": 134,
@@ -2547,7 +2547,7 @@
     },
     {
         "word": "歪む",
-        "reading": "いがむ",
+        "reading": "ゆがむ",
         "meaning": "to warp, to swerve, to deflect, to be crooked, to be distorted, to be bent, to incline, to slant, to be perv",
         "level": "N1",
         "rank": 135,
@@ -2623,7 +2623,7 @@
     },
     {
         "word": "経緯",
-        "reading": "いきさつ",
+        "reading": "けいい",
         "meaning": "1. details, whole story, sequence of events, particulars, how it started, how things got this way, 2. c",
         "level": "N1",
         "rank": 139,
@@ -2718,7 +2718,7 @@
     },
     {
         "word": "軍",
-        "reading": "いくさ",
+        "reading": "ぐん",
         "meaning": "war, battle, campaign, fight",
         "level": "N1",
         "rank": 144,
@@ -2984,7 +2984,7 @@
     },
     {
         "word": "弄る",
-        "reading": "いじる",
+        "reading": "まさぐる",
         "meaning": "to touch, to tamper with",
         "level": "N1",
         "rank": 158,
@@ -3079,7 +3079,7 @@
     },
     {
         "word": "依存",
-        "reading": "いそん",
+        "reading": "いぞん",
         "meaning": "dependence, dependent, reliance",
         "level": "N1",
         "rank": 163,
@@ -3269,7 +3269,7 @@
     },
     {
         "word": "市",
-        "reading": "いち",
+        "reading": "し",
         "meaning": "market, fair",
         "level": "N1",
         "rank": 173,
@@ -3345,7 +3345,7 @@
     },
     {
         "word": "一見",
-        "reading": "いちげん",
+        "reading": "いっけん",
         "meaning": "unfamiliar, never before met",
         "level": "N1",
         "rank": 177,
@@ -3364,7 +3364,7 @@
     },
     {
         "word": "一言",
-        "reading": "いちげん",
+        "reading": "ひとこと",
         "meaning": "single word",
         "level": "N1",
         "rank": 178,
@@ -3383,7 +3383,7 @@
     },
     {
         "word": "一日",
-        "reading": "いちじつ",
+        "reading": "ついたち",
         "meaning": "1. one day, 2. first of month",
         "level": "N1",
         "rank": 179,
@@ -3402,7 +3402,7 @@
     },
     {
         "word": "一定",
-        "reading": "いちじょう",
+        "reading": "いってい",
         "meaning": "fixed, settled, definite, uniform, regularized, defined, standardized, certain, prescribed",
         "level": "N1",
         "rank": 180,
@@ -3459,7 +3459,7 @@
     },
     {
         "word": "一人",
-        "reading": "いちにん",
+        "reading": "ひとり",
         "meaning": "one person",
         "level": "N1",
         "rank": 183,
@@ -3554,7 +3554,7 @@
     },
     {
         "word": "一目",
-        "reading": "いちもく",
+        "reading": "ひとめ",
         "meaning": "a glance, a look, a glimpse",
         "level": "N1",
         "rank": 188,
@@ -3953,7 +3953,7 @@
     },
     {
         "word": "暇",
-        "reading": "いとま",
+        "reading": "ひま",
         "meaning": "free time, leisure, leave, spare time, farewell",
         "level": "N1",
         "rank": 209,
@@ -4276,7 +4276,7 @@
     },
     {
         "word": "入口",
-        "reading": "いりくち",
+        "reading": "いりぐち",
         "meaning": "entrance, gate, approach, mouth",
         "level": "N1",
         "rank": 226,
@@ -4333,7 +4333,7 @@
     },
     {
         "word": "入る",
-        "reading": "いる",
+        "reading": "はいる",
         "meaning": "to get in, to go in, to come in, to flow into, to set, to set in",
         "level": "N1",
         "rank": 229,
@@ -4428,7 +4428,7 @@
     },
     {
         "word": "印",
-        "reading": "いん",
+        "reading": "しるし",
         "meaning": "seal, stamp, mark, print",
         "level": "N1",
         "rank": 234,
@@ -4523,7 +4523,7 @@
     },
     {
         "word": "上下",
-        "reading": "うえした",
+        "reading": "じょうげ",
         "meaning": "high and low, up and down, unloading and loading, praising and blaming",
         "level": "N1",
         "rank": 239,
@@ -4580,7 +4580,7 @@
     },
     {
         "word": "含嗽",
-        "reading": "うがい",
+        "reading": "がんそう",
         "meaning": "gargle, rinse mouth",
         "level": "N1",
         "rank": 242,
@@ -4751,7 +4751,7 @@
     },
     {
         "word": "潮",
-        "reading": "うしお",
+        "reading": "しお",
         "meaning": "tide",
         "level": "N1",
         "rank": 251,
@@ -4770,7 +4770,7 @@
     },
     {
         "word": "氏",
-        "reading": "うじ",
+        "reading": "し",
         "meaning": "family name",
         "level": "N1",
         "rank": 252,
@@ -4808,7 +4808,7 @@
     },
     {
         "word": "埋まる",
-        "reading": "うずまる",
+        "reading": "うまる",
         "meaning": "to be buried, to be surrounded, to overflow, to be filled",
         "level": "N1",
         "rank": 254,
@@ -5188,7 +5188,7 @@
     },
     {
         "word": "甘い",
-        "reading": "うまい",
+        "reading": "あまい",
         "meaning": "delicious",
         "level": "N1",
         "rank": 274,
@@ -5226,7 +5226,7 @@
     },
     {
         "word": "海路",
-        "reading": "うみじ",
+        "reading": "かいろ",
         "meaning": "sea route",
         "level": "N1",
         "rank": 276,
@@ -5302,7 +5302,7 @@
     },
     {
         "word": "末",
-        "reading": "うら",
+        "reading": "すえ",
         "meaning": "top end, tip",
         "level": "N1",
         "rank": 280,
@@ -5454,7 +5454,7 @@
     },
     {
         "word": "上手",
-        "reading": "うわて",
+        "reading": "じょうず",
         "meaning": "1. upper part, upper stream, left side (of a stage), 2. skillful (only in comparisons), dexterity (on",
         "level": "N1",
         "rank": 288,
@@ -5701,7 +5701,7 @@
     },
     {
         "word": "重",
-        "reading": "え",
+        "reading": "じゅう",
         "meaning": "-fold, -ply",
         "level": "N1",
         "rank": 301,
@@ -5853,7 +5853,7 @@
     },
     {
         "word": "役",
-        "reading": "えき",
+        "reading": "やく",
         "meaning": "war, campaign, battle",
         "level": "N1",
         "rank": 309,
@@ -5948,7 +5948,7 @@
     },
     {
         "word": "塩",
-        "reading": "えん",
+        "reading": "しお",
         "meaning": "salt",
         "level": "N1",
         "rank": 314,
@@ -5967,7 +5967,7 @@
     },
     {
         "word": "艶",
-        "reading": "えん",
+        "reading": "つや",
         "meaning": "charming, fascinating, voluptuous",
         "level": "N1",
         "rank": 315,
@@ -5986,7 +5986,7 @@
     },
     {
         "word": "園",
-        "reading": "えん",
+        "reading": "その",
         "meaning": "garden (esp. man-made)",
         "level": "N1",
         "rank": 316,
@@ -6461,7 +6461,7 @@
     },
     {
         "word": "黄色",
-        "reading": "おうしょく",
+        "reading": "きいろ",
         "meaning": "yellow",
         "level": "N1",
         "rank": 341,
@@ -6575,7 +6575,7 @@
     },
     {
         "word": "大事",
-        "reading": "おおごと",
+        "reading": "だいじ",
         "meaning": "important, valuable, serious matter",
         "level": "N1",
         "rank": 347,
@@ -6955,7 +6955,7 @@
     },
     {
         "word": "長",
-        "reading": "おさ",
+        "reading": "ちょう",
         "meaning": "chief, head",
         "level": "N1",
         "rank": 367,
@@ -7601,7 +7601,7 @@
     },
     {
         "word": "弟",
-        "reading": "おと",
+        "reading": "おとうと",
         "meaning": "younger brother",
         "level": "N1",
         "rank": 401,
@@ -7677,7 +7677,7 @@
     },
     {
         "word": "少女",
-        "reading": "おとめ",
+        "reading": "しょうじょ",
         "meaning": "daughter, young lady, virgin, maiden, little girl",
         "level": "N1",
         "rank": 405,
@@ -7753,7 +7753,7 @@
     },
     {
         "word": "脅かす",
-        "reading": "おどかす",
+        "reading": "おびやかす",
         "meaning": "to threaten, to coerce",
         "level": "N1",
         "rank": 409,
@@ -7829,7 +7829,7 @@
     },
     {
         "word": "女子",
-        "reading": "おなご",
+        "reading": "じょし",
         "meaning": "woman, girl",
         "level": "N1",
         "rank": 413,
@@ -7867,7 +7867,7 @@
     },
     {
         "word": "各",
-        "reading": "おのおの",
+        "reading": "かく",
         "meaning": "each, every, either, respectively, severally",
         "level": "N1",
         "rank": 415,
@@ -8114,7 +8114,7 @@
     },
     {
         "word": "面",
-        "reading": "おも",
+        "reading": "めん",
         "meaning": "face",
         "level": "N1",
         "rank": 428,
@@ -8171,7 +8171,7 @@
     },
     {
         "word": "玩具",
-        "reading": "おもちゃ",
+        "reading": "がんぐ",
         "meaning": "toy",
         "level": "N1",
         "rank": 431,
@@ -8190,7 +8190,7 @@
     },
     {
         "word": "重なる",
-        "reading": "おもなる",
+        "reading": "かさなる",
         "meaning": "main, principal, important",
         "level": "N1",
         "rank": 432,
@@ -8247,7 +8247,7 @@
     },
     {
         "word": "重役",
-        "reading": "おもやく",
+        "reading": "じゅうやく",
         "meaning": "heavy responsibilities, director",
         "level": "N1",
         "rank": 435,
@@ -8570,7 +8570,7 @@
     },
     {
         "word": "音色",
-        "reading": "おんいろ",
+        "reading": "ねいろ",
         "meaning": "tone color, tone quality, timbre, synthesizer patch",
         "level": "N1",
         "rank": 452,
@@ -8608,7 +8608,7 @@
     },
     {
         "word": "仮",
-        "reading": "か",
+        "reading": "かり",
         "meaning": "tentative, provisional",
         "level": "N1",
         "rank": 454,
@@ -8646,7 +8646,7 @@
     },
     {
         "word": "個",
-        "reading": "か",
+        "reading": "こ",
         "meaning": "article counter",
         "level": "N1",
         "rank": 456,
@@ -9482,7 +9482,7 @@
     },
     {
         "word": "角",
-        "reading": "かく",
+        "reading": "かど",
         "meaning": "1. angle, 2. bishop (shogi)",
         "level": "N1",
         "rank": 500,
@@ -10052,7 +10052,7 @@
     },
     {
         "word": "華奢",
-        "reading": "かしゃ",
+        "reading": "きゃしゃ",
         "meaning": "luxury, pomp, delicate, slender, gorgeous",
         "level": "N1",
         "rank": 530,
@@ -10090,7 +10090,7 @@
     },
     {
         "word": "火傷",
-        "reading": "かしょう",
+        "reading": "やけど",
         "meaning": "burn, scald",
         "level": "N1",
         "rank": 532,
@@ -10204,7 +10204,7 @@
     },
     {
         "word": "擦る",
-        "reading": "かする",
+        "reading": "する",
         "meaning": "to touch lightly, to take a percentage (from)",
         "level": "N1",
         "rank": 538,
@@ -10337,7 +10337,7 @@
     },
     {
         "word": "難い",
-        "reading": "かたい",
+        "reading": "がたい",
         "meaning": "difficult, hard",
         "level": "N1",
         "rank": 545,
@@ -10375,7 +10375,7 @@
     },
     {
         "word": "敵",
-        "reading": "かたき",
+        "reading": "てき",
         "meaning": "enemy, rival",
         "level": "N1",
         "rank": 547,
@@ -10394,7 +10394,7 @@
     },
     {
         "word": "気質",
-        "reading": "かたぎ",
+        "reading": "きしつ",
         "meaning": "spirit, character, trait, temperament, disposition",
         "level": "N1",
         "rank": 548,
@@ -10451,7 +10451,7 @@
     },
     {
         "word": "傾く",
-        "reading": "かたぶく",
+        "reading": "かたむく",
         "meaning": "to incline toward, to slant, to lurch, to heel over, to be disposed to, to trend toward, to be prone to, to",
         "level": "N1",
         "rank": 551,
@@ -10698,7 +10698,7 @@
     },
     {
         "word": "日付",
-        "reading": "かづけ",
+        "reading": "ひづけ",
         "meaning": "date, dating",
         "level": "N1",
         "rank": 564,
@@ -10717,7 +10717,7 @@
     },
     {
         "word": "門",
-        "reading": "かど",
+        "reading": "もん",
         "meaning": "gate",
         "level": "N1",
         "rank": 565,
@@ -10793,7 +10793,7 @@
     },
     {
         "word": "鉄棒",
-        "reading": "かなぼう",
+        "reading": "てつぼう",
         "meaning": "iron rod, crowbar, horizontal bar (gymnastics)",
         "level": "N1",
         "rank": 569,
@@ -10850,7 +10850,7 @@
     },
     {
         "word": "金庫",
-        "reading": "かねぐら",
+        "reading": "きんこ",
         "meaning": "safe, vault, treasury, provider of funds",
         "level": "N1",
         "rank": 572,
@@ -10869,7 +10869,7 @@
     },
     {
         "word": "予言",
-        "reading": "かねごと",
+        "reading": "よげん",
         "meaning": "prediction, promise, prognostication",
         "level": "N1",
         "rank": 573,
@@ -10926,7 +10926,7 @@
     },
     {
         "word": "下品",
-        "reading": "かひん",
+        "reading": "げひん",
         "meaning": "inferior article",
         "level": "N1",
         "rank": 576,
@@ -11135,7 +11135,7 @@
     },
     {
         "word": "瓶",
-        "reading": "かめ",
+        "reading": "びん",
         "meaning": "earthenware pot",
         "level": "N1",
         "rank": 587,
@@ -11401,7 +11401,7 @@
     },
     {
         "word": "側",
-        "reading": "かわ",
+        "reading": "がわ",
         "meaning": "side, row, surroundings, part, (watch) case",
         "level": "N1",
         "rank": 601,
@@ -11553,7 +11553,7 @@
     },
     {
         "word": "乾",
-        "reading": "かん",
+        "reading": "いぬい",
         "meaning": "heaven, emperor",
         "level": "N1",
         "rank": 609,
@@ -11572,7 +11572,7 @@
     },
     {
         "word": "管",
-        "reading": "かん",
+        "reading": "くだ",
         "meaning": "pipe, tube",
         "level": "N1",
         "rank": 610,
@@ -11591,7 +11591,7 @@
     },
     {
         "word": "幹",
-        "reading": "かん",
+        "reading": "みき",
         "meaning": "(tree) trunk",
         "level": "N1",
         "rank": 611,
@@ -11610,7 +11610,7 @@
     },
     {
         "word": "冠",
-        "reading": "かん",
+        "reading": "かんむり",
         "meaning": "crown, diadem, first, best, peerless, cap, naming, designating, initiating on coming of age, top character ra",
         "level": "N1",
         "rank": 612,
@@ -11705,7 +11705,7 @@
     },
     {
         "word": "寒気",
-        "reading": "かんき",
+        "reading": "さむけ",
         "meaning": "cold, frost, chill",
         "level": "N1",
         "rank": 617,
@@ -12389,7 +12389,7 @@
     },
     {
         "word": "蓋",
-        "reading": "がい",
+        "reading": "ふた",
         "meaning": "cover, lid, cap",
         "level": "N1",
         "rank": 653,
@@ -12408,7 +12408,7 @@
     },
     {
         "word": "街",
-        "reading": "がい",
+        "reading": "まち",
         "meaning": "~street, ~quarters",
         "level": "N1",
         "rank": 654,
@@ -12845,7 +12845,7 @@
     },
     {
         "word": "月日",
-        "reading": "がっぴ",
+        "reading": "つきひ",
         "meaning": "(the) date",
         "level": "N1",
         "rank": 677,
@@ -12978,7 +12978,7 @@
     },
     {
         "word": "眼鏡",
-        "reading": "がんきょう",
+        "reading": "めがね",
         "meaning": "spectacles, glasses",
         "level": "N1",
         "rank": 684,
@@ -13092,7 +13092,7 @@
     },
     {
         "word": "贋物",
-        "reading": "がんぶつ",
+        "reading": "にせもの",
         "meaning": "imitation, counterfeit, forgery, sham",
         "level": "N1",
         "rank": 690,
@@ -13130,7 +13130,7 @@
     },
     {
         "word": "生",
-        "reading": "き",
+        "reading": "なま",
         "meaning": "pure, undiluted, raw, crude",
         "level": "N1",
         "rank": 692,
@@ -13567,7 +13567,7 @@
     },
     {
         "word": "兆",
-        "reading": "きざし",
+        "reading": "しるし",
         "meaning": "signs, omen, symptoms",
         "level": "N1",
         "rank": 715,
@@ -13757,7 +13757,7 @@
     },
     {
         "word": "寄贈",
-        "reading": "きそう",
+        "reading": "きぞう",
         "meaning": "donation, presentation",
         "level": "N1",
         "rank": 725,
@@ -13814,7 +13814,7 @@
     },
     {
         "word": "来る",
-        "reading": "きたる",
+        "reading": "くる",
         "meaning": "to come, to arrive, to be due to, to be next, to be forthcoming",
         "level": "N1",
         "rank": 728,
@@ -14061,7 +14061,7 @@
     },
     {
         "word": "甲",
-        "reading": "きのえ",
+        "reading": "こう",
         "meaning": "1st in rank, first sign of the Chinese calendar, shell, instep, grade A",
         "level": "N1",
         "rank": 741,
@@ -14080,7 +14080,7 @@
     },
     {
         "word": "気配",
-        "reading": "きはい",
+        "reading": "けはい",
         "meaning": "indication, market trend, worry",
         "level": "N1",
         "rank": 742,
@@ -14251,7 +14251,7 @@
     },
     {
         "word": "決まり悪い",
-        "reading": "きまりわるい",
+        "reading": "きまりわりい",
         "meaning": "feeling awkward, being ashamed",
         "level": "N1",
         "rank": 751,
@@ -14631,7 +14631,7 @@
     },
     {
         "word": "共",
-        "reading": "きょう",
+        "reading": "とも",
         "meaning": "both, neither (neg), all, and, as well as, including, with, together with, plural ending",
         "level": "N1",
         "rank": 771,
@@ -15049,7 +15049,7 @@
     },
     {
         "word": "共存",
-        "reading": "きょうそん",
+        "reading": "きょうぞん",
         "meaning": "coexistence",
         "level": "N1",
         "rank": 793,
@@ -15068,7 +15068,7 @@
     },
     {
         "word": "姉妹",
-        "reading": "きょうだい",
+        "reading": "しまい",
         "meaning": "sisters",
         "level": "N1",
         "rank": 794,
@@ -15562,7 +15562,7 @@
     },
     {
         "word": "際",
-        "reading": "きわ",
+        "reading": "さい",
         "meaning": "edge, brink, verge, side",
         "level": "N1",
         "rank": 820,
@@ -15581,7 +15581,7 @@
     },
     {
         "word": "木綿",
-        "reading": "きわた",
+        "reading": "もめん",
         "meaning": "cotton",
         "level": "N1",
         "rank": 821,
@@ -15676,7 +15676,7 @@
     },
     {
         "word": "近々",
-        "reading": "きんきん",
+        "reading": "ちかぢか",
         "meaning": "nearness, before long",
         "level": "N1",
         "rank": 826,
@@ -16132,7 +16132,7 @@
     },
     {
         "word": "玉",
-        "reading": "ぎょく",
+        "reading": "たま",
         "meaning": "king (shogi)",
         "level": "N1",
         "rank": 850,
@@ -16379,7 +16379,7 @@
     },
     {
         "word": "潜る",
-        "reading": "くぐる",
+        "reading": "もぐる",
         "meaning": "1. to drive, to pass through, 2. to evade, to hide, 3. to dive (into or under water), to go undergro",
         "level": "N1",
         "rank": 863,
@@ -16398,7 +16398,7 @@
     },
     {
         "word": "種々",
-        "reading": "くさぐさ",
+        "reading": "しゅじゅ",
         "meaning": "variety",
         "level": "N1",
         "rank": 864,
@@ -16436,7 +16436,7 @@
     },
     {
         "word": "旧事",
-        "reading": "くじ",
+        "reading": "きゅうじ",
         "meaning": "past events, bygones",
         "level": "N1",
         "rank": 866,
@@ -16531,7 +16531,7 @@
     },
     {
         "word": "件",
-        "reading": "くだん",
+        "reading": "けん",
         "meaning": "example, precedent, the usual, the said, the above-mentioned, (man) in question",
         "level": "N1",
         "rank": 871,
@@ -16721,7 +16721,7 @@
     },
     {
         "word": "国境",
-        "reading": "くにざかい",
+        "reading": "こっきょう",
         "meaning": "national or state border",
         "level": "N1",
         "rank": 881,
@@ -16873,7 +16873,7 @@
     },
     {
         "word": "包む",
-        "reading": "くるむ",
+        "reading": "つつむ",
         "meaning": "to be engulfed in, to be enveloped by, to wrap up, to tuck in, to pack, to do up, to cover with, to dress i",
         "level": "N1",
         "rank": 889,
@@ -17177,7 +17177,7 @@
     },
     {
         "word": "頃",
-        "reading": "けい",
+        "reading": "ころ",
         "meaning": "time, about, toward, approximately (time)",
         "level": "N1",
         "rank": 905,
@@ -17652,7 +17652,7 @@
     },
     {
         "word": "汚れ",
-        "reading": "けがれ",
+        "reading": "よごれ",
         "meaning": "uncleanness, impurity, disgrace",
         "level": "N1",
         "rank": 930,
@@ -17671,7 +17671,7 @@
     },
     {
         "word": "汚れる",
-        "reading": "けがれる",
+        "reading": "よごれる",
         "meaning": "to get dirty, to become dirty",
         "level": "N1",
         "rank": 931,
@@ -17690,7 +17690,7 @@
     },
     {
         "word": "獣",
-        "reading": "けだもの",
+        "reading": "けもの",
         "meaning": "beast, brute",
         "level": "N1",
         "rank": 932,
@@ -17709,7 +17709,7 @@
     },
     {
         "word": "吝嗇",
-        "reading": "けち",
+        "reading": "りんしょく",
         "meaning": "stinginess, miser, miserliness, skinflint, tightwad, niggard, pinching pennies",
         "level": "N1",
         "rank": 933,
@@ -17880,7 +17880,7 @@
     },
     {
         "word": "傑",
-        "reading": "けつ",
+        "reading": "すぐる",
         "meaning": "excellence",
         "level": "N1",
         "rank": 942,
@@ -18640,7 +18640,7 @@
     },
     {
         "word": "現場",
-        "reading": "げんじょう",
+        "reading": "げんば",
         "meaning": "actual spot, scene, scene of the crime",
         "level": "N1",
         "rank": 982,
@@ -19001,7 +19001,7 @@
     },
     {
         "word": "溝",
-        "reading": "こう",
+        "reading": "みぞ",
         "meaning": "10^38, hundred undecillion (American), hundred sextillion (British)",
         "level": "N1",
         "rank": 1001,
@@ -20578,7 +20578,7 @@
     },
     {
         "word": "凝らす",
-        "reading": "こごらす",
+        "reading": "こらす",
         "meaning": "to freeze, to congeal",
         "level": "N1",
         "rank": 1084,
@@ -20597,7 +20597,7 @@
     },
     {
         "word": "凝る",
-        "reading": "こごる",
+        "reading": "こる",
         "meaning": "to congeal, to freeze",
         "level": "N1",
         "rank": 1085,
@@ -20806,7 +20806,7 @@
     },
     {
         "word": "堪える",
-        "reading": "こたえる",
+        "reading": "たえる",
         "meaning": "to bear, to stand, to endure, to put up with, to support, to withstand, to resist, to brave, to be fit for, t",
         "level": "N1",
         "rank": 1096,
@@ -20958,7 +20958,7 @@
     },
     {
         "word": "骨",
-        "reading": "こつ",
+        "reading": "ほね",
         "meaning": "knack, skill",
         "level": "N1",
         "rank": 1104,
@@ -21395,7 +21395,7 @@
     },
     {
         "word": "堪える",
-        "reading": "こらえる",
+        "reading": "たえる",
         "meaning": "to bear, to stand, to endure, to put up with, to support, to withstand, to resist, to brave, to be fit for, t",
         "level": "N1",
         "rank": 1127,
@@ -21490,7 +21490,7 @@
     },
     {
         "word": "魂",
-        "reading": "こん",
+        "reading": "たましい",
         "meaning": "soul, spirit",
         "level": "N1",
         "rank": 1132,
@@ -21718,7 +21718,7 @@
     },
     {
         "word": "濠",
-        "reading": "ごう",
+        "reading": "ほり",
         "meaning": "moat",
         "level": "N1",
         "rank": 1144,
@@ -21813,7 +21813,7 @@
     },
     {
         "word": "強気",
-        "reading": "ごうぎ",
+        "reading": "つよき",
         "meaning": "great, grand",
         "level": "N1",
         "rank": 1149,
@@ -22706,7 +22706,7 @@
     },
     {
         "word": "盛る",
-        "reading": "さかる",
+        "reading": "もる",
         "meaning": "to prosper, to flourish, to copulate (animals)",
         "level": "N1",
         "rank": 1196,
@@ -22934,7 +22934,7 @@
     },
     {
         "word": "作物",
-        "reading": "さくぶつ",
+        "reading": "さくもつ",
         "meaning": "literary work",
         "level": "N1",
         "rank": 1208,
@@ -23352,7 +23352,7 @@
     },
     {
         "word": "真実",
-        "reading": "さな",
+        "reading": "しんじつ",
         "meaning": "truth, reality",
         "level": "N1",
         "rank": 1230,
@@ -23485,7 +23485,7 @@
     },
     {
         "word": "然も",
-        "reading": "さも",
+        "reading": "しかも",
         "meaning": "with gusto, with satisfaction",
         "level": "N1",
         "rank": 1237,
@@ -23694,7 +23694,7 @@
     },
     {
         "word": "桟橋",
-        "reading": "さんきょう",
+        "reading": "さんばし",
         "meaning": "wharf, bridge, jetty, pier",
         "level": "N1",
         "rank": 1248,
@@ -24074,7 +24074,7 @@
     },
     {
         "word": "雑木",
-        "reading": "ざつぼく",
+        "reading": "ぞうき",
         "meaning": "various kinds of small trees, assorted trees",
         "level": "N1",
         "rank": 1268,
@@ -24207,7 +24207,7 @@
     },
     {
         "word": "次",
-        "reading": "し",
+        "reading": "つぎ",
         "meaning": "order, sequence, times, next, below",
         "level": "N1",
         "rank": 1275,
@@ -24701,7 +24701,7 @@
     },
     {
         "word": "施行",
-        "reading": "しぎょう",
+        "reading": "しこう",
         "meaning": "1. execution, enforcing, carrying out",
         "level": "N1",
         "rank": 1301,
@@ -25138,7 +25138,7 @@
     },
     {
         "word": "認める",
-        "reading": "したためる",
+        "reading": "みとめる",
         "meaning": "to write up",
         "level": "N1",
         "rank": 1324,
@@ -25461,7 +25461,7 @@
     },
     {
         "word": "嫋か",
-        "reading": "しなやか",
+        "reading": "たおやか",
         "meaning": "supple, flexible, elastic",
         "level": "N1",
         "rank": 1341,
@@ -26240,7 +26240,7 @@
     },
     {
         "word": "修行",
-        "reading": "しゅうぎょう",
+        "reading": "しゅぎょう",
         "meaning": "pursuit of knowledge, studying, learning, training, ascetic practice, discipline",
         "level": "N1",
         "rank": 1382,
@@ -26411,7 +26411,7 @@
     },
     {
         "word": "執着",
-        "reading": "しゅうじゃく",
+        "reading": "しゅうちゃく",
         "meaning": "attachment, adhesion, tenacity",
         "level": "N1",
         "rank": 1391,
@@ -27057,7 +27057,7 @@
     },
     {
         "word": "背負う",
-        "reading": "しょう",
+        "reading": "せおう",
         "meaning": "to be burdened with, to carry on back or shoulder",
         "level": "N1",
         "rank": 1425,
@@ -27076,7 +27076,7 @@
     },
     {
         "word": "象",
-        "reading": "しょう",
+        "reading": "ぞう",
         "meaning": "phenomenon",
         "level": "N1",
         "rank": 1426,
@@ -27114,7 +27114,7 @@
     },
     {
         "word": "傷",
-        "reading": "しょう",
+        "reading": "きず",
         "meaning": "wound, injury, hurt, cut, gash, bruise, scratch, scar, weak point",
         "level": "N1",
         "rank": 1428,
@@ -27228,7 +27228,7 @@
     },
     {
         "word": "消耗",
-        "reading": "しょうこう",
+        "reading": "しょうもう",
         "meaning": "exhaustion, consumption",
         "level": "N1",
         "rank": 1434,
@@ -27589,7 +27589,7 @@
     },
     {
         "word": "所々",
-        "reading": "しょしょ",
+        "reading": "ところどころ",
         "meaning": "here and there, some parts (of something)",
         "level": "N1",
         "rank": 1453,
@@ -28007,7 +28007,7 @@
     },
     {
         "word": "代",
-        "reading": "しろ",
+        "reading": "だい",
         "meaning": "price, materials, substitution",
         "level": "N1",
         "rank": 1475,
@@ -28083,7 +28083,7 @@
     },
     {
         "word": "殿",
-        "reading": "しんがり",
+        "reading": "との",
         "meaning": "rear, rear unit guard",
         "level": "N1",
         "rank": 1479,
@@ -28577,7 +28577,7 @@
     },
     {
         "word": "審判",
-        "reading": "しんばん",
+        "reading": "しんぱん",
         "meaning": "refereeing, trial, judgement, umpire, referee",
         "level": "N1",
         "rank": 1505,
@@ -28729,7 +28729,7 @@
     },
     {
         "word": "地方",
-        "reading": "じかた",
+        "reading": "ちほう",
         "meaning": "area, locality, district, region, the coast",
         "level": "N1",
         "rank": 1513,
@@ -28824,7 +28824,7 @@
     },
     {
         "word": "地形",
-        "reading": "じぎょう",
+        "reading": "ちけい",
         "meaning": "terrain, geographical features, topography",
         "level": "N1",
         "rank": 1518,
@@ -29622,7 +29622,7 @@
     },
     {
         "word": "重複",
-        "reading": "じゅうふく",
+        "reading": "ちょうふく",
         "meaning": "duplication, repetition, overlapping, redundancy, restoration",
         "level": "N1",
         "rank": 1560,
@@ -29641,7 +29641,7 @@
     },
     {
         "word": "重宝",
-        "reading": "じゅうほう",
+        "reading": "ちょうほう",
         "meaning": "priceless treasure, convenience, usefulness",
         "level": "N1",
         "rank": 1561,
@@ -29964,7 +29964,7 @@
     },
     {
         "word": "乗客",
-        "reading": "じょうかく",
+        "reading": "じょうきゃく",
         "meaning": "passenger",
         "level": "N1",
         "rank": 1578,
@@ -30021,7 +30021,7 @@
     },
     {
         "word": "情緒",
-        "reading": "じょうしょ",
+        "reading": "じょうちょ",
         "meaning": "emotion, feeling",
         "level": "N1",
         "rank": 1581,
@@ -30097,7 +30097,7 @@
     },
     {
         "word": "丈夫",
-        "reading": "じょうふ",
+        "reading": "じょうぶ",
         "meaning": "1. hero, gentleman, warrior, manly person, 2. good health, robustness, strong, solid, durable",
         "level": "N1",
         "rank": 1585,
@@ -30325,7 +30325,7 @@
     },
     {
         "word": "人",
-        "reading": "じん",
+        "reading": "ひと",
         "meaning": "man, person, people",
         "level": "N1",
         "rank": 1597,
@@ -30439,7 +30439,7 @@
     },
     {
         "word": "人目",
-        "reading": "じんもく",
+        "reading": "ひとめ",
         "meaning": "glimpse, public gaze",
         "level": "N1",
         "rank": 1603,
@@ -30458,7 +30458,7 @@
     },
     {
         "word": "水気",
-        "reading": "すいき",
+        "reading": "みずけ",
         "meaning": "1. moisture, dampness, vapor, 2. dropsy, edema",
         "level": "N1",
         "rank": 1604,
@@ -31085,7 +31085,7 @@
     },
     {
         "word": "天皇",
-        "reading": "すめらぎ",
+        "reading": "てんのう",
         "meaning": "Emperor of Japan",
         "level": "N1",
         "rank": 1637,
@@ -31123,7 +31123,7 @@
     },
     {
         "word": "剃る",
-        "reading": "する",
+        "reading": "そる",
         "meaning": "to shave",
         "level": "N1",
         "rank": 1639,
@@ -32510,7 +32510,7 @@
     },
     {
         "word": "世論",
-        "reading": "せろん",
+        "reading": "よろん",
         "meaning": "public opinion",
         "level": "N1",
         "rank": 1712,
@@ -32548,7 +32548,7 @@
     },
     {
         "word": "前",
-        "reading": "せん",
+        "reading": "まえ",
         "meaning": "before",
         "level": "N1",
         "rank": 1714,
@@ -33897,7 +33897,7 @@
     },
     {
         "word": "然して",
-        "reading": "そして",
+        "reading": "しこうして",
         "meaning": "and",
         "level": "N1",
         "rank": 1785,
@@ -34030,7 +34030,7 @@
     },
     {
         "word": "外方",
-        "reading": "そっぽ",
+        "reading": "がいほう",
         "meaning": "look (or turn) the other way",
         "level": "N1",
         "rank": 1792,
@@ -34372,7 +34372,7 @@
     },
     {
         "word": "各々",
-        "reading": "それぞれ",
+        "reading": "おのおの",
         "meaning": "each, every, either, respectively, severally",
         "level": "N1",
         "rank": 1810,
@@ -34543,7 +34543,7 @@
     },
     {
         "word": "徐々",
-        "reading": "そろそろ",
+        "reading": "じょじょ",
         "meaning": "gradually, steadily, quietly, slowly, soon",
         "level": "N1",
         "rank": 1819,
@@ -35303,7 +35303,7 @@
     },
     {
         "word": "堪える",
-        "reading": "たえる",
+        "reading": "こらえる",
         "meaning": "to bear, to stand, to endure, to put up with, to support, to withstand, to resist, to brave, to be fit for, t",
         "level": "N1",
         "rank": 1859,
@@ -35322,7 +35322,7 @@
     },
     {
         "word": "高",
-        "reading": "たか",
+        "reading": "だか",
         "meaning": "quantity, amount, volume, number, amount of money",
         "level": "N1",
         "rank": 1860,
@@ -35569,7 +35569,7 @@
     },
     {
         "word": "館",
-        "reading": "たち",
+        "reading": "やかた",
         "meaning": "1. mansion, small castle",
         "level": "N1",
         "rank": 1873,
@@ -35588,7 +35588,7 @@
     },
     {
         "word": "立方",
-        "reading": "たちかた",
+        "reading": "りっぽう",
         "meaning": "dancing (geisha)",
         "level": "N1",
         "rank": 1874,
@@ -35702,7 +35702,7 @@
     },
     {
         "word": "尊い",
-        "reading": "たっとい",
+        "reading": "とうとい",
         "meaning": "precious, valuable, priceless, noble, exalted, sacred",
         "level": "N1",
         "rank": 1880,
@@ -35721,7 +35721,7 @@
     },
     {
         "word": "貴い",
-        "reading": "たっとい",
+        "reading": "とうとい",
         "meaning": "precious, valuable, priceless, noble, exalted, sacred",
         "level": "N1",
         "rank": 1881,
@@ -35740,7 +35740,7 @@
     },
     {
         "word": "尊ぶ",
-        "reading": "たっとぶ",
+        "reading": "とうとぶ",
         "meaning": "to value, to prize, to esteem",
         "level": "N1",
         "rank": 1882,
@@ -35854,7 +35854,7 @@
     },
     {
         "word": "仮令",
-        "reading": "たとえ",
+        "reading": "たとい",
         "meaning": "example, even if, if, though, although",
         "level": "N1",
         "rank": 1888,
@@ -35930,7 +35930,7 @@
     },
     {
         "word": "掌",
-        "reading": "たなごころ",
+        "reading": "てのひら",
         "meaning": "the palm",
         "level": "N1",
         "rank": 1892,
@@ -36158,7 +36158,7 @@
     },
     {
         "word": "例",
-        "reading": "ためし",
+        "reading": "れい",
         "meaning": "instance, example, case, precedent, experience, custom, usage, parallel, illustration",
         "level": "N1",
         "rank": 1904,
@@ -36272,7 +36272,7 @@
     },
     {
         "word": "弛む",
-        "reading": "たるむ",
+        "reading": "たゆむ",
         "meaning": "to slacken, to loosen, to relax",
         "level": "N1",
         "rank": 1910,
@@ -36291,7 +36291,7 @@
     },
     {
         "word": "誰",
-        "reading": "たれ",
+        "reading": "だれ",
         "meaning": "adjectival suffix for a person",
         "level": "N1",
         "rank": 1911,
@@ -36348,7 +36348,7 @@
     },
     {
         "word": "反",
-        "reading": "たん",
+        "reading": "はん",
         "meaning": "roll of cloth (c. 10 yds.), .245 acres, 300 tsubo",
         "level": "N1",
         "rank": 1914,
@@ -36804,7 +36804,7 @@
     },
     {
         "word": "丈",
-        "reading": "だけ",
+        "reading": "たけ",
         "meaning": "only, just, as",
         "level": "N1",
         "rank": 1938,
@@ -36994,7 +36994,7 @@
     },
     {
         "word": "怠い",
-        "reading": "だるい",
+        "reading": "たるい",
         "meaning": "sluggish, feel heavy, languid, dull",
         "level": "N1",
         "rank": 1948,
@@ -37336,7 +37336,7 @@
     },
     {
         "word": "父母",
-        "reading": "ちちはは",
+        "reading": "ふぼ",
         "meaning": "father and mother, parents",
         "level": "N1",
         "rank": 1966,
@@ -37450,7 +37450,7 @@
     },
     {
         "word": "著",
-        "reading": "ちゃく",
+        "reading": "ちょ",
         "meaning": "counter for suits of clothing, arriving at ..",
         "level": "N1",
         "rank": 1972,
@@ -37659,7 +37659,7 @@
     },
     {
         "word": "昼間",
-        "reading": "ちゅうかん",
+        "reading": "ひるま",
         "meaning": "daytime, during the day",
         "level": "N1",
         "rank": 1983,
@@ -37735,7 +37735,7 @@
     },
     {
         "word": "中指",
-        "reading": "ちゅうし",
+        "reading": "なかゆび",
         "meaning": "middle finger",
         "level": "N1",
         "rank": 1987,
@@ -37849,7 +37849,7 @@
     },
     {
         "word": "中腹",
-        "reading": "ちゅうっぱら",
+        "reading": "なかはら",
         "meaning": "irritated, offended",
         "level": "N1",
         "rank": 1993,
@@ -37887,7 +37887,7 @@
     },
     {
         "word": "仲人",
-        "reading": "ちゅうにん",
+        "reading": "なこうど",
         "meaning": "go-between, matchmaker",
         "level": "N1",
         "rank": 1995,
@@ -38457,7 +38457,7 @@
     },
     {
         "word": "塵取り",
-        "reading": "ちりとり",
+        "reading": "ごみとり",
         "meaning": "dustpan",
         "level": "N1",
         "rank": 2025,
@@ -38989,7 +38989,7 @@
     },
     {
         "word": "吐く",
-        "reading": "つく",
+        "reading": "はく",
         "meaning": "1. to breathe, 2. to tell (lies), 3. to vomit, to disgorge",
         "level": "N1",
         "rank": 2053,
@@ -39103,7 +39103,7 @@
     },
     {
         "word": "接ぐ",
-        "reading": "つぐ",
+        "reading": "はぐ",
         "meaning": "to join, to piece together, to set (bones), to graft (trees)",
         "level": "N1",
         "rank": 2059,
@@ -39198,7 +39198,7 @@
     },
     {
         "word": "途中",
-        "reading": "つちゅう",
+        "reading": "とちゅう",
         "meaning": "on the way, en route",
         "level": "N1",
         "rank": 2064,
@@ -39255,7 +39255,7 @@
     },
     {
         "word": "銃",
-        "reading": "つつ",
+        "reading": "じゅう",
         "meaning": "gun",
         "level": "N1",
         "rank": 2067,
@@ -39274,7 +39274,7 @@
     },
     {
         "word": "突く",
-        "reading": "つつく",
+        "reading": "つく",
         "meaning": "1. to thrust, to strike, to attack, 2. to poke, to nudge, to pick at",
         "level": "N1",
         "rank": 2068,
@@ -39312,7 +39312,7 @@
     },
     {
         "word": "伝言",
-        "reading": "つてごと",
+        "reading": "でんごん",
         "meaning": "verbal message, rumor, word",
         "level": "N1",
         "rank": 2070,
@@ -39559,7 +39559,7 @@
     },
     {
         "word": "摘む",
-        "reading": "つまむ",
+        "reading": "つむ",
         "meaning": "to pinch, to hold, to pick up",
         "level": "N1",
         "rank": 2083,
@@ -39635,7 +39635,7 @@
     },
     {
         "word": "露",
-        "reading": "つゆ",
+        "reading": "ろ",
         "meaning": "dew",
         "level": "N1",
         "rank": 2087,
@@ -39844,7 +39844,7 @@
     },
     {
         "word": "体",
-        "reading": "てい",
+        "reading": "からだ",
         "meaning": "appearance, air, condition, state, form",
         "level": "N1",
         "rank": 2098,
@@ -39939,7 +39939,7 @@
     },
     {
         "word": "梯子",
-        "reading": "ていし",
+        "reading": "はしご",
         "meaning": "ladder, stairs",
         "level": "N1",
         "rank": 2103,
@@ -40110,7 +40110,7 @@
     },
     {
         "word": "手数",
-        "reading": "てかず",
+        "reading": "てすう",
         "meaning": "number of moves, trouble",
         "level": "N1",
         "rank": 2112,
@@ -40566,7 +40566,7 @@
     },
     {
         "word": "店",
-        "reading": "てん",
+        "reading": "みせ",
         "meaning": "store, shop, establishment",
         "level": "N1",
         "rank": 2136,
@@ -41269,7 +41269,7 @@
     },
     {
         "word": "問屋",
-        "reading": "といや",
+        "reading": "とんや",
         "meaning": "wholesale store",
         "level": "N1",
         "rank": 2173,
@@ -41307,7 +41307,7 @@
     },
     {
         "word": "棟",
-        "reading": "とう",
+        "reading": "むね",
         "meaning": "place, section, building",
         "level": "N1",
         "rank": 2175,
@@ -41478,7 +41478,7 @@
     },
     {
         "word": "統治",
-        "reading": "とうじ",
+        "reading": "とうち",
         "meaning": "rule, reign, government, governing",
         "level": "N1",
         "rank": 2184,
@@ -41611,7 +41611,7 @@
     },
     {
         "word": "丁々",
-        "reading": "とうとう",
+        "reading": "ちょうちょう",
         "meaning": "clashing of swords, felling of trees, ringing of an ax",
         "level": "N1",
         "rank": 2191,
@@ -42029,7 +42029,7 @@
     },
     {
         "word": "刺",
-        "reading": "とげ",
+        "reading": "さし",
         "meaning": "thorn, splinter, spine, biting words",
         "level": "N1",
         "rank": 2213,
@@ -42067,7 +42067,7 @@
     },
     {
         "word": "床",
-        "reading": "とこ",
+        "reading": "ゆか",
         "meaning": "bed, sickbed, alcove, padding",
         "level": "N1",
         "rank": 2215,
@@ -42447,7 +42447,7 @@
     },
     {
         "word": "止まる",
-        "reading": "とどまる",
+        "reading": "とまる",
         "meaning": "to be limited to",
         "level": "N1",
         "rank": 2235,
@@ -42466,7 +42466,7 @@
     },
     {
         "word": "留める",
-        "reading": "とどめる",
+        "reading": "とめる",
         "meaning": "to stop, to cease, to put an end to",
         "level": "N1",
         "rank": 2236,
@@ -42561,7 +42561,7 @@
     },
     {
         "word": "幕",
-        "reading": "とばり",
+        "reading": "まく",
         "meaning": "curtain, bunting, act (in play)",
         "level": "N1",
         "rank": 2241,
@@ -42732,7 +42732,7 @@
     },
     {
         "word": "灯",
-        "reading": "ともしび",
+        "reading": "あかり",
         "meaning": "light",
         "level": "N1",
         "rank": 2250,
@@ -43131,7 +43131,7 @@
     },
     {
         "word": "取り分",
-        "reading": "とりわけ",
+        "reading": "とりぶん",
         "meaning": "especially, above all",
         "level": "N1",
         "rank": 2271,
@@ -43150,7 +43150,7 @@
     },
     {
         "word": "副",
-        "reading": "とりわけ",
+        "reading": "ふく",
         "meaning": "especially, above all",
         "level": "N1",
         "rank": 2272,
@@ -43511,7 +43511,7 @@
     },
     {
         "word": "何卒",
-        "reading": "どうぞ",
+        "reading": "なにとぞ",
         "meaning": "please, kindly, by all means",
         "level": "N1",
         "rank": 2291,
@@ -43891,7 +43891,7 @@
     },
     {
         "word": "土産",
-        "reading": "どさん",
+        "reading": "みやげ",
         "meaning": "product of the land",
         "level": "N1",
         "rank": 2311,
@@ -43929,7 +43929,7 @@
     },
     {
         "word": "何方",
-        "reading": "どちら",
+        "reading": "どなた",
         "meaning": "which, who",
         "level": "N1",
         "rank": 2313,
@@ -44062,7 +44062,7 @@
     },
     {
         "word": "何れ",
-        "reading": "どれ",
+        "reading": "いずれ",
         "meaning": "well, now, let me see, which (of three or more)",
         "level": "N1",
         "rank": 2320,
@@ -44081,7 +44081,7 @@
     },
     {
         "word": "何々",
-        "reading": "どれどれ",
+        "reading": "なになに",
         "meaning": "which (emphatic)",
         "level": "N1",
         "rank": 2321,
@@ -44860,7 +44860,7 @@
     },
     {
         "word": "鈍る",
-        "reading": "なまる",
+        "reading": "にぶる",
         "meaning": "to become less capable, to grow dull, to become blunt, to weaken",
         "level": "N1",
         "rank": 2362,
@@ -45183,7 +45183,7 @@
     },
     {
         "word": "南",
-        "reading": "なん",
+        "reading": "みなみ",
         "meaning": "south",
         "level": "N1",
         "rank": 2379,
@@ -45430,7 +45430,7 @@
     },
     {
         "word": "悪い",
-        "reading": "にくい",
+        "reading": "わるい",
         "meaning": "hateful, abominable, poor-looking",
         "level": "N1",
         "rank": 2392,
@@ -45639,7 +45639,7 @@
     },
     {
         "word": "二人",
-        "reading": "ににん",
+        "reading": "ふたり",
         "meaning": "two persons, two people, pair, couple",
         "level": "N1",
         "rank": 2403,
@@ -45943,7 +45943,7 @@
     },
     {
         "word": "音",
-        "reading": "ね",
+        "reading": "おと",
         "meaning": "sound, note",
         "level": "N1",
         "rank": 2419,
@@ -46057,7 +46057,7 @@
     },
     {
         "word": "鼠",
-        "reading": "ねず",
+        "reading": "ねずみ",
         "meaning": "1. mouse, rat, 2. dark gray, slate color",
         "level": "N1",
         "rank": 2425,
@@ -46969,7 +46969,7 @@
     },
     {
         "word": "灰皿",
-        "reading": "はいさら",
+        "reading": "はいざら",
         "meaning": "ashtray",
         "level": "N1",
         "rank": 2473,
@@ -47216,7 +47216,7 @@
     },
     {
         "word": "墓地",
-        "reading": "はかち",
+        "reading": "ぼち",
         "meaning": "cemetery, graveyard",
         "level": "N1",
         "rank": 2486,
@@ -47596,7 +47596,7 @@
     },
     {
         "word": "弾く",
-        "reading": "はじく",
+        "reading": "ひく",
         "meaning": "to flip, to snap",
         "level": "N1",
         "rank": 2506,
@@ -47767,7 +47767,7 @@
     },
     {
         "word": "機",
-        "reading": "はた",
+        "reading": "き",
         "meaning": "loom",
         "level": "N1",
         "rank": 2515,
@@ -47900,7 +47900,7 @@
     },
     {
         "word": "発足",
-        "reading": "はっそく",
+        "reading": "ほっそく",
         "meaning": "starting, inauguration",
         "level": "N1",
         "rank": 2522,
@@ -48337,7 +48337,7 @@
     },
     {
         "word": "流行",
-        "reading": "はやり",
+        "reading": "りゅうこう",
         "meaning": "fashionable, fad, in vogue, prevailing",
         "level": "N1",
         "rank": 2545,
@@ -49021,7 +49021,7 @@
     },
     {
         "word": "罰",
-        "reading": "ばち",
+        "reading": "ばつ",
         "meaning": "(divine) punishment, curse, retribution",
         "level": "N1",
         "rank": 2581,
@@ -49078,7 +49078,7 @@
     },
     {
         "word": "発条",
-        "reading": "ばね",
+        "reading": "はつじょう",
         "meaning": "spring (e.g. coil leaf)",
         "level": "N1",
         "rank": 2584,
@@ -49116,7 +49116,7 @@
     },
     {
         "word": "判",
-        "reading": "ばん",
+        "reading": "はん",
         "meaning": "size (of paper or books)",
         "level": "N1",
         "rank": 2586,
@@ -49154,7 +49154,7 @@
     },
     {
         "word": "万人",
-        "reading": "ばんじん",
+        "reading": "ばんにん",
         "meaning": "all people, everybody, 10000 people",
         "level": "N1",
         "rank": 2588,
@@ -49686,7 +49686,7 @@
     },
     {
         "word": "一向",
-        "reading": "ひたすら",
+        "reading": "いっこう",
         "meaning": "earnestly",
         "level": "N1",
         "rank": 2616,
@@ -49933,7 +49933,7 @@
     },
     {
         "word": "一筋",
-        "reading": "ひとすき",
+        "reading": "ひとすじ",
         "meaning": "a line, earnestly, blindly, straightforwardly",
         "level": "N1",
         "rank": 2629,
@@ -50959,7 +50959,7 @@
     },
     {
         "word": "復旧",
-        "reading": "ふくきゅう",
+        "reading": "ふっきゅう",
         "meaning": "restoration, restitution, rehabilitation",
         "level": "N1",
         "rank": 2683,
@@ -51529,7 +51529,7 @@
     },
     {
         "word": "不便",
-        "reading": "ふびん",
+        "reading": "ふべん",
         "meaning": "pity, compassion",
         "level": "N1",
         "rank": 2713,
@@ -51605,7 +51605,7 @@
     },
     {
         "word": "文",
-        "reading": "ふみ",
+        "reading": "ぶん",
         "meaning": "letter, writings",
         "level": "N1",
         "rank": 2717,
@@ -52099,7 +52099,7 @@
     },
     {
         "word": "打付ける",
-        "reading": "ぶつける",
+        "reading": "うちつける",
         "meaning": "to knock, to run into, to nail on, to strike hard, to hit and attack",
         "level": "N1",
         "rank": 2743,
@@ -53695,7 +53695,7 @@
     },
     {
         "word": "乾",
-        "reading": "ほし",
+        "reading": "いぬい",
         "meaning": "dried, cured",
         "level": "N1",
         "rank": 2827,
@@ -53923,7 +53923,7 @@
     },
     {
         "word": "辺り",
-        "reading": "ほとり",
+        "reading": "あたり",
         "meaning": "(in the) neighbourhood, vicinity, nearby",
         "level": "N1",
         "rank": 2839,
@@ -54930,7 +54930,7 @@
     },
     {
         "word": "巻",
-        "reading": "まき",
+        "reading": "かん",
         "meaning": "volume",
         "level": "N1",
         "rank": 2892,
@@ -55025,7 +55025,7 @@
     },
     {
         "word": "真心",
-        "reading": "まこころ",
+        "reading": "まごころ",
         "meaning": "sincerity, devotion",
         "level": "N1",
         "rank": 2897,
@@ -55101,7 +55101,7 @@
     },
     {
         "word": "正しく",
-        "reading": "まさしく",
+        "reading": "ただしく",
         "meaning": "surely, no doubt, evidently",
         "level": "N1",
         "rank": 2901,
@@ -55367,7 +55367,7 @@
     },
     {
         "word": "瞬き",
-        "reading": "またたき",
+        "reading": "まばたき",
         "meaning": "wink, twinkling (of stars), flicker (of light)",
         "level": "N1",
         "rank": 2915,
@@ -55462,7 +55462,7 @@
     },
     {
         "word": "区々",
-        "reading": "まちまち",
+        "reading": "くく",
         "meaning": "1. several, various, divergent, conflicting, different, diverse, 2. trivial",
         "level": "N1",
         "rank": 2920,
@@ -55576,7 +55576,7 @@
     },
     {
         "word": "免れる",
-        "reading": "まぬかれる",
+        "reading": "まぬがれる",
         "meaning": "to escape from, to be rescued from, to avoid, to evade, to avert, to elude, to be exempted, to be relieved",
         "level": "N1",
         "rank": 2926,
@@ -55937,7 +55937,7 @@
     },
     {
         "word": "三",
-        "reading": "み",
+        "reading": "さん",
         "meaning": "(num) three",
         "level": "N1",
         "rank": 2945,
@@ -56811,7 +56811,7 @@
     },
     {
         "word": "六",
-        "reading": "む",
+        "reading": "ろく",
         "meaning": "(num) six",
         "level": "N1",
         "rank": 2991,
@@ -58312,7 +58312,7 @@
     },
     {
         "word": "基",
-        "reading": "もとい",
+        "reading": "もと",
         "meaning": "basis",
         "level": "N1",
         "rank": 3070,
@@ -58616,7 +58616,7 @@
     },
     {
         "word": "問",
-        "reading": "もん",
+        "reading": "とい",
         "meaning": "problem, question",
         "level": "N1",
         "rank": 3086,
@@ -58654,7 +58654,7 @@
     },
     {
         "word": "哉",
-        "reading": "や",
+        "reading": "な",
         "meaning": "question mark",
         "level": "N1",
         "rank": 3088,
@@ -58730,7 +58730,7 @@
     },
     {
         "word": "夜行",
-        "reading": "やぎょう",
+        "reading": "やこう",
         "meaning": "walking around at night, night train, night travel",
         "level": "N1",
         "rank": 3092,
@@ -58825,7 +58825,7 @@
     },
     {
         "word": "優",
-        "reading": "やさ",
+        "reading": "ゆう",
         "meaning": "gentle, affectionate",
         "level": "N1",
         "rank": 3097,
@@ -58882,7 +58882,7 @@
     },
     {
         "word": "社",
-        "reading": "やしろ",
+        "reading": "しゃ",
         "meaning": "Shinto shrine",
         "level": "N1",
         "rank": 3100,
@@ -59015,7 +59015,7 @@
     },
     {
         "word": "夜中",
-        "reading": "やちゅう",
+        "reading": "よなか",
         "meaning": "all night, the whole night",
         "level": "N1",
         "rank": 3107,
@@ -59034,7 +59034,7 @@
     },
     {
         "word": "奴",
-        "reading": "やっこ",
+        "reading": "やつ",
         "meaning": "servant, fellow",
         "level": "N1",
         "rank": 3108,
@@ -60364,7 +60364,7 @@
     },
     {
         "word": "葦",
-        "reading": "よし",
+        "reading": "あし",
         "meaning": "reed, bulrush",
         "level": "N1",
         "rank": 3178,
@@ -60478,7 +60478,7 @@
     },
     {
         "word": "余程",
-        "reading": "よっぽど",
+        "reading": "よほど",
         "meaning": "very, greatly, much, to a large extent, quite",
         "level": "N1",
         "rank": 3184,
@@ -60801,7 +60801,7 @@
     },
     {
         "word": "利根",
-        "reading": "りこん",
+        "reading": "とね",
         "meaning": "intelligence",
         "level": "N1",
         "rank": 3201,
@@ -61561,7 +61561,7 @@
     },
     {
         "word": "連中",
-        "reading": "れんじゅう",
+        "reading": "れんちゅう",
         "meaning": "colleagues, company, a lot",
         "level": "N1",
         "rank": 3241,
@@ -69731,7 +69731,7 @@
     },
     {
         "word": "御手洗",
-        "reading": "おてあらい",
+        "reading": "みたらし",
         "meaning": "font of purifying water placed at entrance of shrine",
         "level": "N2",
         "rank": 195,
@@ -70890,7 +70890,7 @@
     },
     {
         "word": "反る",
-        "reading": "かえる",
+        "reading": "そる",
         "meaning": "to warp, to be warped, to curve",
         "level": "N2",
         "rank": 256,
@@ -76647,7 +76647,7 @@
     },
     {
         "word": "擦る",
-        "reading": "こする",
+        "reading": "する",
         "meaning": "to rub, to chafe, to file, to frost (glass), to strike (match)",
         "level": "N2",
         "rank": 559,
@@ -76856,7 +76856,7 @@
     },
     {
         "word": "言付ける",
-        "reading": "ことづける",
+        "reading": "いいつける",
         "meaning": "to send word, to send a message",
         "level": "N2",
         "rank": 570,
@@ -76970,7 +76970,7 @@
     },
     {
         "word": "塵芥",
-        "reading": "ごみ",
+        "reading": "ちりあくた",
         "meaning": "trash, rubbish",
         "level": "N2",
         "rank": 576,
@@ -79060,7 +79060,7 @@
     },
     {
         "word": "湿気",
-        "reading": "しっき",
+        "reading": "しっけ",
         "meaning": "moisture, humidity, dampness",
         "level": "N2",
         "rank": 686,
@@ -81283,7 +81283,7 @@
     },
     {
         "word": "白髪",
-        "reading": "しらが",
+        "reading": "はくはつ",
         "meaning": "white or grey hair, trendy hair bleaching",
         "level": "N2",
         "rank": 803,
@@ -82803,7 +82803,7 @@
     },
     {
         "word": "滑れる",
-        "reading": "ずれる",
+        "reading": "すべれる",
         "meaning": "to slip; to shift out of position",
         "level": "N2",
         "rank": 883,
@@ -84931,7 +84931,7 @@
     },
     {
         "word": "大分",
-        "reading": "だいぶん",
+        "reading": "だいぶ",
         "meaning": "considerably, greatly, a lot",
         "level": "N2",
         "rank": 995,
@@ -86850,7 +86850,7 @@
     },
     {
         "word": "塵紙",
-        "reading": "ちりがみ",
+        "reading": "ちりし",
         "meaning": "tissue paper, toilet paper",
         "level": "N2",
         "rank": 1096,
@@ -87572,7 +87572,7 @@
     },
     {
         "word": "艶",
-        "reading": "つや",
+        "reading": "えん",
         "meaning": "gloss, glaze",
         "level": "N2",
         "rank": 1134,
@@ -89073,7 +89073,7 @@
     },
     {
         "word": "退く",
-        "reading": "どく",
+        "reading": "しりぞく",
         "meaning": "(1) to retreat, to recede, to withdraw",
         "level": "N2",
         "rank": 1213,
@@ -89225,7 +89225,7 @@
     },
     {
         "word": "退ける",
-        "reading": "どける",
+        "reading": "しりぞける",
         "meaning": "to remove, to take away, to dislodge, to put something out of the way",
         "level": "N2",
         "rank": 1221,
@@ -89396,7 +89396,7 @@
     },
     {
         "word": "留まる",
-        "reading": "とどまる",
+        "reading": "とまる",
         "meaning": "(1) to be fixed, (2) to abide, to stay (in the one place)",
         "level": "N2",
         "rank": 1230,
@@ -89662,7 +89662,7 @@
     },
     {
         "word": "丼",
-        "reading": "どんぶり",
+        "reading": "どん",
         "meaning": "porcelain bowl, bowl of rice with food on top",
         "level": "N2",
         "rank": 1244,
@@ -91220,7 +91220,7 @@
     },
     {
         "word": "鈍い",
-        "reading": "のろい",
+        "reading": "にぶい",
         "meaning": "dull (e.g. a knife), thickheaded, slow (opposite of fast), stupid",
         "level": "N2",
         "rank": 1326,
@@ -91752,7 +91752,7 @@
     },
     {
         "word": "斜",
-        "reading": "はす",
+        "reading": "しゃ",
         "meaning": "diagonal",
         "level": "N2",
         "rank": 1354,
@@ -93291,7 +93291,7 @@
     },
     {
         "word": "日日",
-        "reading": "ひにち",
+        "reading": "にちにち",
         "meaning": "every day, daily, day after day",
         "level": "N2",
         "rank": 1435,
@@ -94412,7 +94412,7 @@
     },
     {
         "word": "船便",
-        "reading": "ふなびん",
+        "reading": "せんびん",
         "meaning": "surface mail (ship)",
         "level": "N2",
         "rank": 1494,
@@ -97547,7 +97547,7 @@
     },
     {
         "word": "蒸す",
-        "reading": "むす",
+        "reading": "ふかす",
         "meaning": "to steam, to poultice, to be sultry",
         "level": "N2",
         "rank": 1659,
@@ -97908,7 +97908,7 @@
     },
     {
         "word": "目下",
-        "reading": "めした",
+        "reading": "もっか",
         "meaning": "at present, now",
         "level": "N2",
         "rank": 1678,
@@ -99675,7 +99675,7 @@
     },
     {
         "word": "汚す",
-        "reading": "よごす",
+        "reading": "けがす",
         "meaning": "(1) to disgrace, to dishonour, (2) to pollute, to contaminate, to soil, to make dirty, to stain",
         "level": "N2",
         "rank": 1771,
@@ -101347,7 +101347,7 @@
     },
     {
         "word": "暖かい",
-        "reading": "あたたか(い)",
+        "reading": "あたたかい",
         "meaning": "warm, mild",
         "level": "N3",
         "rank": 24,
@@ -101556,7 +101556,7 @@
     },
     {
         "word": "油",
-        "reading": "あぶら",
+        "reading": "ゆ",
         "meaning": "oil",
         "level": "N3",
         "rank": 35,
@@ -102183,7 +102183,7 @@
     },
     {
         "word": "行き",
-        "reading": "ゆき",
+        "reading": "いき",
         "meaning": "going",
         "level": "N3",
         "rank": 68,
@@ -103209,7 +103209,7 @@
     },
     {
         "word": "否",
-        "reading": "いや",
+        "reading": "いな",
         "meaning": "no, the noes",
         "level": "N3",
         "rank": 122,
@@ -103532,7 +103532,7 @@
     },
     {
         "word": "上",
-        "reading": "うわ",
+        "reading": "うえ",
         "meaning": "upper, outer, surface",
         "level": "N3",
         "rank": 139,
@@ -103551,7 +103551,7 @@
     },
     {
         "word": "魚",
-        "reading": "うお",
+        "reading": "さかな",
         "meaning": "fish",
         "level": "N3",
         "rank": 140,
@@ -103703,7 +103703,7 @@
     },
     {
         "word": "後",
-        "reading": "うしろ",
+        "reading": "あと",
         "meaning": "afterwards, since then, in the future",
         "level": "N3",
         "rank": 148,
@@ -104140,7 +104140,7 @@
     },
     {
         "word": "柄",
-        "reading": "え",
+        "reading": "がら",
         "meaning": "handle, grip",
         "level": "N3",
         "rank": 171,
@@ -104368,7 +104368,7 @@
     },
     {
         "word": "得る",
-        "reading": "うる",
+        "reading": "える",
         "meaning": "to get, to gain, to win",
         "level": "N3",
         "rank": 183,
@@ -105432,7 +105432,7 @@
     },
     {
         "word": "居る",
-        "reading": "おる",
+        "reading": "いる",
         "meaning": "to be (animate), to be, to exist",
         "level": "N3",
         "rank": 239,
@@ -105451,7 +105451,7 @@
     },
     {
         "word": "下す",
-        "reading": "おろす",
+        "reading": "くだす",
         "meaning": "to lower, to let go down",
         "level": "N3",
         "rank": 240,
@@ -105508,7 +105508,7 @@
     },
     {
         "word": "音",
-        "reading": "おん",
+        "reading": "おと",
         "meaning": "sound, note",
         "level": "N3",
         "rank": 243,
@@ -106230,7 +106230,7 @@
     },
     {
         "word": "描く",
-        "reading": "かく",
+        "reading": "えがく",
         "meaning": "to draw, to paint, to sketch, to depict, to describe",
         "level": "N3",
         "rank": 281,
@@ -107180,7 +107180,7 @@
     },
     {
         "word": "被る",
-        "reading": "かぶる",
+        "reading": "こうむる",
         "meaning": "to suffer",
         "level": "N3",
         "rank": 331,
@@ -107237,7 +107237,7 @@
     },
     {
         "word": "上",
-        "reading": "かみ",
+        "reading": "うえ",
         "meaning": "(1) first volume, (2) superior quality, (3) governmental",
         "level": "N3",
         "rank": 334,
@@ -107370,7 +107370,7 @@
     },
     {
         "word": "空",
-        "reading": "から",
+        "reading": "そら",
         "meaning": "sky",
         "level": "N3",
         "rank": 341,
@@ -108852,7 +108852,7 @@
     },
     {
         "word": "球",
-        "reading": "きゅう",
+        "reading": "たま",
         "meaning": "globe, sphere, ball",
         "level": "N3",
         "rank": 419,
@@ -109460,7 +109460,7 @@
     },
     {
         "word": "金",
-        "reading": "きん",
+        "reading": "かね",
         "meaning": "(1) gold, (2) gold general (shogi) (abbr)",
         "level": "N3",
         "rank": 451,
@@ -109707,7 +109707,7 @@
     },
     {
         "word": "九",
-        "reading": "く",
+        "reading": "きゅう",
         "meaning": "nine",
         "level": "N3",
         "rank": 464,
@@ -110486,7 +110486,7 @@
     },
     {
         "word": "下",
-        "reading": "げ",
+        "reading": "した",
         "meaning": "under, below, beneath",
         "level": "N3",
         "rank": 505,
@@ -111132,7 +111132,7 @@
     },
     {
         "word": "軒",
-        "reading": "けん",
+        "reading": "のき",
         "meaning": "eaves",
         "level": "N3",
         "rank": 539,
@@ -111512,7 +111512,7 @@
     },
     {
         "word": "後",
-        "reading": "ご",
+        "reading": "あと",
         "meaning": "afterwards, since then, in the future",
         "level": "N3",
         "rank": 559,
@@ -111911,7 +111911,7 @@
     },
     {
         "word": "工場",
-        "reading": "こうば",
+        "reading": "こうじょう",
         "meaning": "factory, plant, mill, workshop",
         "level": "N3",
         "rank": 580,
@@ -112272,7 +112272,7 @@
     },
     {
         "word": "極",
-        "reading": "ごく",
+        "reading": "きょく",
         "meaning": "quite, very",
         "level": "N3",
         "rank": 599,
@@ -112994,7 +112994,7 @@
     },
     {
         "word": "今日",
-        "reading": "こんにち",
+        "reading": "きょう",
         "meaning": "today, this day",
         "level": "N3",
         "rank": 637,
@@ -113374,7 +113374,7 @@
     },
     {
         "word": "盛り",
-        "reading": "さかり",
+        "reading": "もり",
         "meaning": "helping, serving",
         "level": "N3",
         "rank": 657,
@@ -114001,7 +114001,7 @@
     },
     {
         "word": "賛成",
-        "reading": "Uӣ[い",
+        "reading": "さんせい",
         "meaning": "approval, agreement, support, favour",
         "level": "N3",
         "rank": 690,
@@ -114058,7 +114058,7 @@
     },
     {
         "word": "四",
-        "reading": "し",
+        "reading": "よん",
         "meaning": "four",
         "level": "N3",
         "rank": 693,
@@ -114248,7 +114248,7 @@
     },
     {
         "word": "直",
-        "reading": "じき",
+        "reading": "ちょく",
         "meaning": "earnestly, immediately, exactly",
         "level": "N3",
         "rank": 703,
@@ -114704,7 +114704,7 @@
     },
     {
         "word": "七",
-        "reading": "しち",
+        "reading": "なな",
         "meaning": "seven",
         "level": "N3",
         "rank": 727,
@@ -115312,7 +115312,7 @@
     },
     {
         "word": "下",
-        "reading": "しも",
+        "reading": "した",
         "meaning": "under, below, beneath",
         "level": "N3",
         "rank": 759,
@@ -118048,7 +118048,7 @@
     },
     {
         "word": "空く",
-        "reading": "すく",
+        "reading": "あく",
         "meaning": "(1) to open, to become empty, (2) to be less crowded",
         "level": "N3",
         "rank": 903,
@@ -118504,7 +118504,7 @@
     },
     {
         "word": "為る",
-        "reading": "する",
+        "reading": "なる",
         "meaning": "to change, to be of use, to reach to",
         "level": "N3",
         "rank": 927,
@@ -118561,7 +118561,7 @@
     },
     {
         "word": "背",
-        "reading": "せい",
+        "reading": "せ",
         "meaning": "height, stature",
         "level": "N3",
         "rank": 930,
@@ -118599,7 +118599,7 @@
     },
     {
         "word": "生",
-        "reading": "せい",
+        "reading": "なま",
         "meaning": "(1) draft (beer), (2) raw, unprocessed",
         "level": "N3",
         "rank": 932,
@@ -120176,7 +120176,7 @@
     },
     {
         "word": "側",
-        "reading": "そば",
+        "reading": "がわ",
         "meaning": "side, edge, third person",
         "level": "N3",
         "rank": 1015,
@@ -121449,7 +121449,7 @@
     },
     {
         "word": "唯",
-        "reading": "たった",
+        "reading": "ただ",
         "meaning": "free of charge, mere, sole, only, usual, common",
         "level": "N3",
         "rank": 1082,
@@ -123178,7 +123178,7 @@
     },
     {
         "word": "注ぐ",
-        "reading": "つぐ",
+        "reading": "そそぐ",
         "meaning": "to pour (into), to irrigate, to pay",
         "level": "N3",
         "rank": 1173,
@@ -124565,7 +124565,7 @@
     },
     {
         "word": "十",
-        "reading": "とお",
+        "reading": "じゅう",
         "meaning": "10, ten",
         "level": "N3",
         "rank": 1246,
@@ -125857,7 +125857,7 @@
     },
     {
         "word": "等",
-        "reading": "など",
+        "reading": "とう",
         "meaning": "et cetera, etc., and the like",
         "level": "N3",
         "rank": 1314,
@@ -125895,7 +125895,7 @@
     },
     {
         "word": "何",
-        "reading": "なに",
+        "reading": "なん",
         "meaning": "what",
         "level": "N3",
         "rank": 1316,
@@ -126275,7 +126275,7 @@
     },
     {
         "word": "日",
-        "reading": "にち",
+        "reading": "ひ",
         "meaning": "sun, sunshine, day",
         "level": "N3",
         "rank": 1336,
@@ -126408,7 +126408,7 @@
     },
     {
         "word": "日本",
-        "reading": "にほん",
+        "reading": "にっぽん",
         "meaning": "Japan",
         "level": "N3",
         "rank": 1343,
@@ -126636,7 +126636,7 @@
     },
     {
         "word": "値",
-        "reading": "ね",
+        "reading": "あたい",
         "meaning": "value, price, cost",
         "level": "N3",
         "rank": 1355,
@@ -126807,7 +126807,7 @@
     },
     {
         "word": "年月",
-        "reading": "ねんげつ",
+        "reading": "としつき",
         "meaning": "months and years",
         "level": "N3",
         "rank": 1364,
@@ -127149,7 +127149,7 @@
     },
     {
         "word": "後",
-        "reading": "のち",
+        "reading": "あと",
         "meaning": "afterwards, since then, in the future",
         "level": "N3",
         "rank": 1382,
@@ -127396,7 +127396,7 @@
     },
     {
         "word": "梅雨",
-        "reading": "ばいう",
+        "reading": "つゆ",
         "meaning": "rainy season, rain during the rainy season",
         "level": "N3",
         "rank": 1395,
@@ -127947,7 +127947,7 @@
     },
     {
         "word": "二十",
-        "reading": "はたち",
+        "reading": "にじゅう",
         "meaning": "20 years old, 20th year",
         "level": "N3",
         "rank": 1424,
@@ -128251,7 +128251,7 @@
     },
     {
         "word": "羽",
-        "reading": "はね",
+        "reading": "わ",
         "meaning": "counter for birds, counter for rabbits",
         "level": "N3",
         "rank": 1440,
@@ -128593,7 +128593,7 @@
     },
     {
         "word": "灯",
-        "reading": "ひ",
+        "reading": "あかり",
         "meaning": "light",
         "level": "N3",
         "rank": 1458,
@@ -128802,7 +128802,7 @@
     },
     {
         "word": "額",
-        "reading": "ひたい",
+        "reading": "がく",
         "meaning": "forehead, brow",
         "level": "N3",
         "rank": 1469,
@@ -129334,7 +129334,7 @@
     },
     {
         "word": "品",
-        "reading": "ひん",
+        "reading": "しな",
         "meaning": "thing, article, goods, dignity, article (goods), counter for meal courses",
         "level": "N3",
         "rank": 1497,
@@ -129429,7 +129429,7 @@
     },
     {
         "word": "不",
-        "reading": "ぶ",
+        "reading": "ふ",
         "meaning": "un, non, negative prefix",
         "level": "N3",
         "rank": 1502,
@@ -129448,7 +129448,7 @@
     },
     {
         "word": "無",
-        "reading": "ぶ",
+        "reading": "む",
         "meaning": "nothing, naught, nil, zero",
         "level": "N3",
         "rank": 1503,
@@ -129923,7 +129923,7 @@
     },
     {
         "word": "縁",
-        "reading": "ふち",
+        "reading": "えん",
         "meaning": "a means,  e.g. of living",
         "level": "N3",
         "rank": 1528,
@@ -129942,7 +129942,7 @@
     },
     {
         "word": "打つ",
-        "reading": "ぶつ",
+        "reading": "うつ",
         "meaning": "to hit, to strike",
         "level": "N3",
         "rank": 1529,
@@ -130854,7 +130854,7 @@
     },
     {
         "word": "方々",
-        "reading": "ほうぼう",
+        "reading": "かたがた",
         "meaning": "persons, this and that, here and there, everywhere",
         "level": "N3",
         "rank": 1577,
@@ -131006,7 +131006,7 @@
     },
     {
         "word": "外",
-        "reading": "ほか",
+        "reading": "そと",
         "meaning": "other place, the rest",
         "level": "N3",
         "rank": 1585,
@@ -131196,7 +131196,7 @@
     },
     {
         "word": "頬",
-        "reading": "ほほ",
+        "reading": "ほお",
         "meaning": "cheek (of face)",
         "level": "N3",
         "rank": 1595,
@@ -131310,7 +131310,7 @@
     },
     {
         "word": "本当",
-        "reading": "ほんと",
+        "reading": "ほんとう",
         "meaning": "truth, reality",
         "level": "N3",
         "rank": 1601,
@@ -131747,7 +131747,7 @@
     },
     {
         "word": "未だ",
-        "reading": "まだ",
+        "reading": "いまだ",
         "meaning": "yet, still, more, besides",
         "level": "N3",
         "rank": 1624,
@@ -132032,7 +132032,7 @@
     },
     {
         "word": "円",
-        "reading": "まる",
+        "reading": "えん",
         "meaning": "circle, money",
         "level": "N3",
         "rank": 1639,
@@ -132184,7 +132184,7 @@
     },
     {
         "word": "実",
-        "reading": "み",
+        "reading": "じつ",
         "meaning": "fruit, nut, seed, content, good result",
         "level": "N3",
         "rank": 1647,
@@ -132336,7 +132336,7 @@
     },
     {
         "word": "皆",
-        "reading": "みんな",
+        "reading": "みな",
         "meaning": "all, everyone, everybody",
         "level": "N3",
         "rank": 1655,
@@ -132393,7 +132393,7 @@
     },
     {
         "word": "都",
-        "reading": "みやこ",
+        "reading": "と",
         "meaning": "capital",
         "level": "N3",
         "rank": 1658,
@@ -133191,7 +133191,7 @@
     },
     {
         "word": "文字",
-        "reading": "もんじ",
+        "reading": "もじ",
         "meaning": "letter (of alphabet), character",
         "level": "N3",
         "rank": 1700,
@@ -133362,7 +133362,7 @@
     },
     {
         "word": "素",
-        "reading": "もと",
+        "reading": "そ",
         "meaning": "prime",
         "level": "N3",
         "rank": 1709,
@@ -133628,7 +133628,7 @@
     },
     {
         "word": "訳",
-        "reading": "やく",
+        "reading": "わけ",
         "meaning": "meaning, reason, circumstances, can be deduced, situation",
         "level": "N3",
         "rank": 1723,
@@ -134217,7 +134217,7 @@
     },
     {
         "word": "夜",
-        "reading": "よ",
+        "reading": "よる",
         "meaning": "evening, night",
         "level": "N3",
         "rank": 1754,
@@ -135642,7 +135642,7 @@
     },
     {
         "word": "綿",
-        "reading": "わた",
+        "reading": "めん",
         "meaning": "cotton, padding",
         "level": "N3",
         "rank": 1829,
@@ -135718,7 +135718,7 @@
     },
     {
         "word": "悪口",
-        "reading": "わるくち",
+        "reading": "わるぐち",
         "meaning": "abuse, insult, slander, evil speaking",
         "level": "N3",
         "rank": 1833,
@@ -135889,7 +135889,7 @@
     },
     {
         "word": "上る",
-        "reading": "あがる",
+        "reading": "のぼる",
         "meaning": "to rise",
         "level": "N4",
         "rank": 7,
@@ -136288,7 +136288,7 @@
     },
     {
         "word": "案内",
-        "reading": "あんない・する",
+        "reading": "あんない",
         "meaning": "to guide",
         "level": "N4",
         "rank": 28,
@@ -136991,7 +136991,7 @@
     },
     {
         "word": "運転",
-        "reading": "うんてん・する",
+        "reading": "うんてん",
         "meaning": "to drive",
         "level": "N4",
         "rank": 65,
@@ -137029,7 +137029,7 @@
     },
     {
         "word": "運動",
-        "reading": "うんどう・する",
+        "reading": "うんどう",
         "meaning": "to exercise",
         "level": "N4",
         "rank": 67,
@@ -137105,7 +137105,7 @@
     },
     {
         "word": "遠慮",
-        "reading": "えんりょ・する",
+        "reading": "えんりょ",
         "meaning": "to be reserved,  to be restrained",
         "level": "N4",
         "rank": 71,
@@ -137713,7 +137713,7 @@
     },
     {
         "word": "表",
-        "reading": "おもて",
+        "reading": "ひょう",
         "meaning": "the front",
         "level": "N4",
         "rank": 103,
@@ -139347,7 +139347,7 @@
     },
     {
         "word": "計画",
-        "reading": "けいかく・する",
+        "reading": "けいかく",
         "meaning": "to plan",
         "level": "N4",
         "rank": 189,
@@ -139366,7 +139366,7 @@
     },
     {
         "word": "経験",
-        "reading": "けいけん・する",
+        "reading": "けいけん",
         "meaning": "to experience",
         "level": "N4",
         "rank": 190,
@@ -139955,7 +139955,7 @@
     },
     {
         "word": "故障",
-        "reading": "こしょう・する",
+        "reading": "こしょう",
         "meaning": "to break-down",
         "level": "N4",
         "rank": 221,
@@ -140924,7 +140924,7 @@
     },
     {
         "word": "支度",
-        "reading": "したく・する",
+        "reading": "したく",
         "meaning": "to prepare",
         "level": "N4",
         "rank": 272,
@@ -141266,7 +141266,7 @@
     },
     {
         "word": "出席",
-        "reading": "しゅっせき・する",
+        "reading": "しゅっせき",
         "meaning": "to attend",
         "level": "N4",
         "rank": 290,
@@ -141285,7 +141285,7 @@
     },
     {
         "word": "出発",
-        "reading": "しゅっぱつ・する",
+        "reading": "しゅっぱつ",
         "meaning": "to depart",
         "level": "N4",
         "rank": 291,
@@ -141323,7 +141323,7 @@
     },
     {
         "word": "準備",
-        "reading": "じゅんび・する",
+        "reading": "じゅんび",
         "meaning": "to prepare",
         "level": "N4",
         "rank": 293,
@@ -141399,7 +141399,7 @@
     },
     {
         "word": "招待",
-        "reading": "しょうたい・する",
+        "reading": "しょうたい",
         "meaning": "to invite",
         "level": "N4",
         "rank": 297,
@@ -141418,7 +141418,7 @@
     },
     {
         "word": "承知",
-        "reading": "しょうち・する",
+        "reading": "しょうち",
         "meaning": "to consent",
         "level": "N4",
         "rank": 298,
@@ -141456,7 +141456,7 @@
     },
     {
         "word": "食事",
-        "reading": "しょくじ・する",
+        "reading": "しょくじ",
         "meaning": "to have a meal",
         "level": "N4",
         "rank": 300,
@@ -141608,7 +141608,7 @@
     },
     {
         "word": "心配",
-        "reading": "しんぱい・する",
+        "reading": "しんぱい",
         "meaning": "to worry",
         "level": "N4",
         "rank": 308,
@@ -142083,7 +142083,7 @@
     },
     {
         "word": "生活",
-        "reading": "せいかつ・する",
+        "reading": "せいかつ",
         "meaning": "to live",
         "level": "N4",
         "rank": 333,
@@ -142102,7 +142102,7 @@
     },
     {
         "word": "生産",
-        "reading": "せいさん・する",
+        "reading": "せいさん",
         "meaning": "to produce",
         "level": "N4",
         "rank": 334,
@@ -142254,7 +142254,7 @@
     },
     {
         "word": "世話",
-        "reading": "せわ・する",
+        "reading": "せわ",
         "meaning": "to look after",
         "level": "N4",
         "rank": 342,
@@ -142368,7 +142368,7 @@
     },
     {
         "word": "相談",
-        "reading": "そうだん・する",
+        "reading": "そうだん",
         "meaning": "to discuss",
         "level": "N4",
         "rank": 348,
@@ -142596,7 +142596,7 @@
     },
     {
         "word": "退院",
-        "reading": "たいいん・する",
+        "reading": "たいいん",
         "meaning": "to leave hospital",
         "level": "N4",
         "rank": 360,
@@ -144496,7 +144496,7 @@
     },
     {
         "word": "入院",
-        "reading": "にゅういん・する",
+        "reading": "にゅういん",
         "meaning": "to hospitalise",
         "level": "N4",
         "rank": 460,
@@ -144515,7 +144515,7 @@
     },
     {
         "word": "入学",
-        "reading": "にゅうがく・する",
+        "reading": "にゅうがく",
         "meaning": "to enter school or university",
         "level": "N4",
         "rank": 461,
@@ -144895,7 +144895,7 @@
     },
     {
         "word": "拝見",
-        "reading": "はいけん・する",
+        "reading": "はいけん",
         "meaning": "(humble) to look at",
         "level": "N4",
         "rank": 481,
@@ -146054,7 +146054,7 @@
     },
     {
         "word": "放送",
-        "reading": "ほうそう・する",
+        "reading": "ほうそう",
         "meaning": "to broadcast",
         "level": "N4",
         "rank": 542,
@@ -147080,7 +147080,7 @@
     },
     {
         "word": "止める",
-        "reading": "やめる",
+        "reading": "とめる",
         "meaning": "to stop",
         "level": "N4",
         "rank": 596,
@@ -147137,7 +147137,7 @@
     },
     {
         "word": "輸出",
-        "reading": "ゆしゅつ・する",
+        "reading": "ゆしゅつ",
         "meaning": "to export",
         "level": "N4",
         "rank": 599,
@@ -147156,7 +147156,7 @@
     },
     {
         "word": "輸入",
-        "reading": "ゆにゅう・する",
+        "reading": "ゆにゅう",
         "meaning": "to import",
         "level": "N4",
         "rank": 600,
@@ -147916,7 +147916,7 @@
     },
     {
         "word": "明い",
-        "reading": "あかるい",
+        "reading": "あい",
         "meaning": "bright",
         "level": "N5",
         "rank": 6,
@@ -147954,7 +147954,7 @@
     },
     {
         "word": "開く",
-        "reading": "あく",
+        "reading": "ひらく",
         "meaning": "to open, to become open",
         "level": "N5",
         "rank": 8,
@@ -148087,7 +148087,7 @@
     },
     {
         "word": "明日",
-        "reading": "あした",
+        "reading": "あす",
         "meaning": "tomorrow",
         "level": "N5",
         "rank": 15,
@@ -148657,7 +148657,7 @@
     },
     {
         "word": "言う",
-        "reading": "いう",
+        "reading": "ゆう",
         "meaning": "to say",
         "level": "N5",
         "rank": 45,
@@ -148885,7 +148885,7 @@
     },
     {
         "word": "一日",
-        "reading": "いちにち",
+        "reading": "ついたち",
         "meaning": "first of the month",
         "level": "N5",
         "rank": 57,
@@ -150956,7 +150956,7 @@
     },
     {
         "word": "辛い",
-        "reading": "からい",
+        "reading": "つらい",
         "meaning": "Spicy",
         "level": "N5",
         "rank": 166,
@@ -151355,7 +151355,7 @@
     },
     {
         "word": "九",
-        "reading": "きゅう / く",
+        "reading": "きゅう",
         "meaning": "Nine",
         "level": "N5",
         "rank": 187,
@@ -152875,7 +152875,7 @@
     },
     {
         "word": "散歩",
-        "reading": "さんぽする",
+        "reading": "さんぽ",
         "meaning": "to stroll",
         "level": "N5",
         "rank": 267,
@@ -152894,7 +152894,7 @@
     },
     {
         "word": "四",
-        "reading": "し / よん",
+        "reading": "よん",
         "meaning": "Four",
         "level": "N5",
         "rank": 268,
@@ -153046,7 +153046,7 @@
     },
     {
         "word": "七",
-        "reading": "しち / なな",
+        "reading": "なな",
         "meaning": "Seven",
         "level": "N5",
         "rank": 276,
@@ -153312,7 +153312,7 @@
     },
     {
         "word": "十",
-        "reading": "じゅう とお",
+        "reading": "じゅう",
         "meaning": "Ten",
         "level": "N5",
         "rank": 290,
@@ -154072,7 +154072,7 @@
     },
     {
         "word": "掃除",
-        "reading": "そうじする",
+        "reading": "そうじ",
         "meaning": "to clean, to sweep",
         "level": "N5",
         "rank": 330,
@@ -154737,7 +154737,7 @@
     },
     {
         "word": "誰",
-        "reading": "だれか",
+        "reading": "だれ",
         "meaning": "somebody",
         "level": "N5",
         "rank": 365,
@@ -156466,7 +156466,7 @@
     },
     {
         "word": "何",
-        "reading": "なん/なに",
+        "reading": "なん",
         "meaning": "what",
         "level": "N5",
         "rank": 456,
@@ -156656,7 +156656,7 @@
     },
     {
         "word": "温い",
-        "reading": "ぬるい",
+        "reading": "ぬくい",
         "meaning": "luke warm",
         "level": "N5",
         "rank": 466,
@@ -158290,7 +158290,7 @@
     },
     {
         "word": "勉強",
-        "reading": "べんきょうする",
+        "reading": "べんきょう",
         "meaning": "to study",
         "level": "N5",
         "rank": 552,
@@ -158575,7 +158575,7 @@
     },
     {
         "word": "毎月",
-        "reading": "まいげつ/まいつき",
+        "reading": "まいつき",
         "meaning": "every month",
         "level": "N5",
         "rank": 567,
@@ -158632,7 +158632,7 @@
     },
     {
         "word": "毎年",
-        "reading": "まいねん/まいとし",
+        "reading": "まいとし",
         "meaning": "every year",
         "level": "N5",
         "rank": 570,
@@ -159734,7 +159734,7 @@
     },
     {
         "word": "昨夜",
-        "reading": "ゆうべ",
+        "reading": "さくや",
         "meaning": "last night",
         "level": "N5",
         "rank": 628,
@@ -159791,7 +159791,7 @@
     },
     {
         "word": "行く",
-        "reading": "ゆく",
+        "reading": "いく",
         "meaning": "to go",
         "level": "N5",
         "rank": 631,
@@ -160285,7 +160285,7 @@
     },
     {
         "word": "練習",
-        "reading": "れんしゅうする",
+        "reading": "れんしゅう",
         "meaning": "to practice",
         "level": "N5",
         "rank": 657,
@@ -160437,7 +160437,7 @@
     },
     {
         "word": "私",
-        "reading": "わたし",
+        "reading": "わたくし",
         "meaning": "I,myself",
         "level": "N5",
         "rank": 665,

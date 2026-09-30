@@ -27,6 +27,9 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('문장 뜻'), findsOneWidget);
+    expect(find.text('ANSWER'), findsOneWidget);
+    expect(find.text('WORDS'), findsOneWidget);
+    expect(find.text('Choose a word below to begin.'), findsOneWidget);
     expect(find.text('Your sentence'), findsNothing);
     expect(find.text('Hide meanings'), findsNothing);
     expect(find.byIcon(Icons.volume_up_rounded), findsNothing);
@@ -35,8 +38,8 @@ void main() {
     );
     final answerDecoration =
         tester.widget<Container>(answerContainer).decoration as BoxDecoration;
-    expect(answerDecoration.color, const Color(0xFFE8EAEB));
-    expect(answerDecoration.border, isNull);
+    expect(answerDecoration.color, const Color(0xFFFFF9DC));
+    expect(answerDecoration.border, isNotNull);
     expect(
       find.descendant(of: answerContainer, matching: find.text('문장 뜻')),
       findsOneWidget,
@@ -50,10 +53,19 @@ void main() {
       tester.getSize(find.widgetWithText(OutlinedButton, 'Reset')).height,
       tester.getSize(find.widgetWithText(FilledButton, 'Check answer')).height,
     );
+    final tilePool = find.byKey(const ValueKey('reorder-tile-pool-container'));
+    final initialTilePoolWidth = tester.getSize(tilePool).width;
+    final initialTilePoolHeight = tester.getSize(tilePool).height;
     for (var index = 0; index < 3; index++) {
       await tester.tap(find.byKey(ValueKey('available-$index')));
       await tester.pump();
     }
+    expect(tester.getSize(tilePool).width, initialTilePoolWidth);
+    expect(tester.getSize(tilePool).height, initialTilePoolHeight);
+    expect(
+      tester.getSize(tilePool).width,
+      tester.getSize(answerContainer).width,
+    );
     expect(
       find.descendant(
         of: answerContainer,
@@ -69,7 +81,9 @@ void main() {
     expect(find.text('1 / 1'), findsOneWidget);
   });
 
-  testWidgets('answer area uses dark gray in dark mode', (tester) async {
+  testWidgets('answer area uses dark paper styling in dark mode', (
+    tester,
+  ) async {
     final container = ProviderContainer(
       overrides: [
         appControllerProvider.overrideWith(_ReorderTestController.new),
@@ -93,8 +107,14 @@ void main() {
     );
     final decoration =
         tester.widget<Container>(answerContainer).decoration as BoxDecoration;
-    expect(decoration.color, const Color(0xFF292C2E));
-    expect(decoration.border, isNull);
+    expect(decoration.color, const Color(0xFF35321D));
+    expect(decoration.border, isNotNull);
+
+    final tilePool = find.byKey(const ValueKey('reorder-tile-pool-container'));
+    final tilePoolDecoration =
+        tester.widget<Container>(tilePool).decoration as BoxDecoration;
+    expect(tilePoolDecoration.color, const Color(0xFF1D2C33));
+    expect(tilePoolDecoration.border, isNotNull);
   });
 
   testWidgets('X asks before leaving and cancel keeps the game', (

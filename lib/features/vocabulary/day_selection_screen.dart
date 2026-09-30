@@ -9,10 +9,31 @@ import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/core/services/day_block_access.dart';
 import 'package:jlpt_practice/core/services/cloud_sync_service.dart';
 import 'package:jlpt_practice/core/utils/study_batches.dart';
+import 'package:jlpt_practice/data/repositories/kanji_repository.dart';
 import 'package:jlpt_practice/features/vocabulary/day_selection_skeleton.dart';
 
+/// The course whose days [DaySelectionScreen] lists.
+enum StudyCourse {
+  vocabulary,
+  kanji;
+
+  /// Key under which the course keeps its completed and ad-unlocked days, so
+  /// kanji progress never mixes with the level's vocabulary progress.
+  String progressKey(String level) => switch (this) {
+    StudyCourse.vocabulary => level,
+    StudyCourse.kanji => 'kanji-$level',
+  };
+
+  String dayRoute(int day) => switch (this) {
+    StudyCourse.vocabulary => '/study/day/$day',
+    StudyCourse.kanji => '/kanji/day/$day',
+  };
+}
+
 class DaySelectionScreen extends ConsumerStatefulWidget {
-  const DaySelectionScreen({super.key});
+  const DaySelectionScreen({this.course = StudyCourse.vocabulary, super.key});
+
+  final StudyCourse course;
 
   @override
   ConsumerState<DaySelectionScreen> createState() => _DaySelectionScreenState();
@@ -46,7 +67,7 @@ class _DaySelectionScreenState extends ConsumerState<DaySelectionScreen> {
     Set<int> completedDays,
   ) async {
     if (completedDays.contains(day)) {
-      if (mounted) context.push('/study/day/$day');
+      if (mounted) context.push(widget.course.dayRoute(day));
       return;
     }
 
@@ -72,7 +93,7 @@ class _DaySelectionScreenState extends ConsumerState<DaySelectionScreen> {
 
     if (!DayBlockAccess.requiresRewardedAd(day) ||
         _rewardedDays.contains(day)) {
-      if (mounted) context.push('/study/day/$day');
+      if (mounted) context.push(widget.course.dayRoute(day));
       return;
     }
 
@@ -80,7 +101,7 @@ class _DaySelectionScreenState extends ConsumerState<DaySelectionScreen> {
     if (!mounted) return;
     if (persistedRewardedDays.contains(day)) {
       setState(() => _rewardedDays = persistedRewardedDays);
-      context.push('/study/day/$day');
+      context.push(widget.course.dayRoute(day));
       return;
     }
 
@@ -115,23 +136,38 @@ class _DaySelectionScreenState extends ConsumerState<DaySelectionScreen> {
     }
     if (!mounted) return;
     setState(() => _rewardedDays = {..._rewardedDays, day});
-    context.push('/study/day/$day');
+    context.push(widget.course.dayRoute(day));
   }
 
   @override
   Widget build(BuildContext context) {
     final asyncState = ref.watch(appControllerProvider);
+    final kanjiCatalog = widget.course == StudyCourse.kanji
+        ? ref.watch(kanjiCatalogProvider)
+        : null;
     return Scaffold(
       appBar: AppBar(title: Text(context.strings('chooseStudyDay'))),
       body: asyncState.when(
         loading: () => const DaySelectionSkeleton(),
         error: (error, _) => Center(child: Text(error.toString())),
         data: (state) {
-          _ensureRewardedDaysLoaded(state.selectedLevel);
-          final words = state.selectedVocabulary;
-          final dayCount = StudyBatches.count(words.length, state.dailyGoal);
+          if (kanjiCatalog != null) {
+            if (kanjiCatalog.hasError) {
+              return Center(child: Text('${kanjiCatalog.error}'));
+            }
+            if (!kanjiCatalog.hasValue) return const DaySelectionSkeleton();
+          }
+          final progressKey = widget.course.progressKey(state.selectedLevel);
+          _ensureRewardedDaysLoaded(progressKey);
+          final itemCount = kanjiCatalog == null
+              ? state.selectedVocabulary.length
+              : kanjiForLevel(
+                  kanjiCatalog.requireValue,
+                  state.selectedLevel,
+                ).length;
+          final dayCount = StudyBatches.count(itemCount, state.dailyGoal);
           final completedDays =
-              state.completedStudyDays[state.selectedLevel] ?? const <int>{};
+              state.completedStudyDays[progressKey] ?? const <int>{};
           final nextIndex = List.generate(dayCount, (index) => index)
               .indexWhere((index) {
                 return !completedDays.contains(index + 1);
@@ -175,12 +211,12 @@ class _DaySelectionScreenState extends ConsumerState<DaySelectionScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              '${words.length} ${context.strings('words').toLowerCase()}',
+                              '$itemCount ${context.strings(widget.course == StudyCourse.kanji ? 'kanji' : 'words').toLowerCase()}',
                               style: Theme.of(context).textTheme.titleLarge,
                             ),
                             const SizedBox(height: 3),
                             Text(
-                              '${state.dailyGoal} ${context.strings('wordsPerDay')} · $dayCount ${context.strings('days')}',
+                              '${state.dailyGoal} ${context.strings(widget.course == StudyCourse.kanji ? 'kanjiPerDay' : 'wordsPerDay')} · $dayCount ${context.strings('days')}',
                               style: TextStyle(
                                 color: Theme.of(
                                   context,
@@ -209,7 +245,7 @@ class _DaySelectionScreenState extends ConsumerState<DaySelectionScreen> {
                           columns;
                       _scheduleNextDayFocus(
                         signature:
-                            '${state.selectedLevel}-${state.dailyGoal}-$focusIndex-$columns',
+                            '$progressKey-${state.dailyGoal}-$focusIndex-$columns',
                         focusIndex: focusIndex,
                         columns: columns,
                         cardSize: cardSize,
@@ -247,7 +283,7 @@ class _DaySelectionScreenState extends ConsumerState<DaySelectionScreen> {
                             child: InkWell(
                               borderRadius: BorderRadius.circular(24),
                               onTap: () => _handleDayTap(
-                                state.selectedLevel,
+                                progressKey,
                                 day,
                                 completedDays,
                               ),

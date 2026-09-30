@@ -44,100 +44,42 @@ class StudyQuizSelectionScreen extends StatelessWidget {
         title: Text(strings('chooseQuizGame')),
       ),
       body: SafeArea(
-        child: Stack(
-          children: [
-            Positioned(
-              top: 34,
-              right: -76,
-              child: _BackgroundCircle(
-                diameter: 216,
-                color: scheme.primary.withValues(alpha: 0.06),
-              ),
-            ),
-            Positioned(
-              bottom: 24,
-              left: -82,
-              child: _BackgroundCircle(
-                diameter: 188,
-                color: scheme.secondary.withValues(alpha: 0.08),
-              ),
-            ),
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 440),
-                  child: Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: scheme.surface.withValues(alpha: 0.96),
-                      borderRadius: BorderRadius.circular(28),
-                      border: Border.all(
-                        color: scheme.outlineVariant.withValues(alpha: 0.5),
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: scheme.shadow.withValues(alpha: 0.08),
-                          blurRadius: 30,
-                          offset: const Offset(0, 14),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          strings('chooseQuizGame'),
-                          textAlign: TextAlign.left,
-                          style: Theme.of(context).textTheme.bodyLarge
-                              ?.copyWith(
-                                fontSize: 20,
-                                letterSpacing: 0,
-                                fontWeight: FontWeight.w600,
-                                color: scheme.onSurfaceVariant,
-                              ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          strings('chooseQuizGameSubtitle'),
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(color: scheme.onSurfaceVariant),
-                        ),
-                        const SizedBox(height: 12),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _QuizChoiceButton(
-                                icon: Icons.quiz_rounded,
-                                label: strings('fillInBlankGame'),
-                                backgroundColor: scheme.primaryContainer,
-                                foregroundColor: scheme.onPrimaryContainer,
-                                onPressed: () => context.push(
-                                  levelComplete ? '/quiz' : '/quiz/day/$day',
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: _QuizChoiceButton(
-                                icon: Icons.reorder_rounded,
-                                label: strings('sentenceReordering'),
-                                backgroundColor: scheme.secondaryContainer,
-                                foregroundColor: scheme.onSecondaryContainer,
-                                onPressed: () =>
-                                    context.push('/study/day/$day/reorder'),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 560),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    strings('chooseQuizGameSubtitle'),
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                      fontSize: 17,
                     ),
                   ),
-                ),
+                  const SizedBox(height: 30),
+                  _QuizChoiceButton(
+                    icon: Icons.space_bar_rounded,
+                    label: strings('fillInBlankGame'),
+                    description: strings('fillInBlankGameSubtitle'),
+                    onPressed: () => context.push(
+                      levelComplete ? '/quiz' : '/quiz/day/$day',
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  _QuizChoiceButton(
+                    icon: Icons.reorder_rounded,
+                    label: strings('sentenceReordering'),
+                    description: strings('sentenceReorderingSubtitle'),
+                    onPressed: () => context.push('/study/day/$day/reorder'),
+                  ),
+                ],
               ),
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -148,80 +90,83 @@ class _QuizChoiceButton extends StatelessWidget {
   const _QuizChoiceButton({
     required this.icon,
     required this.label,
-    required this.backgroundColor,
-    required this.foregroundColor,
+    required this.description,
     required this.onPressed,
   });
 
   final IconData icon;
   final String label;
-  final Color backgroundColor;
-  final Color foregroundColor;
+  final String description;
   final VoidCallback onPressed;
 
   @override
-  Widget build(BuildContext context) => AspectRatio(
-    aspectRatio: 0.78,
-    child: FilledButton(
-      onPressed: onPressed,
-      style: FilledButton.styleFrom(
-        backgroundColor: backgroundColor,
-        foregroundColor: foregroundColor,
-        padding: const EdgeInsets.all(8),
-        side: BorderSide(color: foregroundColor.withValues(alpha: 0.12)),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      ),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final compact = constraints.maxWidth < 125;
-          final badgeSize = compact ? 38.0 : 56.0;
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                width: badgeSize,
-                height: badgeSize,
-                decoration: BoxDecoration(
-                  color: foregroundColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(compact ? 12 : 18),
-                ),
-                alignment: Alignment.center,
-                child: Icon(icon, size: compact ? 22 : 30),
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final isDark = scheme.brightness == Brightness.dark;
+    return SizedBox(
+      width: double.infinity,
+      child: FilledButton(
+        onPressed: onPressed,
+        style: FilledButton.styleFrom(
+          minimumSize: const Size.fromHeight(132),
+          backgroundColor: isDark ? const Color(0xFF1A1A1A) : scheme.surface,
+          foregroundColor: scheme.onSurface,
+          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 20),
+          side: BorderSide(
+            color: scheme.outlineVariant.withValues(alpha: isDark ? 0.55 : 0.8),
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 64,
+              height: 64,
+              decoration: BoxDecoration(
+                color: scheme.onSurface.withValues(alpha: 0.09),
+                borderRadius: BorderRadius.circular(18),
               ),
-              SizedBox(height: compact ? 6 : 12),
-              Text(
-                label,
-                textAlign: TextAlign.center,
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: compact ? 14 : 18,
-                  height: 1.15,
-                  fontWeight: FontWeight.w700,
-                ),
+              alignment: Alignment.center,
+              child: Icon(icon, size: 30),
+            ),
+            const SizedBox(width: 20),
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      height: 1.2,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    description,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: scheme.onSurfaceVariant,
+                      fontSize: 16,
+                      height: 1.35,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ],
               ),
-            ],
-          );
-        },
+            ),
+            const SizedBox(width: 12),
+            const Icon(Icons.arrow_forward_rounded, size: 28),
+          ],
+        ),
       ),
-    ),
-  );
-}
-
-class _BackgroundCircle extends StatelessWidget {
-  const _BackgroundCircle({required this.diameter, required this.color});
-
-  final double diameter;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) => IgnorePointer(
-    child: Container(
-      width: diameter,
-      height: diameter,
-      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-    ),
-  );
+    );
+  }
 }

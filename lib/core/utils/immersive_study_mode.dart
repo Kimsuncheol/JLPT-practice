@@ -49,6 +49,43 @@ mixin ImmersiveStudyMode<T extends StatefulWidget> on State<T> {
     );
   }
 
+  /// Like [wrapImmersive], and also styles the bottom system-bar inset.
+  ///
+  /// The app keeps its screens inside a [SafeArea], so an [AnnotatedRegion]
+  /// around a screen stops short of the screen's last pixel row, which is
+  /// where Flutter looks for the navigation bar style. A second region hanging
+  /// below the screen covers that row.
+  Widget wrapImmersiveIncludingBottomInset(
+    Widget child, {
+    Color? systemBarColor,
+  }) {
+    final style = _systemBarStyle(
+      systemBarColor ?? Theme.of(context).scaffoldBackgroundColor,
+    );
+    final inset = MediaQuery.paddingOf(context).bottom;
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: style,
+      child: Stack(
+        fit: StackFit.expand,
+        clipBehavior: Clip.none,
+        children: [
+          child,
+          if (inset > 0)
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: -inset,
+              height: inset,
+              child: AnnotatedRegion<SystemUiOverlayStyle>(
+                value: style,
+                child: const SizedBox.expand(),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
   /// Keeps existing call sites simple while dialogs retain normal gestures.
   Widget wrapImmersiveSystemBarGesture(Widget child) => child;
 

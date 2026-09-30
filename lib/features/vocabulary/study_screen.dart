@@ -7,17 +7,16 @@ import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/core/services/tts_service.dart';
-import 'package:jlpt_practice/core/services/volume_service.dart';
 import 'package:jlpt_practice/core/utils/immersive_study_mode.dart';
 import 'package:jlpt_practice/core/utils/study_batches.dart';
 import 'package:jlpt_practice/data/models/app_state.dart';
-import 'package:jlpt_practice/data/models/study_preferences.dart';
 import 'package:jlpt_practice/data/models/study_session.dart';
 import 'package:jlpt_practice/data/models/vocabulary.dart';
+import 'package:jlpt_practice/features/vocabulary/audible_speech.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_masking.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_tape.dart';
 import 'package:jlpt_practice/features/vocabulary/masked_translation.dart';
-import 'package:jlpt_practice/shared/volume_warning_toast.dart';
+import 'package:jlpt_practice/features/vocabulary/start_over_button.dart';
 
 class StudyScreen extends ConsumerStatefulWidget {
   const StudyScreen({required this.day, super.key});
@@ -39,6 +38,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   bool _resumeDecisionPending = false;
   bool _resumeDialogVisible = false;
   bool _leaveDialogVisible = false;
+  bool _startOverDialogVisible = false;
   bool _suppressAutoAudio = false;
   int _pageChangeRequest = 0;
   int _readingsRequest = 0;
@@ -56,7 +56,8 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   Widget build(BuildContext context) {
     final asyncState = ref.watch(appControllerProvider);
     final scaffoldBackgroundColor = Theme.of(context).scaffoldBackgroundColor;
-    final systemBarColor = _resumeDialogVisible || _leaveDialogVisible
+    final systemBarColor =
+        _resumeDialogVisible || _leaveDialogVisible || _startOverDialogVisible
         ? Color.alphaBlend(_dialogBarrierColor, scaffoldBackgroundColor)
         : scaffoldBackgroundColor;
     return wrapImmersive(
@@ -142,7 +143,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: SizedBox(
                 height: 82,
-                child: _buildActionArea(state, words[_index]),
+                child: _buildActionArea(state, words, _index),
               ),
             ),
             SafeArea(
@@ -162,7 +163,11 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   }
 
   Future<void> _confirmLeave() async {
-    if (_leaveDialogVisible || _resumeDialogVisible) return;
+    if (_leaveDialogVisible ||
+        _resumeDialogVisible ||
+        _startOverDialogVisible) {
+      return;
+    }
     final dimmedBackground = Color.alphaBlend(
       _dialogBarrierColor,
       Theme.of(context).scaffoldBackgroundColor,
@@ -204,14 +209,72 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
     if (mounted && shouldLeave) context.pop();
   }
 
+  Future<void> _confirmStartOver(List<Vocabulary> words) async {
+    if (_leaveDialogVisible ||
+        _resumeDialogVisible ||
+        _startOverDialogVisible) {
+      return;
+    }
+    final dimmedBackground = Color.alphaBlend(
+      _dialogBarrierColor,
+      Theme.of(context).scaffoldBackgroundColor,
+    );
+    setImmersiveOuterBackgroundColor(dimmedBackground);
+    setState(() => _startOverDialogVisible = true);
+    bool shouldStartOver = false;
+    try {
+      final dialogResult = showDialog<bool>(
+        context: context,
+        barrierColor: _dialogBarrierColor,
+        builder: (dialogContext) => wrapImmersiveSystemBarGesture(
+          AlertDialog(
+            title: Text(dialogContext.strings('startOverTitle')),
+            content: Text(dialogContext.strings('startOverBody')),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext, false),
+                child: Text(dialogContext.strings('cancel')),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(dialogContext, true),
+                child: Text(dialogContext.strings('startOver')),
+              ),
+            ],
+          ),
+        ),
+      );
+      _applySystemBarColorAfterFrame(modalVisible: true);
+      shouldStartOver = await dialogResult ?? false;
+    } finally {
+      if (mounted) {
+        setImmersiveOuterBackgroundColor(null);
+        setState(() => _startOverDialogVisible = false);
+        reassertImmersiveMode();
+        _applySystemBarColorAfterFrame(modalVisible: false);
+      }
+    }
+    if (!mounted || !shouldStartOver || _pageController == null) return;
+    _pageController!.jumpToPage(0);
+  }
+
   Widget _actionPage(List<Widget> actions) => Row(
     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [for (final action in actions) Flexible(child: action)],
   );
 
-  Widget _buildActionArea(AppState state, Vocabulary word) {
-    return _actionPage(_manualActions(state, word));
+  Widget _buildActionArea(AppState state, List<Vocabulary> words, int index) {
+    final word = words[index];
+    final actions = _manualActions(state, word);
+    if (index == words.length - 1) {
+      actions.add(
+        StartOverButton(
+          label: context.strings('startOver'),
+          onPressed: () => unawaited(_confirmStartOver(words)),
+        ),
+      );
+    }
+    return _actionPage(actions);
   }
 
   _CardVisibility _visibilityFor(Vocabulary word, AppState state) =>
@@ -387,7 +450,10 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   void _applySystemBarColorAfterFrame({required bool modalVisible}) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted ||
-          (_resumeDialogVisible || _leaveDialogVisible) != modalVisible) {
+          (_resumeDialogVisible ||
+                  _leaveDialogVisible ||
+                  _startOverDialogVisible) !=
+              modalVisible) {
         return;
       }
       final scaffoldBackgroundColor = Theme.of(context).scaffoldBackgroundColor;
@@ -456,30 +522,8 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   }
 
   Future<void> _speakIfAudible(String text, {Vocabulary? word}) async {
-    // Slider mode sets the device volume itself when speaking, so only the
-    // level chosen there can make speech inaudible.
     final settings = ref.read(appControllerProvider).value;
-    String? warningKey;
-    var playbackBlocked = false;
-    if (settings?.ttsVolumeMode == TtsVolumeMode.slider) {
-      if (settings!.ttsVolume <= lowVolumeThreshold) {
-        warningKey = 'lowCustomVolumeBody';
-      }
-    } else {
-      final volumeStatus = await getSystemVolumeStatus();
-      warningKey = switch (volumeStatus) {
-        SystemVolumeStatus.audible => null,
-        SystemVolumeStatus.muted => 'mutedSystemVolumeBody',
-        SystemVolumeStatus.low => 'lowSystemVolumeBody',
-      };
-      playbackBlocked = volumeStatus == SystemVolumeStatus.muted;
-    }
-    if (warningKey != null) {
-      if (!mounted) return;
-      showVolumeWarningToast(context, context.strings(warningKey));
-      if (playbackBlocked) return;
-    }
-    if (!mounted) return;
+    if (!await confirmSpeechAudible(context, settings) || !mounted) return;
     final readings = word == null ? const <String>[] : splitReadings(text);
     if (readings.length > 1) {
       _speakReadings(readings);

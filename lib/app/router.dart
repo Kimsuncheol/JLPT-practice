@@ -7,6 +7,7 @@ import 'package:jlpt_practice/features/grammar/grammar_list_screen.dart';
 import 'package:jlpt_practice/features/grammar/grammar_part_tutor_screen.dart';
 import 'package:jlpt_practice/features/grammar/grammar_tutor_screen.dart';
 import 'package:jlpt_practice/features/kana/kana_chart_screen.dart';
+import 'package:jlpt_practice/features/kanji/kanji_study_screen.dart';
 import 'package:jlpt_practice/features/onboarding/onboarding_screen.dart';
 import 'package:jlpt_practice/features/quiz/quiz_result_screen.dart';
 import 'package:jlpt_practice/features/quiz/fill_in_the_blank_screen.dart';
@@ -65,6 +66,18 @@ GoRouter createAppRouter({String initialLocation = '/'}) => GoRouter(
     ),
     GoRoute(path: '/settings/levels', builder: (_, _) => const LevelsScreen()),
     GoRoute(path: '/study', builder: (_, _) => const DaySelectionScreen()),
+    GoRoute(
+      path: '/kanji',
+      builder: (_, _) => const DaySelectionScreen(course: StudyCourse.kanji),
+    ),
+    GoRoute(
+      path: '/kanji/day/:day',
+      builder: (_, state) => EyeComfortOverlay(
+        child: KanjiStudyScreen(
+          day: int.tryParse(state.pathParameters['day'] ?? '') ?? 1,
+        ),
+      ),
+    ),
     GoRoute(
       path: '/settings/offline-ai',
       builder: (_, _) => const OfflineAiScreen(),

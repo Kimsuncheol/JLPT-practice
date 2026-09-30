@@ -151,6 +151,12 @@ class DashboardScreen extends ConsumerWidget {
                           onTap: () => context.push('/study'),
                         ),
                         _GridActionTile(
+                          color: Theme.of(context).colorScheme.primaryContainer,
+                          icon: Icons.translate_rounded,
+                          title: strings('kanji'),
+                          onTap: () => context.push('/kanji'),
+                        ),
+                        _GridActionTile(
                           color: Theme.of(
                             context,
                           ).colorScheme.secondaryContainer,

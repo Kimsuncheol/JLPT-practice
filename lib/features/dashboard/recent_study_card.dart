@@ -7,7 +7,10 @@ import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/core/utils/study_batches.dart';
 import 'package:jlpt_practice/data/models/app_state.dart';
 import 'package:jlpt_practice/data/models/grammar_study_session.dart';
+import 'package:jlpt_practice/data/models/study_session.dart';
+import 'package:jlpt_practice/data/repositories/kanji_repository.dart';
 import 'package:jlpt_practice/features/grammar/grammar_study_session_provider.dart';
+import 'package:jlpt_practice/features/vocabulary/day_selection_screen.dart';
 
 class RecentStudyCard extends ConsumerWidget {
   const RecentStudyCard({required this.state, super.key});
@@ -55,6 +58,7 @@ class RecentStudyCard extends ConsumerWidget {
             ),
           ];
         }(),
+      ...?_kanjiEntry(context, ref),
       if (grammar != null)
         _RecentStudyEntry(
           course: '${context.strings('grammar')} · ${grammar.level}',
@@ -203,6 +207,42 @@ class RecentStudyCard extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  /// The kanji day the learner left part-way, if any. The kanji list is only
+  /// loaded when such a session exists.
+  List<_RecentStudyEntry>? _kanjiEntry(BuildContext context, WidgetRef ref) {
+    final level = state.selectedLevel;
+    final key = StudyCourse.kanji.progressKey(level);
+    final StudySession? session = state.studySessions[key];
+    if (session == null ||
+        !session.isCompatible(level: key, dailyGoal: state.dailyGoal)) {
+      return null;
+    }
+    final catalog = ref.watch(kanjiCatalogProvider).value;
+    if (catalog == null) return null;
+    final kanji = StudyBatches.wordsForDay(
+      kanjiForLevel(catalog, level),
+      day: session.day,
+      dailyGoal: state.dailyGoal,
+    );
+    if (kanji.isEmpty) return null;
+    final position = math.min(session.indexFallback + 1, kanji.length);
+    return [
+      _RecentStudyEntry(
+        course: '${context.strings('kanji')} · $level',
+        destination: '${context.strings('day')} ${session.day}',
+        detail: context
+            .strings('kanjiProgress')
+            .replaceAll('{current}', '$position')
+            .replaceAll('{total}', '${kanji.length}'),
+        route: '/kanji/day/${session.day}',
+        parentRoute: '/kanji',
+        updatedAt: session.updatedAt,
+        symbol: '漢',
+        progress: position / kanji.length,
+      ),
+    ];
   }
 
   void _openEntry(BuildContext context, _RecentStudyEntry entry) {

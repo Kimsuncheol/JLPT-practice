@@ -69,6 +69,7 @@ dependencies:
   flutter_gen_ai_chat_ui: ^2.19.1
   flutter_markdown_plus: ^1.0.12
   google_fonts: ^8.2.1
+  flip_card_plus: ^1.0.5
 
 dev_dependencies:
   flutter_test:

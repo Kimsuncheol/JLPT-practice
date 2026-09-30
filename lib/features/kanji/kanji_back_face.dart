@@ -1,0 +1,141 @@
+import 'package:flutter/material.dart';
+import 'package:jlpt_practice/core/localization/app_strings.dart';
+import 'package:jlpt_practice/data/models/kanji.dart';
+import 'package:jlpt_practice/features/kanji/kanji_visibility.dart';
+import 'package:jlpt_practice/features/kanji/widgets/hide_group.dart';
+import 'package:jlpt_practice/features/kanji/widgets/kanji_footer.dart';
+import 'package:jlpt_practice/features/kanji/widgets/kanji_glyph.dart';
+import 'package:jlpt_practice/features/kanji/widgets/dashed_divider.dart';
+import 'package:jlpt_practice/features/kanji/widgets/reading_section.dart';
+
+/// The back: every reading with its examples, in a scroll view that runs down to the hide group. The kanji is always shown here, even if it was covered on the front.
+class KanjiBackFace extends StatelessWidget {
+  const KanjiBackFace({
+    required this.kanji,
+    required this.language,
+    required this.visibility,
+    required this.onVisibilityChanged,
+    required this.onSpeakReading,
+    required this.onSpeakSentence,
+    required this.footer,
+    super.key,
+  });
+
+  final Kanji kanji;
+  final String language;
+  final KanjiVisibility visibility;
+  final ValueChanged<KanjiVisibility> onVisibilityChanged;
+  final ValueChanged<String> onSpeakReading;
+  final ValueChanged<String> onSpeakSentence;
+  final Widget footer;
+
+  @override
+  Widget build(BuildContext context) {
+    final strings = context.strings;
+    const sideInset = EdgeInsets.symmetric(horizontal: 16);
+    return Column(
+      children: [
+        // The scroll view runs down to the hide group; the footer floats over
+        // its lower edge, which the extra bottom padding keeps clear of text.
+        Expanded(
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(
+                    16,
+                    16,
+                    16,
+                    12 + KanjiFooter.height,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Center(
+                        child: KanjiGlyph(
+                          character: kanji.character,
+                          fontSize: 56,
+                        ),
+                      ),
+                      if (kanji.kunYomi.isNotEmpty ||
+                          kanji.kunExamples.isNotEmpty)
+                        ReadingSection(
+                          label: strings('kunYomi'),
+                          readings: kanji.kunYomi,
+                          examples: kanji.kunExamples,
+                          language: language,
+                          hideReadings: visibility.hideKunYomi,
+                          hideMeanings: visibility.hideMeanings,
+                          onSpeak: onSpeakReading,
+                          onSpeakSentence: onSpeakSentence,
+                        ),
+                      if ((kanji.kunYomi.isNotEmpty ||
+                              kanji.kunExamples.isNotEmpty) &&
+                          (kanji.onYomi.isNotEmpty ||
+                              kanji.onExamples.isNotEmpty))
+                        Padding(
+                          padding: const EdgeInsets.only(top: 22),
+                          child: DashedDivider(
+                            key: const ValueKey('kun-on-divider'),
+                            color: Theme.of(context).colorScheme.outline,
+                          ),
+                        ),
+                      if (kanji.onYomi.isNotEmpty ||
+                          kanji.onExamples.isNotEmpty)
+                        ReadingSection(
+                          label: strings('onYomi'),
+                          readings: kanji.onYomi,
+                          examples: kanji.onExamples,
+                          language: language,
+                          hideReadings: visibility.hideOnYomi,
+                          hideMeanings: visibility.hideMeanings,
+                          onSpeak: onSpeakReading,
+                          onSpeakSentence: onSpeakSentence,
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(left: 16, right: 16, bottom: 0, child: footer),
+            ],
+          ),
+        ),
+        Padding(
+          padding: sideInset,
+          child: HideGroup(
+            side: 'back',
+            toggles: [
+              HideToggle(
+                id: 'kun',
+                hidden: visibility.hideKunYomi,
+                hideLabel: strings('hideKunYomi'),
+                showLabel: strings('showKunYomi'),
+                onTap: () => onVisibilityChanged(
+                  visibility.copyWith(hideKunYomi: !visibility.hideKunYomi),
+                ),
+              ),
+              HideToggle(
+                id: 'on',
+                hidden: visibility.hideOnYomi,
+                hideLabel: strings('hideOnYomi'),
+                showLabel: strings('showOnYomi'),
+                onTap: () => onVisibilityChanged(
+                  visibility.copyWith(hideOnYomi: !visibility.hideOnYomi),
+                ),
+              ),
+              HideToggle(
+                id: 'meanings',
+                hidden: visibility.hideMeanings,
+                hideLabel: strings('hideMeanings'),
+                showLabel: strings('showMeanings'),
+                onTap: () => onVisibilityChanged(
+                  visibility.copyWith(hideMeanings: !visibility.hideMeanings),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}

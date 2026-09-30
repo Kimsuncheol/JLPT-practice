@@ -4,6 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/core/utils/study_batches.dart';
+import 'package:jlpt_practice/features/vocabulary/study_finish/studied_words_section.dart';
+import 'package:jlpt_practice/features/vocabulary/study_finish/study_finish_actions.dart';
+import 'package:jlpt_practice/features/vocabulary/study_finish/study_finish_header.dart';
 
 class StudyFinishScreen extends ConsumerWidget {
   const StudyFinishScreen({required this.day, super.key});
@@ -23,6 +26,11 @@ class StudyFinishScreen extends ConsumerWidget {
     final level = state.selectedLevel;
     final wordCount = state.selectedVocabulary.length;
     final dayCount = StudyBatches.count(wordCount, state.dailyGoal);
+    final todaysWords = StudyBatches.wordsForDay(
+      state.selectedVocabulary,
+      day: day,
+      dailyGoal: state.dailyGoal,
+    );
     final completedDays = state.completedStudyDays[level] ?? const <int>{};
     final completesLevel =
         dayCount > 0 &&
@@ -47,106 +55,47 @@ class StudyFinishScreen extends ConsumerWidget {
           child: Column(
             children: [
               Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 92,
-                      height: 92,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primaryContainer,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.celebration_rounded, size: 42),
-                    ),
-                    const SizedBox(height: 22),
-                    Text(
-                      title,
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.headlineMedium,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      body,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
+                flex: 2,
+                child: Center(child: StudyFinishHeader(title: title, body: body)),
+              ),
+              Expanded(
+                flex: 3,
+                child: StudiedWordsSection(
+                  words: [for (final word in todaysWords) word.word],
+                  onWordTap: (word) =>
+                      ref.read(ttsServiceProvider).speak(word),
                 ),
               ),
-              if (completesLevel) ...[
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton.icon(
-                    onPressed: () => _completeLevel(
-                      context,
-                      ref,
-                      level: level,
-                      destination: _LevelCompletionDestination.levels,
-                    ),
-                    icon: const Icon(Icons.swap_horiz_rounded),
-                    label: Text(strings('chooseAnotherLevel')),
+              const SizedBox(height: 16),
+              if (completesLevel)
+                LevelCompleteActions(
+                  onChooseAnotherLevel: () => _completeLevel(
+                    context,
+                    ref,
+                    level: level,
+                    destination: _LevelCompletionDestination.levels,
                   ),
-                ),
-                const SizedBox(height: 10),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    onPressed: () => _completeLevel(
-                      context,
-                      ref,
-                      level: level,
-                      destination: _LevelCompletionDestination.days,
-                    ),
-                    icon: const Icon(Icons.grid_view_rounded),
-                    label: Text(strings('backToStudyDays')),
+                  onBackToStudyDays: () => _completeLevel(
+                    context,
+                    ref,
+                    level: level,
+                    destination: _LevelCompletionDestination.days,
                   ),
-                ),
-                const SizedBox(height: 10),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    style: OutlinedButton.styleFrom(
-                      minimumSize: const Size.fromHeight(54),
-                    ),
-                    onPressed: () => _completeLevel(
-                      context,
-                      ref,
-                      level: level,
-                      destination: _LevelCompletionDestination.quizSelection,
-                    ),
-                    icon: const Icon(Icons.quiz_rounded),
-                    label: Text(strings('chooseQuizGame')),
+                  onChooseQuizGame: () => _completeLevel(
+                    context,
+                    ref,
+                    level: level,
+                    destination: _LevelCompletionDestination.quizSelection,
                   ),
+                )
+              else
+                SessionActions(
+                  onFinish: () => _finish(context, ref),
+                  onChooseQuizGame: () {
+                    ref.read(ttsServiceProvider).stop();
+                    context.push('/study/day/$day/quiz-selection');
+                  },
                 ),
-              ] else ...[
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton.icon(
-                    style: FilledButton.styleFrom(
-                      minimumSize: const Size.fromHeight(54),
-                    ),
-                    onPressed: () => _finish(context, ref),
-                    icon: const Icon(Icons.check_rounded),
-                    label: Text(strings('finishSession')),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    style: OutlinedButton.styleFrom(
-                      minimumSize: const Size.fromHeight(54),
-                    ),
-                    onPressed: () =>
-                        context.push('/study/day/$day/quiz-selection'),
-                    icon: const Icon(Icons.quiz_rounded),
-                    label: Text(strings('chooseQuizGame')),
-                  ),
-                ),
-              ],
             ],
           ),
         ),
@@ -160,6 +109,7 @@ class StudyFinishScreen extends ConsumerWidget {
     required String level,
     required _LevelCompletionDestination destination,
   }) async {
+    ref.read(ttsServiceProvider).stop();
     await ref
         .read(appControllerProvider.notifier)
         .completeStudySession(level, day);
@@ -176,6 +126,7 @@ class StudyFinishScreen extends ConsumerWidget {
   }
 
   Future<void> _finish(BuildContext context, WidgetRef ref) async {
+    ref.read(ttsServiceProvider).stop();
     final state = ref.read(appControllerProvider).requireValue;
     final level = state.selectedLevel;
     final alreadyCompleted =
