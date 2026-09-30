@@ -7,18 +7,16 @@ import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/core/services/tts_service.dart';
-import 'package:jlpt_practice/core/services/volume_service.dart';
 import 'package:jlpt_practice/core/utils/immersive_study_mode.dart';
 import 'package:jlpt_practice/core/utils/study_batches.dart';
 import 'package:jlpt_practice/data/models/app_state.dart';
-import 'package:jlpt_practice/data/models/study_preferences.dart';
 import 'package:jlpt_practice/data/models/study_session.dart';
 import 'package:jlpt_practice/data/models/vocabulary.dart';
+import 'package:jlpt_practice/features/vocabulary/audible_speech.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_masking.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_tape.dart';
 import 'package:jlpt_practice/features/vocabulary/masked_translation.dart';
 import 'package:jlpt_practice/features/vocabulary/start_over_button.dart';
-import 'package:jlpt_practice/shared/volume_warning_toast.dart';
 
 class StudyScreen extends ConsumerStatefulWidget {
   const StudyScreen({required this.day, super.key});
@@ -165,7 +163,9 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   }
 
   Future<void> _confirmLeave() async {
-    if (_leaveDialogVisible || _resumeDialogVisible || _startOverDialogVisible) {
+    if (_leaveDialogVisible ||
+        _resumeDialogVisible ||
+        _startOverDialogVisible) {
       return;
     }
     final dimmedBackground = Color.alphaBlend(
@@ -210,7 +210,9 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   }
 
   Future<void> _confirmStartOver(List<Vocabulary> words) async {
-    if (_leaveDialogVisible || _resumeDialogVisible || _startOverDialogVisible) {
+    if (_leaveDialogVisible ||
+        _resumeDialogVisible ||
+        _startOverDialogVisible) {
       return;
     }
     final dimmedBackground = Color.alphaBlend(
@@ -520,30 +522,8 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   }
 
   Future<void> _speakIfAudible(String text, {Vocabulary? word}) async {
-    // Slider mode sets the device volume itself when speaking, so only the
-    // level chosen there can make speech inaudible.
     final settings = ref.read(appControllerProvider).value;
-    String? warningKey;
-    var playbackBlocked = false;
-    if (settings?.ttsVolumeMode == TtsVolumeMode.slider) {
-      if (settings!.ttsVolume <= lowVolumeThreshold) {
-        warningKey = 'lowCustomVolumeBody';
-      }
-    } else {
-      final volumeStatus = await getSystemVolumeStatus();
-      warningKey = switch (volumeStatus) {
-        SystemVolumeStatus.audible => null,
-        SystemVolumeStatus.muted => 'mutedSystemVolumeBody',
-        SystemVolumeStatus.low => 'lowSystemVolumeBody',
-      };
-      playbackBlocked = volumeStatus == SystemVolumeStatus.muted;
-    }
-    if (warningKey != null) {
-      if (!mounted) return;
-      showVolumeWarningToast(context, context.strings(warningKey));
-      if (playbackBlocked) return;
-    }
-    if (!mounted) return;
+    if (!await confirmSpeechAudible(context, settings) || !mounted) return;
     final readings = word == null ? const <String>[] : splitReadings(text);
     if (readings.length > 1) {
       _speakReadings(readings);
