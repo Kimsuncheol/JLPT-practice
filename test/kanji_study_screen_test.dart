@@ -8,14 +8,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/app/theme/app_theme.dart';
-import 'package:jlpt_practice/core/services/tts_service.dart';
-import 'package:jlpt_practice/data/models/app_state.dart';
 import 'package:jlpt_practice/data/models/kanji.dart';
 import 'package:jlpt_practice/data/repositories/kanji_repository.dart';
 import 'package:jlpt_practice/features/kanji/kanji_study_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_tape.dart';
 import 'package:jlpt_practice/features/vocabulary/day_selection_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'support/kanji_test_support.dart';
 
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
@@ -311,7 +311,7 @@ void main() {
   testWidgets('finishing the last kanji completes the kanji day', (
     tester,
   ) async {
-    final controller = _KanjiAppController();
+    final controller = KanjiTestAppController();
     await _pumpStudy(tester, controller: controller);
     expect(find.text('Finish').hitTestable(), findsNothing);
 
@@ -594,6 +594,20 @@ void main() {
     );
   });
 
+  testWidgets('front readings are larger than back readings', (tester) async {
+    await _pumpStudy(tester);
+    final front = tester
+        .widget<Text>(_inFront(find.text('いち')))
+        .style!
+        .fontSize!;
+
+    await _flip(tester);
+    final back = tester.widget<Text>(_inBack(find.text('いち'))).style!.fontSize!;
+
+    expect(front, 32);
+    expect(front, greaterThan(back));
+  });
+
   testWidgets('front readings use the primary color', (tester) async {
     await _pumpStudy(tester);
 
@@ -651,7 +665,7 @@ void main() {
   ) async {
     await _pumpDaySelection(
       tester,
-      controller: _KanjiAppController(
+      controller: KanjiTestAppController(
         completed: const {
           'kanji-N5': {1},
         },
@@ -712,20 +726,21 @@ Future<void> _flip(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
-Future<_RecordingTtsService> _pumpStudy(
+Future<RecordingTtsService> _pumpStudy(
   WidgetTester tester, {
   bool autoPlayAudio = false,
-  _KanjiAppController? controller,
+  KanjiTestAppController? controller,
   double bottomInset = 0,
 }) async {
   _mockAudibleVolume(tester);
-  final speech = _RecordingTtsService();
+  final speech = RecordingTtsService();
   final container = ProviderContainer(
     overrides: [
       appControllerProvider.overrideWith(
-        () => controller ?? _KanjiAppController(autoPlayAudio: autoPlayAudio),
+        () =>
+            controller ?? KanjiTestAppController(autoPlayAudio: autoPlayAudio),
       ),
-      kanjiCatalogProvider.overrideWith((ref) async => _catalog),
+      kanjiCatalogProvider.overrideWith((ref) async => kanjiTestCatalog),
       ttsServiceProvider.overrideWithValue(speech),
     ],
   );
@@ -756,14 +771,14 @@ Future<_RecordingTtsService> _pumpStudy(
 
 Future<void> _pumpDaySelection(
   WidgetTester tester, {
-  _KanjiAppController? controller,
+  KanjiTestAppController? controller,
 }) async {
   final container = ProviderContainer(
     overrides: [
       appControllerProvider.overrideWith(
-        () => controller ?? _KanjiAppController(),
+        () => controller ?? KanjiTestAppController(),
       ),
-      kanjiCatalogProvider.overrideWith((ref) async => _catalog),
+      kanjiCatalogProvider.overrideWith((ref) async => kanjiTestCatalog),
     ],
   );
   addTearDown(container.dispose);
@@ -813,121 +828,4 @@ GoRouter _router(String initialLocation) {
       ),
     ],
   );
-}
-
-class _KanjiAppController extends AppController {
-  _KanjiAppController({this.autoPlayAudio = false, this.completed = const {}});
-
-  final bool autoPlayAudio;
-  final Map<String, Set<int>> completed;
-  final List<(String, int)> completions = [];
-
-  @override
-  Future<AppState> build() async => AppState(
-    vocabulary: const [],
-    progress: const {},
-    onboardingComplete: true,
-    selectedLevel: 'N5',
-    languageCode: 'system',
-    meaningLanguageMode: 'en',
-    meaningLanguage: 'en',
-    dailyGoal: 2,
-    showFurigana: true,
-    autoPlayAudio: autoPlayAudio,
-    themeMode: ThemeMode.system,
-    notificationsEnabled: false,
-    studySeconds: 0,
-    quizAnswered: 0,
-    quizCorrect: 0,
-    currentStreak: 0,
-    longestStreak: 0,
-    completedStudyDays: completed,
-  );
-
-  @override
-  Future<void> completeStudySession(String level, int day) async =>
-      completions.add((level, day));
-}
-
-final _catalog = [
-  Kanji.fromJson({
-    'kanji': '一',
-    'jlpt': 'N5',
-    'hun_eum': ['한 일'],
-    'strokes': 1,
-    'kun_yomi': ['ひと-', 'ひと.つ'],
-    'on_yomi': ['いち', 'いつ', 'イチ'],
-    'kun_examples': [
-      {
-        'word': '一つ',
-        'reading': 'ひとつ',
-        'meaning_ko': '하나',
-        'meaning_en': 'one thing',
-        'sentence_jp': 'りんごを一つください。',
-        'sentence_furigana': 'りんごを{一|ひと}つください。',
-        'sentence_ko': '사과를 하나 주세요.',
-      },
-    ],
-    'on_examples': [
-      {
-        'word': '一部',
-        'reading': 'いちぶ',
-        'meaning_ko': '일부',
-        'meaning_en': 'part',
-        'sentence_jp': '一部が遅れた。',
-        'sentence_furigana': '{一部|いちぶ}が{遅|おく}れた。',
-        'sentence_ko': '일부가 늦었다.',
-      },
-    ],
-  }),
-  Kanji.fromJson({
-    'kanji': '二',
-    'jlpt': 'N5',
-    'hun_eum': ['두 이'],
-    'strokes': 2,
-    'kun_yomi': <String>[],
-    'on_yomi': ['に'],
-    'kun_examples': <Object>[],
-    'on_examples': <Object>[],
-  }),
-  Kanji.fromJson({
-    'kanji': '三',
-    'jlpt': 'N5',
-    'hun_eum': ['석 삼'],
-    'strokes': 3,
-    'kun_yomi': ['み'],
-    'on_yomi': ['さん'],
-    'kun_examples': <Object>[],
-    'on_examples': <Object>[],
-  }),
-  Kanji.fromJson({
-    'kanji': '日',
-    'jlpt': 'N4',
-    'hun_eum': ['날 일'],
-    'strokes': 4,
-    'kun_yomi': ['ひ'],
-    'on_yomi': ['にち'],
-    'kun_examples': <Object>[],
-    'on_examples': <Object>[],
-  }),
-];
-
-class _RecordingTtsService implements TtsService {
-  final spoken = <String>[];
-  final events = <String>[];
-
-  @override
-  Future<void> speak(String text) async {
-    spoken.add(text);
-    events.add('speak:$text');
-  }
-
-  @override
-  Future<void> speakDialogue(List<DialogueTurn> turns) async {}
-
-  @override
-  Future<void> stop() async => events.add('stop');
-
-  @override
-  Future<void> dispose() async {}
 }

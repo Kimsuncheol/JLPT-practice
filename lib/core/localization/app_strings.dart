@@ -63,6 +63,9 @@ class AppStrings {
     'leaveStudyBody':
         'Your place will be saved, but hidden words and meanings will reset when you return.',
     'leave': 'Leave',
+    'leaveKanjiTitle': 'Leave kanji study?',
+    'leaveKanjiBody':
+        'Your place will be saved, but hidden kanji, readings and meanings will reset when you return.',
     'startOverTitle': 'Start over?',
     'startOverBody':
         'This will take you back to the first word of today’s session.',
@@ -194,6 +197,7 @@ class AppStrings {
     'previousStudy': 'Previous',
     'continueLesson': 'Continue your lesson',
     'wordProgress': '{current} of {total} words',
+    'kanjiProgress': '{current} of {total} kanji',
     'recentActivity': 'Your progress',
     'learned': 'Learned',
     'learning': 'Learning',
@@ -458,6 +462,8 @@ class AppStrings {
     'leaveStudyTitle': '단어 학습을 나갈까요?',
     'leaveStudyBody': '학습 위치는 저장되지만, 가려 둔 단어와 뜻은 다시 들어오면 초기화됩니다.',
     'leave': '나가기',
+    'leaveKanjiTitle': '한자 학습을 나갈까요?',
+    'leaveKanjiBody': '학습 위치는 저장되지만, 가려 둔 한자와 읽기, 뜻은 다시 들어오면 초기화됩니다.',
     'startOverTitle': '처음부터 다시 시작할까요?',
     'startOverBody': '오늘 학습의 첫 번째 단어로 돌아갑니다.',
     'startOver': '처음부터',
@@ -576,6 +582,7 @@ class AppStrings {
     'previousStudy': '이전 학습',
     'continueLesson': '학습 이어가기',
     'wordProgress': '{total}개 중 {current}번째 단어',
+    'kanjiProgress': '{total}개 중 {current}번째 한자',
     'recentActivity': '학습 현황',
     'learned': '완료',
     'learning': '학습 중',
