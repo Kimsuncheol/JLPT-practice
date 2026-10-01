@@ -51,6 +51,11 @@ void main() {
       final kanji = Kanji.fromJson(item as Map<String, dynamic>);
       for (final example in [...kanji.kunExamples, ...kanji.onExamples]) {
         final plain = example.sentenceSegments.map((s) => s.text).join();
+        for (final segment in example.sentenceSegments) {
+          if (segment.ruby != null) {
+            expect(RegExp(r'^[㐀-䶿一-鿿々〆]+$').hasMatch(segment.text), isTrue);
+          }
+        }
         expect(plain, example.sentence, reason: kanji.character);
         checked++;
       }
@@ -243,7 +248,9 @@ void main() {
     expect(speech.spoken, ['いち']);
   });
 
-  testWidgets('back hide group covers kun, on and meanings', (tester) async {
+  testWidgets('back hide group covers kun, on, reading and meanings', (
+    tester,
+  ) async {
     await _pumpStudy(tester);
     await _flip(tester);
     expect(find.byKey(const ValueKey('hide-group-back')), findsOneWidget);
@@ -267,6 +274,11 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('hide-back-on')));
     await tester.pumpAndSettle();
     expect(_inBack(find.text('いつ')), findsNothing);
+    // Only the sentence furigana still shows いちぶ; the word reading is covered.
+    expect(_inBack(find.text('いちぶ')), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('hide-back-furigana')));
+    await tester.pumpAndSettle();
     expect(_inBack(find.text('いちぶ')), findsNothing);
   });
 
@@ -295,7 +307,7 @@ void main() {
     await tester.pumpAndSettle();
     await _flip(tester);
 
-    expect(_inBack(find.text('りんごを一つください。')), findsOneWidget);
+    expect(_inBack(find.byKey(const ValueKey('sentence-一つ'))), findsOneWidget);
   });
 
   testWidgets('settings button opens the study settings screen', (
@@ -412,7 +424,7 @@ void main() {
   ) async {
     await _pumpStudy(tester);
     await _flip(tester);
-    await tester.tap(_inBack(find.text('りんごを一つください。')).first);
+    await tester.tap(_inBack(find.byKey(const ValueKey('sentence-一つ'))).first);
     await tester.pumpAndSettle();
 
     await _swipeForward(tester);
@@ -509,15 +521,15 @@ void main() {
     expect(gap, closeTo(screenHeight * 0.05, 6));
   });
 
-  testWidgets('example sentences show their kana reading above the sentence', (
+  testWidgets('example sentences show furigana directly above their kanji', (
     tester,
   ) async {
     await _pumpStudy(tester);
     await _flip(tester);
 
     const pairs = {
-      '一つ': ['りんごをひとつください。', 'りんごを一つください。'],
-      '一部': ['いちぶがおくれた。', '一部が遅れた。'],
+      '一つ': ['ひと', '一'],
+      '一部': ['いちぶ', '一部'],
     };
     for (final entry in pairs.entries) {
       final sentence = _inBack(find.byKey(ValueKey('sentence-${entry.key}')));
@@ -525,7 +537,7 @@ void main() {
       await tester.pumpAndSettle();
       final reading = find.descendant(
         of: sentence,
-        matching: find.text(entry.value[0]),
+        matching: find.text(entry.value[0], findRichText: true),
       );
       final plain = find.descendant(
         of: sentence,
@@ -540,21 +552,45 @@ void main() {
     }
   });
 
-  testWidgets('hiding a reading type hides its sentence reading too', (
+  testWidgets('hide reading covers sentence furigana only', (tester) async {
+    await _pumpStudy(tester);
+    await _flip(tester);
+    Finder ruby(String word, String text) => find.descendant(
+      of: _inBack(find.byKey(ValueKey('sentence-$word'))),
+      matching: find.text(text, findRichText: true),
+    );
+    expect(ruby('一つ', 'ひと'), findsOneWidget);
+    expect(ruby('一部', 'いちぶ'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('hide-back-furigana')));
+    await tester.pumpAndSettle();
+    expect(ruby('一つ', 'ひと'), findsNothing);
+    expect(ruby('一部', 'いちぶ'), findsNothing);
+    // Readings and example word readings are not touched.
+    expect(_inBack(find.text('ひと.つ')), findsOneWidget);
+    expect(_inBack(find.text('ひとつ')), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('hide-back-furigana')));
+    await tester.pumpAndSettle();
+    expect(ruby('一つ', 'ひと'), findsOneWidget);
+  });
+
+  testWidgets('hiding kun or on leaves sentence furigana shown', (
     tester,
   ) async {
     await _pumpStudy(tester);
     await _flip(tester);
     await tester.tap(find.byKey(const ValueKey('hide-back-kun')));
-    await tester.pumpAndSettle();
-
-    expect(_inBack(find.text('りんごをひとつください。')), findsNothing);
-    expect(_inBack(find.text('りんごを一つください。')), findsOneWidget);
-    expect(_inBack(find.text('いちぶがおくれた。')), findsOneWidget);
-
     await tester.tap(find.byKey(const ValueKey('hide-back-on')));
     await tester.pumpAndSettle();
-    expect(_inBack(find.text('いちぶがおくれた。')), findsNothing);
+
+    expect(
+      find.descendant(
+        of: _inBack(find.byKey(const ValueKey('sentence-一つ'))),
+        matching: find.text('ひと', findRichText: true),
+      ),
+      findsOneWidget,
+    );
   });
 
   testWidgets('a divider separates kun and on yomi only when both exist', (
@@ -567,7 +603,7 @@ void main() {
       findsOneWidget,
     );
 
-    await tester.tap(_inBack(find.text('りんごを一つください。')).first);
+    await tester.tap(_inBack(find.byKey(const ValueKey('sentence-一つ'))).first);
     await tester.pumpAndSettle();
     await _swipeForward(tester);
     await _flip(tester);

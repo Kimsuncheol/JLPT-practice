@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:jlpt_practice/data/models/kanji.dart';
 import 'package:jlpt_practice/features/kanji/widgets/reading_chip.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_tape.dart';
+import 'package:jlpt_practice/features/vocabulary/example_furigana_text.dart';
 import 'package:jlpt_practice/core/constants/app_sizes.dart';
 import 'package:jlpt_practice/core/constants/app_font_weights.dart';
 import 'package:jlpt_practice/core/constants/app_spacing.dart';
@@ -14,6 +15,7 @@ class ReadingSection extends StatelessWidget {
     required this.examples,
     required this.language,
     required this.hideReadings,
+    required this.hideFurigana,
     required this.hideMeanings,
     required this.onSpeak,
     required this.onSpeakSentence,
@@ -28,6 +30,7 @@ class ReadingSection extends StatelessWidget {
   final List<KanjiExample> examples;
   final String language;
   final bool hideReadings;
+  final bool hideFurigana;
   final bool hideMeanings;
   final ValueChanged<String> onSpeak;
   final ValueChanged<String> onSpeakSentence;
@@ -62,6 +65,7 @@ class ReadingSection extends StatelessWidget {
             example: example,
             language: language,
             hideReadings: hideReadings,
+            hideFurigana: hideFurigana,
             hideMeanings: hideMeanings,
             onSpeakSentence: onSpeakSentence,
           ),
@@ -75,6 +79,7 @@ class ExampleTile extends StatelessWidget {
     required this.example,
     required this.language,
     required this.hideReadings,
+    required this.hideFurigana,
     required this.hideMeanings,
     required this.onSpeakSentence,
     super.key,
@@ -83,6 +88,9 @@ class ExampleTile extends StatelessWidget {
   final KanjiExample example;
   final String language;
   final bool hideReadings;
+
+  /// Covers the furigana of the sentence only.
+  final bool hideFurigana;
   final bool hideMeanings;
   final ValueChanged<String> onSpeakSentence;
 
@@ -136,29 +144,15 @@ class ExampleTile extends StatelessWidget {
                 onTap: () => onSpeakSentence(example.sentence),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: AppSizes.size2),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // The kana reading is stacked above the sentence, with
-                      // no brackets around it.
-                      if (example.sentenceReading.isNotEmpty)
-                        hideReadings
-                            ? coverTapeFor(
-                                characters: example.sentenceReading.length,
-                                fontSize: AppSizes.font12,
-                                maxWidth: AppSizes.size220,
-                                glyphWidth: 0.9,
-                              )
-                            : Text(
-                                example.sentenceReading,
-                                style: TextStyle(
-                                  fontSize: AppSizes.font12,
-                                  height: AppSizes.lineHeight1_2,
-                                  color: theme.colorScheme.primary,
-                                ),
-                              ),
-                      Text(example.sentence, style: theme.textTheme.bodyMedium),
-                    ],
+                  child: ExampleFuriganaText(
+                    segments: example.sentenceSegments,
+                    style:
+                        theme.textTheme.titleMedium?.copyWith(height: 1.2) ??
+                        const TextStyle(fontSize: AppSizes.font18),
+                    wordTargets: const [],
+                    hideReadings: hideFurigana,
+                    runSpacingWithFurigana: AppSizes.space6,
+                    alignment: WrapAlignment.start,
                   ),
                 ),
               ),

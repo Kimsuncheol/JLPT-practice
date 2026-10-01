@@ -289,7 +289,7 @@
     "sentence_jp": "今年の売り上げは二けたの伸びを記録した。",
     "sentence_ko": "올해 매출은 두 자릿수 성장을 기록했다.",
     "meaning_en": "two-digit number",
-    "sentence_furigana": "{今年|ことし}の{売り上|うりあ}げは{二|に}けたの{伸|の}びを{記録|きろく}した。"
+    "sentence_furigana": "{今年|ことし}の{売|う}り{上|あ}げは{二|に}けたの{伸|の}びを{記録|きろく}した。"
    }
   ],
   "on_examples": [
@@ -436,7 +436,7 @@
     "sentence_jp": "日の入りは午後六時ごろです。",
     "sentence_ko": "일몰은 오후 6시경입니다.",
     "meaning_en": "entering",
-    "sentence_furigana": "{日の入|ひのい}りは{午後|ごご}{六|ろく}{時|じ}ごろです。"
+    "sentence_furigana": "{日|ひ}の{入|い}りは{午後|ごご}{六|ろく}{時|じ}ごろです。"
    },
    {
     "word": "入る",
@@ -1028,7 +1028,7 @@
     "sentence_jp": "君が代は千代に八千代にと歌われる。",
     "sentence_ko": "임의 시대는 천년만년 이어지라고 노래한다.",
     "meaning_en": "thousand years",
-    "sentence_furigana": "{君が代|きみがよ}は{千代|ちよ}に{八千|はっせん}{代|だい}にと{歌|うた}われる。"
+    "sentence_furigana": "{君|きみ}が{代|よ}は{千代|ちよ}に{八千|はっせん}{代|だい}にと{歌|うた}われる。"
    },
    {
     "word": "千世",
@@ -1129,7 +1129,7 @@
     "sentence_jp": "風が吹いて土ぼこりが舞い上がった。",
     "sentence_ko": "바람이 불어 흙먼지가 날아올랐다.",
     "meaning_en": "dust",
-    "sentence_furigana": "{風|かぜ}が{吹|ふ}いて{土|つち}ぼこりが{舞い上|まいあ}がった。"
+    "sentence_furigana": "{風|かぜ}が{吹|ふ}いて{土|つち}ぼこりが{舞|ま}い{上|あ}がった。"
    }
   ],
   "on_examples": [
@@ -1316,7 +1316,7 @@
     "sentence_jp": "女房と一緒に買い物に行った。",
     "sentence_ko": "아내와 함께 장을 보러 갔다.",
     "meaning_en": "wife (esp. one's own wife)",
-    "sentence_furigana": "{女房|にょうぼう}と{一緒|いっしょ}に{買い物|かいもの}に{行|い}った。"
+    "sentence_furigana": "{女房|にょうぼう}と{一緒|いっしょ}に{買|か}い{物|もの}に{行|い}った。"
    },
    {
     "word": "女房役",
@@ -1922,7 +1922,7 @@
     "sentence_jp": "六つに切り分けてください。",
     "sentence_ko": "여섯 조각으로 잘라 주세요.",
     "meaning_en": "six",
-    "sentence_furigana": "{六|むい}つに{切り分|きりわ}けてください。"
+    "sentence_furigana": "{六|むい}つに{切|き}り{分|わ}けてください。"
    },
    {
     "word": "六日",
@@ -2136,7 +2136,7 @@
     "sentence_jp": "正午に駅で待ち合わせよう。",
     "sentence_ko": "정오에 역에서 만나자.",
     "meaning_en": "noon",
-    "sentence_furigana": "{正午|しょうご}に{駅|えき}で{待ち合|まちあ}わせよう。"
+    "sentence_furigana": "{正午|しょうご}に{駅|えき}で{待|ま}ち{合|あ}わせよう。"
    }
   ]
  },
@@ -2244,7 +2244,7 @@
     "sentence_jp": "天つ神を祭る。",
     "sentence_ko": "하늘의 신을 모시다.",
     "meaning_en": "heavenly",
-    "sentence_furigana": "{天つ神|あまつかみ}を{祭|まつ}る。"
+    "sentence_furigana": "{天|あま}つ{神|かみ}を{祭|まつ}る。"
    },
    {
     "word": "天",
@@ -2508,7 +2508,7 @@
     "sentence_jp": "木づちで杭を打ち込んだ。",
     "sentence_ko": "나무망치로 말뚝을 박았다.",
     "meaning_en": "wooden hammer",
-    "sentence_furigana": "{木|き}づちで{杭|くい}を{打ち込|うちこ}んだ。"
+    "sentence_furigana": "{木|き}づちで{杭|くい}を{打|う}ち{込|こ}んだ。"
    }
   ],
   "on_examples": [
@@ -3397,7 +3397,7 @@
     "sentence_jp": "本木に新しい枝を接ぎ木する。",
     "sentence_ko": "원줄기에 새 가지를 접붙인다.",
     "meaning_en": "original stock",
-    "sentence_furigana": "{本木|もとき}に{新|あたら}しい{枝|えだ}を{接ぎ木|つぎき}する。"
+    "sentence_furigana": "{本木|もとき}に{新|あたら}しい{枝|えだ}を{接|つ}ぎ{木|き}する。"
    }
   ],
   "on_examples": [
@@ -4010,7 +4010,7 @@
     "sentence_jp": "この店の年間の売り上げを計算しました。",
     "sentence_ko": "이 가게의 연간 매출을 계산했습니다.",
     "meaning_en": "(period of) a year",
-    "sentence_furigana": "この{店|みせ}の{年間|ねんかん}の{売り上|うりあ}げを{計算|けいさん}しました。"
+    "sentence_furigana": "この{店|みせ}の{年間|ねんかん}の{売|う}り{上|あ}げを{計算|けいさん}しました。"
    }
   ]
  },
@@ -4461,7 +4461,7 @@
     "sentence_jp": "何とか間に合いました。",
     "sentence_ko": "간신히 시간에 맞췄습니다.",
     "meaning_en": "something",
-    "sentence_furigana": "{何|なん}とか{間に合|まにあ}いました。"
+    "sentence_furigana": "{何|なん}とか{間|ま}に{合|あ}いました。"
    },
    {
     "word": "何",
@@ -4790,7 +4790,7 @@
     "sentence_jp": "祖母は車いすで買い物に行きます。",
     "sentence_ko": "할머니는 휠체어를 타고 장을 보러 갑니다.",
     "meaning_en": "wheelchair",
-    "sentence_furigana": "{祖母|そぼ}は{車|くるま}いすで{買い物|かいもの}に{行|い}きます。"
+    "sentence_furigana": "{祖母|そぼ}は{車|くるま}いすで{買|か}い{物|もの}に{行|い}きます。"
    },
    {
     "word": "車ぶ",
@@ -4879,7 +4879,7 @@
     "sentence_jp": "この神社は国つ神をまつっています。",
     "sentence_ko": "이 신사는 국신(땅의 신)을 모시고 있습니다.",
     "meaning_en": "of the land",
-    "sentence_furigana": "この{神社|じんじゃ}は{国つ神|くにつかみ}をまつっています。"
+    "sentence_furigana": "この{神社|じんじゃ}は{国|くに}つ{神|かみ}をまつっています。"
    }
   ],
   "on_examples": [
@@ -5037,7 +5037,7 @@
     "sentence_jp": "東口で待ち合わせしましょう。",
     "sentence_ko": "동쪽 출구에서 만납시다.",
     "meaning_en": "east entrance",
-    "sentence_furigana": "{東口|ひがしぐち}で{待ち合|まちあ}わせしましょう。"
+    "sentence_furigana": "{東口|ひがしぐち}で{待|ま}ち{合|あ}わせしましょう。"
    }
   ],
   "on_examples": [
@@ -5384,7 +5384,7 @@
     "sentence_jp": "前年より売り上げが増えました。",
     "sentence_ko": "전년보다 매출이 늘었습니다.",
     "meaning_en": "the preceding year",
-    "sentence_furigana": "{前年|ぜんねん}より{売り上|うりあ}げが{増|ふ}えました。"
+    "sentence_furigana": "{前年|ぜんねん}より{売|う}り{上|あ}げが{増|ふ}えました。"
    },
    {
     "word": "直前",
@@ -5964,7 +5964,7 @@
     "sentence_jp": "木と木の間に道がある。",
     "sentence_ko": "나무와 나무 사이에 길이 있다.",
     "meaning_en": "space (between)",
-    "sentence_furigana": "{木|き}と{木の間|このま}に{道|みち}がある。"
+    "sentence_furigana": "{木|き}と{木|こ}の{間|ま}に{道|みち}がある。"
    },
    {
     "word": "間もなく",
@@ -6251,7 +6251,7 @@
     "sentence_jp": "彼は昔の思い出を語る。",
     "sentence_ko": "그는 옛 추억을 이야기한다.",
     "meaning_en": "to talk about",
-    "sentence_furigana": "{彼|かれ}は{昔|むかし}の{思い出|おもいで}を{語|かた}る。"
+    "sentence_furigana": "{彼|かれ}は{昔|むかし}の{思|おも}い{出|で}を{語|かた}る。"
    },
    {
     "word": "語らう",
@@ -7658,7 +7658,7 @@
     "sentence_jp": "世の中は変わった。",
     "sentence_ko": "세상은 변했다.",
     "meaning_en": "world",
-    "sentence_furigana": "{世の中|よのなか}は{変|か}わった。"
+    "sentence_furigana": "{世|よ}の{中|なか}は{変|か}わった。"
    },
    {
     "word": "世にも",
@@ -7909,7 +7909,7 @@
     "sentence_jp": "母の代わりに私が買い物に行った。",
     "sentence_ko": "어머니 대신 내가 장을 보러 갔다.",
     "meaning_en": "substitute",
-    "sentence_furigana": "{母|はは}の{代|か}わりに{私|わたくし}が{買い物|かいもの}に{行|い}った。"
+    "sentence_furigana": "{母|はは}の{代|か}わりに{私|わたくし}が{買|か}い{物|もの}に{行|い}った。"
    },
    {
     "word": "代る",
@@ -8090,7 +8090,7 @@
     "sentence_jp": "私は三人兄弟の末っ子です。",
     "sentence_ko": "저는 삼형제의 막내입니다.",
     "meaning_en": "siblings",
-    "sentence_furigana": "{私|わたくし}は{三|さん}{人|にん}{兄弟|きょうだい}の{末っ子|すえっこ}です。"
+    "sentence_furigana": "{私|わたくし}は{三|さん}{人|にん}{兄弟|きょうだい}の{末|すえ}っ{子|こ}です。"
    },
    {
     "word": "父兄",
@@ -8621,7 +8621,7 @@
     "sentence_jp": "正に今が買い時だ。",
     "sentence_ko": "바로 지금이 살 때다.",
     "meaning_en": "exactly",
-    "sentence_furigana": "{正|まさ}に{今|いま}が{買い時|かいどき}だ。"
+    "sentence_furigana": "{正|まさ}に{今|いま}が{買|か}い{時|どき}だ。"
    }
   ],
   "on_examples": [
@@ -8643,7 +8643,7 @@
     "sentence_jp": "正午に駅で待ち合わせよう。",
     "sentence_ko": "정오에 역에서 만나자.",
     "meaning_en": "noon",
-    "sentence_furigana": "{正午|しょうご}に{駅|えき}で{待ち合|まちあ}わせよう。"
+    "sentence_furigana": "{正午|しょうご}に{駅|えき}で{待|ま}ち{合|あ}わせよう。"
    },
    {
     "word": "正式",
@@ -9161,7 +9161,7 @@
     "sentence_jp": "現地の食べ物を楽しんだ。",
     "sentence_ko": "현지 음식을 즐겼다.",
     "meaning_en": "actual place",
-    "sentence_furigana": "{現地|げんち}の{食べ物|たべもの}を{楽|たの}しんだ。"
+    "sentence_furigana": "{現地|げんち}の{食|た}べ{物|もの}を{楽|たの}しんだ。"
    },
    {
     "word": "露地",
@@ -9343,7 +9343,7 @@
     "sentence_jp": "表に数字を書き入れた。",
     "sentence_ko": "표에 숫자를 써넣었다.",
     "meaning_en": "numeral",
-    "sentence_furigana": "{表|ひょう}に{数字|すうじ}を{書き入|かきい}れた。"
+    "sentence_furigana": "{表|ひょう}に{数字|すうじ}を{書|か}き{入|い}れた。"
    }
   ]
  },
@@ -10055,7 +10055,7 @@
     "sentence_jp": "住民が集まって話し合った。",
     "sentence_ko": "주민들이 모여 의논했다.",
     "meaning_en": "inhabitant",
-    "sentence_furigana": "{住民|じゅうみん}が{集|あつ}まって{話し合|はなしあ}った。"
+    "sentence_furigana": "{住民|じゅうみん}が{集|あつ}まって{話|はな}し{合|あ}った。"
    },
    {
     "word": "住宅",
@@ -10624,7 +10624,7 @@
     "sentence_jp": "私は三人兄弟の末っ子です。",
     "sentence_ko": "저는 삼형제의 막내입니다.",
     "meaning_en": "siblings",
-    "sentence_furigana": "{私|わたくし}は{三|さん}{人|にん}{兄弟|きょうだい}の{末っ子|すえっこ}です。"
+    "sentence_furigana": "{私|わたくし}は{三|さん}{人|にん}{兄弟|きょうだい}の{末|すえ}っ{子|こ}です。"
    },
    {
     "word": "弟子",
@@ -11460,7 +11460,7 @@
     "sentence_jp": "重要な事がらを話し合いました。",
     "sentence_ko": "중요한 사항을 논의했습니다.",
     "meaning_en": "matter",
-    "sentence_furigana": "{重要|じゅうよう}な{事|こと}がらを{話し合|はなしあ}いました。"
+    "sentence_furigana": "{重要|じゅうよう}な{事|こと}がらを{話|はな}し{合|あ}いました。"
    }
   ],
   "on_examples": [
@@ -12252,7 +12252,7 @@
     "sentence_jp": "判決に不服を申し立てた。",
     "sentence_ko": "판결에 불복하여 이의를 제기했다.",
     "meaning_en": "dissatisfaction",
-    "sentence_furigana": "{判決|はんけつ}に{不服|ふふく}を{申し立|もうした}てた。"
+    "sentence_furigana": "{判決|はんけつ}に{不服|ふふく}を{申|もう}し{立|た}てた。"
    }
   ]
  },
@@ -12486,7 +12486,7 @@
     "sentence_jp": "貨物列車が通り過ぎた。",
     "sentence_ko": "화물 열차가 지나갔다.",
     "meaning_en": "cargo",
-    "sentence_furigana": "{貨物|かもつ}{列車|れっしゃ}が{通り過|とおりす}ぎた。"
+    "sentence_furigana": "{貨物|かもつ}{列車|れっしゃ}が{通|とお}り{過|す}ぎた。"
    },
    {
     "word": "人物",
@@ -12969,7 +12969,7 @@
     "sentence_jp": "青春時代を思い出す。",
     "sentence_ko": "청춘 시절을 떠올리다.",
     "meaning_en": "youth",
-    "sentence_furigana": "{青春|せいしゅん}{時代|じだい}を{思い出|おもいだ}す。"
+    "sentence_furigana": "{青春|せいしゅん}{時代|じだい}を{思|おも}い{出|だ}す。"
    }
   ]
  },
@@ -13039,7 +13039,7 @@
     "sentence_jp": "経典の品題を読み上げた。",
     "sentence_ko": "경전의 품 제목을 읽어 올렸다.",
     "meaning_en": "chapter title",
-    "sentence_furigana": "{経典|きょうてん}の{品|ひん}{題|だい}を{読み上|よみあ}げた。"
+    "sentence_furigana": "{経典|きょうてん}の{品|ひん}{題|だい}を{読|よ}み{上|あ}げた。"
    },
    {
     "word": "作品",
@@ -13197,7 +13197,7 @@
     "sentence_jp": "古い家屋を取り壊す。",
     "sentence_ko": "오래된 가옥을 철거한다.",
     "meaning_en": "house",
-    "sentence_furigana": "{古|ふる}い{家屋|かおく}を{取り壊|とりこわ}す。"
+    "sentence_furigana": "{古|ふる}い{家屋|かおく}を{取|と}り{壊|こわ}す。"
    },
    {
     "word": "屋外",
@@ -13248,7 +13248,7 @@
     "sentence_jp": "この写真を見る度に、昔を思い出す。",
     "sentence_ko": "이 사진을 볼 때마다 옛날이 떠오른다.",
     "meaning_en": "each time",
-    "sentence_furigana": "この{写真|しゃしん}を{見|み}る{度|たび}に、{昔|むかし}を{思い出|おもいだ}す。"
+    "sentence_furigana": "この{写真|しゃしん}を{見|み}る{度|たび}に、{昔|むかし}を{思|おも}い{出|だ}す。"
    },
    {
     "word": "度ごと",
@@ -13654,7 +13654,7 @@
     "sentence_jp": "食べ物を教室に持ちこまないでください。",
     "sentence_ko": "음식을 교실에 가지고 들어오지 마세요.",
     "meaning_en": "to take something into ...",
-    "sentence_furigana": "{食べ物|たべもの}を{教室|きょうしつ}に{持|も}ちこまないでください。"
+    "sentence_furigana": "{食|た}べ{物|もの}を{教室|きょうしつ}に{持|も}ちこまないでください。"
    },
    {
     "word": "持つ",
@@ -13837,7 +13837,7 @@
     "sentence_jp": "青春時代を思い出す。",
     "sentence_ko": "청춘 시절을 떠올리다.",
     "meaning_en": "youth",
-    "sentence_furigana": "{青春|せいしゅん}{時代|じだい}を{思い出|おもいだ}す。"
+    "sentence_furigana": "{青春|せいしゅん}{時代|じだい}を{思|おも}い{出|だ}す。"
    },
    {
     "word": "売春",
@@ -15185,7 +15185,7 @@
     "sentence_jp": "帰りに買い物する。",
     "sentence_ko": "돌아가는 길에 장을 보다.",
     "meaning_en": "return",
-    "sentence_furigana": "{帰|かえ}りに{買い物|かいもの}する。"
+    "sentence_furigana": "{帰|かえ}りに{買|か}い{物|もの}する。"
    },
    {
     "word": "帰る",
@@ -16839,7 +16839,7 @@
     "sentence_jp": "朝早く魚がしへ買い出しに行く。",
     "sentence_ko": "아침 일찍 생선 시장에 장 보러 간다.",
     "meaning_en": "riverside fish market",
-    "sentence_furigana": "{朝|あさ}{早|はや}く{魚|うお}がしへ{買い出|かいだ}しに{行|い}く。"
+    "sentence_furigana": "{朝|あさ}{早|はや}く{魚|うお}がしへ{買|か}い{出|だ}しに{行|い}く。"
    },
    {
     "word": "魚",
@@ -18605,7 +18605,7 @@
     "sentence_jp": "駅前で待ち合わせる。",
     "sentence_ko": "역 앞에서 만나기로 한다.",
     "meaning_en": "in front of a station",
-    "sentence_furigana": "{駅前|えきまえ}で{待ち合|まちあ}わせる。"
+    "sentence_furigana": "{駅前|えきまえ}で{待|ま}ち{合|あ}わせる。"
    },
    {
     "word": "駅員",
@@ -19347,7 +19347,7 @@
     "sentence_jp": "互いに助け合おう。",
     "sentence_ko": "서로 도와주자.",
     "meaning_en": "each other",
-    "sentence_furigana": "{互|たが}いに{助け合|たすけあ}おう。"
+    "sentence_furigana": "{互|たが}いに{助|たす}け{合|あ}おう。"
    },
    {
     "word": "互に",
@@ -19367,7 +19367,7 @@
     "sentence_jp": "互いに助け合おう。",
     "sentence_ko": "서로 도우며 지내자.",
     "meaning_en": "mutually",
-    "sentence_furigana": "{互|たが}いに{助け合|たすけあ}おう。"
+    "sentence_furigana": "{互|たが}いに{助|たす}け{合|あ}おう。"
    }
   ],
   "on_examples": [
@@ -19841,7 +19841,7 @@
     "sentence_jp": "夫と買い物に行く。",
     "sentence_ko": "남편과 장을 보러 가다.",
     "meaning_en": "husband",
-    "sentence_furigana": "{夫|おっと}と{買い物|かいもの}に{行|い}く。"
+    "sentence_furigana": "{夫|おっと}と{買|か}い{物|もの}に{行|い}く。"
    },
    {
     "word": "元夫",
@@ -20891,7 +20891,7 @@
     "sentence_jp": "必死に走ってバスに間に合った。",
     "sentence_ko": "필사적으로 달려서 버스 시간에 맞췄다.",
     "meaning_en": "frantic",
-    "sentence_furigana": "{必死|ひっし}に{走|はし}ってバスに{間に合|まにあ}った。"
+    "sentence_furigana": "{必死|ひっし}に{走|はし}ってバスに{間|ま}に{合|あ}った。"
    }
   ]
  },
@@ -21087,7 +21087,7 @@
     "sentence_jp": "未だに彼の名前が思い出せない。",
     "sentence_ko": "아직도 그의 이름이 기억나지 않는다.",
     "meaning_en": "still",
-    "sentence_furigana": "{未|いま}だに{彼|かれ}の{名前|なまえ}が{思い出|おもいだ}せない。"
+    "sentence_furigana": "{未|いま}だに{彼|かれ}の{名前|なまえ}が{思|おも}い{出|だ}せない。"
    },
    {
     "word": "未だ",
@@ -21187,7 +21187,7 @@
     "sentence_jp": "末広の扇子を贈り物にした。",
     "sentence_ko": "스에히로 부채를 선물로 했다.",
     "meaning_en": "spreading out like an open fan",
-    "sentence_furigana": "{末広|すえひろ}の{扇子|せんす}を{贈り物|おくりもの}にした。"
+    "sentence_furigana": "{末広|すえひろ}の{扇子|せんす}を{贈|おく}り{物|もの}にした。"
    }
   ],
   "on_examples": [
@@ -21592,7 +21592,7 @@
     "sentence_jp": "磁石で鉄を引き寄せる。",
     "sentence_ko": "자석으로 철을 끌어당긴다.",
     "meaning_en": "magnet",
-    "sentence_furigana": "{磁石|じしゃく}で{鉄|てつ}を{引き寄|ひきよ}せる。"
+    "sentence_furigana": "{磁石|じしゃく}で{鉄|てつ}を{引|ひ}き{寄|よ}せる。"
    },
    {
     "word": "黒曜石",
@@ -22056,7 +22056,7 @@
     "sentence_jp": "彼の要求を無条件で受け入れた。",
     "sentence_ko": "그의 요구를 무조건 받아들였다.",
     "meaning_en": "unconditional",
-    "sentence_furigana": "{彼|かれ}の{要求|ようきゅう}を{無|む}{条件|じょうけん}で{受け入|うけい}れた。"
+    "sentence_furigana": "{彼|かれ}の{要求|ようきゅう}を{無|む}{条件|じょうけん}で{受|う}け{入|い}れた。"
    }
   ]
  },
@@ -22381,7 +22381,7 @@
     "sentence_jp": "クラス全体で話し合いました。",
     "sentence_ko": "반 전체가 함께 의논했습니다.",
     "meaning_en": "whole",
-    "sentence_furigana": "クラス{全体|ぜんたい}で{話し合|はなしあ}いました。"
+    "sentence_furigana": "クラス{全体|ぜんたい}で{話|はな}し{合|あ}いました。"
    }
   ]
  },
@@ -22829,7 +22829,7 @@
     "sentence_jp": "深く呼吸をして落ち着いた。",
     "sentence_ko": "깊게 호흡을 하고 진정했다.",
     "meaning_en": "breathing",
-    "sentence_furigana": "{深|ふか}く{呼吸|こきゅう}をして{落ち着|おちつ}いた。"
+    "sentence_furigana": "{深|ふか}く{呼吸|こきゅう}をして{落|お}ち{着|つ}いた。"
    },
    {
     "word": "吸収",
@@ -23064,7 +23064,7 @@
     "sentence_jp": "在りし日の祖父を思い出す。",
     "sentence_ko": "생전의 할아버지를 떠올린다.",
     "meaning_en": "prior",
-    "sentence_furigana": "{在|あ}りし{日|ひ}の{祖父|そふ}を{思い出|おもいだ}す。"
+    "sentence_furigana": "{在|あ}りし{日|ひ}の{祖父|そふ}を{思|おも}い{出|だ}す。"
    }
   ],
   "on_examples": [
@@ -23450,7 +23450,7 @@
     "sentence_jp": "それは当たり前のことだ。",
     "sentence_ko": "그것은 당연한 일이다.",
     "meaning_en": "natural",
-    "sentence_furigana": "それは{当たり前|あたりまえ}のことだ。"
+    "sentence_furigana": "それは{当|あ}たり{前|まえ}のことだ。"
    },
    {
     "word": "当り",
@@ -23543,7 +23543,7 @@
     "sentence_jp": "店員は忙しげに動き回っていた。",
     "sentence_ko": "점원은 바쁜 듯이 돌아다니고 있었다.",
     "meaning_en": "looking busy",
-    "sentence_furigana": "{店員|てんいん}は{忙|いそが}しげに{動き回|うごきまわ}っていた。"
+    "sentence_furigana": "{店員|てんいん}は{忙|いそが}しげに{動|うご}き{回|まわ}っていた。"
    },
    {
     "word": "忙しない",
@@ -23959,7 +23959,7 @@
     "sentence_jp": "老いを受け入れる。",
     "sentence_ko": "늙음을 받아들이다.",
     "meaning_en": "old age",
-    "sentence_furigana": "{老|お}いを{受け入|うけい}れる。"
+    "sentence_furigana": "{老|お}いを{受|う}け{入|い}れる。"
    }
   ],
   "on_examples": [
@@ -24692,7 +24692,7 @@
     "sentence_jp": "引っ越しの助として友人が来てくれた。",
     "sentence_ko": "이삿짐 도우미로 친구가 와 주었다.",
     "meaning_en": "assistance",
-    "sentence_furigana": "{引っ越|ひっこ}しの{助|すけ}として{友人|ゆうじん}が{来|き}てくれた。"
+    "sentence_furigana": "{引|ひ}っ{越|こ}しの{助|すけ}として{友人|ゆうじん}が{来|き}てくれた。"
    }
   ],
   "on_examples": [
@@ -24761,7 +24761,7 @@
     "sentence_jp": "努めて明るく振る舞った。",
     "sentence_ko": "애써 밝게 행동했다.",
     "meaning_en": "as much as possible",
-    "sentence_furigana": "{努|つと}めて{明|あか}るく{振る舞|ふるま}った。"
+    "sentence_furigana": "{努|つと}めて{明|あか}るく{振|ふ}る{舞|ま}った。"
    }
   ],
   "on_examples": [
@@ -25246,7 +25246,7 @@
     "sentence_jp": "困難を乗り越えて成功した。",
     "sentence_ko": "어려움을 극복하고 성공했다.",
     "meaning_en": "difficulty",
-    "sentence_furigana": "{困難|こんなん}を{乗り越|のりこ}えて{成功|せいこう}した。"
+    "sentence_furigana": "{困難|こんなん}を{乗|の}り{越|こ}えて{成功|せいこう}した。"
    },
    {
     "word": "貧困",
@@ -25347,7 +25347,7 @@
     "sentence_jp": "音声が聞き取りにくい。",
     "sentence_ko": "음성이 알아듣기 어렵다.",
     "meaning_en": "voice",
-    "sentence_furigana": "{音声|おんせい}が{聞き取|ききと}りにくい。"
+    "sentence_furigana": "{音声|おんせい}が{聞|き}き{取|と}りにくい。"
    }
   ]
  },
@@ -25746,7 +25746,7 @@
     "sentence_jp": "嫌な思い出は忘却の彼方へ消えた。",
     "sentence_ko": "싫은 기억은 망각 저편으로 사라졌다.",
     "meaning_en": "lapse of memory",
-    "sentence_furigana": "{嫌|いや}な{思い出|おもいで}は{忘却|ぼうきゃく}の{彼方|かなた}へ{消|き}えた。"
+    "sentence_furigana": "{嫌|いや}な{思|おも}い{出|で}は{忘却|ぼうきゃく}の{彼方|かなた}へ{消|き}えた。"
    },
    {
     "word": "忘我",
@@ -25806,7 +25806,7 @@
     "sentence_jp": "忘れ物を取りに家に戻る。",
     "sentence_ko": "두고 온 물건을 가지러 집으로 돌아간다.",
     "meaning_en": "to turn back (e.g. half-way)",
-    "sentence_furigana": "{忘れ物|わすれもの}を{取|と}りに{家|いえ}に{戻|もど}る。"
+    "sentence_furigana": "{忘|わす}れ{物|もの}を{取|と}りに{家|いえ}に{戻|もど}る。"
    }
   ],
   "on_examples": [
@@ -27199,7 +27199,7 @@
     "sentence_jp": "参拾人が申し込んだ。",
     "sentence_ko": "서른 명이 신청했다.",
     "meaning_en": "thirty",
-    "sentence_furigana": "{参|さん}{拾|じゅう}{人|にん}が{申し込|もうしこ}んだ。"
+    "sentence_furigana": "{参|さん}{拾|じゅう}{人|にん}が{申|もう}し{込|こ}んだ。"
    },
    {
     "word": "人参",
@@ -27442,7 +27442,7 @@
     "sentence_jp": "深く呼吸をして落ち着いた。",
     "sentence_ko": "깊게 호흡을 하고 진정했다.",
     "meaning_en": "breathing",
-    "sentence_furigana": "{深|ふか}く{呼吸|こきゅう}をして{落ち着|おちつ}いた。"
+    "sentence_furigana": "{深|ふか}く{呼吸|こきゅう}をして{落|お}ち{着|つ}いた。"
    },
    {
     "word": "呼応",
@@ -27654,7 +27654,7 @@
     "sentence_jp": "妻と一緒に買い物に行った。",
     "sentence_ko": "아내와 함께 쇼핑을 갔다.",
     "meaning_en": "wife",
-    "sentence_furigana": "{妻|つま}と{一緒|いっしょ}に{買い物|かいもの}に{行|い}った。"
+    "sentence_furigana": "{妻|つま}と{一緒|いっしょ}に{買|か}い{物|もの}に{行|い}った。"
    },
    {
     "word": "人妻",
@@ -28414,7 +28414,7 @@
     "sentence_jp": "待ち合わせの場所を決めた。",
     "sentence_ko": "만날 장소를 정했다.",
     "meaning_en": "place",
-    "sentence_furigana": "{待ち合|まちあ}わせの{場所|ばしょ}を{決|き}めた。"
+    "sentence_furigana": "{待|ま}ち{合|あ}わせの{場所|ばしょ}を{決|き}めた。"
    },
    {
     "word": "事務所",
@@ -28906,7 +28906,7 @@
     "sentence_jp": "昔時を思い出す。",
     "sentence_ko": "옛날을 떠올리다.",
     "meaning_en": "old times",
-    "sentence_furigana": "{昔時|せきじ}を{思い出|おもいだ}す。"
+    "sentence_furigana": "{昔時|せきじ}を{思|おも}い{出|だ}す。"
    },
    {
     "word": "今昔",
@@ -30149,7 +30149,7 @@
     "sentence_jp": "関係者以外は立ち入り禁止です。",
     "sentence_ko": "관계자 외에는 출입 금지입니다.",
     "meaning_en": "person concerned",
-    "sentence_furigana": "{関係|かんけい}{者|しゃ}{以外|いがい}は{立ち入|たちい}り{禁止|きんし}です。"
+    "sentence_furigana": "{関係|かんけい}{者|しゃ}{以外|いがい}は{立|た}ち{入|い}り{禁止|きんし}です。"
    }
   ]
  },
@@ -30614,7 +30614,7 @@
     "sentence_jp": "平安時代、政所が家の事務を取り仕切った。",
     "sentence_ko": "헤이안 시대에 정소가 가문의 사무를 관장했다.",
     "meaning_en": "official in charge of the administration of domains and general affairs of powerful noble families (from the middle of the Heian period)",
-    "sentence_furigana": "{平安|へいあん}{時代|じだい}、{政所|まんどころ}が{家|いえ}の{事務|じむ}を{取り仕切|とりしき}った。"
+    "sentence_furigana": "{平安|へいあん}{時代|じだい}、{政所|まんどころ}が{家|いえ}の{事務|じむ}を{取|と}り{仕切|しき}った。"
    }
   ],
   "on_examples": [
@@ -30692,7 +30692,7 @@
     "sentence_jp": "昨年度の売り上げは目標を超えた。",
     "sentence_ko": "작년도 매출은 목표를 넘었다.",
     "meaning_en": "previous year (fiscal, academic, etc.)",
-    "sentence_furigana": "{昨|さく}{年度|ねんど}の{売り上|うりあ}げは{目標|もくひょう}を{超|こ}えた。"
+    "sentence_furigana": "{昨|さく}{年度|ねんど}の{売|う}り{上|あ}げは{目標|もくひょう}を{超|こ}えた。"
    }
   ]
  },
@@ -31977,7 +31977,7 @@
     "sentence_jp": "道の真ん中の石を退かした。",
     "sentence_ko": "길 한가운데의 돌을 치웠다.",
     "meaning_en": "to remove",
-    "sentence_furigana": "{道|みち}の{真ん中|まんなか}の{石|いし}を{退|ど}かした。"
+    "sentence_furigana": "{道|みち}の{真|ま}ん{中|なか}の{石|いし}を{退|ど}かした。"
    }
   ],
   "on_examples": [
@@ -32704,7 +32704,7 @@
     "sentence_jp": "子供たちが野原で走り回っている。",
     "sentence_ko": "아이들이 들판에서 뛰어다니고 있다.",
     "meaning_en": "field",
-    "sentence_furigana": "{子供|こども}たちが{野原|のはら}で{走り回|はしりまわ}っている。"
+    "sentence_furigana": "{子供|こども}たちが{野原|のはら}で{走|はし}り{回|まわ}っている。"
    }
   ],
   "on_examples": [
@@ -32843,7 +32843,7 @@
     "sentence_jp": "多くの障害を乗り越えた。",
     "sentence_ko": "많은 장애를 극복했다.",
     "meaning_en": "obstacle",
-    "sentence_furigana": "{多|おお}くの{障害|しょうがい}を{乗り越|のりこ}えた。"
+    "sentence_furigana": "{多|おお}くの{障害|しょうがい}を{乗|の}り{越|こ}えた。"
    },
    {
     "word": "被害",
@@ -35314,7 +35314,7 @@
     "sentence_jp": "どこの馬のほねかわからない人とは付き合えない。",
     "sentence_ko": "어디 굴러먹던 사람인지 모르는 사람과는 어울릴 수 없다.",
     "meaning_en": "person of doubtful origin",
-    "sentence_furigana": "どこの{馬|うま}のほねかわからない{人|ひと}とは{付き合|つきあ}えない。"
+    "sentence_furigana": "どこの{馬|うま}のほねかわからない{人|ひと}とは{付|つ}き{合|あ}えない。"
    },
    {
     "word": "馬主",
@@ -35437,7 +35437,7 @@
     "sentence_jp": "道路の側溝に落ち葉が詰まっている。",
     "sentence_ko": "도로의 도랑에 낙엽이 막혀 있다.",
     "meaning_en": "gutter",
-    "sentence_furigana": "{道路|どうろ}の{側溝|そっこう}に{落ち葉|おちば}が{詰|つ}まっている。"
+    "sentence_furigana": "{道路|どうろ}の{側溝|そっこう}に{落|お}ち{葉|ば}が{詰|つ}まっている。"
    }
   ]
  },
@@ -35516,7 +35516,7 @@
     "sentence_jp": "偶数は二で割り切れる。",
     "sentence_ko": "짝수는 2로 나누어떨어진다.",
     "meaning_en": "even number",
-    "sentence_furigana": "{偶数|ぐうすう}は{二|に}で{割り切|わりき}れる。"
+    "sentence_furigana": "{偶数|ぐうすう}は{二|に}で{割|わ}り{切|き}れる。"
    }
   ]
  },
@@ -35779,7 +35779,7 @@
     "sentence_jp": "婦人服売り場は二階にあります。",
     "sentence_ko": "여성복 매장은 2층에 있습니다.",
     "meaning_en": "woman",
-    "sentence_furigana": "{婦人|ふじん}{服|ふく}{売り場|うりば}は{二|に}{階|かい}にあります。"
+    "sentence_furigana": "{婦人|ふじん}{服|ふく}{売|う}り{場|ば}は{二|に}{階|かい}にあります。"
    }
   ]
  },
@@ -36130,7 +36130,7 @@
     "sentence_jp": "彼は情け深い人だ。",
     "sentence_ko": "그는 인정 많은 사람이다.",
     "meaning_en": "pity",
-    "sentence_furigana": "{彼|かれ}は{情け深|なさけぶか}い{人|ひと}だ。"
+    "sentence_furigana": "{彼|かれ}は{情|なさ}け{深|ぶか}い{人|ひと}だ。"
    },
    {
     "word": "情ない",
@@ -36182,7 +36182,7 @@
     "sentence_jp": "彼の情態は少しずつ落ち着いてきた。",
     "sentence_ko": "그의 상태는 조금씩 안정되어 갔다.",
     "meaning_en": "state",
-    "sentence_furigana": "{彼|かれ}の{情態|じょうたい}は{少|すこ}しずつ{落ち着|おちつ}いてきた。"
+    "sentence_furigana": "{彼|かれ}の{情態|じょうたい}は{少|すこ}しずつ{落|お}ち{着|つ}いてきた。"
    }
   ]
  },
@@ -37007,7 +37007,7 @@
     "sentence_jp": "現地の食べ物を楽しんだ。",
     "sentence_ko": "현지 음식을 즐겼다.",
     "meaning_en": "actual place",
-    "sentence_furigana": "{現地|げんち}の{食べ物|たべもの}を{楽|たの}しんだ。"
+    "sentence_furigana": "{現地|げんち}の{食|た}べ{物|もの}を{楽|たの}しんだ。"
    }
   ]
  },
@@ -37613,7 +37613,7 @@
     "sentence_jp": "為術もなく立ち尽くした。",
     "sentence_ko": "어찌할 방법이 없어 우두커니 서 있었다.",
     "meaning_en": "means",
-    "sentence_furigana": "{為|ため}{術|じゅつ}もなく{立ち尽|たちつ}くした。"
+    "sentence_furigana": "{為|ため}{術|じゅつ}もなく{立|た}ち{尽|つ}くした。"
    }
   ],
   "on_examples": [
@@ -38381,7 +38381,7 @@
     "sentence_jp": "雪どけの水が川に流れ込む。",
     "sentence_ko": "눈 녹은 물이 강으로 흘러든다.",
     "meaning_en": "snow thaw",
-    "sentence_furigana": "{雪|ゆき}どけの{水|みず}が{川|かわ}に{流れ込|ながれこ}む。"
+    "sentence_furigana": "{雪|ゆき}どけの{水|みず}が{川|かわ}に{流|なが}れ{込|こ}む。"
    },
    {
     "word": "雪だるま",
@@ -38950,7 +38950,7 @@
     "sentence_jp": "母は贈り物を喜んだ。",
     "sentence_ko": "어머니는 선물을 기뻐하셨다.",
     "meaning_en": "to be delighted",
-    "sentence_furigana": "{母|はは}は{贈り物|おくりもの}を{喜|よろこ}んだ。"
+    "sentence_furigana": "{母|はは}は{贈|おく}り{物|もの}を{喜|よろこ}んだ。"
    },
    {
     "word": "喜ばす",
@@ -39936,7 +39936,7 @@
     "sentence_jp": "橋を渡って向こう岸へ行く。",
     "sentence_ko": "다리를 건너 맞은편으로 간다.",
     "meaning_en": "to cross over",
-    "sentence_furigana": "{橋|はし}を{渡|わた}って{向こう岸|むこうぎし}へ{行|い}く。"
+    "sentence_furigana": "{橋|はし}を{渡|わた}って{向|む}こう{岸|ぎし}へ{行|い}く。"
    },
    {
     "word": "渡り",
@@ -39946,7 +39946,7 @@
     "sentence_jp": "渡り鳥の渡りが始まった。",
     "sentence_ko": "철새의 이동이 시작되었다.",
     "meaning_en": "crossing",
-    "sentence_furigana": "{渡り鳥|わたりどり}の{渡|わた}りが{始|はじ}まった。"
+    "sentence_furigana": "{渡|わた}り{鳥|どり}の{渡|わた}りが{始|はじ}まった。"
    }
   ],
   "on_examples": [
@@ -40629,7 +40629,7 @@
     "sentence_jp": "私たちは対等な立場で話し合った。",
     "sentence_ko": "우리는 대등한 입장에서 이야기를 나눴다.",
     "meaning_en": "equality (esp. of status, on equal terms)",
-    "sentence_furigana": "{私|わたくし}たちは{対等|たいとう}な{立場|たちば}で{話し合|はなしあ}った。"
+    "sentence_furigana": "{私|わたくし}たちは{対等|たいとう}な{立場|たちば}で{話|はな}し{合|あ}った。"
    }
   ]
  },
@@ -42305,7 +42305,7 @@
     "sentence_jp": "表に数字を書き入れた。",
     "sentence_ko": "표에 숫자를 써넣었다.",
     "meaning_en": "numeral",
-    "sentence_furigana": "{表|ひょう}に{数字|すうじ}を{書き入|かきい}れた。"
+    "sentence_furigana": "{表|ひょう}に{数字|すうじ}を{書|か}き{入|い}れた。"
    },
    {
     "word": "過半数",
@@ -42518,7 +42518,7 @@
     "sentence_jp": "煙が立ち上る。",
     "sentence_ko": "연기가 피어오르다.",
     "meaning_en": "smoke",
-    "sentence_furigana": "{煙|けむり}が{立ち上|たちのぼ}る。"
+    "sentence_furigana": "{煙|けむり}が{立|た}ち{上|のぼ}る。"
    },
    {
     "word": "煙になる",
@@ -42983,7 +42983,7 @@
     "sentence_jp": "結び目をゆっくり解いた。",
     "sentence_ko": "매듭을 천천히 풀었다.",
     "meaning_en": "to untie",
-    "sentence_furigana": "{結び目|むすびめ}をゆっくり{解|と}いた。"
+    "sentence_furigana": "{結|むす}び{目|め}をゆっくり{解|と}いた。"
    },
    {
     "word": "解ける",
@@ -44423,7 +44423,7 @@
     "sentence_jp": "試行錯誤を繰り返す。",
     "sentence_ko": "시행착오를 거듭하다.",
     "meaning_en": "mistake",
-    "sentence_furigana": "{試行|しこう}{錯誤|さくご}を{繰り返|くりかえ}す。"
+    "sentence_furigana": "{試行|しこう}{錯誤|さくご}を{繰|く}り{返|かえ}す。"
    }
   ]
  },
@@ -44607,7 +44607,7 @@
     "sentence_jp": "環境に関る問題を話し合う。",
     "sentence_ko": "환경에 관련된 문제를 논의한다.",
     "meaning_en": "to be affected",
-    "sentence_furigana": "{環境|かんきょう}に{関|かかわ}る{問題|もんだい}を{話し合|はなしあ}う。"
+    "sentence_furigana": "{環境|かんきょう}に{関|かかわ}る{問題|もんだい}を{話|はな}し{合|あ}う。"
    },
    {
     "word": "関わる",
@@ -44931,7 +44931,7 @@
     "sentence_jp": "間一髪で電車に間に合った。",
     "sentence_ko": "간발의 차로 전철 시간에 맞췄다.",
     "meaning_en": "hair's breadth",
-    "sentence_furigana": "{間|ま}{一髪|いっぱつ}で{電車|でんしゃ}に{間に合|まにあ}った。"
+    "sentence_furigana": "{間|ま}{一髪|いっぱつ}で{電車|でんしゃ}に{間|ま}に{合|あ}った。"
    },
    {
     "word": "理髪",
@@ -45271,7 +45271,7 @@
     "sentence_jp": "確か、彼は先月引っ越したはずだ。",
     "sentence_ko": "아마 그는 지난달에 이사했을 것이다.",
     "meaning_en": "sure",
-    "sentence_furigana": "{確|たし}か、{彼|かれ}は{先月|せんげつ}{引っ越|ひっこ}したはずだ。"
+    "sentence_furigana": "{確|たし}か、{彼|かれ}は{先月|せんげつ}{引|ひ}っ{越|こ}したはずだ。"
    },
    {
     "word": "確かめる",
@@ -45649,7 +45649,7 @@
     "sentence_jp": "話し合いで結論を出す。",
     "sentence_ko": "토의로 결론을 내다.",
     "meaning_en": "conclusion",
-    "sentence_furigana": "{話し合|はなしあ}いで{結論|けつろん}を{出|だ}す。"
+    "sentence_furigana": "{話|はな}し{合|あ}いで{結論|けつろん}を{出|だ}す。"
    }
   ]
  },
@@ -45746,7 +45746,7 @@
     "sentence_jp": "贈り物選びは楽しい。",
     "sentence_ko": "선물 고르기는 즐겁다.",
     "meaning_en": "choosing",
-    "sentence_furigana": "{贈り物|おくりもの}{選|えら}びは{楽|たの}しい。"
+    "sentence_furigana": "{贈|おく}り{物|もの}{選|えら}びは{楽|たの}しい。"
    },
    {
     "word": "選びとる",
@@ -46458,7 +46458,7 @@
     "sentence_jp": "困難を乗り越えて成功した。",
     "sentence_ko": "어려움을 극복하고 성공했다.",
     "meaning_en": "difficulty",
-    "sentence_furigana": "{困難|こんなん}を{乗り越|のりこ}えて{成功|せいこう}した。"
+    "sentence_furigana": "{困難|こんなん}を{乗|の}り{越|こ}えて{成功|せいこう}した。"
    },
    {
     "word": "避難",
@@ -46547,7 +46547,7 @@
     "sentence_jp": "絵の具には顔料が使われている。",
     "sentence_ko": "물감에는 안료가 사용된다.",
     "meaning_en": "pigment",
-    "sentence_furigana": "{絵の具|えのぐ}には{顔料|がんりょう}が{使|つか}われている。"
+    "sentence_furigana": "{絵|え}の{具|ぐ}には{顔料|がんりょう}が{使|つか}われている。"
    }
   ]
  },
@@ -47019,7 +47019,7 @@
     "sentence_jp": "弾丸のような速さで電車が通り過ぎた。",
     "sentence_ko": "총알 같은 속도로 전철이 지나갔다.",
     "meaning_en": "bullet",
-    "sentence_furigana": "{弾丸|だんがん}のような{速|はや}さで{電車|でんしゃ}が{通り過|とおりす}ぎた。"
+    "sentence_furigana": "{弾丸|だんがん}のような{速|はや}さで{電車|でんしゃ}が{通|とお}り{過|す}ぎた。"
    },
    {
     "word": "砲丸投",
@@ -47724,7 +47724,7 @@
     "sentence_jp": "毛あなの汚れを丁寧に洗い落とす。",
     "sentence_ko": "모공의 때를 꼼꼼히 씻어 낸다.",
     "meaning_en": "pore (of the skin)",
-    "sentence_furigana": "{毛|け}あなの{汚|よご}れを{丁寧|ていねい}に{洗い落|あらいお}とす。"
+    "sentence_furigana": "{毛|け}あなの{汚|よご}れを{丁寧|ていねい}に{洗|あら}い{落|お}とす。"
    },
    {
     "word": "毛ほど",
@@ -47931,7 +47931,7 @@
     "sentence_jp": "七夕に願い事を短冊に書いた。",
     "sentence_ko": "칠석에 소원을 단자쿠에 적었다.",
     "meaning_en": "long, narrow card on which Japanese poems are written (vertically)",
-    "sentence_furigana": "{七夕|たなばた}に{願い事|ねがいごと}を{短冊|たんざく}に{書|か}いた。"
+    "sentence_furigana": "{七夕|たなばた}に{願|ねが}い{事|ごと}を{短冊|たんざく}に{書|か}いた。"
    },
    {
     "word": "別冊",
@@ -48575,7 +48575,7 @@
     "sentence_jp": "幼き日の思い出です。",
     "sentence_ko": "어린 시절의 추억입니다.",
     "meaning_en": "very young",
-    "sentence_furigana": "{幼|おさな}き{日|ひ}の{思い出|おもいで}です。"
+    "sentence_furigana": "{幼|おさな}き{日|ひ}の{思|おも}い{出|で}です。"
    }
   ],
   "on_examples": [
@@ -48736,7 +48736,7 @@
     "sentence_jp": "新旧の文化が混ざり合う町だ。",
     "sentence_ko": "신구 문화가 어우러진 도시다.",
     "meaning_en": "new and old",
-    "sentence_furigana": "{新旧|しんきゅう}の{文化|ぶんか}が{混ざり合|まざりあ}う{町|まち}だ。"
+    "sentence_furigana": "{新旧|しんきゅう}の{文化|ぶんか}が{混|ま}ざり{合|あ}う{町|まち}だ。"
    }
   ]
  },
@@ -49106,7 +49106,7 @@
     "sentence_jp": "子犬が飼い主に甘える。",
     "sentence_ko": "강아지가 주인에게 응석을 부린다.",
     "meaning_en": "to behave like a spoiled child",
-    "sentence_furigana": "{子犬|こいぬ}が{飼い主|かいぬし}に{甘|あま}える。"
+    "sentence_furigana": "{子犬|こいぬ}が{飼|か}い{主|ぬし}に{甘|あま}える。"
    }
   ],
   "on_examples": [
@@ -49118,7 +49118,7 @@
     "sentence_jp": "この飲み物には甘味料が入っています。",
     "sentence_ko": "이 음료에는 감미료가 들어 있습니다.",
     "meaning_en": "sweetener (sugar, honey, saccharin, maltose, etc.)",
-    "sentence_furigana": "この{飲み物|のみもの}には{甘味|かんみ}{料|りょう}が{入|はい}っています。"
+    "sentence_furigana": "この{飲|の}み{物|もの}には{甘味|かんみ}{料|りょう}が{入|はい}っています。"
    },
    {
     "word": "甘美",
@@ -50130,7 +50130,7 @@
     "sentence_jp": "手紙の宛名に机下と書き添えた。",
     "sentence_ko": "편지 수신인 이름에 궤하라고 덧붙였다.",
     "meaning_en": "word of respect added to the addressee's name on a letter",
-    "sentence_furigana": "{手紙|てがみ}の{宛名|あてな}に{机下|きか}と{書き添|かきそ}えた。"
+    "sentence_furigana": "{手紙|てがみ}の{宛名|あてな}に{机下|きか}と{書|か}き{添|そ}えた。"
    }
   ]
  },
@@ -51311,7 +51311,7 @@
     "sentence_jp": "警官は胡乱な男を呼び止めた。",
     "sentence_ko": "경찰관은 수상쩍은 남자를 불러 세웠다.",
     "meaning_en": "suspicious-looking",
-    "sentence_furigana": "{警官|けいかん}は{胡乱|うろん}な{男|おとこ}を{呼び止|よびと}めた。"
+    "sentence_furigana": "{警官|けいかん}は{胡乱|うろん}な{男|おとこ}を{呼|よ}び{止|と}めた。"
    },
    {
     "word": "波乱",
@@ -52222,7 +52222,7 @@
     "sentence_jp": "彼女の床しい振る舞いに感心した。",
     "sentence_ko": "그녀의 기품 있는 행동에 감탄했다.",
     "meaning_en": "admirable",
-    "sentence_furigana": "{彼女|かのじょ}の{床|ゆか}しい{振る舞|ふるま}いに{感心|かんしん}した。"
+    "sentence_furigana": "{彼女|かのじょ}の{床|ゆか}しい{振|ふ}る{舞|ま}いに{感心|かんしん}した。"
    },
    {
     "word": "床ずれ",
@@ -53181,7 +53181,7 @@
     "sentence_jp": "国の防衛について話し合った。",
     "sentence_ko": "나라의 방위에 대해 논의했다.",
     "meaning_en": "defense",
-    "sentence_furigana": "{国|くに}の{防衛|ぼうえい}について{話し合|はなしあ}った。"
+    "sentence_furigana": "{国|くに}の{防衛|ぼうえい}について{話|はな}し{合|あ}った。"
    },
    {
     "word": "防止",
@@ -53332,7 +53332,7 @@
     "sentence_jp": "会場では食事並びに飲み物が提供される。",
     "sentence_ko": "행사장에서는 식사 및 음료가 제공된다.",
     "meaning_en": "and (also)",
-    "sentence_furigana": "{会場|かいじょう}では{食事|しょくじ}{並|なら}びに{飲み物|のみもの}が{提供|ていきょう}される。"
+    "sentence_furigana": "{会場|かいじょう}では{食事|しょくじ}{並|なら}びに{飲|の}み{物|もの}が{提供|ていきょう}される。"
    }
   ],
   "on_examples": [
@@ -53564,7 +53564,7 @@
     "sentence_jp": "絵の具で空に淡い色を刷く。",
     "sentence_ko": "물감으로 하늘에 옅은 색을 쓱 칠한다.",
     "meaning_en": "to daub",
-    "sentence_furigana": "{絵の具|えのぐ}で{空|そら}に{淡|あわ}い{色|いろ}を{刷|は}く。"
+    "sentence_furigana": "{絵|え}の{具|ぐ}で{空|そら}に{淡|あわ}い{色|いろ}を{刷|は}く。"
    },
    {
     "word": "刷",
@@ -54427,7 +54427,7 @@
     "sentence_jp": "岩間から清水が湧き出ている。",
     "sentence_ko": "바위 틈에서 맑은 물이 솟아나고 있다.",
     "meaning_en": "among rocks",
-    "sentence_furigana": "{岩間|いわま}から{清水|しみず}が{湧き出|わきで}ている。"
+    "sentence_furigana": "{岩間|いわま}から{清水|しみず}が{湧|わ}き{出|で}ている。"
    }
   ],
   "on_examples": [
@@ -54439,7 +54439,7 @@
     "sentence_jp": "火山から熔岩が流れ出した。",
     "sentence_ko": "화산에서 용암이 흘러나왔다.",
     "meaning_en": "lava",
-    "sentence_furigana": "{火山|かざん}から{熔岩|ようがん}が{流れ出|ながれだ}した。"
+    "sentence_furigana": "{火山|かざん}から{熔岩|ようがん}が{流|なが}れ{出|だ}した。"
    },
    {
     "word": "溶岩",
@@ -54449,7 +54449,7 @@
     "sentence_jp": "溶岩が流れ出した。",
     "sentence_ko": "용암이 흘러나왔다.",
     "meaning_en": "lava",
-    "sentence_furigana": "{溶岩|ようがん}が{流れ出|ながれだ}した。"
+    "sentence_furigana": "{溶岩|ようがん}が{流|なが}れ{出|だ}した。"
    },
    {
     "word": "岩石",
@@ -54608,7 +54608,7 @@
     "sentence_jp": "海底には不思議な生き物がいます。",
     "sentence_ko": "해저에는 신기한 생물이 있습니다.",
     "meaning_en": "bottom of the ocean",
-    "sentence_furigana": "{海底|かいてい}には{不思議|ふしぎ}な{生き物|いきもの}がいます。"
+    "sentence_furigana": "{海底|かいてい}には{不思議|ふしぎ}な{生|い}き{物|もの}がいます。"
    },
    {
     "word": "到底",
@@ -55289,7 +55289,7 @@
     "sentence_jp": "締め切り前は寝ずに枝ることもある。",
     "sentence_ko": "마감 전에는 자지도 않고 일할 때도 있다.",
     "meaning_en": "to work without sleep or rest",
-    "sentence_furigana": "{締め切|しめき}り{前|まえ}は{寝|ね}ずに{枝|えだ}ることもある。"
+    "sentence_furigana": "{締|し}め{切|き}り{前|まえ}は{寝|ね}ずに{枝|えだ}ることもある。"
    },
    {
     "word": "枝むち",
@@ -56641,7 +56641,7 @@
     "sentence_jp": "厚生労働省に問い合わせた。",
     "sentence_ko": "후생노동성에 문의했다.",
     "meaning_en": "welfare",
-    "sentence_furigana": "{厚生|こうせい}{労働|ろうどう}{省|しょう}に{問い合|といあ}わせた。"
+    "sentence_furigana": "{厚生|こうせい}{労働|ろうどう}{省|しょう}に{問|と}い{合|あ}わせた。"
    },
    {
     "word": "濃厚",
@@ -57178,7 +57178,7 @@
     "sentence_jp": "参拾人が申し込んだ。",
     "sentence_ko": "서른 명이 신청했다.",
     "meaning_en": "thirty",
-    "sentence_furigana": "{参|さん}{拾|じゅう}{人|にん}が{申し込|もうしこ}んだ。"
+    "sentence_furigana": "{参|さん}{拾|じゅう}{人|にん}が{申|もう}し{込|こ}んだ。"
    },
    {
     "word": "拾萬",
@@ -57188,7 +57188,7 @@
     "sentence_jp": "拾萬円を受け取った。",
     "sentence_ko": "10만 엔을 받았다.",
     "meaning_en": "100,000",
-    "sentence_furigana": "{拾|じゅう}{萬|まん}{円|えん}を{受け取|うけと}った。"
+    "sentence_furigana": "{拾|じゅう}{萬|まん}{円|えん}を{受|う}け{取|と}った。"
    }
   ]
  },
@@ -57542,7 +57542,7 @@
     "sentence_jp": "父は我が家の大黒柱だ。",
     "sentence_ko": "아버지는 우리 집의 대들보다.",
     "meaning_en": "central pillar (of a building)",
-    "sentence_furigana": "{父|ちち}は{我が家|わがや}の{大黒|だいこく}{柱|はしら}だ。"
+    "sentence_furigana": "{父|ちち}は{我|わ}が{家|や}の{大黒|だいこく}{柱|はしら}だ。"
    },
    {
     "word": "火柱",
@@ -57793,7 +57793,7 @@
     "sentence_jp": "原泉から水が湧き出る。",
     "sentence_ko": "수원에서 물이 솟아난다.",
     "meaning_en": "source (of a spring, etc.)",
-    "sentence_furigana": "{原泉|げんせん}から{水|みず}が{湧き出|わきで}る。"
+    "sentence_furigana": "{原泉|げんせん}から{水|みず}が{湧|わ}き{出|で}る。"
    }
   ]
  },
@@ -57941,7 +57941,7 @@
     "sentence_jp": "炭酸の入った飲み物が好きだ。",
     "sentence_ko": "탄산이 들어간 음료를 좋아한다.",
     "meaning_en": "carbonic acid",
-    "sentence_furigana": "{炭酸|たんさん}の{入|はい}った{飲み物|のみもの}が{好|す}きだ。"
+    "sentence_furigana": "{炭酸|たんさん}の{入|はい}った{飲|の}み{物|もの}が{好|す}きだ。"
    },
    {
     "word": "炭素",
@@ -59025,7 +59025,7 @@
     "sentence_jp": "売り上げが倍増した。",
     "sentence_ko": "매출이 두 배로 늘었다.",
     "meaning_en": "double",
-    "sentence_furigana": "{売り上|うりあ}げが{倍増|ばいぞう}した。"
+    "sentence_furigana": "{売|う}り{上|あ}げが{倍増|ばいぞう}した。"
    },
    {
     "word": "人一倍",
@@ -59404,7 +59404,7 @@
     "sentence_jp": "会社の将来像を語り合った。",
     "sentence_ko": "회사의 미래상에 대해 이야기를 나눴다.",
     "meaning_en": "vision of the future",
-    "sentence_furigana": "{会社|かいしゃ}の{将来|しょうらい}{像|ぞう}を{語り合|かたりあ}った。"
+    "sentence_furigana": "{会社|かいしゃ}の{将来|しょうらい}{像|ぞう}を{語|かた}り{合|あ}った。"
    },
    {
     "word": "将棋",
@@ -60039,7 +60039,7 @@
     "sentence_jp": "根本から考え直す。",
     "sentence_ko": "근본부터 다시 생각하다.",
     "meaning_en": "root",
-    "sentence_furigana": "{根本|こんぽん}から{考え直|かんがえなお}す。"
+    "sentence_furigana": "{根本|こんぽん}から{考|かんが}え{直|なお}す。"
    },
    {
     "word": "根性",
@@ -61212,7 +61212,7 @@
     "sentence_jp": "隻脚の選手が走り抜けた。",
     "sentence_ko": "외다리 선수가 달려 나갔다.",
     "meaning_en": "one-legged",
-    "sentence_furigana": "{隻脚|せっきゃく}の{選手|せんしゅ}が{走り抜|はしりぬ}けた。"
+    "sentence_furigana": "{隻脚|せっきゃく}の{選手|せんしゅ}が{走|はし}り{抜|ぬ}けた。"
    }
   ]
  },
@@ -61735,7 +61735,7 @@
     "sentence_jp": "掃きだめに鶴が舞い降りた。",
     "sentence_ko": "쓰레기 더미에 학이 내려앉았다.",
     "meaning_en": "rubbish heap",
-    "sentence_furigana": "{掃|は}きだめに{鶴|つる}が{舞い降|まいお}りた。"
+    "sentence_furigana": "{掃|は}きだめに{鶴|つる}が{舞|ま}い{降|お}りた。"
    }
   ],
   "on_examples": [
@@ -62441,7 +62441,7 @@
     "sentence_jp": "火炎瓶が投げ込まれる事件があった。",
     "sentence_ko": "화염병이 던져지는 사건이 있었다.",
     "meaning_en": "Molotov cocktail",
-    "sentence_furigana": "{火炎|かえん}{瓶|びん}が{投げ込|なげこ}まれる{事件|じけん}があった。"
+    "sentence_furigana": "{火炎|かえん}{瓶|びん}が{投|な}げ{込|こ}まれる{事件|じけん}があった。"
    }
   ]
  },
@@ -63328,7 +63328,7 @@
     "sentence_jp": "風袋の重さを差し引く。",
     "sentence_ko": "포장 용기의 무게를 뺀다.",
     "meaning_en": "packing",
-    "sentence_furigana": "{風袋|ふうたい}の{重|おも}さを{差し引|さしひ}く。"
+    "sentence_furigana": "{風袋|ふうたい}の{重|おも}さを{差|さ}し{引|ひ}く。"
    },
    {
     "word": "頸袋",
@@ -63476,7 +63476,7 @@
     "sentence_jp": "貨物列車が通り過ぎた。",
     "sentence_ko": "화물 열차가 지나갔다.",
     "meaning_en": "cargo",
-    "sentence_furigana": "{貨物|かもつ}{列車|れっしゃ}が{通り過|とおりす}ぎた。"
+    "sentence_furigana": "{貨物|かもつ}{列車|れっしゃ}が{通|とお}り{過|す}ぎた。"
    }
   ]
  },
@@ -63522,7 +63522,7 @@
     "sentence_jp": "自販機で飲み物を買った。",
     "sentence_ko": "자동판매기에서 음료를 샀다.",
     "meaning_en": "automobile sales",
-    "sentence_furigana": "{自販|じはん}{機|き}で{飲み物|のみもの}を{買|か}った。"
+    "sentence_furigana": "{自販|じはん}{機|き}で{飲|の}み{物|もの}を{買|か}った。"
    }
   ]
  },
@@ -63602,7 +63602,7 @@
     "sentence_jp": "彼は軟派で女の子によく声をかける。",
     "sentence_ko": "그는 바람둥이라 여자아이들에게 자주 말을 건다.",
     "meaning_en": "seducer",
-    "sentence_furigana": "{彼|かれ}は{軟派|なんぱ}で{女の子|おんなのこ}によく{声|こえ}をかける。"
+    "sentence_furigana": "{彼|かれ}は{軟派|なんぱ}で{女|おんな}の{子|こ}によく{声|こえ}をかける。"
    }
   ]
  },
@@ -64135,7 +64135,7 @@
     "sentence_jp": "陸奥は東北地方の古い呼び名だ。",
     "sentence_ko": "리쿠오는 도호쿠 지방의 옛 이름이다.",
     "meaning_en": "Rikuō (former province located in parts of present-day Aomori and Iwate prefectures)",
-    "sentence_furigana": "{陸奥|みちのく}は{東北|とうほく}{地方|ちほう}の{古|ふる}い{呼び名|よびな}だ。"
+    "sentence_furigana": "{陸奥|みちのく}は{東北|とうほく}{地方|ちほう}の{古|ふる}い{呼|よ}び{名|な}だ。"
    }
   ]
  },
@@ -65912,7 +65912,7 @@
     "sentence_jp": "童唄が今も歌い継がれている。",
     "sentence_ko": "전래 동요가 지금도 대대로 불리고 있다.",
     "meaning_en": "children's song",
-    "sentence_furigana": "{童|どう}{唄|うた}が{今|いま}も{歌い継|うたいつ}がれている。"
+    "sentence_furigana": "{童|どう}{唄|うた}が{今|いま}も{歌|うた}い{継|つ}がれている。"
    }
   ],
   "on_examples": [
@@ -65934,7 +65934,7 @@
     "sentence_jp": "童話を読み聞かせる。",
     "sentence_ko": "동화를 읽어 주다.",
     "meaning_en": "children's story",
-    "sentence_furigana": "{童話|どうわ}を{読み聞|よみき}かせる。"
+    "sentence_furigana": "{童話|どうわ}を{読|よ}み{聞|き}かせる。"
    },
    {
     "word": "童謡",
@@ -67269,7 +67269,7 @@
     "sentence_jp": "交渉の行方に暗雲が立ち込めた。",
     "sentence_ko": "협상의 행방에 먹구름이 드리웠다.",
     "meaning_en": "dark clouds",
-    "sentence_furigana": "{交渉|こうしょう}の{行方|ゆくえ}に{暗雲|あんうん}が{立ち込|たちこ}めた。"
+    "sentence_furigana": "{交渉|こうしょう}の{行方|ゆくえ}に{暗雲|あんうん}が{立|た}ち{込|こ}めた。"
    },
    {
     "word": "青雲",
@@ -67947,7 +67947,7 @@
     "sentence_jp": "絵の具を水で溶いて色を塗った。",
     "sentence_ko": "물감을 물에 풀어 색을 칠했다.",
     "meaning_en": "to dissolve (paint)",
-    "sentence_furigana": "{絵の具|えのぐ}を{水|みず}で{溶|と}いて{色|いろ}を{塗|ぬ}った。"
+    "sentence_furigana": "{絵|え}の{具|ぐ}を{水|みず}で{溶|と}いて{色|いろ}を{塗|ぬ}った。"
    }
   ],
   "on_examples": [
@@ -67959,7 +67959,7 @@
     "sentence_jp": "溶岩が流れ出した。",
     "sentence_ko": "용암이 흘러나왔다.",
     "meaning_en": "lava",
-    "sentence_furigana": "{溶岩|ようがん}が{流れ出|ながれだ}した。"
+    "sentence_furigana": "{溶岩|ようがん}が{流|なが}れ{出|だ}した。"
    },
    {
     "word": "溶接",
@@ -68474,7 +68474,7 @@
     "sentence_jp": "その光景が脳裏に焼き付いている。",
     "sentence_ko": "그 광경이 뇌리에 박혀 있다.",
     "meaning_en": "one's mind",
-    "sentence_furigana": "その{光景|こうけい}が{脳裏|のうり}に{焼き付|やきつ}いている。"
+    "sentence_furigana": "その{光景|こうけい}が{脳裏|のうり}に{焼|や}き{付|つ}いている。"
    }
   ]
  },
@@ -68932,7 +68932,7 @@
     "sentence_jp": "山から鉱を掘り出す。",
     "sentence_ko": "산에서 광석을 캐내다.",
     "meaning_en": "ore",
-    "sentence_furigana": "{山|やま}から{鉱|あらがね}を{掘り出|ほりだ}す。"
+    "sentence_furigana": "{山|やま}から{鉱|あらがね}を{掘|ほ}り{出|だ}す。"
    }
   ],
   "on_examples": [
@@ -69288,7 +69288,7 @@
     "sentence_jp": "高層ビルが立ち並んでいる。",
     "sentence_ko": "고층 빌딩이 늘어서 있다.",
     "meaning_en": "high-rise (building)",
-    "sentence_furigana": "{高層|こうそう}ビルが{立ち並|たちなら}んでいる。"
+    "sentence_furigana": "{高層|こうそう}ビルが{立|た}ち{並|なら}んでいる。"
    },
    {
     "word": "断層",
@@ -69370,7 +69370,7 @@
     "sentence_jp": "親子の間には愛憎が入り混じっていた。",
     "sentence_ko": "부모와 자식 사이에는 애증이 뒤섞여 있었다.",
     "meaning_en": "love and hate",
-    "sentence_furigana": "{親子|おやこ}の{間|あいだ}には{愛憎|あいぞう}が{入り混|いりま}じっていた。"
+    "sentence_furigana": "{親子|おやこ}の{間|あいだ}には{愛憎|あいぞう}が{入|い}り{混|ま}じっていた。"
    },
    {
     "word": "愛憎劇",
@@ -69507,7 +69507,7 @@
     "sentence_jp": "最後の一滴まで飲み干した。",
     "sentence_ko": "마지막 한 방울까지 다 마셨다.",
     "meaning_en": "one drop (of fluid)",
-    "sentence_furigana": "{最後|さいご}の{一|いち}{滴|てき}まで{飲み干|のみほ}した。"
+    "sentence_furigana": "{最後|さいご}の{一|いち}{滴|てき}まで{飲|の}み{干|ほ}した。"
    }
   ]
  },
@@ -71505,7 +71505,7 @@
     "sentence_jp": "晴曇を繰り返す天気だ。",
     "sentence_ko": "맑음과 흐림을 반복하는 날씨다.",
     "meaning_en": "fine weather and cloudy",
-    "sentence_furigana": "{晴|はれ}{曇|くもり}を{繰り返|くりかえ}す{天気|てんき}だ。"
+    "sentence_furigana": "{晴|はれ}{曇|くもり}を{繰|く}り{返|かえ}す{天気|てんき}だ。"
    },
    {
     "word": "優曇華",
@@ -71594,7 +71594,7 @@
     "sentence_jp": "陸橋を渡って向こう側へ行く。",
     "sentence_ko": "육교를 건너 맞은편으로 간다.",
     "meaning_en": "viaduct",
-    "sentence_furigana": "{陸橋|りっきょう}を{渡|わた}って{向こう側|むこうがわ}へ{行|い}く。"
+    "sentence_furigana": "{陸橋|りっきょう}を{渡|わた}って{向|む}こう{側|がわ}へ{行|い}く。"
    }
   ]
  },
@@ -71712,7 +71712,7 @@
     "sentence_jp": "落ち葉を燃すと煙が出る。",
     "sentence_ko": "낙엽을 태우면 연기가 난다.",
     "meaning_en": "to burn",
-    "sentence_furigana": "{落ち葉|おちば}を{燃|も}すと{煙|けむり}が{出|で}る。"
+    "sentence_furigana": "{落|お}ち{葉|ば}を{燃|も}すと{煙|けむり}が{出|で}る。"
    },
    {
     "word": "燃やす",
@@ -71883,7 +71883,7 @@
     "sentence_jp": "新築の家に引っ越した。",
     "sentence_ko": "신축 집으로 이사했다.",
     "meaning_en": "new building",
-    "sentence_furigana": "{新築|しんちく}の{家|いえ}に{引っ越|ひっこ}した。"
+    "sentence_furigana": "{新築|しんちく}の{家|いえ}に{引|ひ}っ{越|こ}した。"
    },
    {
     "word": "改築",
@@ -72017,7 +72017,7 @@
     "sentence_jp": "手紙の最後に「賢」と書き添えた。",
     "sentence_ko": "편지 끝에 '총총'이라고 덧붙여 썼다.",
     "meaning_en": "yours sincerely",
-    "sentence_furigana": "{手紙|てがみ}の{最後|さいご}に「{賢|けん}」と{書き添|かきそ}えた。"
+    "sentence_furigana": "{手紙|てがみ}の{最後|さいご}に「{賢|けん}」と{書|か}き{添|そ}えた。"
    },
    {
     "word": "賢所",
@@ -72286,7 +72286,7 @@
     "sentence_jp": "彼は焦燥に駆られて部屋を歩き回った。",
     "sentence_ko": "그는 초조함에 사로잡혀 방 안을 서성였다.",
     "meaning_en": "impatience",
-    "sentence_furigana": "{彼|かれ}は{焦燥|しょうそう}に{駆|か}られて{部屋|へや}を{歩き回|あるきまわ}った。"
+    "sentence_furigana": "{彼|かれ}は{焦燥|しょうそう}に{駆|か}られて{部屋|へや}を{歩|ある}き{回|まわ}った。"
    },
    {
     "word": "乾燥機",
@@ -72555,7 +72555,7 @@
     "sentence_jp": "簡易な手続きで申し込みができる。",
     "sentence_ko": "간단한 절차로 신청할 수 있다.",
     "meaning_en": "simplicity",
-    "sentence_furigana": "{簡易|かんい}な{手続|てつづ}きで{申し込|もうしこ}みができる。"
+    "sentence_furigana": "{簡易|かんい}な{手続|てつづ}きで{申|もう}し{込|こ}みができる。"
    }
   ]
  },
@@ -73605,7 +73605,7 @@
     "sentence_jp": "電車が出る寸前に飛び乗った。",
     "sentence_ko": "전철이 출발하기 직전에 뛰어 탔다.",
     "meaning_en": "just before",
-    "sentence_furigana": "{電車|でんしゃ}が{出|で}る{寸前|すんぜん}に{飛び乗|とびの}った。"
+    "sentence_furigana": "{電車|でんしゃ}が{出|で}る{寸前|すんぜん}に{飛|と}び{乗|の}った。"
    },
    {
     "word": "寸断",
@@ -73893,7 +73893,7 @@
     "sentence_jp": "乏しきを分け合うのが村の習わしだった。",
     "sentence_ko": "부족한 것을 나누는 것이 마을의 관습이었다.",
     "meaning_en": "poverty",
-    "sentence_furigana": "{乏|とぼし}しきを{分け合|わけあ}うのが{村|むら}の{習|なら}わしだった。"
+    "sentence_furigana": "{乏|とぼし}しきを{分|わ}け{合|あ}うのが{村|むら}の{習|なら}わしだった。"
    }
   ],
   "on_examples": [
@@ -74759,7 +74759,7 @@
     "sentence_jp": "山に入って斧斤で木を切り倒した。",
     "sentence_ko": "산에 들어가 도끼로 나무를 베어 넘겼다.",
     "meaning_en": "axe",
-    "sentence_furigana": "{山|やま}に{入|はい}って{斧|おの}{斤|きん}で{木|き}を{切り倒|きりたお}した。"
+    "sentence_furigana": "{山|やま}に{入|はい}って{斧|おの}{斤|きん}で{木|き}を{切|き}り{倒|たお}した。"
    }
   ]
  },
@@ -75641,7 +75641,7 @@
     "sentence_jp": "「あの尼っちょめ」と男は吐き捨てた。",
     "sentence_ko": "\"저 계집이\"라고 남자는 내뱉었다.",
     "meaning_en": "bitch",
-    "sentence_furigana": "「あの{尼|に}っちょめ」と{男|おとこ}は{吐き捨|はきす}てた。"
+    "sentence_furigana": "「あの{尼|に}っちょめ」と{男|おとこ}は{吐|は}き{捨|す}てた。"
    }
   ],
   "on_examples": [
@@ -75712,7 +75712,7 @@
     "sentence_jp": "彼は巧んでその状況を作り出した。",
     "sentence_ko": "그는 꾀를 부려 그런 상황을 만들어 냈다.",
     "meaning_en": "to devise",
-    "sentence_furigana": "{彼|かれ}は{巧|たく}んでその{状況|じょうきょう}を{作り出|つくりだ}した。"
+    "sentence_furigana": "{彼|かれ}は{巧|たく}んでその{状況|じょうきょう}を{作|つく}り{出|だ}した。"
    },
    {
     "word": "巧い",
@@ -77123,7 +77123,7 @@
     "sentence_jp": "匠の技を受け継ぐ。",
     "sentence_ko": "장인의 기술을 물려받다.",
     "meaning_en": "workman",
-    "sentence_furigana": "{匠|たくみ}の{技|わざ}を{受け継|うけつ}ぐ。"
+    "sentence_furigana": "{匠|たくみ}の{技|わざ}を{受|う}け{継|つ}ぐ。"
    }
   ],
   "on_examples": [
@@ -77431,7 +77431,7 @@
     "sentence_jp": "彼は音吐朗々と詩を読み上げた。",
     "sentence_ko": "그는 낭랑한 목소리로 시를 낭독했다.",
     "meaning_en": "voice",
-    "sentence_furigana": "{彼|かれ}は{音吐|おんと}{朗々|ろうろう}と{詩|し}を{読み上|よみあ}げた。"
+    "sentence_furigana": "{彼|かれ}は{音吐|おんと}{朗々|ろうろう}と{詩|し}を{読|よ}み{上|あ}げた。"
    }
   ]
  },
@@ -77528,7 +77528,7 @@
     "sentence_jp": "時は矢の如く過ぎ去る。",
     "sentence_ko": "시간은 화살처럼 지나간다.",
     "meaning_en": "like",
-    "sentence_furigana": "{時|とき}は{矢|や}の{如|ごと}く{過ぎ去|すぎさ}る。"
+    "sentence_furigana": "{時|とき}は{矢|や}の{如|ごと}く{過|す}ぎ{去|さ}る。"
    },
    {
     "word": "如く",
@@ -77538,7 +77538,7 @@
     "sentence_jp": "彼は風のごとく走り去った。",
     "sentence_ko": "그는 바람처럼 달려 사라졌다.",
     "meaning_en": "like",
-    "sentence_furigana": "{彼|かれ}は{風|かぜ}のごとく{走り去|はしりさ}った。"
+    "sentence_furigana": "{彼|かれ}は{風|かぜ}のごとく{走|はし}り{去|さ}った。"
    }
   ],
   "on_examples": [
@@ -77570,7 +77570,7 @@
     "sentence_jp": "突如、大きな音が鳴り響いた。",
     "sentence_ko": "돌연 큰 소리가 울려 퍼졌다.",
     "meaning_en": "suddenly",
-    "sentence_furigana": "{突如|とつじょ}、{大|おお}きな{音|おと}が{鳴り響|なりひび}いた。"
+    "sentence_furigana": "{突如|とつじょ}、{大|おお}きな{音|おと}が{鳴|な}り{響|ひび}いた。"
    }
   ]
  },
@@ -78614,7 +78614,7 @@
     "sentence_jp": "長い話し合いの末、結論に至った。",
     "sentence_ko": "긴 논의 끝에 결론에 이르렀다.",
     "meaning_en": "to arrive at (e.g. a decision)",
-    "sentence_furigana": "{長|なが}い{話し合|はなしあ}いの{末|すえ}、{結論|けつろん}に{至|いた}った。"
+    "sentence_furigana": "{長|なが}い{話|はな}し{合|あ}いの{末|すえ}、{結論|けつろん}に{至|いた}った。"
    },
    {
     "word": "至り",
@@ -78930,7 +78930,7 @@
     "sentence_jp": "迅雷が鳴り響き、子供が泣き出した。",
     "sentence_ko": "세찬 천둥이 울려 퍼지자 아이가 울음을 터뜨렸다.",
     "meaning_en": "thunderclap",
-    "sentence_furigana": "{迅雷|じんらい}が{鳴り響|なりひび}き、{子供|こども}が{泣|な}き{出|だ}した。"
+    "sentence_furigana": "{迅雷|じんらい}が{鳴|な}り{響|ひび}き、{子供|こども}が{泣|な}き{出|だ}した。"
    },
    {
     "word": "奮迅",
@@ -80337,7 +80337,7 @@
     "sentence_jp": "ご序での折にお立ち寄りください。",
     "sentence_ko": "기회가 되실 때 들러 주세요.",
     "meaning_en": "opportunity",
-    "sentence_furigana": "ご{序|じょ}での{折|おり}にお{立ち寄|たちよ}りください。"
+    "sentence_furigana": "ご{序|じょ}での{折|おり}にお{立|た}ち{寄|よ}りください。"
    },
    {
     "word": "序に",
@@ -80347,7 +80347,7 @@
     "sentence_jp": "買い物に行く序に郵便局へ寄った。",
     "sentence_ko": "쇼핑하러 가는 김에 우체국에 들렀다.",
     "meaning_en": "incidentally",
-    "sentence_furigana": "{買い物|かいもの}に{行|い}く{序|じょ}に{郵便|ゆうびん}{局|きょく}へ{寄|よ}った。"
+    "sentence_furigana": "{買|か}い{物|もの}に{行|い}く{序|じょ}に{郵便|ゆうびん}{局|きょく}へ{寄|よ}った。"
    }
   ],
   "on_examples": [
@@ -80790,7 +80790,7 @@
     "sentence_jp": "我が家は駅から歩いて五分です。",
     "sentence_ko": "우리 집은 역에서 걸어서 5분입니다.",
     "meaning_en": "my",
-    "sentence_furigana": "{我が家|わがや}は{駅|えき}から{歩|ある}いて{五|ご}{分|ふん}です。"
+    "sentence_furigana": "{我|わ}が{家|や}は{駅|えき}から{歩|ある}いて{五|ご}{分|ふん}です。"
    }
   ],
   "on_examples": [
@@ -80960,7 +80960,7 @@
     "sentence_jp": "扶桑は日本の古い呼び名だ。",
     "sentence_ko": "부상은 일본의 옛 이름이다.",
     "meaning_en": "land east of China",
-    "sentence_furigana": "{扶桑|ふそう}は{日本|にっぽん}の{古|ふる}い{呼び名|よびな}だ。"
+    "sentence_furigana": "{扶桑|ふそう}は{日本|にっぽん}の{古|ふる}い{呼|よ}び{名|な}だ。"
    }
   ]
  },
@@ -82196,7 +82196,7 @@
     "sentence_jp": "不肖の息子で申し訳ありません。",
     "sentence_ko": "불초한 자식이라 죄송합니다.",
     "meaning_en": "unworthy (of one's father, teacher, etc.)",
-    "sentence_furigana": "{不肖|ふしょう}の{息子|むすこ}で{申し訳|もうしわけ}ありません。"
+    "sentence_furigana": "{不肖|ふしょう}の{息子|むすこ}で{申|もう}し{訳|わけ}ありません。"
    },
    {
     "word": "肖像画",
@@ -83299,7 +83299,7 @@
     "sentence_jp": "焼き鳥に垂れをつける。",
     "sentence_ko": "닭꼬치에 양념장을 바른다.",
     "meaning_en": "sauce (esp. soy or mirin-based dipping sauce)",
-    "sentence_furigana": "{焼き鳥|やきとり}に{垂|た}れをつける。"
+    "sentence_furigana": "{焼|や}き{鳥|とり}に{垂|た}れをつける。"
    },
    {
     "word": "垂れる",
@@ -83526,7 +83526,7 @@
     "sentence_jp": "神に供え物を奉ずる。",
     "sentence_ko": "신에게 공물을 바치다.",
     "meaning_en": "to present",
-    "sentence_furigana": "{神|かみ}に{供え物|そなえもの}を{奉|ほう}ずる。"
+    "sentence_furigana": "{神|かみ}に{供|そな}え{物|もの}を{奉|ほう}ずる。"
    },
    {
     "word": "奉じる",
@@ -84322,7 +84322,7 @@
     "sentence_jp": "往んじ年の思い出を語った。",
     "sentence_ko": "지난해의 추억을 이야기했다.",
     "meaning_en": "olden-day",
-    "sentence_furigana": "{往|さ}んじ{年|とし}の{思い出|おもいで}を{語|かた}った。"
+    "sentence_furigana": "{往|さ}んじ{年|とし}の{思|おも}い{出|で}を{語|かた}った。"
    }
   ],
   "on_examples": [
@@ -84354,7 +84354,7 @@
     "sentence_jp": "渋滞に巻き込まれて往生した。",
     "sentence_ko": "정체에 휘말려 난처했다.",
     "meaning_en": "passing on to the next life",
-    "sentence_furigana": "{渋滞|じゅうたい}に{巻き込|まきこ}まれて{往生|おうじょう}した。"
+    "sentence_furigana": "{渋滞|じゅうたい}に{巻|ま}き{込|こ}まれて{往生|おうじょう}した。"
    }
   ]
  },
@@ -84658,7 +84658,7 @@
     "sentence_jp": "女房と一緒に買い物に行った。",
     "sentence_ko": "아내와 함께 장을 보러 갔다.",
     "meaning_en": "wife (esp. one's own wife)",
-    "sentence_furigana": "{女房|にょうぼう}と{一緒|いっしょ}に{買い物|かいもの}に{行|い}った。"
+    "sentence_furigana": "{女房|にょうぼう}と{一緒|いっしょ}に{買|か}い{物|もの}に{行|い}った。"
    },
    {
     "word": "冷房",
@@ -85009,7 +85009,7 @@
     "sentence_jp": "彼は私の申し出を拒絶した。",
     "sentence_ko": "그는 나의 제안을 거절했다.",
     "meaning_en": "refusal",
-    "sentence_furigana": "{彼|かれ}は{私|わたくし}の{申し出|もうしで}を{拒絶|きょぜつ}した。"
+    "sentence_furigana": "{彼|かれ}は{私|わたくし}の{申|もう}し{出|で}を{拒絶|きょぜつ}した。"
    },
    {
     "word": "拒否権",
@@ -85508,7 +85508,7 @@
     "sentence_jp": "旺然たる意気で事業に取り組んだ。",
     "sentence_ko": "왕성한 기세로 사업에 임했다.",
     "meaning_en": "prosperous",
-    "sentence_furigana": "{旺|さかん}{然|さ}たる{意気|いき}で{事業|じぎょう}に{取り組|とりく}んだ。"
+    "sentence_furigana": "{旺|さかん}{然|さ}たる{意気|いき}で{事業|じぎょう}に{取|と}り{組|く}んだ。"
    },
    {
     "word": "気力旺盛",
@@ -85634,7 +85634,7 @@
     "sentence_jp": "松竹梅はおめでたい組み合わせです。",
     "sentence_ko": "송죽매는 경사스러운 조합입니다.",
     "meaning_en": "pine, bamboo and plum (an auspicious grouping)",
-    "sentence_furigana": "{松竹|しょうちく}{梅|ばい}はおめでたい{組み合|くみあ}わせです。"
+    "sentence_furigana": "{松竹|しょうちく}{梅|ばい}はおめでたい{組|く}み{合|あ}わせです。"
    },
    {
     "word": "青松",
@@ -86170,7 +86170,7 @@
     "sentence_jp": "泣き声が聞こえる。",
     "sentence_ko": "울음소리가 들리다.",
     "meaning_en": "weeping",
-    "sentence_furigana": "{泣き声|なきごえ}が{聞|き}こえる。"
+    "sentence_furigana": "{泣|な}き{声|ごえ}が{聞|き}こえる。"
    },
    {
     "word": "泣く",
@@ -86387,7 +86387,7 @@
     "sentence_jp": "工場に炎検出器を取り付けた。",
     "sentence_ko": "공장에 화염 감지기를 설치했다.",
     "meaning_en": "flame detector",
-    "sentence_furigana": "{工場|こうじょう}に{炎|ほのお}{検出|けんしゅつ}{器|き}を{取り付|とりつ}けた。"
+    "sentence_furigana": "{工場|こうじょう}に{炎|ほのお}{検出|けんしゅつ}{器|き}を{取|と}り{付|つ}けた。"
    }
   ],
   "on_examples": [
@@ -86788,7 +86788,7 @@
     "sentence_jp": "脂肪質の食べ物を控える。",
     "sentence_ko": "지방질 음식을 삼간다.",
     "meaning_en": "fatty",
-    "sentence_furigana": "{脂肪|しぼう}{質|しつ}の{食べ物|たべもの}を{控|ひか}える。"
+    "sentence_furigana": "{脂肪|しぼう}{質|しつ}の{食|た}べ{物|もの}を{控|ひか}える。"
    }
   ]
  },
@@ -87114,7 +87114,7 @@
     "sentence_jp": "茎わかめを酢の物にした。",
     "sentence_ko": "미역 줄기로 초무침을 만들었다.",
     "meaning_en": "wakame stem",
-    "sentence_furigana": "{茎|くき}わかめを{酢の物|すのもの}にした。"
+    "sentence_furigana": "{茎|くき}わかめを{酢|す}の{物|もの}にした。"
    },
    {
     "word": "茎茶",
@@ -87215,7 +87215,7 @@
     "sentence_jp": "二人は龍虎の争いを繰り広げた。",
     "sentence_ko": "두 사람은 용호상박의 싸움을 벌였다.",
     "meaning_en": "dragon and tiger",
-    "sentence_furigana": "{二人|ふたり}は{龍虎|りゅうこ}の{争|あらそ}いを{繰り広|くりひろ}げた。"
+    "sentence_furigana": "{二人|ふたり}は{龍虎|りゅうこ}の{争|あらそ}いを{繰|く}り{広|ひろ}げた。"
    },
    {
     "word": "騎虎",
@@ -87262,7 +87262,7 @@
     "sentence_jp": "締め切りが迫っている。",
     "sentence_ko": "마감이 다가오고 있다.",
     "meaning_en": "to approach",
-    "sentence_furigana": "{締め切|しめき}りが{迫|せま}っている。"
+    "sentence_furigana": "{締|し}め{切|き}りが{迫|せま}っている。"
    },
    {
     "word": "迫りくる",
@@ -87595,7 +87595,7 @@
     "sentence_jp": "附けで買い物をする。",
     "sentence_ko": "외상으로 물건을 사다.",
     "meaning_en": "bill",
-    "sentence_furigana": "{附|つ}けで{買い物|かいもの}をする。"
+    "sentence_furigana": "{附|つ}けで{買|か}い{物|もの}をする。"
    },
    {
     "word": "附ける",
@@ -88587,7 +88587,7 @@
     "sentence_jp": "彼女は捨て犬を哀れみました。",
     "sentence_ko": "그녀는 버려진 개를 불쌍히 여겼습니다.",
     "meaning_en": "to pity",
-    "sentence_furigana": "{彼女|かのじょ}は{捨て犬|すていぬ}を{哀|あわ}れみました。"
+    "sentence_furigana": "{彼女|かのじょ}は{捨|す}て{犬|いぬ}を{哀|あわ}れみました。"
    },
    {
     "word": "哀しみ",
@@ -89033,7 +89033,7 @@
     "sentence_jp": "市場では威勢のいい声が飛び交っている。",
     "sentence_ko": "시장에서는 힘찬 목소리가 오간다.",
     "meaning_en": "power",
-    "sentence_furigana": "{市場|しじょう}では{威勢|いせい}のいい{声|こえ}が{飛び交|とびか}っている。"
+    "sentence_furigana": "{市場|しじょう}では{威勢|いせい}のいい{声|こえ}が{飛|と}び{交|か}っている。"
    }
   ]
  },
@@ -89993,7 +89993,7 @@
     "sentence_jp": "故い友との思い出を大切にしている。",
     "sentence_ko": "오랜 친구와의 추억을 소중히 여기고 있다.",
     "meaning_en": "old",
-    "sentence_furigana": "{故|ふり}い{友|とも}との{思い出|おもいで}を{大切|たいせつ}にしている。"
+    "sentence_furigana": "{故|ふり}い{友|とも}との{思|おも}い{出|で}を{大切|たいせつ}にしている。"
    },
    {
     "word": "故",
@@ -90064,7 +90064,7 @@
     "sentence_jp": "貧しい人に食べ物を施した。",
     "sentence_ko": "가난한 사람에게 음식을 베풀었다.",
     "meaning_en": "to give (time, money, goods)",
-    "sentence_furigana": "{貧|まず}しい{人|ひと}に{食べ物|たべもの}を{施|ほどこ}した。"
+    "sentence_furigana": "{貧|まず}しい{人|ひと}に{食|た}べ{物|もの}を{施|ほどこ}した。"
    },
    {
     "word": "施し",
@@ -90712,7 +90712,7 @@
     "sentence_jp": "洞窟の奥は真っ暗だった。",
     "sentence_ko": "동굴 안쪽은 캄캄했다.",
     "meaning_en": "cavern",
-    "sentence_furigana": "{洞窟|どうくつ}の{奥|おく}は{真っ暗|まっくら}だった。"
+    "sentence_furigana": "{洞窟|どうくつ}の{奥|おく}は{真|ま}っ{暗|くら}だった。"
    }
   ]
  },
@@ -91446,7 +91446,7 @@
     "sentence_jp": "行疫神を追い払う祭りがある。",
     "sentence_ko": "역병의 신을 쫓아내는 축제가 있다.",
     "meaning_en": "god of pestilence",
-    "sentence_furigana": "{行|ぎょう}{疫神|えきしん}を{追い払|おいはら}う{祭|まつ}りがある。"
+    "sentence_furigana": "{行|ぎょう}{疫神|えきしん}を{追|お}い{払|はら}う{祭|まつ}りがある。"
    },
    {
     "word": "検疫",
@@ -91700,7 +91700,7 @@
     "sentence_jp": "彼は眉間にしわを寄せて考え込んだ。",
     "sentence_ko": "그는 미간을 찌푸리며 생각에 잠겼다.",
     "meaning_en": "brow",
-    "sentence_furigana": "{彼|かれ}は{眉間|みけん}にしわを{寄|よ}せて{考え込|かんがえこ}んだ。"
+    "sentence_furigana": "{彼|かれ}は{眉間|みけん}にしわを{寄|よ}せて{考|かんが}え{込|こ}んだ。"
    },
    {
     "word": "眉雪",
@@ -94480,7 +94480,7 @@
     "sentence_jp": "宵の口に出かける。",
     "sentence_ko": "초저녁에 외출하다.",
     "meaning_en": "evening",
-    "sentence_furigana": "{宵の口|よいのくち}に{出|で}かける。"
+    "sentence_furigana": "{宵|よい}の{口|くち}に{出|で}かける。"
    },
    {
     "word": "宵っぱり",
@@ -94767,7 +94767,7 @@
     "sentence_jp": "彼は徐に立ち上がった。",
     "sentence_ko": "그는 천천히 일어났다.",
     "meaning_en": "suddenly",
-    "sentence_furigana": "{彼|かれ}は{徐|おもむろ}に{立ち上|たちあ}がった。"
+    "sentence_furigana": "{彼|かれ}は{徐|おもむろ}に{立|た}ち{上|あ}がった。"
    },
    {
     "word": "徐ろに",
@@ -94777,7 +94777,7 @@
     "sentence_jp": "彼はおもむろに立ち上がった。",
     "sentence_ko": "그는 천천히 일어섰다.",
     "meaning_en": "suddenly",
-    "sentence_furigana": "{彼|かれ}はおもむろに{立ち上|たちあ}がった。"
+    "sentence_furigana": "{彼|かれ}はおもむろに{立|た}ち{上|あ}がった。"
    }
   ],
   "on_examples": [
@@ -94987,7 +94987,7 @@
     "sentence_jp": "新年の恭賀を申し上げます。",
     "sentence_ko": "새해를 삼가 축하드립니다.",
     "meaning_en": "respectful congratulations",
-    "sentence_furigana": "{新年|しんねん}の{恭賀|きょうが}を{申し上|もうしあ}げます。"
+    "sentence_furigana": "{新年|しんねん}の{恭賀|きょうが}を{申|もう}し{上|あ}げます。"
    },
    {
     "word": "恭謙",
@@ -95036,7 +95036,7 @@
     "sentence_jp": "彼は貧しい人に食べ物を恵んだ。",
     "sentence_ko": "그는 가난한 사람에게 음식을 베풀었다.",
     "meaning_en": "to bless",
-    "sentence_furigana": "{彼|かれ}は{貧|まず}しい{人|ひと}に{食べ物|たべもの}を{恵|めぐ}んだ。"
+    "sentence_furigana": "{彼|かれ}は{貧|まず}しい{人|ひと}に{食|た}べ{物|もの}を{恵|めぐ}んだ。"
    },
    {
     "word": "恵まれる",
@@ -95068,7 +95068,7 @@
     "sentence_jp": "みんなで知恵を出し合って問題を解決した。",
     "sentence_ko": "모두가 지혜를 모아 문제를 해결했다.",
     "meaning_en": "wisdom",
-    "sentence_furigana": "みんなで{知恵|ちえ}を{出し合|だしあ}って{問題|もんだい}を{解決|かいけつ}した。"
+    "sentence_furigana": "みんなで{知恵|ちえ}を{出|だ}し{合|あ}って{問題|もんだい}を{解決|かいけつ}した。"
    },
    {
     "word": "最恵国",
@@ -95175,7 +95175,7 @@
     "sentence_jp": "悦びを分かち合う。",
     "sentence_ko": "기쁨을 나누다.",
     "meaning_en": "joy",
-    "sentence_furigana": "{悦|よろこ}びを{分かち合|わかちあ}う。"
+    "sentence_furigana": "{悦|よろこ}びを{分|わ}かち{合|あ}う。"
    },
    {
     "word": "悦ぶ",
@@ -95195,7 +95195,7 @@
     "sentence_jp": "贈り物で母を悦ばす。",
     "sentence_ko": "선물로 어머니를 기쁘게 하다.",
     "meaning_en": "to delight",
-    "sentence_furigana": "{贈り物|おくりもの}で{母|はは}を{悦|よろこ}ばす。"
+    "sentence_furigana": "{贈|おく}り{物|もの}で{母|はは}を{悦|よろこ}ばす。"
    }
   ],
   "on_examples": [
@@ -95264,7 +95264,7 @@
     "sentence_jp": "ケーキを扇形に切り分けた。",
     "sentence_ko": "케이크를 부채꼴로 잘랐다.",
     "meaning_en": "fan shape",
-    "sentence_furigana": "ケーキを{扇形|せんけい}に{切り分|きりわ}けた。"
+    "sentence_furigana": "ケーキを{扇形|せんけい}に{切|き}り{分|わ}けた。"
    },
    {
     "word": "衵扇",
@@ -95354,7 +95354,7 @@
     "sentence_jp": "彼は力拳を握りしめて立ち上がった。",
     "sentence_ko": "그는 주먹을 불끈 쥐고 일어섰다.",
     "meaning_en": "clenched fist",
-    "sentence_furigana": "{彼|かれ}は{力|ちから}{拳|けん}を{握|にぎ}りしめて{立ち上|たちあ}がった。"
+    "sentence_furigana": "{彼|かれ}は{力|ちから}{拳|けん}を{握|にぎ}りしめて{立|た}ち{上|あ}がった。"
    }
   ],
   "on_examples": [
@@ -95540,7 +95540,7 @@
     "sentence_jp": "今年は売り上げが不振だった。",
     "sentence_ko": "올해는 매출이 부진했다.",
     "meaning_en": "dullness",
-    "sentence_furigana": "{今年|ことし}は{売り上|うりあ}げが{不振|ふしん}だった。"
+    "sentence_furigana": "{今年|ことし}は{売|う}り{上|あ}げが{不振|ふしん}だった。"
    },
    {
     "word": "振動",
@@ -96247,7 +96247,7 @@
     "sentence_jp": "扶桑は日本の古い呼び名だ。",
     "sentence_ko": "부상은 일본의 옛 이름이다.",
     "meaning_en": "land east of China",
-    "sentence_furigana": "{扶桑|ふそう}は{日本|にっぽん}の{古|ふる}い{呼び名|よびな}だ。"
+    "sentence_furigana": "{扶桑|ふそう}は{日本|にっぽん}の{古|ふる}い{呼|よ}び{名|な}だ。"
    },
    {
     "word": "桑門",
@@ -98144,7 +98144,7 @@
     "sentence_jp": "どさくさ紛れに、彼は逃げ出した。",
     "sentence_ko": "북새통을 틈타 그는 도망쳤다.",
     "meaning_en": "confusion",
-    "sentence_furigana": "どさくさ{紛|まぎ}れに、{彼|かれ}は{逃げ出|にげだ}した。"
+    "sentence_furigana": "どさくさ{紛|まぎ}れに、{彼|かれ}は{逃|に}げ{出|だ}した。"
    }
   ],
   "on_examples": [
@@ -98663,7 +98663,7 @@
     "sentence_jp": "動脈は血液を心臓から送り出す。",
     "sentence_ko": "동맥은 혈액을 심장에서 내보낸다.",
     "meaning_en": "artery",
-    "sentence_furigana": "{動脈|どうみゃく}は{血液|けつえき}を{心臓|しんぞう}から{送り出|おくりだ}す。"
+    "sentence_furigana": "{動脈|どうみゃく}は{血液|けつえき}を{心臓|しんぞう}から{送|おく}り{出|だ}す。"
    },
    {
     "word": "文脈",
@@ -99069,7 +99069,7 @@
     "sentence_jp": "衷心よりお祝い申し上げます。",
     "sentence_ko": "진심으로 축하드립니다.",
     "meaning_en": "innermost feelings",
-    "sentence_furigana": "{衷心|ちゅうしん}よりお{祝|いわ}い{申し上|もうしあ}げます。"
+    "sentence_furigana": "{衷心|ちゅうしん}よりお{祝|いわ}い{申|もう}し{上|あ}げます。"
    },
    {
     "word": "衷情",
@@ -99287,7 +99287,7 @@
     "sentence_jp": "王に貢物を差し出した。",
     "sentence_ko": "왕에게 공물을 바쳤다.",
     "meaning_en": "tribute",
-    "sentence_furigana": "{王|おう}に{貢物|みつぎもの}を{差し出|さしだ}した。"
+    "sentence_furigana": "{王|おう}に{貢物|みつぎもの}を{差|さ}し{出|だ}した。"
    }
   ],
   "on_examples": [
@@ -100552,7 +100552,7 @@
     "sentence_jp": "今日の飲み会は割勘にしよう。",
     "sentence_ko": "오늘 술자리는 각자 내기로 하자.",
     "meaning_en": "splitting the cost",
-    "sentence_furigana": "{今日|きょう}の{飲み会|のみかい}は{割勘|わりかん}にしよう。"
+    "sentence_furigana": "{今日|きょう}の{飲|の}み{会|かい}は{割勘|わりかん}にしよう。"
    }
   ]
  },
@@ -100976,7 +100976,7 @@
     "sentence_jp": "この映画は実話に基ずいている。",
     "sentence_ko": "이 영화는 실화에 기초하고 있다.",
     "meaning_en": "to be grounded on",
-    "sentence_furigana": "この{映画|えいが}は{実話|じつわ}に{基ず|もとづ}いている。"
+    "sentence_furigana": "この{映画|えいが}は{実話|じつわ}に{基|もと}ずいている。"
    }
   ],
   "on_examples": [
@@ -101256,7 +101256,7 @@
     "sentence_jp": "密やかな笑い声が聞こえた。",
     "sentence_ko": "은밀한 웃음소리가 들렸다.",
     "meaning_en": "quiet",
-    "sentence_furigana": "{密|ひそ}やかな{笑い声|わらいごえ}が{聞|き}こえた。"
+    "sentence_furigana": "{密|ひそ}やかな{笑|わら}い{声|ごえ}が{聞|き}こえた。"
    }
   ],
   "on_examples": [
@@ -101515,7 +101515,7 @@
     "sentence_jp": "積み木を崩す。",
     "sentence_ko": "쌓기 나무를 무너뜨린다.",
     "meaning_en": "to destroy",
-    "sentence_furigana": "{積み木|つみき}を{崩|くず}す。"
+    "sentence_furigana": "{積|つ}み{木|き}を{崩|くず}す。"
    },
    {
     "word": "崩れ",
@@ -101637,7 +101637,7 @@
     "sentence_jp": "病巣を手術で取り除いた。",
     "sentence_ko": "병소를 수술로 제거했다.",
     "meaning_en": "focus",
-    "sentence_furigana": "{病巣|びょうそう}を{手術|しゅじゅつ}で{取り除|とりのぞ}いた。"
+    "sentence_furigana": "{病巣|びょうそう}を{手術|しゅじゅつ}で{取|と}り{除|のぞ}いた。"
    }
   ]
  },
@@ -102969,7 +102969,7 @@
     "sentence_jp": "僧侶に斎を差し上げる。",
     "sentence_ko": "승려에게 재를 올리다.",
     "meaning_en": "meals exchanged by parishioners and priests",
-    "sentence_furigana": "{僧侶|そうりょ}に{斎|とき}を{差し上|さしあ}げる。"
+    "sentence_furigana": "{僧侶|そうりょ}に{斎|とき}を{差|さ}し{上|あ}げる。"
    },
    {
     "word": "斎う",
@@ -103082,7 +103082,7 @@
     "sentence_jp": "斜面を滑り降りる。",
     "sentence_ko": "경사면을 미끄러져 내려간다.",
     "meaning_en": "slope",
-    "sentence_furigana": "{斜面|しゃめん}を{滑り降|すべりお}りる。"
+    "sentence_furigana": "{斜面|しゃめん}を{滑|すべ}り{降|お}りる。"
    },
    {
     "word": "傾斜",
@@ -103605,7 +103605,7 @@
     "sentence_jp": "母は娘に付き添いを添わせた。",
     "sentence_ko": "어머니는 딸에게 동행할 사람을 딸려 보냈다.",
     "meaning_en": "to make (someone) accompany",
-    "sentence_furigana": "{母|はは}は{娘|むすめ}に{付き添|つきそ}いを{添|そ}わせた。"
+    "sentence_furigana": "{母|はは}は{娘|むすめ}に{付|つ}き{添|そ}いを{添|そ}わせた。"
    }
   ],
   "on_examples": [
@@ -105154,7 +105154,7 @@
     "sentence_jp": "髪の毛が脱けてきた。",
     "sentence_ko": "머리카락이 빠지기 시작했다.",
     "meaning_en": "to come out",
-    "sentence_furigana": "{髪の毛|かみのけ}が{脱|ぬ}けてきた。"
+    "sentence_furigana": "{髪|かみ}の{毛|け}が{脱|ぬ}けてきた。"
    },
    {
     "word": "脱け",
@@ -105557,7 +105557,7 @@
     "sentence_jp": "蛍光灯を取り替えた。",
     "sentence_ko": "형광등을 교체했다.",
     "meaning_en": "fluorescent lamp",
-    "sentence_furigana": "{蛍光|けいこう}{灯|とう}を{取り替|とりか}えた。"
+    "sentence_furigana": "{蛍光|けいこう}{灯|とう}を{取|と}り{替|か}えた。"
    },
    {
     "word": "蛍光",
@@ -105840,7 +105840,7 @@
     "sentence_jp": "昼ご飯に豚骨ラーメンを食べた。",
     "sentence_ko": "점심으로 돈코쓰 라멘을 먹었다.",
     "meaning_en": "dish made with pork belly and bones, simmered with miso, sake, vegetables, etc. (from Kagoshima)",
-    "sentence_furigana": "{昼ご飯|ひるごはん}に{豚骨|とんこつ}ラーメンを{食|た}べた。"
+    "sentence_furigana": "{昼|ひる}ご{飯|はん}に{豚骨|とんこつ}ラーメンを{食|た}べた。"
    },
    {
     "word": "豚足",
@@ -106583,7 +106583,7 @@
     "sentence_jp": "彼らは社長を追い出す陰謀を企てた。",
     "sentence_ko": "그들은 사장을 쫓아낼 음모를 꾸몄다.",
     "meaning_en": "plot",
-    "sentence_furigana": "{彼|かれ}らは{社長|しゃちょう}を{追い出|おいだ}す{陰謀|いんぼう}を{企|くわだ}てた。"
+    "sentence_furigana": "{彼|かれ}らは{社長|しゃちょう}を{追|お}い{出|だ}す{陰謀|いんぼう}を{企|くわだ}てた。"
    },
    {
     "word": "陰性",
@@ -106997,7 +106997,7 @@
     "sentence_jp": "炒め物に胡麻油を少し加える。",
     "sentence_ko": "볶음 요리에 참기름을 조금 넣는다.",
     "meaning_en": "sesame oil",
-    "sentence_furigana": "{炒め物|いためもの}に{胡麻|ごま}{油|ゆ}を{少|すこ}し{加|くわ}える。"
+    "sentence_furigana": "{炒|いた}め{物|もの}に{胡麻|ごま}{油|ゆ}を{少|すこ}し{加|くわ}える。"
    },
    {
     "word": "麻酔",
@@ -108325,7 +108325,7 @@
     "sentence_jp": "その件に就いて話し合った。",
     "sentence_ko": "그 건에 대하여 이야기를 나눴다.",
     "meaning_en": "about",
-    "sentence_furigana": "その{件|けん}に{就|つ}いて{話し合|はなしあ}った。"
+    "sentence_furigana": "その{件|けん}に{就|つ}いて{話|はな}し{合|あ}った。"
    },
    {
     "word": "就く",
@@ -108466,7 +108466,7 @@
     "sentence_jp": "青嵐が木々をゆらして吹き抜けた。",
     "sentence_ko": "신록 사이로 부는 바람이 나무들을 흔들며 지나갔다.",
     "meaning_en": "wind blowing through fresh verdure",
-    "sentence_furigana": "{青嵐|せいらん}が{木々|きぎ}をゆらして{吹き抜|ふきぬ}けた。"
+    "sentence_furigana": "{青嵐|せいらん}が{木々|きぎ}をゆらして{吹|ふ}き{抜|ぬ}けた。"
    },
    {
     "word": "雪嵐",
@@ -108546,7 +108546,7 @@
     "sentence_jp": "流行り廃りの激しい業界だ。",
     "sentence_ko": "유행의 흥망이 심한 업계다.",
     "meaning_en": "waste",
-    "sentence_furigana": "{流行り廃|はやりすた}りの{激|はげ}しい{業界|ぎょうかい}だ。"
+    "sentence_furigana": "{流行|はや}り{廃|すた}りの{激|はげ}しい{業界|ぎょうかい}だ。"
    },
    {
     "word": "廃れる",
@@ -109697,7 +109697,7 @@
     "sentence_jp": "水晶のように透き通った湖だ。",
     "sentence_ko": "수정처럼 투명한 호수다.",
     "meaning_en": "(rock) crystal",
-    "sentence_furigana": "{水晶|すいしょう}のように{透き通|すきとお}った{湖|みずうみ}だ。"
+    "sentence_furigana": "{水晶|すいしょう}のように{透|す}き{通|とお}った{湖|みずうみ}だ。"
    }
   ]
  },
@@ -109966,7 +109966,7 @@
     "sentence_jp": "南極の氷棚が崩れ落ちた。",
     "sentence_ko": "남극의 빙붕이 무너져 내렸다.",
     "meaning_en": "ice shelf",
-    "sentence_furigana": "{南極|なんきょく}の{氷棚|ひょうほう}が{崩れ落|くずれお}ちた。"
+    "sentence_furigana": "{南極|なんきょく}の{氷棚|ひょうほう}が{崩|くず}れ{落|お}ちた。"
    }
   ]
  },
@@ -110654,7 +110654,7 @@
     "sentence_jp": "彼は焦燥に駆られて部屋を歩き回った。",
     "sentence_ko": "그는 초조함에 사로잡혀 방 안을 서성였다.",
     "meaning_en": "impatience",
-    "sentence_furigana": "{彼|かれ}は{焦燥|しょうそう}に{駆|か}られて{部屋|へや}を{歩き回|あるきまわ}った。"
+    "sentence_furigana": "{彼|かれ}は{焦燥|しょうそう}に{駆|か}られて{部屋|へや}を{歩|ある}き{回|まわ}った。"
    }
   ]
  },
@@ -110784,7 +110784,7 @@
     "sentence_jp": "このままでは猶あらじと、皆が立ち上がった。",
     "sentence_ko": "이대로 끝내서는 안 된다며 모두가 일어섰다.",
     "meaning_en": "must not be concluded like this",
-    "sentence_furigana": "このままでは{猶|なお}あらじと、{皆|みな}が{立ち上|たちあ}がった。"
+    "sentence_furigana": "このままでは{猶|なお}あらじと、{皆|みな}が{立|た}ち{上|あ}がった。"
    }
   ],
   "on_examples": [
@@ -111060,7 +111060,7 @@
     "sentence_jp": "赤痢は水や食べ物から感染する。",
     "sentence_ko": "이질은 물이나 음식을 통해 감염된다.",
     "meaning_en": "dysentery",
-    "sentence_furigana": "{赤痢|せきり}は{水|みず}や{食べ物|たべもの}から{感染|かんせん}する。"
+    "sentence_furigana": "{赤痢|せきり}は{水|みず}や{食|た}べ{物|もの}から{感染|かんせん}する。"
    },
    {
     "word": "痢病",
@@ -111366,7 +111366,7 @@
     "sentence_jp": "紫電一閃、剣が振り下ろされた。",
     "sentence_ko": "번개처럼 번쩍하며 검이 내리쳐졌다.",
     "meaning_en": "purple lightning",
-    "sentence_furigana": "{紫電|しでん}{一閃|いっせん}、{剣|けん}が{振り下|ふりお}ろされた。"
+    "sentence_furigana": "{紫電|しでん}{一閃|いっせん}、{剣|けん}が{振|ふ}り{下|お}ろされた。"
    }
   ]
  },
@@ -111448,7 +111448,7 @@
     "sentence_jp": "話し合いで結論を出す。",
     "sentence_ko": "토의로 결론을 내다.",
     "meaning_en": "conclusion",
-    "sentence_furigana": "{話し合|はなしあ}いで{結論|けつろん}を{出|だ}す。"
+    "sentence_furigana": "{話|はな}し{合|あ}いで{結論|けつろん}を{出|だ}す。"
    }
   ]
  },
@@ -112347,7 +112347,7 @@
     "sentence_jp": "詔書を読み上げる。",
     "sentence_ko": "조서를 낭독하다.",
     "meaning_en": "imperial edict",
-    "sentence_furigana": "{詔書|しょうしょ}を{読み上|よみあ}げる。"
+    "sentence_furigana": "{詔書|しょうしょ}を{読|よ}み{上|あ}げる。"
    },
    {
     "word": "詔命",
@@ -112727,7 +112727,7 @@
     "sentence_jp": "床の間に掛軸を飾る。",
     "sentence_ko": "도코노마에 족자를 걸다.",
     "meaning_en": "hanging scroll",
-    "sentence_furigana": "{床の間|とこのま}に{掛軸|かけじく}を{飾|かざ}る。"
+    "sentence_furigana": "{床|とこ}の{間|ま}に{掛軸|かけじく}を{飾|かざ}る。"
    },
    {
     "word": "主軸",
@@ -113061,7 +113061,7 @@
     "sentence_jp": "閑静な住宅街に引っ越しました。",
     "sentence_ko": "한적하고 조용한 주택가로 이사했습니다.",
     "meaning_en": "quiet (e.g. neighbourhood)",
-    "sentence_furigana": "{閑静|かんせい}な{住宅|じゅうたく}{街|がい}に{引っ越|ひっこ}しました。"
+    "sentence_furigana": "{閑静|かんせい}な{住宅|じゅうたく}{街|がい}に{引|ひ}っ{越|こ}しました。"
    },
    {
     "word": "農閑期",
@@ -113197,7 +113197,7 @@
     "sentence_jp": "質問は随時受け付けます。",
     "sentence_ko": "질문은 수시로 받습니다.",
     "meaning_en": "whenever necessary",
-    "sentence_furigana": "{質問|しつもん}は{随時|ずいじ}{受け付|うけつ}けます。"
+    "sentence_furigana": "{質問|しつもん}は{随時|ずいじ}{受|う}け{付|つ}けます。"
    }
   ]
  },
@@ -114264,7 +114264,7 @@
     "sentence_jp": "あそこの嫁ごはとても働き者だ。",
     "sentence_ko": "저 집 며느리는 아주 부지런하다.",
     "meaning_en": "bride",
-    "sentence_furigana": "あそこの{嫁|よめ}ごはとても{働き者|はたらきもの}だ。"
+    "sentence_furigana": "あそこの{嫁|よめ}ごはとても{働|はたら}き{者|もの}だ。"
    }
   ],
   "on_examples": [
@@ -114557,7 +114557,7 @@
     "sentence_jp": "彼が飲み会の幹事を務めた。",
     "sentence_ko": "그가 회식의 간사를 맡았다.",
     "meaning_en": "executive secretary",
-    "sentence_furigana": "{彼|かれ}が{飲み会|のみかい}の{幹事|かんじ}を{務|つと}めた。"
+    "sentence_furigana": "{彼|かれ}が{飲|の}み{会|かい}の{幹事|かんじ}を{務|つと}めた。"
    },
    {
     "word": "新幹線",
@@ -114821,7 +114821,7 @@
     "sentence_jp": "二度と愚行を繰り返さない。",
     "sentence_ko": "다시는 어리석은 짓을 되풀이하지 않겠다.",
     "meaning_en": "foolish act",
-    "sentence_furigana": "{二|に}{度|ど}と{愚行|ぐこう}を{繰り返|くりかえ}さない。"
+    "sentence_furigana": "{二|に}{度|ど}と{愚行|ぐこう}を{繰|く}り{返|かえ}さない。"
    },
    {
     "word": "愚直",
@@ -115567,7 +115567,7 @@
     "sentence_jp": "ニューヨークには多くの摩天楼が立ち並ぶ。",
     "sentence_ko": "뉴욕에는 많은 마천루가 늘어서 있다.",
     "meaning_en": "skyscraper",
-    "sentence_furigana": "ニューヨークには{多|おお}くの{摩天|まてん}{楼|ろう}が{立ち並|たちなら}ぶ。"
+    "sentence_furigana": "ニューヨークには{多|おお}くの{摩天|まてん}{楼|ろう}が{立|た}ち{並|なら}ぶ。"
    },
    {
     "word": "鐘楼",
@@ -115705,7 +115705,7 @@
     "sentence_jp": "道路の側溝に落ち葉が詰まっている。",
     "sentence_ko": "도로의 도랑에 낙엽이 막혀 있다.",
     "meaning_en": "gutter",
-    "sentence_furigana": "{道路|どうろ}の{側溝|そっこう}に{落ち葉|おちば}が{詰|つ}まっている。"
+    "sentence_furigana": "{道路|どうろ}の{側溝|そっこう}に{落|お}ち{葉|ば}が{詰|つ}まっている。"
    },
    {
     "word": "排水溝",
@@ -116724,7 +116724,7 @@
     "sentence_jp": "町は戦禍から立ち直りつつある。",
     "sentence_ko": "도시는 전쟁의 피해에서 회복되어 가고 있다.",
     "meaning_en": "war damage",
-    "sentence_furigana": "{町|まち}は{戦禍|せんか}から{立ち直|たちなお}りつつある。"
+    "sentence_furigana": "{町|まち}は{戦禍|せんか}から{立|た}ち{直|なお}りつつある。"
    },
    {
     "word": "惨禍",
@@ -116765,7 +116765,7 @@
     "sentence_jp": "稚い頃の思い出は今も忘れない。",
     "sentence_ko": "어렸을 때의 추억은 지금도 잊지 못한다.",
     "meaning_en": "very young",
-    "sentence_furigana": "{稚|いとけな}い{頃|ころ}の{思い出|おもいで}は{今|いま}も{忘|わす}れない。"
+    "sentence_furigana": "{稚|いとけな}い{頃|ころ}の{思|おも}い{出|で}は{今|いま}も{忘|わす}れない。"
    }
   ],
   "on_examples": [
@@ -117202,7 +117202,7 @@
     "sentence_jp": "えびの背腸を取り除く。",
     "sentence_ko": "새우의 내장을 제거한다.",
     "meaning_en": "vein of a shrimp (prawn)",
-    "sentence_furigana": "えびの{背腸|せわた}を{取り除|とりのぞ}く。"
+    "sentence_furigana": "えびの{背腸|せわた}を{取|と}り{除|のぞ}く。"
    },
    {
     "word": "糞腸",
@@ -117533,7 +117533,7 @@
     "sentence_jp": "赤ちゃんが裸んぼで走り回る。",
     "sentence_ko": "아기가 알몸으로 뛰어다닌다.",
     "meaning_en": "naked person (esp. child)",
-    "sentence_furigana": "{赤|あか}ちゃんが{裸|はだか}んぼで{走り回|はしりまわ}る。"
+    "sentence_furigana": "{赤|あか}ちゃんが{裸|はだか}んぼで{走|はし}り{回|まわ}る。"
    },
    {
     "word": "裸になる",
@@ -117983,7 +117983,7 @@
     "sentence_jp": "誠に申し訳ございません。",
     "sentence_ko": "참으로 죄송합니다.",
     "meaning_en": "indeed",
-    "sentence_furigana": "{誠|まこと}に{申し訳|もうしわけ}ございません。"
+    "sentence_furigana": "{誠|まこと}に{申|もう}し{訳|わけ}ございません。"
    },
    {
     "word": "誠",
@@ -118071,7 +118071,7 @@
     "sentence_jp": "最低賃金が引き上げられた。",
     "sentence_ko": "최저임금이 인상되었다.",
     "meaning_en": "wages",
-    "sentence_furigana": "{最低|さいてい}{賃金|ちんぎん}が{引き上|ひきあ}げられた。"
+    "sentence_furigana": "{最低|さいてい}{賃金|ちんぎん}が{引|ひ}き{上|あ}げられた。"
    },
    {
     "word": "運賃",
@@ -118150,7 +118150,7 @@
     "sentence_jp": "賄賂を受け取ったことが発覚しました。",
     "sentence_ko": "뇌물을 받은 사실이 발각되었습니다.",
     "meaning_en": "bribe",
-    "sentence_furigana": "{賄賂|わいろ}を{受け取|うけと}ったことが{発覚|はっかく}しました。"
+    "sentence_furigana": "{賄賂|わいろ}を{受|う}け{取|と}ったことが{発覚|はっかく}しました。"
    }
   ]
  },
@@ -118278,7 +118278,7 @@
     "sentence_jp": "悪人が跳梁する世の中だ。",
     "sentence_ko": "악인이 날뛰는 세상이다.",
     "meaning_en": "jumping about",
-    "sentence_furigana": "{悪人|あくにん}が{跳梁|ちょうりょう}する{世の中|よのなか}だ。"
+    "sentence_furigana": "{悪人|あくにん}が{跳梁|ちょうりょう}する{世|よ}の{中|なか}だ。"
    }
   ]
  },
@@ -118708,7 +118708,7 @@
     "sentence_jp": "二人は激しい議論の応酬を繰り広げた。",
     "sentence_ko": "두 사람은 격렬한 논쟁을 주고받았다.",
     "meaning_en": "exchange",
-    "sentence_furigana": "{二人|ふたり}は{激|はげ}しい{議論|ぎろん}の{応酬|おうしゅう}を{繰り広|くりひろ}げた。"
+    "sentence_furigana": "{二人|ふたり}は{激|はげ}しい{議論|ぎろん}の{応酬|おうしゅう}を{繰|く}り{広|ひろ}げた。"
    }
   ]
  },
@@ -118746,7 +118746,7 @@
     "sentence_jp": "庭の柿の木に実が鈴なりになっている。",
     "sentence_ko": "뜰의 감나무에 열매가 주렁주렁 열려 있다.",
     "meaning_en": "bunches (e.g. of fruit)",
-    "sentence_furigana": "{庭|にわ}の{柿の木|かきのき}に{実|じつ}が{鈴|すず}なりになっている。"
+    "sentence_furigana": "{庭|にわ}の{柿|かき}の{木|き}に{実|じつ}が{鈴|すず}なりになっている。"
    },
    {
     "word": "鈴鴨",
@@ -119696,7 +119696,7 @@
     "sentence_jp": "同僚と昼ご飯を食べに行った。",
     "sentence_ko": "동료와 점심을 먹으러 갔다.",
     "meaning_en": "coworker",
-    "sentence_furigana": "{同僚|どうりょう}と{昼ご飯|ひるごはん}を{食|た}べに{行|い}った。"
+    "sentence_furigana": "{同僚|どうりょう}と{昼|ひる}ご{飯|はん}を{食|た}べに{行|い}った。"
    }
   ]
  },
@@ -119821,7 +119821,7 @@
     "sentence_jp": "祖父の遺墨を床の間に飾っている。",
     "sentence_ko": "할아버지의 유묵을 도코노마에 걸어 두고 있다.",
     "meaning_en": "autographs (brushwork) of departed person",
-    "sentence_furigana": "{祖父|そふ}の{遺墨|いぼく}を{床の間|とこのま}に{飾|かざ}っている。"
+    "sentence_furigana": "{祖父|そふ}の{遺墨|いぼく}を{床|とこ}の{間|ま}に{飾|かざ}っている。"
    }
   ]
  },
@@ -120254,7 +120254,7 @@
     "sentence_jp": "彼の情態は少しずつ落ち着いてきた。",
     "sentence_ko": "그의 상태는 조금씩 안정되어 갔다.",
     "meaning_en": "state",
-    "sentence_furigana": "{彼|かれ}の{情態|じょうたい}は{少|すこ}しずつ{落ち着|おちつ}いてきた。"
+    "sentence_furigana": "{彼|かれ}の{情態|じょうたい}は{少|すこ}しずつ{落|お}ち{着|つ}いてきた。"
    },
    {
     "word": "事態",
@@ -120495,7 +120495,7 @@
     "sentence_jp": "彼は改革を旗じるしに立ち上がった。",
     "sentence_ko": "그는 개혁을 기치로 내걸고 일어섰다.",
     "meaning_en": "design (on a banner)",
-    "sentence_furigana": "{彼|かれ}は{改革|かいかく}を{旗|はた}じるしに{立ち上|たちあ}がった。"
+    "sentence_furigana": "{彼|かれ}は{改革|かいかく}を{旗|はた}じるしに{立|た}ち{上|あ}がった。"
    },
    {
     "word": "旗ざお",
@@ -120980,7 +120980,7 @@
     "sentence_jp": "漫りに立ち入るな。",
     "sentence_ko": "함부로 들어가지 마라.",
     "meaning_en": "selfish",
-    "sentence_furigana": "{漫|みだ}りに{立ち入|たちい}るな。"
+    "sentence_furigana": "{漫|みだ}りに{立|た}ち{入|い}るな。"
    },
    {
     "word": "漫ろ",
@@ -121234,7 +121234,7 @@
     "sentence_jp": "熊手で落ち葉を集めた。",
     "sentence_ko": "갈퀴로 낙엽을 모았다.",
     "meaning_en": "rake",
-    "sentence_furigana": "{熊手|くまで}で{落ち葉|おちば}を{集|あつ}めた。"
+    "sentence_furigana": "{熊手|くまで}で{落|お}ち{葉|ば}を{集|あつ}めた。"
    },
    {
     "word": "穴熊",
@@ -121444,7 +121444,7 @@
     "sentence_jp": "磁石で鉄を引き寄せる。",
     "sentence_ko": "자석으로 철을 끌어당긴다.",
     "meaning_en": "magnet",
-    "sentence_furigana": "{磁石|じしゃく}で{鉄|てつ}を{引き寄|ひきよ}せる。"
+    "sentence_furigana": "{磁石|じしゃく}で{鉄|てつ}を{引|ひ}き{寄|よ}せる。"
    },
    {
     "word": "磁気",
@@ -121633,7 +121633,7 @@
     "sentence_jp": "端たの金額は切り捨てます。",
     "sentence_ko": "우수리 금액은 버립니다.",
     "meaning_en": "fraction",
-    "sentence_furigana": "{端|はし}たの{金額|きんがく}は{切り捨|きりす}てます。"
+    "sentence_furigana": "{端|はし}たの{金額|きんがく}は{切|き}り{捨|す}てます。"
    },
    {
     "word": "端から",
@@ -121795,7 +121795,7 @@
     "sentence_jp": "綱を強く引っ張る。",
     "sentence_ko": "밧줄을 세게 잡아당기다.",
     "meaning_en": "rope",
-    "sentence_furigana": "{綱|つな}を{強|つよ}く{引っ張|ひっぱ}る。"
+    "sentence_furigana": "{綱|つな}を{強|つよ}く{引|ひ}っ{張|ぱ}る。"
    },
    {
     "word": "綱とり",
@@ -122039,7 +122039,7 @@
     "sentence_jp": "夏は食べ物がすぐ腐る。",
     "sentence_ko": "여름에는 음식이 금방 상한다.",
     "meaning_en": "to rot",
-    "sentence_furigana": "{夏|なつ}は{食べ物|たべもの}がすぐ{腐|くさ}る。"
+    "sentence_furigana": "{夏|なつ}は{食|た}べ{物|もの}がすぐ{腐|くさ}る。"
    },
    {
     "word": "腐り",
@@ -122059,7 +122059,7 @@
     "sentence_jp": "彼とは腐れ縁が続いている。",
     "sentence_ko": "그와는 질긴 악연(인연)이 이어지고 있다.",
     "meaning_en": "rotting",
-    "sentence_furigana": "{彼|かれ}とは{腐れ縁|くされえん}が{続|つづ}いている。"
+    "sentence_furigana": "{彼|かれ}とは{腐|くさ}れ{縁|えん}が{続|つづ}いている。"
    }
   ],
   "on_examples": [
@@ -122723,7 +122723,7 @@
     "sentence_jp": "酸いも甘いも噛み分ける。",
     "sentence_ko": "세상의 단맛 쓴맛을 다 안다.",
     "meaning_en": "sour",
-    "sentence_furigana": "{酸|す}いも{甘|あま}いも{噛み分|かみわ}ける。"
+    "sentence_furigana": "{酸|す}いも{甘|あま}いも{噛|か}み{分|わ}ける。"
    }
   ],
   "on_examples": [
@@ -122930,7 +122930,7 @@
     "sentence_jp": "釣銭を受け取るのを忘れた。",
     "sentence_ko": "거스름돈을 받는 것을 잊었다.",
     "meaning_en": "change (for a purchase)",
-    "sentence_furigana": "{釣銭|つりせん}を{受け取|うけと}るのを{忘|わす}れた。"
+    "sentence_furigana": "{釣銭|つりせん}を{受|う}け{取|と}るのを{忘|わす}れた。"
    }
   ]
  },
@@ -123091,7 +123091,7 @@
     "sentence_jp": "多くの障害を乗り越えた。",
     "sentence_ko": "많은 장애를 극복했다.",
     "meaning_en": "obstacle",
-    "sentence_furigana": "{多|おお}くの{障害|しょうがい}を{乗り越|のりこ}えた。"
+    "sentence_furigana": "{多|おお}くの{障害|しょうがい}を{乗|の}り{越|こ}えた。"
    }
   ]
  },
@@ -124542,7 +124542,7 @@
     "sentence_jp": "ご結婚のお慶びを申し上げます。",
     "sentence_ko": "결혼의 기쁨을 말씀드립니다.",
     "meaning_en": "joy",
-    "sentence_furigana": "ご{結婚|けっこん}のお{慶|よろこ}びを{申し上|もうしあ}げます。"
+    "sentence_furigana": "ご{結婚|けっこん}のお{慶|よろこ}びを{申|もう}し{上|あ}げます。"
    },
    {
     "word": "慶ぶ",
@@ -125500,7 +125500,7 @@
     "sentence_jp": "馬槽に干し草を入れた。",
     "sentence_ko": "말구유에 건초를 넣었다.",
     "meaning_en": "horse trough",
-    "sentence_furigana": "{馬槽|うまぶね}に{干し草|ほしくさ}を{入|い}れた。"
+    "sentence_furigana": "{馬槽|うまぶね}に{干|ほ}し{草|くさ}を{入|い}れた。"
    }
   ],
   "on_examples": [
@@ -125750,7 +125750,7 @@
     "sentence_jp": "不潔な手で食べ物を触らないで。",
     "sentence_ko": "불결한 손으로 음식을 만지지 마.",
     "meaning_en": "unclean",
-    "sentence_furigana": "{不潔|ふけつ}な{手|て}で{食べ物|たべもの}を{触|さわ}らないで。"
+    "sentence_furigana": "{不潔|ふけつ}な{手|て}で{食|た}べ{物|もの}を{触|さわ}らないで。"
    }
   ]
  },
@@ -126460,7 +126460,7 @@
     "sentence_jp": "原稿を書き上げた。",
     "sentence_ko": "원고를 다 썼다.",
     "meaning_en": "manuscript",
-    "sentence_furigana": "{原稿|げんこう}を{書き上|かきあ}げた。"
+    "sentence_furigana": "{原稿|げんこう}を{書|か}き{上|あ}げた。"
    },
    {
     "word": "投稿",
@@ -127196,7 +127196,7 @@
     "sentence_jp": "不正が罷り通る。",
     "sentence_ko": "부정이 버젓이 통하다.",
     "meaning_en": "emphatic verbal prefix",
-    "sentence_furigana": "{不正|ふせい}が{罷り通|まかりとお}る。"
+    "sentence_furigana": "{不正|ふせい}が{罷|まか}り{通|とお}る。"
    },
    {
     "word": "罷める",
@@ -127780,7 +127780,7 @@
     "sentence_jp": "優勝チームが賜杯を受け取った。",
     "sentence_ko": "우승팀이 천황배를 받았다.",
     "meaning_en": "Emperor's cup",
-    "sentence_furigana": "{優勝|ゆうしょう}チームが{賜杯|しはい}を{受け取|うけと}った。"
+    "sentence_furigana": "{優勝|ゆうしょう}チームが{賜杯|しはい}を{受|う}け{取|と}った。"
    },
    {
     "word": "恩賜",
@@ -128455,7 +128455,7 @@
     "sentence_jp": "溶けた鉄を鋳型に流し込む。",
     "sentence_ko": "녹은 철을 주형에 부어 넣는다.",
     "meaning_en": "mold",
-    "sentence_furigana": "{溶|と}けた{鉄|てつ}を{鋳型|いがた}に{流し込|ながしこ}む。"
+    "sentence_furigana": "{溶|と}けた{鉄|てつ}を{鋳型|いがた}に{流|なが}し{込|こ}む。"
    },
    {
     "word": "電鋳",
@@ -129095,7 +129095,7 @@
     "sentence_jp": "荒れ地を墾く。",
     "sentence_ko": "황무지를 개간하다.",
     "meaning_en": "to cultivate (land)",
-    "sentence_furigana": "{荒れ地|あれち}を{墾|ひら}く。"
+    "sentence_furigana": "{荒|あ}れ{地|ち}を{墾|ひら}く。"
    }
   ],
   "on_examples": [
@@ -129174,7 +129174,7 @@
     "sentence_jp": "部屋の壁紙を張り替えた。",
     "sentence_ko": "방의 벽지를 새로 발랐다.",
     "meaning_en": "wallpaper",
-    "sentence_furigana": "{部屋|へや}の{壁紙|かべがみ}を{張り替|はりか}えた。"
+    "sentence_furigana": "{部屋|へや}の{壁紙|かべがみ}を{張|は}り{替|か}えた。"
    }
   ],
   "on_examples": [
@@ -129186,7 +129186,7 @@
     "sentence_jp": "貿易の障壁が取り除かれた。",
     "sentence_ko": "무역 장벽이 제거되었다.",
     "meaning_en": "enclosing wall",
-    "sentence_furigana": "{貿易|ぼうえき}の{障壁|しょうへき}が{取り除|とりのぞ}かれた。"
+    "sentence_furigana": "{貿易|ぼうえき}の{障壁|しょうへき}が{取|と}り{除|のぞ}かれた。"
    },
    {
     "word": "牆壁",
@@ -130597,7 +130597,7 @@
     "sentence_jp": "緯を織り込む。",
     "sentence_ko": "씨실을 짜 넣다.",
     "meaning_en": "weft",
-    "sentence_furigana": "{緯|ぬき}を{織り込|おりこ}む。"
+    "sentence_furigana": "{緯|ぬき}を{織|お}り{込|こ}む。"
    },
    {
     "word": "緯糸",
@@ -131365,7 +131365,7 @@
     "sentence_jp": "絵の具を水で融く。",
     "sentence_ko": "물감을 물에 푼다.",
     "meaning_en": "to dissolve (paint)",
-    "sentence_furigana": "{絵の具|えのぐ}を{水|みず}で{融|とおる}く。"
+    "sentence_furigana": "{絵|え}の{具|ぐ}を{水|みず}で{融|とおる}く。"
    },
    {
     "word": "融ける",
@@ -131434,7 +131434,7 @@
     "sentence_jp": "国の防衛について話し合った。",
     "sentence_ko": "나라의 방위에 대해 논의했다.",
     "meaning_en": "defense",
-    "sentence_furigana": "{国|くに}の{防衛|ぼうえい}について{話し合|はなしあ}った。"
+    "sentence_furigana": "{国|くに}の{防衛|ぼうえい}について{話|はな}し{合|あ}った。"
    },
    {
     "word": "自衛隊",
@@ -132273,7 +132273,7 @@
     "sentence_jp": "試行錯誤を繰り返す。",
     "sentence_ko": "시행착오를 거듭하다.",
     "meaning_en": "mistake",
-    "sentence_furigana": "{試行|しこう}{錯誤|さくご}を{繰り返|くりかえ}す。"
+    "sentence_furigana": "{試行|しこう}{錯誤|さくご}を{繰|く}り{返|かえ}す。"
    }
   ]
  },
@@ -133235,7 +133235,7 @@
     "sentence_jp": "船が暗礁に乗り上げる。",
     "sentence_ko": "배가 암초에 걸리다.",
     "meaning_en": "reef",
-    "sentence_furigana": "{船|ふね}が{暗礁|あんしょう}に{乗り上|のりあ}げる。"
+    "sentence_furigana": "{船|ふね}が{暗礁|あんしょう}に{乗|の}り{上|あ}げる。"
    },
    {
     "word": "岩礁",
@@ -133245,7 +133245,7 @@
     "sentence_jp": "船が岩礁に乗り上げてしまった。",
     "sentence_ko": "배가 암초에 얹혀 버렸다.",
     "meaning_en": "reef",
-    "sentence_furigana": "{船|ふね}が{岩礁|がんしょう}に{乗り上|のりあ}げてしまった。"
+    "sentence_furigana": "{船|ふね}が{岩礁|がんしょう}に{乗|の}り{上|あ}げてしまった。"
    },
    {
     "word": "環礁",
@@ -133813,7 +133813,7 @@
     "sentence_jp": "謹んでお悔やみ申し上げます。",
     "sentence_ko": "삼가 조의를 표합니다.",
     "meaning_en": "respectfully",
-    "sentence_furigana": "{謹|つつし}んでお{悔|く}やみ{申し上|もうしあ}げます。"
+    "sentence_furigana": "{謹|つつし}んでお{悔|く}やみ{申|もう}し{上|あ}げます。"
    }
   ],
   "on_examples": [
@@ -133918,7 +133918,7 @@
     "sentence_jp": "轄を打ち込む。",
     "sentence_ko": "쐐기를 박다.",
     "meaning_en": "wedge",
-    "sentence_furigana": "轄を{打ち込|うちこ}む。"
+    "sentence_furigana": "轄を{打|う}ち{込|こ}む。"
    }
   ],
   "on_examples": [
@@ -134426,7 +134426,7 @@
     "sentence_jp": "濫りに立ち入らない。",
     "sentence_ko": "함부로 들어가지 않는다.",
     "meaning_en": "selfish",
-    "sentence_furigana": "{濫|みだ}りに{立ち入|たちい}らない。"
+    "sentence_furigana": "{濫|みだ}りに{立|た}ち{入|い}らない。"
    },
    {
     "word": "濫りに",
@@ -135108,7 +135108,7 @@
     "sentence_jp": "蚕繭から絹糸を取り出す。",
     "sentence_ko": "누에고치에서 명주실을 뽑는다.",
     "meaning_en": "silkworm cocoon",
-    "sentence_furigana": "{蚕繭|さんけん}から{絹糸|きぬいと}を{取り出|とりだ}す。"
+    "sentence_furigana": "{蚕繭|さんけん}から{絹糸|きぬいと}を{取|と}り{出|だ}す。"
    }
   ]
  },
@@ -135157,7 +135157,7 @@
     "sentence_jp": "翻って我が身を振り返ってみよう。",
     "sentence_ko": "한편으로 나 자신을 돌아보자.",
     "meaning_en": "conversely",
-    "sentence_furigana": "{翻|ひるがえ}って{我|わ}が{身|み}を{振り返|ふりかえ}ってみよう。"
+    "sentence_furigana": "{翻|ひるがえ}って{我|わ}が{身|み}を{振|ふ}り{返|かえ}ってみよう。"
    }
   ],
   "on_examples": [
@@ -135258,7 +135258,7 @@
     "sentence_jp": "祖母の臨終に立ち会った。",
     "sentence_ko": "할머니의 임종을 지켰다.",
     "meaning_en": "deathbed",
-    "sentence_furigana": "{祖母|そぼ}の{臨終|りんじゅう}に{立ち会|たちあ}った。"
+    "sentence_furigana": "{祖母|そぼ}の{臨終|りんじゅう}に{立|た}ち{会|あ}った。"
    },
    {
     "word": "臨床",
@@ -135417,7 +135417,7 @@
     "sentence_jp": "藤黄は黄色い絵の具の原料だ。",
     "sentence_ko": "등황은 노란 물감의 원료이다.",
     "meaning_en": "gamboge",
-    "sentence_furigana": "{藤|ふじ}{黄|き}は{黄色|きいろ}い{絵の具|えのぐ}の{原料|げんりょう}だ。"
+    "sentence_furigana": "{藤|ふじ}{黄|き}は{黄色|きいろ}い{絵|え}の{具|ぐ}の{原料|げんりょう}だ。"
    },
    {
     "word": "藤花",
@@ -136273,7 +136273,7 @@
     "sentence_jp": "出発日の繰上を会社に申し出た。",
     "sentence_ko": "출발일을 앞당겨 달라고 회사에 요청했다.",
     "meaning_en": "upward move",
-    "sentence_furigana": "{出発|しゅっぱつ}{日|ひ}の{繰上|くりあげ}を{会社|かいしゃ}に{申し出|もうしで}た。"
+    "sentence_furigana": "{出発|しゅっぱつ}{日|ひ}の{繰上|くりあげ}を{会社|かいしゃ}に{申|もう}し{出|で}た。"
    }
   ],
   "on_examples": [
@@ -138095,7 +138095,7 @@
     "sentence_jp": "田鶴が空高く舞い上がった。",
     "sentence_ko": "학이 하늘 높이 날아올랐다.",
     "meaning_en": "crane (any bird of the family Gruidae, esp. the red-crowned crane, Grus japonensis)",
-    "sentence_furigana": "{田鶴|たず}が{空|そら}{高|たか}く{舞い上|まいあ}がった。"
+    "sentence_furigana": "{田鶴|たず}が{空|そら}{高|たか}く{舞|ま}い{上|あ}がった。"
    },
    {
     "word": "黒鶴",
@@ -138105,7 +138105,7 @@
     "sentence_jp": "池に黒鶴が舞い降りた。",
     "sentence_ko": "연못에 검은 두루미가 내려앉았다.",
     "meaning_en": "common crane (Grus grus)",
-    "sentence_furigana": "{池|いけ}に{黒鶴|くろつる}が{舞い降|まいお}りた。"
+    "sentence_furigana": "{池|いけ}に{黒鶴|くろつる}が{舞|ま}い{降|お}りた。"
    }
   ],
   "on_examples": [

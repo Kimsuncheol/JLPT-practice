@@ -233,6 +233,7 @@ class _KanjiStudyScreenState extends ConsumerState<KanjiStudyScreen>
           hideKanji: state.hideWord,
           hideKunYomi: !state.showFurigana,
           hideOnYomi: !state.showFurigana,
+          hideFurigana: !state.showFurigana,
           hideMeanings: state.hideMeanings,
         ),
       );

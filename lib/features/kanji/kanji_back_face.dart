@@ -64,6 +64,7 @@ class KanjiBackFace extends StatelessWidget {
                           examples: kanji.kunExamples,
                           language: language,
                           hideReadings: visibility.hideKunYomi,
+                          hideFurigana: visibility.hideFurigana,
                           hideMeanings: visibility.hideMeanings,
                           onSpeak: onSpeakReading,
                           onSpeakSentence: onSpeakSentence,
@@ -91,6 +92,7 @@ class KanjiBackFace extends StatelessWidget {
                           examples: kanji.onExamples,
                           language: language,
                           hideReadings: visibility.hideOnYomi,
+                          hideFurigana: visibility.hideFurigana,
                           hideMeanings: visibility.hideMeanings,
                           onSpeak: onSpeakReading,
                           onSpeakSentence: onSpeakSentence,
@@ -136,6 +138,15 @@ class KanjiBackFace extends StatelessWidget {
                 showLabel: strings('showOnYomi'),
                 onTap: () => onVisibilityChanged(
                   visibility.copyWith(hideOnYomi: !visibility.hideOnYomi),
+                ),
+              ),
+              HideToggle(
+                id: 'furigana',
+                hidden: visibility.hideFurigana,
+                hideLabel: strings('hideReading'),
+                showLabel: strings('showReading'),
+                onTap: () => onVisibilityChanged(
+                  visibility.copyWith(hideFurigana: !visibility.hideFurigana),
                 ),
               ),
               HideToggle(

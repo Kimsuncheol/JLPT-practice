@@ -12,6 +12,8 @@ class ExampleFuriganaText extends StatelessWidget {
     required this.style,
     required this.wordTargets,
     required this.hideReadings,
+    this.alignment = WrapAlignment.center,
+    this.runSpacingWithFurigana,
     super.key,
   });
 
@@ -19,6 +21,10 @@ class ExampleFuriganaText extends StatelessWidget {
   final TextStyle style;
   final List<String> wordTargets;
   final bool hideReadings;
+  final WrapAlignment alignment;
+
+  /// Space between wrapped lines while furigana is shown; the default when null.
+  final double? runSpacingWithFurigana;
 
   @override
   Widget build(BuildContext context) {
@@ -105,13 +111,16 @@ class ExampleFuriganaText extends StatelessWidget {
       child: ExcludeSemantics(
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: alignment == WrapAlignment.start
+              ? CrossAxisAlignment.start
+              : CrossAxisAlignment.center,
           children: [
             for (final line in lines)
               Wrap(
-                alignment: WrapAlignment.center,
+                alignment: alignment,
                 crossAxisAlignment: WrapCrossAlignment.end,
                 runSpacing: hasVisibleFurigana
-                    ? AppSpacing.run20
+                    ? runSpacingWithFurigana ?? AppSpacing.run20
                     : AppSpacing.run2,
                 children: line,
               ),
