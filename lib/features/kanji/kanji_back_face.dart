@@ -4,11 +4,10 @@ import 'package:jlpt_practice/data/models/kanji.dart';
 import 'package:jlpt_practice/features/kanji/kanji_visibility.dart';
 import 'package:jlpt_practice/features/kanji/widgets/hide_group.dart';
 import 'package:jlpt_practice/features/kanji/widgets/kanji_footer.dart';
-import 'package:jlpt_practice/features/kanji/widgets/kanji_glyph.dart';
 import 'package:jlpt_practice/features/kanji/widgets/dashed_divider.dart';
 import 'package:jlpt_practice/features/kanji/widgets/reading_section.dart';
 
-/// The back: every reading with its examples, in a scroll view that runs down to the hide group. The kanji is always shown here, even if it was covered on the front.
+/// The back: every reading with its examples, in a scroll view that runs down to the hide group. The kanji itself is not repeated here.
 class KanjiBackFace extends StatelessWidget {
   const KanjiBackFace({
     required this.kanji,
@@ -18,6 +17,7 @@ class KanjiBackFace extends StatelessWidget {
     required this.onSpeakReading,
     required this.onSpeakSentence,
     required this.footer,
+    this.onStartOver,
     super.key,
   });
 
@@ -28,6 +28,9 @@ class KanjiBackFace extends StatelessWidget {
   final ValueChanged<String> onSpeakReading;
   final ValueChanged<String> onSpeakSentence;
   final Widget footer;
+
+  /// Shown as the hide group's last item when set: restarts the day.
+  final VoidCallback? onStartOver;
 
   @override
   Widget build(BuildContext context) {
@@ -51,12 +54,6 @@ class KanjiBackFace extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Center(
-                        child: KanjiGlyph(
-                          character: kanji.character,
-                          fontSize: 56,
-                        ),
-                      ),
                       if (kanji.kunYomi.isNotEmpty ||
                           kanji.kunExamples.isNotEmpty)
                         ReadingSection(
@@ -104,6 +101,13 @@ class KanjiBackFace extends StatelessWidget {
           padding: sideInset,
           child: HideGroup(
             side: 'back',
+            trailing: onStartOver == null
+                ? null
+                : HideGroupAction(
+                    icon: Icons.refresh_rounded,
+                    label: strings('startOver'),
+                    onTap: onStartOver!,
+                  ),
             toggles: [
               HideToggle(
                 id: 'kun',

@@ -10,6 +10,7 @@ import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/app/theme/app_theme.dart';
 import 'package:jlpt_practice/data/models/kanji.dart';
 import 'package:jlpt_practice/data/repositories/kanji_repository.dart';
+import 'package:jlpt_practice/features/kanji/kanji_finish_screen.dart';
 import 'package:jlpt_practice/features/kanji/kanji_study_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_tape.dart';
 import 'package:jlpt_practice/features/vocabulary/day_selection_screen.dart';
@@ -308,22 +309,44 @@ void main() {
     expect(find.text('Settings route'), findsOneWidget);
   });
 
-  testWidgets('finishing the last kanji completes the kanji day', (
+  testWidgets('swiping past the last kanji opens the finish screen', (
     tester,
   ) async {
     final controller = KanjiTestAppController();
     await _pumpStudy(tester, controller: controller);
-    expect(find.text('Finish').hitTestable(), findsNothing);
+    expect(find.text('Finish'), findsNothing);
 
     await _swipeNext(tester);
-    expect(find.text('Finish').hitTestable(), findsNothing);
     await _flip(tester);
-    expect(find.text('Finish').hitTestable(), findsOneWidget);
-    await tester.tap(find.text('Finish').hitTestable());
+    expect(find.text('Finish'), findsNothing);
+    await _swipeForward(tester);
+
+    expect(find.text('Great work!'), findsOneWidget);
+    expect(controller.completions, isEmpty);
+    await tester.tap(find.text('Finish'));
     await tester.pumpAndSettle();
 
     expect(controller.completions, [('kanji-N5', 1)]);
     expect(find.text('Kanji day list'), findsOneWidget);
+  });
+
+  testWidgets('start over sits in a four-item hide group on the last kanji', (
+    tester,
+  ) async {
+    await _pumpStudy(tester);
+    expect(find.byKey(const ValueKey('hide-front-action')), findsNothing);
+    await _swipeNext(tester);
+    expect(find.byKey(const ValueKey('hide-front-action')), findsNothing);
+    await _flip(tester);
+
+    expect(find.byKey(const ValueKey('hide-back-action')), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('hide-group-back')),
+        matching: find.text('Start over'),
+      ),
+      findsOneWidget,
+    );
   });
 
   testWidgets('start over returns to the first kanji', (tester) async {
@@ -819,6 +842,14 @@ GoRouter _router(String initialLocation) {
                 body: Text('Kanji study day ${state.pathParameters['day']}'),
               )
             : KanjiStudyScreen(
+                day: int.parse(state.pathParameters['day'] ?? '1'),
+              ),
+      ),
+      GoRoute(
+        path: '/kanji/day/:day/finish',
+        builder: (_, state) => daySelection
+            ? const Scaffold()
+            : KanjiFinishScreen(
                 day: int.parse(state.pathParameters['day'] ?? '1'),
               ),
       ),

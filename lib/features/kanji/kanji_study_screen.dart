@@ -117,19 +117,22 @@ class _KanjiStudyScreenState extends ConsumerState<KanjiStudyScreen>
               child: PageView.builder(
                 controller: controller,
                 physics: KanjiForwardLockPhysics(lockedPage: () => _lockedPage),
-                itemCount: kanji.length,
+                // One page past the last kanji: swiping onto it opens the finish screen.
+                itemCount: kanji.length + 1,
                 onPageChanged: (index) => _handlePageChanged(
                   index: index,
                   kanji: kanji,
                   state: state,
                 ),
-                itemBuilder: (context, index) => _buildCard(
-                  kanji[index],
-                  state: state,
-                  seenBack: seenBack,
-                  isLast: index == kanji.length - 1,
-                  controller: controller,
-                ),
+                itemBuilder: (context, index) => index == kanji.length
+                    ? const SizedBox.shrink()
+                    : _buildCard(
+                        kanji[index],
+                        state: state,
+                        seenBack: seenBack,
+                        isLast: index == kanji.length - 1,
+                        controller: controller,
+                      ),
               ),
             ),
             Positioned(
@@ -193,12 +196,8 @@ class _KanjiStudyScreenState extends ConsumerState<KanjiStudyScreen>
     language: state.meaningLanguage,
     visibility: _visibilityFor(item, state),
     bottomInset: _hideGroupBottomInset(context),
-    footer: KanjiFooter(
-      seenBack: seenBack,
-      isLast: isLast,
-      onStartOver: () => controller.jumpToPage(0),
-      onFinish: () => unawaited(_finish(state)),
-    ),
+    footer: KanjiFooter(seenBack: seenBack),
+    onStartOver: isLast && seenBack ? () => controller.jumpToPage(0) : null,
     onVisibilityChanged: (value) =>
         setState(() => _visibility[item.id] = value),
     onSpeakReading: (reading) =>
@@ -265,27 +264,16 @@ class _KanjiStudyScreenState extends ConsumerState<KanjiStudyScreen>
         ),
       );
 
-  Future<void> _finish(AppState state) async {
-    stopSpeech();
-    await ref
-        .read(appControllerProvider.notifier)
-        .completeStudySession(
-          StudyCourse.kanji.progressKey(state.selectedLevel),
-          widget.day,
-        );
-    if (!mounted) return;
-    // go('/kanji') would leave the day list as the only route, so the system
-    // back button would close the app. Rebuild home → day list instead.
-    context.go('/home');
-    context.push('/kanji');
-  }
-
   void _handlePageChanged({
     required int index,
     required List<Kanji> kanji,
     required AppState state,
   }) {
     stopSpeech();
+    if (index == kanji.length) {
+      context.pushReplacement('/kanji/day/${widget.day}/finish');
+      return;
+    }
     setState(() => _index = index);
     unawaited(_savePosition(state, kanji[index], index));
     if (state.autoPlayAudio) _speakFirstReading(kanji[index]);

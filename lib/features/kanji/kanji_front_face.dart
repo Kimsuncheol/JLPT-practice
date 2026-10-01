@@ -14,6 +14,7 @@ class KanjiFrontFace extends StatelessWidget {
     required this.onVisibilityChanged,
     required this.onSpeakReading,
     required this.footer,
+    this.onStartOver,
     super.key,
   });
 
@@ -22,6 +23,9 @@ class KanjiFrontFace extends StatelessWidget {
   final ValueChanged<KanjiVisibility> onVisibilityChanged;
   final ValueChanged<String> onSpeakReading;
   final Widget footer;
+
+  /// Shown as the hide group's last item when set: restarts the day.
+  final VoidCallback? onStartOver;
 
   @override
   Widget build(BuildContext context) {
@@ -68,6 +72,13 @@ class KanjiFrontFace extends StatelessWidget {
         footer,
         HideGroup(
           side: 'front',
+          trailing: onStartOver == null
+              ? null
+              : HideGroupAction(
+                  icon: Icons.refresh_rounded,
+                  label: strings('startOver'),
+                  onTap: onStartOver!,
+                ),
           toggles: [
             HideToggle(
               id: 'kanji',

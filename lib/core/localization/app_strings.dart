@@ -92,6 +92,7 @@ class AppStrings {
     'finish': 'Finish',
     'studyComplete': 'Great work!',
     'studyCompleteBody': 'You’ve gone through today’s words.',
+    'kanjiStudyCompleteBody': 'You’ve gone through today’s kanji.',
     'levelVocabularyComplete': '{level} vocabulary complete!',
     'levelVocabularyCompleteBody':
         'You studied all {words} words across {days} study days.',
@@ -486,6 +487,7 @@ class AppStrings {
     'finish': '마치기',
     'studyComplete': '수고하셨어요!',
     'studyCompleteBody': '오늘의 단어를 모두 학습했어요.',
+    'kanjiStudyCompleteBody': '오늘의 한자를 모두 학습했어요.',
     'levelVocabularyComplete': '{level} 단어 학습 완료!',
     'levelVocabularyCompleteBody': '{days}일 동안 총 {words}개의 단어를 모두 학습했어요.',
     'chooseAnotherLevel': '다른 JLPT 급수 선택',

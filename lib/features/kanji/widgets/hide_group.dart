@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 
-/// The row of hide/show toggles at the foot of a card face.
+/// The row of hide/show toggles at the foot of a card face, optionally ending
+/// with a [trailing] action such as start over.
 class HideGroup extends StatelessWidget {
-  const HideGroup({required this.side, required this.toggles, super.key});
+  const HideGroup({
+    required this.side,
+    required this.toggles,
+    this.trailing,
+    super.key,
+  });
 
   final String side;
   final List<HideToggle> toggles;
+  final HideGroupAction? trailing;
 
   @override
   Widget build(BuildContext context) => Container(
@@ -19,7 +26,52 @@ class HideGroup extends StatelessWidget {
               child: toggle,
             ),
           ),
+        if (trailing != null)
+          Expanded(
+            child: KeyedSubtree(
+              key: ValueKey('hide-$side-action'),
+              child: trailing!,
+            ),
+          ),
       ],
+    ),
+  );
+}
+
+/// An action that sits in the hide group's row, laid out like a [HideToggle].
+/// Its label wraps onto as many lines as it needs.
+class HideGroupAction extends StatelessWidget {
+  const HideGroupAction({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    super.key,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => InkWell(
+    borderRadius: BorderRadius.circular(20),
+    splashFactory: NoSplash.splashFactory,
+    highlightColor: Colors.transparent,
+    onTap: onTap,
+    child: Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.labelSmall,
+          ),
+        ],
+      ),
     ),
   );
 }
