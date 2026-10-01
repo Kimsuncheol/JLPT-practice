@@ -6,6 +6,7 @@ import 'package:jlpt_practice/core/constants/app_sizes.dart';
 import 'package:jlpt_practice/core/constants/app_colors.dart';
 import 'package:jlpt_practice/core/constants/app_font_weights.dart';
 import 'package:jlpt_practice/core/constants/app_font_styles.dart';
+import 'package:jlpt_practice/core/constants/app_spacing.dart';
 
 class ReorderAnswerArea extends StatelessWidget {
   const ReorderAnswerArea({
@@ -57,7 +58,7 @@ class ReorderAnswerArea extends StatelessWidget {
             painter: IndexNoteLinesPainter(
               color: lineColor,
               firstLineY: 56,
-              spacing: 42,
+              spacing: AppSpacing.item42,
               drawBottomRule: true,
             ),
             child: ConstrainedBox(
@@ -90,8 +91,8 @@ class ReorderAnswerArea extends StatelessWidget {
                         ],
                       )
                     : Wrap(
-                        spacing: 14,
-                        runSpacing: 8,
+                        spacing: AppSpacing.item14,
+                        runSpacing: AppSpacing.run8,
                         children: [
                           for (final (position, tile) in selected.indexed)
                             InputChip(

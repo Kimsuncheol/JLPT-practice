@@ -4,6 +4,7 @@ import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:jlpt_practice/core/constants/app_sizes.dart';
 import 'package:jlpt_practice/core/constants/app_font_weights.dart';
+import 'package:jlpt_practice/core/constants/app_spacing.dart';
 
 /// Chat colors follow the app's active light or dark ColorScheme.
 class ChatUiStyle {
@@ -190,7 +191,11 @@ class ChatUiStyle {
             ),
             borderRadius: BorderRadius.circular(AppSizes.radius20),
           ),
-          child: Wrap(spacing: 8, runSpacing: 8, children: chips),
+          child: Wrap(
+            spacing: AppSpacing.item8,
+            runSpacing: AppSpacing.run8,
+            children: chips,
+          ),
         ),
       );
     }
@@ -201,7 +206,7 @@ class ChatUiStyle {
         horizontal: AppSizes.size16,
         vertical: AppSizes.size4,
       ),
-      child: Row(spacing: 8, children: chips),
+      child: Row(spacing: AppSpacing.item8, children: chips),
     );
   }
 

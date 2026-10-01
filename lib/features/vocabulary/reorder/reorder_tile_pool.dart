@@ -5,6 +5,7 @@ import 'package:jlpt_practice/features/vocabulary/sentence_reorder_quiz.dart';
 import 'package:jlpt_practice/core/constants/app_sizes.dart';
 import 'package:jlpt_practice/core/constants/app_colors.dart';
 import 'package:jlpt_practice/core/constants/app_font_weights.dart';
+import 'package:jlpt_practice/core/constants/app_spacing.dart';
 
 class ReorderTilePool extends StatelessWidget {
   const ReorderTilePool({
@@ -51,7 +52,7 @@ class ReorderTilePool extends StatelessWidget {
           painter: IndexNoteLinesPainter(
             color: lineColor,
             firstLineY: 72,
-            spacing: 52,
+            spacing: AppSpacing.item52,
           ),
           child: ConstrainedBox(
             constraints: const BoxConstraints(minHeight: AppSizes.size90),
@@ -70,8 +71,8 @@ class ReorderTilePool extends StatelessWidget {
                     maintainSize: true,
                     maintainState: true,
                     child: Wrap(
-                      spacing: 14,
-                      runSpacing: 12,
+                      spacing: AppSpacing.item14,
+                      runSpacing: AppSpacing.run12,
                       children: [
                         for (final tile in reservedTiles)
                           _WordTile(tile: tile, borderColor: chipBorderColor),
@@ -82,8 +83,8 @@ class ReorderTilePool extends StatelessWidget {
                     child: Align(
                       alignment: Alignment.topLeft,
                       child: Wrap(
-                        spacing: 14,
-                        runSpacing: 12,
+                        spacing: AppSpacing.item14,
+                        runSpacing: AppSpacing.run12,
                         children: [
                           for (final tile in tiles)
                             _WordTile(

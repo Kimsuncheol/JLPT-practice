@@ -6,6 +6,7 @@ import 'package:jlpt_practice/app/theme/app_theme.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/core/constants/app_sizes.dart';
 import 'package:jlpt_practice/core/constants/app_font_weights.dart';
+import 'package:jlpt_practice/core/constants/app_spacing.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
@@ -75,7 +76,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     _Label(strings('chooseLevel')),
                     const SizedBox(height: AppSizes.space12),
                     Wrap(
-                      spacing: 9,
+                      spacing: AppSpacing.item9,
                       children: ['N5', 'N4', 'N3', 'N2', 'N1']
                           .map(
                             (level) => ChoiceChip(

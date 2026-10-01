@@ -4,6 +4,7 @@ import 'package:jlpt_practice/features/kanji/widgets/reading_chip.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_tape.dart';
 import 'package:jlpt_practice/core/constants/app_sizes.dart';
 import 'package:jlpt_practice/core/constants/app_font_weights.dart';
+import 'package:jlpt_practice/core/constants/app_spacing.dart';
 
 /// One reading type on the back: its readings, then an example for each.
 class ReadingSection extends StatelessWidget {
@@ -45,8 +46,8 @@ class ReadingSection extends StatelessWidget {
         ),
         const SizedBox(height: AppSizes.space8),
         Wrap(
-          spacing: 8,
-          runSpacing: 8,
+          spacing: AppSpacing.item8,
+          runSpacing: AppSpacing.run8,
           children: [
             for (final reading in readings)
               ReadingChip(

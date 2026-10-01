@@ -3,6 +3,7 @@ import 'package:jlpt_practice/data/models/kanji.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_masking.dart';
 import 'package:jlpt_practice/features/vocabulary/masked_translation.dart';
 import 'package:jlpt_practice/core/constants/app_sizes.dart';
+import 'package:jlpt_practice/core/constants/app_spacing.dart';
 
 /// Keeps each kanji run's reading directly above its written form.
 class ExampleFuriganaText extends StatelessWidget {
@@ -32,6 +33,9 @@ class ExampleFuriganaText extends StatelessWidget {
         ),
     ];
     final sentence = displaySegments.map((segment) => segment.text).join();
+    final hasVisibleFurigana =
+        !hideReadings &&
+        displaySegments.any((segment) => segment.ruby?.isNotEmpty ?? false);
     final baseMasks = maskSegments(sentence, wordTargets);
     final covered = <({int start, int end})>[];
     var offset = 0;
@@ -106,7 +110,9 @@ class ExampleFuriganaText extends StatelessWidget {
               Wrap(
                 alignment: WrapAlignment.center,
                 crossAxisAlignment: WrapCrossAlignment.end,
-                runSpacing: 2,
+                runSpacing: hasVisibleFurigana
+                    ? AppSpacing.run20
+                    : AppSpacing.run2,
                 children: line,
               ),
           ],

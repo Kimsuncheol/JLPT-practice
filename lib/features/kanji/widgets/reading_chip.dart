@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_tape.dart';
 import 'package:jlpt_practice/core/constants/app_sizes.dart';
+import 'package:jlpt_practice/core/constants/app_spacing.dart';
 
 /// Size of the readings on the card front, larger than on the back.
 const frontFontSize = 32.0;
@@ -33,8 +34,8 @@ class ReadingGroup extends StatelessWidget {
       const SizedBox(height: AppSizes.space6),
       Wrap(
         alignment: WrapAlignment.center,
-        spacing: 8,
-        runSpacing: 8,
+        spacing: AppSpacing.item8,
+        runSpacing: AppSpacing.run8,
         children: [
           for (final reading in readings)
             ReadingChip(
