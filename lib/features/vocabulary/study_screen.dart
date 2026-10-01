@@ -15,6 +15,7 @@ import 'package:jlpt_practice/data/models/vocabulary.dart';
 import 'package:jlpt_practice/features/vocabulary/audible_speech.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_masking.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_tape.dart';
+import 'package:jlpt_practice/features/vocabulary/example_furigana_text.dart';
 import 'package:jlpt_practice/features/vocabulary/masked_translation.dart';
 import 'package:jlpt_practice/features/vocabulary/start_over_button.dart';
 
@@ -122,7 +123,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
                       (!showFurigana && word.reading == word.word);
                   final meaningsHidden = visibility.hideMeanings;
                   return Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 8, 20, 14),
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 14),
                     child: _StudyCard(
                       vocabulary: word,
                       language: state.meaningLanguage,
@@ -611,7 +612,7 @@ class _StudyCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _centeredScrollable(
-      padding: const EdgeInsets.fromLTRB(24, 26, 24, 24),
+      padding: const EdgeInsets.only(top: 26, bottom: 24),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -626,7 +627,7 @@ class _StudyCard extends StatelessWidget {
           if (vocabulary.hasExample) ...[
             const SizedBox(height: 34),
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.symmetric(vertical: 20),
               child: _buildExample(context),
             ),
           ],
@@ -772,30 +773,18 @@ class _StudyCard extends StatelessWidget {
             onTap: onSpeakExample,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              child: _maskedText(
-                _withRolePlayLineBreaks(vocabulary.example.sentence),
-                style: sentenceStyle,
-                targets: hideWord ? wordMaskTargets(vocabulary.word) : const [],
-                glyphWidth: 1,
+              child: ExampleFuriganaText(
+                key: const ValueKey('example-furigana'),
+                segments: vocabulary.example.sentenceSegments,
+                style: sentenceStyle ?? const TextStyle(fontSize: 22),
+                wordTargets: hideWord
+                    ? wordMaskTargets(vocabulary.word)
+                    : const [],
+                hideReadings: !showFurigana,
               ),
             ),
           ),
         ),
-        if (vocabulary.example.reading.isNotEmpty) ...[
-          const SizedBox(height: 6),
-          _speechTarget(
-            onTap: onSpeakExample,
-            child: KeyedSubtree(
-              key: const ValueKey('example-furigana'),
-              child: _maskedText(
-                _withRolePlayLineBreaks(vocabulary.example.reading),
-                style: null,
-                targets: showFurigana ? const [] : _readingMaskTargets(),
-                glyphWidth: 1,
-              ),
-            ),
-          ),
-        ],
         const SizedBox(height: 4),
         _buildTranslation(context, translationStyle),
       ],
@@ -830,18 +819,6 @@ class _StudyCard extends StatelessWidget {
           : const [],
       glyphWidth: 0.55,
     );
-  }
-
-  List<String> _readingMaskTargets() {
-    final reading = vocabulary.reading.trim();
-    if (reading.isEmpty) return const [];
-    final targets = <String>[reading];
-    // If the written form has an inflecting kana ending (食べる, 読む, ...),
-    // also cover its reading stem in examples such as たべます or よみます.
-    if (wordMaskTargets(vocabulary.word).length > 1 && reading.length > 1) {
-      targets.add(reading.substring(0, reading.length - 1));
-    }
-    return targets;
   }
 
   /// Renders [text] centered, laying tape over every run matching [targets].

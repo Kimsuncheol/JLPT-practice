@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:jlpt_practice/data/models/kanji.dart';
-import 'package:jlpt_practice/features/kanji/widgets/furigana_text.dart';
 import 'package:jlpt_practice/features/kanji/widgets/reading_chip.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_tape.dart';
 
@@ -15,9 +14,12 @@ class ReadingSection extends StatelessWidget {
     required this.hideMeanings,
     required this.onSpeak,
     required this.onSpeakSentence,
+    this.topPadding = 18,
     super.key,
   });
 
+  /// Space above the label; zero when the section opens the face.
+  final double topPadding;
   final String label;
   final List<String> readings;
   final List<KanjiExample> examples;
@@ -29,7 +31,7 @@ class ReadingSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.only(top: 18),
+    padding: EdgeInsets.only(top: topPadding),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -91,29 +93,28 @@ class ExampleTile extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Wrap(
-            crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: 10,
-            children: [
-              Text(
-                example.word,
-                style: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              if (example.reading.isNotEmpty)
-                hideReadings
-                    ? coverTapeFor(
-                        characters: example.reading.length,
-                        fontSize: 16,
-                        maxWidth: 110,
-                        glyphWidth: 0.9,
-                      )
-                    : Text(
-                        example.reading,
-                        style: TextStyle(color: theme.colorScheme.primary),
-                      ),
-            ],
+          // The reading is stacked above the word, with no brackets around it.
+          if (example.reading.isNotEmpty)
+            hideReadings
+                ? coverTapeFor(
+                    characters: example.reading.length,
+                    fontSize: 12,
+                    maxWidth: 110,
+                    glyphWidth: 0.9,
+                  )
+                : Text(
+                    example.reading,
+                    style: TextStyle(
+                      fontSize: 12,
+                      height: 1.2,
+                      color: theme.colorScheme.primary,
+                    ),
+                  ),
+          Text(
+            example.word,
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w800,
+            ),
           ),
           const SizedBox(height: 2),
           _maybeCovered(
@@ -132,10 +133,29 @@ class ExampleTile extends StatelessWidget {
                 onTap: () => onSpeakSentence(example.sentence),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 2),
-                  child: FuriganaText(
-                    segments: example.sentenceSegments,
-                    style: theme.textTheme.bodyMedium ?? const TextStyle(),
-                    hideFurigana: hideReadings,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // The kana reading is stacked above the sentence, with
+                      // no brackets around it.
+                      if (example.sentenceReading.isNotEmpty)
+                        hideReadings
+                            ? coverTapeFor(
+                                characters: example.sentenceReading.length,
+                                fontSize: 12,
+                                maxWidth: 220,
+                                glyphWidth: 0.9,
+                              )
+                            : Text(
+                                example.sentenceReading,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  height: 1.2,
+                                  color: theme.colorScheme.primary,
+                                ),
+                              ),
+                      Text(example.sentence, style: theme.textTheme.bodyMedium),
+                    ],
                   ),
                 ),
               ),

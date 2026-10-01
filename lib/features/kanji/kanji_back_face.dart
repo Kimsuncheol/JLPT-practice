@@ -58,6 +58,7 @@ class KanjiBackFace extends StatelessWidget {
                           kanji.kunExamples.isNotEmpty)
                         ReadingSection(
                           label: strings('kunYomi'),
+                          topPadding: 0,
                           readings: kanji.kunYomi,
                           examples: kanji.kunExamples,
                           language: language,
@@ -81,6 +82,10 @@ class KanjiBackFace extends StatelessWidget {
                           kanji.onExamples.isNotEmpty)
                         ReadingSection(
                           label: strings('onYomi'),
+                          topPadding:
+                              kanji.kunYomi.isEmpty && kanji.kunExamples.isEmpty
+                              ? 0
+                              : 18,
                           readings: kanji.onYomi,
                           examples: kanji.onExamples,
                           language: language,

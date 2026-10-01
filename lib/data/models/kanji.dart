@@ -75,6 +75,16 @@ class KanjiExample {
       ? [FuriganaSegment(sentence)]
       : parseFurigana(sentenceFurigana);
 
+  /// [sentence] written in kana only, read from [sentenceFurigana]; empty when
+  /// there are no readings or the sentence has no kanji to read.
+  String get sentenceReading {
+    if (sentenceFurigana.isEmpty) return '';
+    final reading = sentenceSegments
+        .map((segment) => segment.ruby ?? segment.text)
+        .join();
+    return reading == sentence ? '' : reading;
+  }
+
   String meaning(String language) => meanings[language] ?? meanings['en'] ?? '';
 
   String sentenceTranslation(String language) =>

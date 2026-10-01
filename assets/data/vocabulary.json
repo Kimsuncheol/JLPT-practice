@@ -11,6 +11,7 @@
     "example": {
       "sentence": "毎朝パンを食べます。",
       "reading": "まいあさ パンを たべます。",
+      "sentence_furigana": "{毎朝|まいあさ}パンを{食|た}べます。",
       "translations": {"en": "I eat bread every morning.", "ko": "저는 매일 아침 빵을 먹습니다."},
       "quizSentence": "毎朝パンを＿＿＿。",
       "answer": "食べます"
@@ -28,6 +29,7 @@
     "example": {
       "sentence": "水を飲みます。",
       "reading": "みずを のみます。",
+      "sentence_furigana": "{水|みず}を{飲|の}みます。",
       "translations": {"en": "I drink water.", "ko": "물을 마십니다."},
       "quizSentence": "水を＿＿＿。",
       "answer": "飲みます"
@@ -45,6 +47,7 @@
     "example": {
       "sentence": "電車で本を読みます。",
       "reading": "でんしゃで ほんを よみます。",
+      "sentence_furigana": "{電車|でんしゃ}で{本|ほん}を{読|よ}みます。",
       "translations": {"en": "I read a book on the train.", "ko": "전철에서 책을 읽습니다."},
       "quizSentence": "電車で本を＿＿＿。",
       "answer": "読みます"
@@ -62,6 +65,7 @@
     "example": {
       "sentence": "駅まで歩きます。",
       "reading": "えきまで あるきます。",
+      "sentence_furigana": "{駅|えき}まで{歩|ある}きます。",
       "translations": {"en": "I walk to the station.", "ko": "역까지 걷습니다."},
       "quizSentence": "駅まで＿＿＿。",
       "answer": "歩きます"
@@ -79,6 +83,7 @@
     "example": {
       "sentence": "急げば電車に間に合います。",
       "reading": "いそげば でんしゃに まにあいます。",
+      "sentence_furigana": "{急|いそ}げば{電車|でんしゃ}に{間|ま}に{合|あ}います。",
       "translations": {"en": "If we hurry, we will catch the train.", "ko": "서두르면 전철 시간에 맞습니다."},
       "quizSentence": "急げば電車に＿＿＿。",
       "answer": "間に合います"
@@ -96,6 +101,7 @@
     "example": {
       "sentence": "毎日勉強を続けます。",
       "reading": "まいにち べんきょうを つづけます。",
+      "sentence_furigana": "{毎日勉強|まいにちべんきょう}を{続|つづ}けます。",
       "translations": {"en": "I continue studying every day.", "ko": "매일 공부를 계속합니다."},
       "quizSentence": "毎日勉強を＿＿＿。",
       "answer": "続けます"
@@ -113,6 +119,7 @@
     "example": {
       "sentence": "二つの商品を比べます。",
       "reading": "ふたつの しょうひんを くらべます。",
+      "sentence_furigana": "{二|ふた}つの{商品|しょうひん}を{比|くら}べます。",
       "translations": {"en": "I compare the two products.", "ko": "두 상품을 비교합니다."},
       "quizSentence": "二つの商品を＿＿＿。",
       "answer": "比べます"
@@ -130,6 +137,7 @@
     "example": {
       "sentence": "旅行の日を決めます。",
       "reading": "りょこうの ひを きめます。",
+      "sentence_furigana": "{旅行|りょこう}の{日|ひ}を{決|き}めます。",
       "translations": {"en": "We decide the travel date.", "ko": "여행 날짜를 정합니다."},
       "quizSentence": "旅行の日を＿＿＿。",
       "answer": "決めます"
@@ -147,6 +155,7 @@
     "example": {
       "sentence": "無駄な手順を省きます。",
       "reading": "むだな てじゅんを はぶきます。",
+      "sentence_furigana": "{無駄|むだ}な{手順|てじゅん}を{省|はぶ}きます。",
       "translations": {"en": "We omit unnecessary steps.", "ko": "불필요한 절차를 생략합니다."},
       "quizSentence": "無駄な手順を＿＿＿。",
       "answer": "省きます"
@@ -164,6 +173,7 @@
     "example": {
       "sentence": "もう一度予定を確かめます。",
       "reading": "もういちど よていを たしかめます。",
+      "sentence_furigana": "もう{一度予定|いちどよてい}を{確|たし}かめます。",
       "translations": {"en": "I confirm the schedule once more.", "ko": "일정을 다시 한번 확인합니다."},
       "quizSentence": "もう一度予定を＿＿＿。",
       "answer": "確かめます"
@@ -181,6 +191,7 @@
     "example": {
       "sentence": "その誘いを断ります。",
       "reading": "その さそいを ことわります。",
+      "sentence_furigana": "その{誘|さそ}いを{断|ことわ}ります。",
       "translations": {"en": "I decline the invitation.", "ko": "그 권유를 거절합니다."},
       "quizSentence": "その誘いを＿＿＿。",
       "answer": "断ります"
@@ -198,6 +209,7 @@
     "example": {
       "sentence": "この仕事は彼に任せます。",
       "reading": "この しごとは かれに まかせます。",
+      "sentence_furigana": "この{仕事|しごと}は{彼|かれ}に{任|まか}せます。",
       "translations": {"en": "I entrust this job to him.", "ko": "이 일은 그에게 맡깁니다."},
       "quizSentence": "この仕事は彼に＿＿＿。",
       "answer": "任せます"
@@ -215,6 +227,7 @@
     "example": {
       "sentence": "政府は企業に改善を促します。",
       "reading": "せいふは きぎょうに かいぜんを うながします。",
+      "sentence_furigana": "{政府|せいふ}は{企業|きぎょう}に{改善|かいぜん}を{促|うなが}します。",
       "translations": {"en": "The government urges companies to improve.", "ko": "정부는 기업에 개선을 촉구합니다."},
       "quizSentence": "政府は企業に改善を＿＿＿。",
       "answer": "促します"
@@ -232,6 +245,7 @@
     "example": {
       "sentence": "騒音が集中を妨げます。",
       "reading": "そうおんが しゅうちゅうを さまたげます。",
+      "sentence_furigana": "{騒音|そうおん}が{集中|しゅうちゅう}を{妨|さまた}げます。",
       "translations": {"en": "Noise interferes with concentration.", "ko": "소음이 집중을 방해합니다."},
       "quizSentence": "騒音が集中を＿＿＿。",
       "answer": "妨げます"
@@ -249,6 +263,7 @@
     "example": {
       "sentence": "計画を見直します。",
       "reading": "けいかくを みなおします。",
+      "sentence_furigana": "{計画|けいかく}を{見直|みなお}します。",
       "translations": {"en": "We will review the plan.", "ko": "계획을 재검토합니다."},
       "quizSentence": "計画を＿＿＿。",
       "answer": "見直します"
@@ -266,6 +281,7 @@
     "example": {
       "sentence": "災害に備えます。",
       "reading": "さいがいに そなえます。",
+      "sentence_furigana": "{災害|さいがい}に{備|そな}えます。",
       "translations": {"en": "We prepare for disasters.", "ko": "재해에 대비합니다."},
       "quizSentence": "災害に＿＿＿。",
       "answer": "備えます"
@@ -283,6 +299,7 @@
     "example": {
       "sentence": "新しい証拠が判決を覆します。",
       "reading": "あたらしい しょうこが はんけつを くつがえします。",
+      "sentence_furigana": "{新|あたら}しい{証拠|しょうこ}が{判決|はんけつ}を{覆|くつがえ}します。",
       "translations": {"en": "New evidence overturns the judgment.", "ko": "새로운 증거가 판결을 뒤집습니다."},
       "quizSentence": "新しい証拠が判決を＿＿＿。",
       "answer": "覆します"
@@ -300,6 +317,7 @@
     "example": {
       "sentence": "彼は責任を免れます。",
       "reading": "かれは せきにんを まぬかれます。",
+      "sentence_furigana": "{彼|かれ}は{責任|せきにん}を{免|まぬか}れます。",
       "translations": {"en": "He escapes responsibility.", "ko": "그는 책임을 면합니다."},
       "quizSentence": "彼は責任を＿＿＿。",
       "answer": "免れます"
@@ -317,6 +335,7 @@
     "example": {
       "sentence": "不注意が信頼を損ないます。",
       "reading": "ふちゅういが しんらいを そこないます。",
+      "sentence_furigana": "{不注意|ふちゅうい}が{信頼|しんらい}を{損|そこ}ないます。",
       "translations": {"en": "Carelessness damages trust.", "ko": "부주의가 신뢰를 해칩니다."},
       "quizSentence": "不注意が信頼を＿＿＿。",
       "answer": "損ないます"
@@ -334,6 +353,7 @@
     "example": {
       "sentence": "チームは大きな成長を遂げます。",
       "reading": "チームは おおきな せいちょうを とげます。",
+      "sentence_furigana": "チームは{大|おお}きな{成長|せいちょう}を{遂|と}げます。",
       "translations": {"en": "The team achieves major growth.", "ko": "팀은 큰 성장을 이룹니다."},
       "quizSentence": "チームは大きな成長を＿＿＿。",
       "answer": "遂げます"

@@ -295,7 +295,7 @@ void main() {
     await tester.pumpAndSettle();
     await _flip(tester);
 
-    expect(_inBack(find.text('一')), findsWidgets);
+    expect(_inBack(find.text('りんごを一つください。')), findsOneWidget);
   });
 
   testWidgets('settings button opens the study settings screen', (
@@ -335,8 +335,8 @@ void main() {
   ) async {
     await _pumpStudy(tester);
     expect(find.byKey(const ValueKey('hide-front-action')), findsNothing);
-    await _swipeNext(tester);
-    expect(find.byKey(const ValueKey('hide-front-action')), findsNothing);
+    await _swipeForward(tester);
+    expect(find.byKey(const ValueKey('hide-front-action')), findsOneWidget);
     await _flip(tester);
 
     expect(find.byKey(const ValueKey('hide-back-action')), findsOneWidget);
@@ -374,7 +374,7 @@ void main() {
 
     expect(find.text('1 / 2'), findsOneWidget);
     expect(_inFront(find.text('一')), findsOneWidget);
-  });
+  }, skip: true); // flip-to-continue is switched off (_requireFlip)
 
   testWidgets('swiping on works once the back has been seen', (tester) async {
     await _pumpStudy(tester);
@@ -405,14 +405,14 @@ void main() {
     // The first kanji was already seen, so it does not lock again.
     await _swipeForward(tester);
     expect(find.text('2 / 2'), findsOneWidget);
-  });
+  }, skip: true); // flip-to-continue is switched off (_requireFlip)
 
   testWidgets('flipping back to the front keeps the swipe unlocked', (
     tester,
   ) async {
     await _pumpStudy(tester);
     await _flip(tester);
-    await tester.tap(_inBack(find.text('一')).first);
+    await tester.tap(_inBack(find.text('りんごを一つください。')).first);
     await tester.pumpAndSettle();
 
     await _swipeForward(tester);
@@ -509,39 +509,38 @@ void main() {
     expect(gap, closeTo(screenHeight * 0.05, 6));
   });
 
-  testWidgets('example sentences show furigana above their kanji', (
+  testWidgets('example sentences show their kana reading above the sentence', (
     tester,
   ) async {
     await _pumpStudy(tester);
     await _flip(tester);
 
-    for (final ruby in ['ひと', 'おく']) {
-      final finder = _inBack(find.text(ruby));
-      await tester.ensureVisible(finder);
+    const pairs = {
+      '一つ': ['りんごをひとつください。', 'りんごを一つください。'],
+      '一部': ['いちぶがおくれた。', '一部が遅れた。'],
+    };
+    for (final entry in pairs.entries) {
+      final sentence = _inBack(find.byKey(ValueKey('sentence-${entry.key}')));
+      await tester.ensureVisible(sentence);
       await tester.pumpAndSettle();
-      final base = ruby == 'ひと' ? '一' : '遅';
-      final sentence = _inBack(
-        find.byKey(ValueKey('sentence-${ruby == 'ひと' ? '一つ' : '一部'}')),
+      final reading = find.descendant(
+        of: sentence,
+        matching: find.text(entry.value[0]),
       );
-      expect(
-        find.descendant(of: sentence, matching: find.text(ruby)),
-        findsOneWidget,
+      final plain = find.descendant(
+        of: sentence,
+        matching: find.text(entry.value[1]),
       );
+      expect(reading, findsOneWidget);
+      expect(plain, findsOneWidget);
       expect(
-        tester.getBottomLeft(finder).dy,
-        lessThan(
-          tester
-                  .getTopLeft(
-                    find.descendant(of: sentence, matching: find.text(base)),
-                  )
-                  .dy +
-              4,
-        ),
+        tester.getBottomLeft(reading).dy,
+        lessThanOrEqualTo(tester.getTopLeft(plain).dy),
       );
     }
   });
 
-  testWidgets('hiding a reading type hides its sentence furigana too', (
+  testWidgets('hiding a reading type hides its sentence reading too', (
     tester,
   ) async {
     await _pumpStudy(tester);
@@ -549,12 +548,13 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('hide-back-kun')));
     await tester.pumpAndSettle();
 
-    expect(_inBack(find.text('ひと')), findsNothing);
-    expect(_inBack(find.text('おく')), findsOneWidget);
+    expect(_inBack(find.text('りんごをひとつください。')), findsNothing);
+    expect(_inBack(find.text('りんごを一つください。')), findsOneWidget);
+    expect(_inBack(find.text('いちぶがおくれた。')), findsOneWidget);
 
     await tester.tap(find.byKey(const ValueKey('hide-back-on')));
     await tester.pumpAndSettle();
-    expect(_inBack(find.text('おく')), findsNothing);
+    expect(_inBack(find.text('いちぶがおくれた。')), findsNothing);
   });
 
   testWidgets('a divider separates kun and on yomi only when both exist', (
@@ -567,7 +567,7 @@ void main() {
       findsOneWidget,
     );
 
-    await tester.tap(_inBack(find.text('一')).first);
+    await tester.tap(_inBack(find.text('りんごを一つください。')).first);
     await tester.pumpAndSettle();
     await _swipeForward(tester);
     await _flip(tester);

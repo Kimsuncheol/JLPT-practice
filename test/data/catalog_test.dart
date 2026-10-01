@@ -45,7 +45,19 @@ void main() {
     for (final word in catalog) {
       final example = word['example'] as Map<String, dynamic>;
       final sentence = example['sentence'] as String;
-      final reading = example['reading'] as String;
+      final parsed = VocabularyExample.fromJson(example);
+      final reading = parsed.sentenceReading;
+      expect(
+        parsed.sentenceSegments.map((segment) => segment.text).join(),
+        sentence,
+      );
+      for (final segment in parsed.sentenceSegments) {
+        if (segment.ruby != null) {
+          expect(RegExp(r'^[㐀-䶿一-鿿々〆]+$').hasMatch(segment.text), isTrue);
+          expect(segment.ruby, isNotEmpty);
+        }
+      }
+      expect(example.containsKey('reading'), isFalse);
       final quizSentence = example['quizSentence'] as String;
       final answer = example['answer'] as String;
       final translations = example['translations'] as Map<String, dynamic>;
@@ -86,6 +98,55 @@ void main() {
     );
   });
 
+  test('sentence furigana takes precedence and decodes kanji markup', () {
+    final example = VocabularyExample.fromJson({
+      'sentence': 'りんごを一つください。',
+      'reading': 'legacy reading',
+      'sentence_furigana': 'りんごを{一|ひと}つください。',
+      'translations': <String, String>{},
+    });
+
+    expect(example.sentenceReading, 'りんごをひとつください。');
+    expect(example.sentenceReading, isNot(contains('(')));
+    expect(example.sentenceReading, isNot(contains('（')));
+  });
+
+  test('legacy examples still expose their kana reading', () {
+    final example = VocabularyExample.fromJson({
+      'sentence': '一つください。',
+      'reading': 'ひとつください。',
+      'translations': <String, String>{},
+    });
+
+    expect(example.sentenceReading, 'ひとつください。');
+  });
+
+  test('enrichment copies furigana only for a matching sentence', () {
+    const catalog = VocabularyExample(
+      sentence: '一つください。',
+      sentenceFurigana: '{一|ひと}つください。',
+      translations: {},
+      quizSentence: '',
+      answer: '',
+    );
+    const matching = VocabularyExample(
+      sentence: '一つください。',
+      translations: {},
+      quizSentence: '',
+      answer: '',
+    );
+    const different = VocabularyExample(
+      sentence: '二つください。',
+      reading: 'ふたつください。',
+      translations: {},
+      quizSentence: '',
+      answer: '',
+    );
+
+    expect(matching.withReorderData(catalog).sentenceReading, 'ひとつください。');
+    expect(different.withReorderData(catalog).sentenceReading, 'ふたつください。');
+  });
+
   test('migrated reorder tiles reconstruct every example', () {
     var awaitingReview = 0;
     for (final word in catalog) {
@@ -113,7 +174,7 @@ void main() {
 String _compact(String value) => value.replaceAll(RegExp(r'[\s\u3000]'), '');
 
 bool _containsKanji(String value) =>
-    RegExp(r'[\u3400-\u4DBF\u4E00-\u9FFF々〆ヵヶ]').hasMatch(value);
+    RegExp(r'[\u3400-\u4DBF\u4E00-\u9FFF々〆]').hasMatch(value);
 
 int _count(List<Map<String, dynamic>> catalog, String level) =>
     catalog.where((word) => word['level'] == level).length;

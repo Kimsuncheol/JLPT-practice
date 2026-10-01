@@ -36,6 +36,11 @@ class _KanjiStudyScreenState extends ConsumerState<KanjiStudyScreen>
   /// screen height.
   static const _hideGroupGapShare = 0.05;
 
+  /// Whether a card's back must be seen before swiping on. Switched off for
+  /// now: with it off there is no lock, no hint, and start over is always
+  /// offered on the last kanji.
+  static const _requireFlip = false;
+
   PageController? _pageController;
   final Map<String, KanjiVisibility> _visibility = {};
 
@@ -92,7 +97,7 @@ class _KanjiStudyScreenState extends ConsumerState<KanjiStudyScreen>
       );
     }
     final controller = _pageController ?? _initializePage(kanji, state);
-    final seenBack = _seenBack.contains(kanji[_index].id);
+    final seenBack = !_requireFlip || _seenBack.contains(kanji[_index].id);
     _lockedPage = seenBack ? null : _index;
     return PopScope(
       canPop: false,
@@ -240,7 +245,7 @@ class _KanjiStudyScreenState extends ConsumerState<KanjiStudyScreen>
     _index = canResume
         ? session.resolveIndex(kanji.map((item) => item.id).toList())
         : 0;
-    _lockedPage = _index;
+    _lockedPage = _requireFlip ? _index : null;
     final controller = _pageController = PageController(initialPage: _index);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
