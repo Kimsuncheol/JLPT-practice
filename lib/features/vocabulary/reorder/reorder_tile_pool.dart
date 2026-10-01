@@ -51,8 +51,8 @@ class ReorderTilePool extends StatelessWidget {
         child: CustomPaint(
           painter: IndexNoteLinesPainter(
             color: lineColor,
-            firstLineY: 72,
-            spacing: AppSpacing.item52,
+            firstLineY: 72 + AppSpacing.item8,
+            spacing: AppSizes.size48 + AppSpacing.run20,
           ),
           child: ConstrainedBox(
             constraints: const BoxConstraints(minHeight: AppSizes.size90),
@@ -61,7 +61,7 @@ class ReorderTilePool extends StatelessWidget {
                 AppSizes.size24,
                 AppSizes.size28,
                 AppSizes.size24,
-                AppSizes.size14,
+                AppSizes.size14 + AppSpacing.item8,
               ),
               child: Stack(
                 children: [
@@ -72,7 +72,7 @@ class ReorderTilePool extends StatelessWidget {
                     maintainState: true,
                     child: Wrap(
                       spacing: AppSpacing.item14,
-                      runSpacing: AppSpacing.run12,
+                      runSpacing: AppSpacing.run20,
                       children: [
                         for (final tile in reservedTiles)
                           _WordTile(tile: tile, borderColor: chipBorderColor),
@@ -84,7 +84,7 @@ class ReorderTilePool extends StatelessWidget {
                       alignment: Alignment.topLeft,
                       child: Wrap(
                         spacing: AppSpacing.item14,
-                        runSpacing: AppSpacing.run12,
+                        runSpacing: AppSpacing.run20,
                         children: [
                           for (final tile in tiles)
                             _WordTile(

@@ -5,7 +5,6 @@ import 'package:jlpt_practice/features/vocabulary/sentence_reorder_quiz.dart';
 import 'package:jlpt_practice/core/constants/app_sizes.dart';
 import 'package:jlpt_practice/core/constants/app_colors.dart';
 import 'package:jlpt_practice/core/constants/app_font_weights.dart';
-import 'package:jlpt_practice/core/constants/app_font_styles.dart';
 import 'package:jlpt_practice/core/constants/app_spacing.dart';
 
 class ReorderAnswerArea extends StatelessWidget {
@@ -57,42 +56,27 @@ class ReorderAnswerArea extends StatelessWidget {
           CustomPaint(
             painter: IndexNoteLinesPainter(
               color: lineColor,
-              firstLineY: 56,
-              spacing: AppSpacing.item42,
-              drawBottomRule: true,
+              // The visible chip ends 5px above its 48px touch target.
+              firstLineY:
+                  AppSizes.size18 + AppSizes.size48 - 5 + AppSpacing.item8,
+              spacing: AppSizes.size48 + AppSpacing.run16,
             ),
             child: ConstrainedBox(
-              constraints: const BoxConstraints(minHeight: AppSizes.size88),
+              constraints: const BoxConstraints(
+                minHeight: AppSizes.size88 + AppSizes.size48 + AppSpacing.run16,
+              ),
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(
                   AppSizes.size24,
                   AppSizes.size18,
                   AppSizes.size24,
-                  AppSizes.size10,
+                  AppSizes.size10 + AppSpacing.item8,
                 ),
                 child: selected.isEmpty
-                    ? Row(
-                        children: [
-                          Icon(
-                            Icons.drag_indicator_rounded,
-                            size: AppSizes.size22,
-                            color: foregroundColor.withValues(alpha: 0.78),
-                          ),
-                          const SizedBox(width: AppSizes.space10),
-                          Expanded(
-                            child: Text(
-                              context.strings('chooseWordToBegin'),
-                              style: theme.textTheme.bodyLarge?.copyWith(
-                                color: foregroundColor.withValues(alpha: 0.82),
-                                fontStyle: AppFontStyles.italic,
-                              ),
-                            ),
-                          ),
-                        ],
-                      )
+                    ? const SizedBox(height: AppSizes.size48)
                     : Wrap(
                         spacing: AppSpacing.item14,
-                        runSpacing: AppSpacing.run8,
+                        runSpacing: AppSpacing.run16,
                         children: [
                           for (final (position, tile) in selected.indexed)
                             InputChip(
