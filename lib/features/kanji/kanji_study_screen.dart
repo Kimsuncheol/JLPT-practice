@@ -122,6 +122,7 @@ class _KanjiStudyScreenState extends ConsumerState<KanjiStudyScreen>
           children: [
             Positioned.fill(
               child: PageView.builder(
+                key: const ValueKey('kanji-pages'),
                 controller: controller,
                 physics: KanjiForwardLockPhysics(lockedPage: () => _lockedPage),
                 // One page past the last kanji: swiping onto it opens the finish screen.
@@ -234,6 +235,8 @@ class _KanjiStudyScreenState extends ConsumerState<KanjiStudyScreen>
           hideKunYomi: !state.showFurigana,
           hideOnYomi: !state.showFurigana,
           hideFurigana: !state.showFurigana,
+          hideHun: state.hideMeanings,
+          hideEum: state.hideMeanings,
           hideMeanings: state.hideMeanings,
         ),
       );

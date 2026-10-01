@@ -150,7 +150,10 @@ void main() {
         viaHome: true,
       );
       await _flipAndSwipe(tester, swipe: false);
-      await tester.drag(find.byType(PageView), const Offset(-500, 0));
+      await tester.drag(
+        find.byKey(const ValueKey('kanji-pages')),
+        const Offset(-500, 0),
+      );
       await tester.pumpAndSettle();
       await tester.tap(find.text('Finish'));
       await tester.pumpAndSettle();
@@ -217,7 +220,10 @@ void main() {
       );
       await _pumpStudy(tester, controller);
       await _flipAndSwipe(tester, swipe: false);
-      await tester.drag(find.byType(PageView), const Offset(-500, 0));
+      await tester.drag(
+        find.byKey(const ValueKey('kanji-pages')),
+        const Offset(-500, 0),
+      );
       await tester.pumpAndSettle();
       await tester.tap(find.text('Finish'));
       await tester.pumpAndSettle();
@@ -232,7 +238,10 @@ Future<void> _flipAndSwipe(WidgetTester tester, {bool swipe = true}) async {
   await tester.tapAt(face.topCenter + const Offset(0, 24));
   await tester.pumpAndSettle();
   if (!swipe) return;
-  await tester.drag(find.byType(PageView), const Offset(-500, 0));
+  await tester.drag(
+    find.byKey(const ValueKey('kanji-pages')),
+    const Offset(-500, 0),
+  );
   await tester.pumpAndSettle();
 }
 

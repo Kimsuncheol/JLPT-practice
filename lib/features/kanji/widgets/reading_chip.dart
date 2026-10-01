@@ -13,9 +13,12 @@ class ReadingGroup extends StatelessWidget {
     required this.readings,
     required this.hidden,
     required this.onSpeak,
+    this.extra,
     super.key,
   });
 
+  /// Shown below the readings, such as the hun of a kun'yomi group.
+  final Widget? extra;
   final String label;
   final List<String> readings;
   final bool hidden;
@@ -47,6 +50,7 @@ class ReadingGroup extends StatelessWidget {
             ),
         ],
       ),
+      ?extra,
     ],
   );
 }

@@ -50,6 +50,10 @@ class AppSizes {
   static const double space32 = 32;
   static const double space34 = 34;
   static const double space36 = 36;
+  static const double space44 = 44;
+  static const double space48 = 48;
+  static const double space52 = 52;
+  static const double space60 = 60;
 
   // Corner radii
   static const double radius3 = 3;

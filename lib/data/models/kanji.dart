@@ -95,7 +95,8 @@ class Kanji {
   const Kanji({
     required this.character,
     required this.jlptLevel,
-    required this.hunEum,
+    required this.hun,
+    required this.eum,
     required this.strokes,
     required this.kunYomi,
     required this.onYomi,
@@ -106,7 +107,8 @@ class Kanji {
   factory Kanji.fromJson(Map<String, dynamic> json) => Kanji(
     character: json['kanji'] as String,
     jlptLevel: json['jlpt'] as String,
-    hunEum: _strings(json['hun_eum']),
+    hun: _strings(json['hun']),
+    eum: _strings(json['eum']),
     strokes: json['strokes'] as int? ?? 0,
     kunYomi: _strings(json['kun_yomi']),
     onYomi: _strings(json['on_yomi']),
@@ -116,12 +118,20 @@ class Kanji {
 
   final String character;
   final String jlptLevel;
-  final List<String> hunEum;
+
+  /// The Korean meaning (훈) and sound (음) of the kanji. The lists run in
+  /// parallel: `hun[i]` and `eum[i]` belong to the same entry.
+  final List<String> hun;
+  final List<String> eum;
   final int strokes;
   final List<String> kunYomi;
   final List<String> onYomi;
   final List<KanjiExample> kunExamples;
   final List<KanjiExample> onExamples;
+
+  /// The hun and eum without repeats, in order.
+  List<String> get uniqueHun => hun.toSet().toList(growable: false);
+  List<String> get uniqueEum => eum.toSet().toList(growable: false);
 
   /// One kanji appears once per level, so the character identifies it.
   String get id => '$jlptLevel-$character';
