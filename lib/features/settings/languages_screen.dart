@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
+import 'package:jlpt_practice/core/constants/app_font_weights.dart';
 
 class LanguagesScreen extends ConsumerWidget {
   const LanguagesScreen({super.key});
@@ -21,9 +23,15 @@ class LanguagesScreen extends ConsumerWidget {
             ('ko', '한국어', Icons.translate_rounded),
           ];
           return ListView.separated(
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
+            padding: const EdgeInsets.fromLTRB(
+              AppSizes.size20,
+              AppSizes.size12,
+              AppSizes.size20,
+              AppSizes.size28,
+            ),
             itemCount: options.length,
-            separatorBuilder: (_, _) => const SizedBox(height: 10),
+            separatorBuilder: (_, _) =>
+                const SizedBox(height: AppSizes.space10),
             itemBuilder: (context, index) {
               final option = options[index];
               final selected = state.languageCode == option.$1;
@@ -31,16 +39,16 @@ class LanguagesScreen extends ConsumerWidget {
                 color: selected
                     ? Theme.of(context).colorScheme.primaryContainer
                     : Theme.of(context).colorScheme.surface,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(AppSizes.radius20),
                 child: ListTile(
                   minTileHeight: 68,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(AppSizes.radius20),
                   ),
                   leading: Icon(option.$3),
                   title: Text(
                     option.$2,
-                    style: const TextStyle(fontWeight: FontWeight.w700),
+                    style: const TextStyle(fontWeight: AppFontWeights.bold700),
                   ),
                   trailing: selected
                       ? const Icon(Icons.check_circle_rounded)

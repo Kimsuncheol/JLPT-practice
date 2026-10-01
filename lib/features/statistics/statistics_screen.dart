@@ -4,6 +4,8 @@ import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/features/statistics/statistics_skeleton.dart';
 import 'package:jlpt_practice/shared/rewarded_xp_card.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
+import 'package:jlpt_practice/core/constants/app_font_weights.dart';
 
 class StatisticsScreen extends ConsumerWidget {
   const StatisticsScreen({super.key});
@@ -21,13 +23,18 @@ class StatisticsScreen extends ConsumerWidget {
             children: [
               Expanded(
                 child: ListView(
-                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSizes.size20,
+                    AppSizes.size20,
+                    AppSizes.size20,
+                    AppSizes.size18,
+                  ),
                   children: [
                     Text(
                       strings('progress'),
                       style: Theme.of(context).textTheme.headlineMedium,
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: AppSizes.space20),
                     Row(
                       children: [
                         Expanded(
@@ -37,7 +44,7 @@ class StatisticsScreen extends ConsumerWidget {
                             label: strings('totalStudied'),
                           ),
                         ),
-                        const SizedBox(width: 10),
+                        const SizedBox(width: AppSizes.space10),
                         Expanded(
                           child: _StatCard(
                             icon: Icons.workspace_premium_rounded,
@@ -47,7 +54,7 @@ class StatisticsScreen extends ConsumerWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: AppSizes.space10),
                     Row(
                       children: [
                         Expanded(
@@ -57,7 +64,7 @@ class StatisticsScreen extends ConsumerWidget {
                             label: strings('streak'),
                           ),
                         ),
-                        const SizedBox(width: 10),
+                        const SizedBox(width: AppSizes.space10),
                         Expanded(
                           child: _StatCard(
                             icon: Icons.track_changes_rounded,
@@ -67,7 +74,7 @@ class StatisticsScreen extends ConsumerWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: AppSizes.space10),
                     SizedBox(
                       width: double.infinity,
                       child: _StatCard(
@@ -76,18 +83,23 @@ class StatisticsScreen extends ConsumerWidget {
                         label: strings('totalXp'),
                       ),
                     ),
-                    const SizedBox(height: 26),
+                    const SizedBox(height: AppSizes.space26),
                     Text(
                       strings('weeklyActivity'),
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppSizes.space12),
                     Container(
-                      height: 210,
-                      padding: const EdgeInsets.fromLTRB(18, 24, 18, 14),
+                      height: AppSizes.size210,
+                      padding: const EdgeInsets.fromLTRB(
+                        AppSizes.size18,
+                        AppSizes.size24,
+                        AppSizes.size18,
+                        AppSizes.size14,
+                      ),
                       decoration: BoxDecoration(
                         color: Theme.of(context).colorScheme.surface,
-                        borderRadius: BorderRadius.circular(24),
+                        borderRadius: BorderRadius.circular(AppSizes.radius24),
                       ),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.end,
@@ -105,7 +117,7 @@ class StatisticsScreen extends ConsumerWidget {
                           return Expanded(
                             child: Padding(
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 4,
+                                horizontal: AppSizes.size4,
                               ),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.end,
@@ -121,10 +133,12 @@ class StatisticsScreen extends ConsumerWidget {
                                           : Theme.of(
                                               context,
                                             ).colorScheme.primaryContainer,
-                                      borderRadius: BorderRadius.circular(9),
+                                      borderRadius: BorderRadius.circular(
+                                        AppSizes.radius9,
+                                      ),
                                     ),
                                   ),
-                                  const SizedBox(height: 9),
+                                  const SizedBox(height: AppSizes.space9),
                                   Text(
                                     days[index],
                                     style: Theme.of(
@@ -138,7 +152,7 @@ class StatisticsScreen extends ConsumerWidget {
                         }),
                       ),
                     ),
-                    const SizedBox(height: 26),
+                    const SizedBox(height: AppSizes.space26),
                     FittedBox(
                       fit: BoxFit.scaleDown,
                       alignment: Alignment.centerLeft,
@@ -149,12 +163,12 @@ class StatisticsScreen extends ConsumerWidget {
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppSizes.space12),
                     Container(
-                      padding: const EdgeInsets.all(20),
+                      padding: const EdgeInsets.all(AppSizes.size20),
                       decoration: BoxDecoration(
                         color: Theme.of(context).colorScheme.surface,
-                        borderRadius: BorderRadius.circular(24),
+                        borderRadius: BorderRadius.circular(AppSizes.radius24),
                       ),
                       child: Table(
                         columnWidths: const {
@@ -174,29 +188,35 @@ class StatisticsScreen extends ConsumerWidget {
                           return TableRow(
                             children: [
                               Padding(
-                                padding: const EdgeInsets.only(bottom: 16),
+                                padding: const EdgeInsets.only(
+                                  bottom: AppSizes.size16,
+                                ),
                                 child: Text(
                                   level,
                                   style: const TextStyle(
-                                    fontWeight: FontWeight.w800,
+                                    fontWeight: AppFontWeights.extraBold,
                                   ),
                                 ),
                               ),
                               Padding(
                                 padding: const EdgeInsets.fromLTRB(
-                                  10,
+                                  AppSizes.size10,
                                   0,
-                                  10,
-                                  16,
+                                  AppSizes.size10,
+                                  AppSizes.size16,
                                 ),
                                 child: LinearProgressIndicator(
                                   value: total == 0 ? 0 : studied / total,
-                                  minHeight: 10,
-                                  borderRadius: BorderRadius.circular(10),
+                                  minHeight: AppSizes.size10,
+                                  borderRadius: BorderRadius.circular(
+                                    AppSizes.radius10,
+                                  ),
                                 ),
                               ),
                               Padding(
-                                padding: const EdgeInsets.only(bottom: 16),
+                                padding: const EdgeInsets.only(
+                                  bottom: AppSizes.size16,
+                                ),
                                 child: Text(
                                   '$studied / $total',
                                   textAlign: TextAlign.start,
@@ -233,19 +253,22 @@ class _StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(18),
+    padding: const EdgeInsets.all(AppSizes.size18),
     decoration: BoxDecoration(
       color: Theme.of(context).colorScheme.surface,
-      borderRadius: BorderRadius.circular(22),
+      borderRadius: BorderRadius.circular(AppSizes.radius22),
     ),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Icon(icon, color: Theme.of(context).colorScheme.primary),
-        const SizedBox(height: 17),
+        const SizedBox(height: AppSizes.space17),
         Text(
           value,
-          style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w800),
+          style: const TextStyle(
+            fontSize: AppSizes.font30,
+            fontWeight: AppFontWeights.extraBold,
+          ),
         ),
         Text(
           label,

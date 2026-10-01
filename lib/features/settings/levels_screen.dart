@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/features/dashboard/home_tab_provider.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
+import 'package:jlpt_practice/core/constants/app_font_weights.dart';
 
 class LevelsScreen extends ConsumerWidget {
   const LevelsScreen({super.key});
@@ -25,9 +27,15 @@ class LevelsScreen extends ConsumerWidget {
             'N1': context.strings('advanced'),
           };
           return ListView.separated(
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
+            padding: const EdgeInsets.fromLTRB(
+              AppSizes.size20,
+              AppSizes.size12,
+              AppSizes.size20,
+              AppSizes.size28,
+            ),
             itemCount: descriptions.length,
-            separatorBuilder: (_, _) => const SizedBox(height: 10),
+            separatorBuilder: (_, _) =>
+                const SizedBox(height: AppSizes.space10),
             itemBuilder: (context, index) {
               final entry = descriptions.entries.elementAt(index);
               final selected = state.selectedLevel == entry.key;
@@ -35,15 +43,15 @@ class LevelsScreen extends ConsumerWidget {
                 color: selected
                     ? Theme.of(context).colorScheme.primaryContainer
                     : Theme.of(context).colorScheme.surface,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(AppSizes.radius20),
                 child: ListTile(
                   minTileHeight: 76,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(AppSizes.radius20),
                   ),
                   leading: Container(
-                    width: 44,
-                    height: 44,
+                    width: AppSizes.size44,
+                    height: AppSizes.size44,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.surface,
@@ -51,12 +59,14 @@ class LevelsScreen extends ConsumerWidget {
                     ),
                     child: Text(
                       entry.key,
-                      style: const TextStyle(fontWeight: FontWeight.w800),
+                      style: const TextStyle(
+                        fontWeight: AppFontWeights.extraBold,
+                      ),
                     ),
                   ),
                   title: Text(
                     entry.key,
-                    style: const TextStyle(fontWeight: FontWeight.w700),
+                    style: const TextStyle(fontWeight: AppFontWeights.bold700),
                   ),
                   subtitle: Text(entry.value),
                   trailing: selected

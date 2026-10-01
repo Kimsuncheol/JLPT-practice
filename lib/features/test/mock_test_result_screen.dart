@@ -6,6 +6,8 @@ import 'package:jlpt_practice/core/ads/ad_service.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/data/models/mock_test.dart';
 import 'package:jlpt_practice/shared/rewarded_xp_card.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
+import 'package:jlpt_practice/core/constants/app_font_weights.dart';
 
 class MockTestResultScreen extends ConsumerStatefulWidget {
   const MockTestResultScreen({super.key, required this.retryPath});
@@ -54,12 +56,17 @@ class _MockTestResultScreenState extends ConsumerState<MockTestResultScreen> {
           children: [
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(24, 34, 24, 20),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSizes.size24,
+                  AppSizes.size34,
+                  AppSizes.size24,
+                  AppSizes.size20,
+                ),
                 child: Column(
                   children: [
                     Container(
-                      width: 92,
-                      height: 92,
+                      width: AppSizes.size92,
+                      height: AppSizes.size92,
                       decoration: BoxDecoration(
                         color: Theme.of(context).colorScheme.primaryContainer,
                         shape: BoxShape.circle,
@@ -68,21 +75,21 @@ class _MockTestResultScreenState extends ConsumerState<MockTestResultScreen> {
                         percentage >= 70
                             ? Icons.celebration_rounded
                             : Icons.auto_awesome_rounded,
-                        size: 42,
+                        size: AppSizes.size42,
                       ),
                     ),
-                    const SizedBox(height: 22),
+                    const SizedBox(height: AppSizes.space22),
                     Text(
                       context.strings('mockTestComplete'),
                       style: Theme.of(context).textTheme.headlineMedium,
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppSizes.space8),
                     Text(
                       '$percentage%',
                       style: const TextStyle(
-                        fontSize: 58,
-                        height: 1.1,
-                        fontWeight: FontWeight.w900,
+                        fontSize: AppSizes.font58,
+                        height: AppSizes.lineHeight1_1,
+                        fontWeight: AppFontWeights.black,
                       ),
                     ),
                     Text(
@@ -91,7 +98,7 @@ class _MockTestResultScreenState extends ConsumerState<MockTestResultScreen> {
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
-                    const SizedBox(height: 28),
+                    const SizedBox(height: AppSizes.space28),
                     Row(
                       children: [
                         Expanded(
@@ -101,7 +108,7 @@ class _MockTestResultScreenState extends ConsumerState<MockTestResultScreen> {
                             label: context.strings('correctAnswers'),
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: AppSizes.space12),
                         Expanded(
                           child: _ResultMetric(
                             icon: Icons.refresh_rounded,
@@ -109,7 +116,7 @@ class _MockTestResultScreenState extends ConsumerState<MockTestResultScreen> {
                             label: context.strings('incorrect'),
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: AppSizes.space12),
                         Expanded(
                           child: _ResultMetric(
                             icon: Icons.timer_outlined,
@@ -119,13 +126,13 @@ class _MockTestResultScreenState extends ConsumerState<MockTestResultScreen> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 22),
+                    const SizedBox(height: AppSizes.space22),
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.all(18),
+                      padding: const EdgeInsets.all(AppSizes.size18),
                       decoration: BoxDecoration(
                         color: Theme.of(context).colorScheme.surface,
-                        borderRadius: BorderRadius.circular(22),
+                        borderRadius: BorderRadius.circular(AppSizes.radius22),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -134,24 +141,26 @@ class _MockTestResultScreenState extends ConsumerState<MockTestResultScreen> {
                             context.strings('sectionResults'),
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: AppSizes.space12),
                           for (final section in result.sections)
                             Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 6),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: AppSizes.size6,
+                              ),
                               child: Row(
                                 children: [
                                   Expanded(
                                     child: Text(
                                       _sectionLabel(context, section.type),
                                       style: const TextStyle(
-                                        fontWeight: FontWeight.w600,
+                                        fontWeight: AppFontWeights.semiBold,
                                       ),
                                     ),
                                   ),
                                   Text(
                                     '${section.correct}/${section.total}',
                                     style: const TextStyle(
-                                      fontWeight: FontWeight.w700,
+                                      fontWeight: AppFontWeights.bold700,
                                     ),
                                   ),
                                 ],
@@ -160,7 +169,7 @@ class _MockTestResultScreenState extends ConsumerState<MockTestResultScreen> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 26),
+                    const SizedBox(height: AppSizes.space26),
                     FilledButton.icon(
                       onPressed: () => context.go(widget.retryPath),
                       icon: const Icon(Icons.replay_rounded),
@@ -169,7 +178,7 @@ class _MockTestResultScreenState extends ConsumerState<MockTestResultScreen> {
                         minimumSize: const Size.fromHeight(56),
                       ),
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: AppSizes.space10),
                     TextButton(
                       onPressed: () => context.go('/home'),
                       child: Text(context.strings('backHome')),
@@ -198,18 +207,21 @@ class _ResultMetric extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(14),
+    padding: const EdgeInsets.all(AppSizes.size14),
     decoration: BoxDecoration(
       color: Theme.of(context).colorScheme.surface,
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(AppSizes.radius20),
     ),
     child: Column(
       children: [
         Icon(icon, color: Theme.of(context).colorScheme.primary),
-        const SizedBox(height: 9),
+        const SizedBox(height: AppSizes.space9),
         Text(
           value,
-          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
+          style: const TextStyle(
+            fontSize: AppSizes.font22,
+            fontWeight: AppFontWeights.extraBold,
+          ),
         ),
         Text(
           label,

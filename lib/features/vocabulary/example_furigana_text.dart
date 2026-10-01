@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:jlpt_practice/data/models/kanji.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_masking.dart';
 import 'package:jlpt_practice/features/vocabulary/masked_translation.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
 
 /// Keeps each kanji run's reading directly above its written form.
 class ExampleFuriganaText extends StatelessWidget {
@@ -41,8 +42,8 @@ class ExampleFuriganaText extends StatelessWidget {
       offset += mask.text.length;
     }
     final rubyStyle = style.copyWith(
-      fontSize: 12,
-      height: 1.2,
+      fontSize: AppSizes.font12,
+      height: AppSizes.lineHeight1_2,
       color: Theme.of(context).colorScheme.primary,
     );
     final lines = <List<Widget>>[[]];
@@ -71,7 +72,7 @@ class ExampleFuriganaText extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               SizedBox(
-                height: 16,
+                height: AppSizes.size16,
                 child: segment.ruby == null
                     ? null
                     : MaskedSegmentsText(

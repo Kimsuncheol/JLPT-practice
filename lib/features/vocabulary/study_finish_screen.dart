@@ -7,6 +7,7 @@ import 'package:jlpt_practice/core/utils/study_batches.dart';
 import 'package:jlpt_practice/features/vocabulary/study_finish/studied_words_section.dart';
 import 'package:jlpt_practice/features/vocabulary/study_finish/study_finish_actions.dart';
 import 'package:jlpt_practice/features/vocabulary/study_finish/study_finish_header.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
 
 class StudyFinishScreen extends ConsumerWidget {
   const StudyFinishScreen({required this.day, super.key});
@@ -51,22 +52,28 @@ class StudyFinishScreen extends ConsumerWidget {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 24, 24, 20),
+          padding: const EdgeInsets.fromLTRB(
+            AppSizes.size24,
+            AppSizes.size24,
+            AppSizes.size24,
+            AppSizes.size20,
+          ),
           child: Column(
             children: [
               Expanded(
                 flex: 2,
-                child: Center(child: StudyFinishHeader(title: title, body: body)),
+                child: Center(
+                  child: StudyFinishHeader(title: title, body: body),
+                ),
               ),
               Expanded(
                 flex: 3,
                 child: StudiedWordsSection(
                   words: [for (final word in todaysWords) word.word],
-                  onWordTap: (word) =>
-                      ref.read(ttsServiceProvider).speak(word),
+                  onWordTap: (word) => ref.read(ttsServiceProvider).speak(word),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSizes.space16),
               if (completesLevel)
                 LevelCompleteActions(
                   onChooseAnotherLevel: () => _completeLevel(

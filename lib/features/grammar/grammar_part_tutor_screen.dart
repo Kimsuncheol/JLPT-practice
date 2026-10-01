@@ -9,6 +9,9 @@ import 'package:jlpt_practice/data/models/grammar_study_session.dart';
 import 'package:jlpt_practice/features/grammar/grammar_providers.dart';
 import 'package:jlpt_practice/features/grammar/grammar_study_session_provider.dart';
 import 'package:jlpt_practice/features/grammar/grammar_tutor_providers.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
+import 'package:jlpt_practice/core/constants/app_colors.dart';
+import 'package:jlpt_practice/core/constants/app_font_weights.dart';
 
 class GrammarPartTutorScreen extends ConsumerStatefulWidget {
   const GrammarPartTutorScreen({
@@ -145,7 +148,7 @@ class _GrammarPartTutorScreenState extends ConsumerState<GrammarPartTutorScreen>
         LinearProgressIndicator(value: (_index + 1) / questions.length),
         Expanded(
           child: ListView(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(AppSizes.size20),
             children: [
               Text(
                 '${context.strings('question')} ${_index + 1}/${questions.length}',
@@ -153,15 +156,15 @@ class _GrammarPartTutorScreenState extends ConsumerState<GrammarPartTutorScreen>
                   color: Theme.of(context).colorScheme.primary,
                 ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: AppSizes.space10),
               Text(
                 grammar.localizedSummary(language),
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: AppSizes.space20),
               for (final choice in choices)
                 Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
+                  padding: const EdgeInsets.only(bottom: AppSizes.size10),
                   child: OutlinedButton(
                     onPressed: _selected == null
                         ? () => setState(() {
@@ -170,28 +173,28 @@ class _GrammarPartTutorScreenState extends ConsumerState<GrammarPartTutorScreen>
                           })
                         : null,
                     style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.all(18),
+                      padding: const EdgeInsets.all(AppSizes.size18),
                       alignment: Alignment.centerLeft,
                     ),
                     child: Text('#${choice.rank}  ${choice.title}'),
                   ),
                 ),
               if (_selected != null) ...[
-                const SizedBox(height: 8),
+                const SizedBox(height: AppSizes.space8),
                 Text(
                   context.strings(correct ? 'correct' : 'incorrect'),
                   style: TextStyle(
-                    fontWeight: FontWeight.w700,
+                    fontWeight: AppFontWeights.bold700,
                     color: correct
-                        ? Colors.green
+                        ? AppPalette.green
                         : Theme.of(context).colorScheme.error,
                   ),
                 ),
                 if (!correct) ...[
-                  const SizedBox(height: 6),
+                  const SizedBox(height: AppSizes.space6),
                   Text('${context.strings('answer')}: ${grammar.title}'),
                 ],
-                const SizedBox(height: 18),
+                const SizedBox(height: AppSizes.space18),
                 FilledButton(
                   onPressed: () => setState(() {
                     _index++;
@@ -234,33 +237,33 @@ class _GrammarPartTutorScreenState extends ConsumerState<GrammarPartTutorScreen>
         .where((item) => _results[item.id] == true)
         .toList();
     return ListView(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(AppSizes.size20),
       children: [
         Icon(
           Icons.insights_rounded,
-          size: 58,
+          size: AppSizes.size58,
           color: Theme.of(context).colorScheme.primary,
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSizes.space12),
         Text(
           context.strings('checkpointComplete'),
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.headlineSmall,
         ),
-        const SizedBox(height: 22),
+        const SizedBox(height: AppSizes.space22),
         _ResultGroup(
           title: context.strings('strong'),
           icon: Icons.check_circle_outline,
           items: strong,
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: AppSizes.space14),
         _ResultGroup(
           title: context.strings('reviewNext'),
           icon: Icons.refresh_rounded,
           items: weak,
           onTap: (item) => context.push('/grammar/tutor/${item.id}'),
         ),
-        const SizedBox(height: 22),
+        const SizedBox(height: AppSizes.space22),
         if (weak.isNotEmpty)
           FilledButton(
             onPressed: () => context.push('/grammar/tutor/${weak.first.id}'),
@@ -290,10 +293,10 @@ class _ResultGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(16),
+    padding: const EdgeInsets.all(AppSizes.size16),
     decoration: BoxDecoration(
       color: Theme.of(context).colorScheme.surfaceContainerLow,
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(AppSizes.radius20),
     ),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -301,11 +304,11 @@ class _ResultGroup extends StatelessWidget {
         Row(
           children: [
             Icon(icon),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppSizes.space8),
             Text(title, style: Theme.of(context).textTheme.titleMedium),
           ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSizes.space8),
         if (items.isEmpty) Text(context.strings('none')),
         for (final item in items)
           ListTile(

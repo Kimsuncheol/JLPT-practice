@@ -5,6 +5,7 @@ import 'package:jlpt_practice/features/kanji/kanji_visibility.dart';
 import 'package:jlpt_practice/features/kanji/widgets/hide_group.dart';
 import 'package:jlpt_practice/features/kanji/widgets/kanji_glyph.dart';
 import 'package:jlpt_practice/features/kanji/widgets/reading_chip.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
 
 /// The front: the kanji with its first kun and first two on readings.
 class KanjiFrontFace extends StatelessWidget {
@@ -43,11 +44,11 @@ class KanjiFrontFace extends StatelessWidget {
                 children: [
                   KanjiGlyph(
                     character: kanji.character,
-                    fontSize: 132,
+                    fontSize: AppSizes.font132,
                     hidden: visibility.hideKanji,
                   ),
                   if (kanji.frontKunYomi.isNotEmpty) ...[
-                    const SizedBox(height: 22),
+                    const SizedBox(height: AppSizes.space22),
                     ReadingGroup(
                       label: strings('kunYomi'),
                       readings: kanji.frontKunYomi,
@@ -56,7 +57,7 @@ class KanjiFrontFace extends StatelessWidget {
                     ),
                   ],
                   if (kanji.frontOnYomi.isNotEmpty) ...[
-                    const SizedBox(height: 18),
+                    const SizedBox(height: AppSizes.space18),
                     ReadingGroup(
                       label: strings('onYomi'),
                       readings: kanji.frontOnYomi,

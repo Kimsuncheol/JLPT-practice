@@ -7,6 +7,7 @@ import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/core/services/account_service.dart';
 import 'package:jlpt_practice/features/dashboard/home_tab_provider.dart';
 import 'package:jlpt_practice/shared/session_actions.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -23,13 +24,18 @@ class SettingsScreen extends ConsumerWidget {
           final strings = context.strings;
           final user = ref.watch(firebaseUserProvider).value;
           return ListView(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 36),
+            padding: const EdgeInsets.fromLTRB(
+              AppSizes.size20,
+              AppSizes.size20,
+              AppSizes.size20,
+              AppSizes.size36,
+            ),
             children: [
               Text(
                 strings('settings'),
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
-              const SizedBox(height: 18),
+              const SizedBox(height: AppSizes.space18),
               _SettingsGroup(
                 children: [
                   ListTile(
@@ -75,7 +81,7 @@ class SettingsScreen extends ConsumerWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: AppSizes.space14),
               _SettingsGroup(
                 children: [
                   SwitchListTile(
@@ -128,7 +134,7 @@ class SettingsScreen extends ConsumerWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: AppSizes.space14),
               _SettingsGroup(
                 children: [
                   ListTile(
@@ -147,7 +153,7 @@ class SettingsScreen extends ConsumerWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: AppSizes.space14),
               _SettingsGroup(
                 children: [
                   ListTile(
@@ -192,7 +198,7 @@ class SettingsScreen extends ConsumerWidget {
                 ],
               ),
               if (user != null) ...[
-                const SizedBox(height: 14),
+                const SizedBox(height: AppSizes.space14),
                 _SettingsGroup(
                   children: [
                     ListTile(
@@ -203,7 +209,7 @@ class SettingsScreen extends ConsumerWidget {
                   ],
                 ),
               ],
-              const SizedBox(height: 22),
+              const SizedBox(height: AppSizes.space22),
               Text(
                 user != null
                     ? strings('syncActiveBody')
@@ -267,7 +273,7 @@ class _SettingsGroup extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Material(
     color: Theme.of(context).colorScheme.surface,
-    borderRadius: BorderRadius.circular(22),
+    borderRadius: BorderRadius.circular(AppSizes.radius22),
     clipBehavior: Clip.antiAlias,
     child: Column(
       children: [
@@ -275,8 +281,8 @@ class _SettingsGroup extends StatelessWidget {
           children[index],
           if (index != children.length - 1)
             Divider(
-              height: 1,
-              indent: 56,
+              height: AppSizes.size1,
+              indent: AppSizes.size56,
               color: Theme.of(context).colorScheme.outlineVariant,
             ),
         ],

@@ -5,6 +5,8 @@ import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/ads/ad_service.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/shared/rewarded_xp_card.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
+import 'package:jlpt_practice/core/constants/app_font_weights.dart';
 
 class QuizResultScreen extends ConsumerStatefulWidget {
   const QuizResultScreen({super.key});
@@ -39,12 +41,17 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen> {
           children: [
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(24, 34, 24, 20),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSizes.size24,
+                  AppSizes.size34,
+                  AppSizes.size24,
+                  AppSizes.size20,
+                ),
                 child: Column(
                   children: [
                     Container(
-                      width: 92,
-                      height: 92,
+                      width: AppSizes.size92,
+                      height: AppSizes.size92,
                       decoration: BoxDecoration(
                         color: Theme.of(context).colorScheme.primaryContainer,
                         shape: BoxShape.circle,
@@ -53,21 +60,21 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen> {
                         percentage >= 70
                             ? Icons.celebration_rounded
                             : Icons.auto_awesome_rounded,
-                        size: 42,
+                        size: AppSizes.size42,
                       ),
                     ),
-                    const SizedBox(height: 22),
+                    const SizedBox(height: AppSizes.space22),
                     Text(
                       context.strings('quizComplete'),
                       style: Theme.of(context).textTheme.headlineMedium,
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppSizes.space8),
                     Text(
                       '$percentage%',
                       style: const TextStyle(
-                        fontSize: 58,
-                        height: 1.1,
-                        fontWeight: FontWeight.w900,
+                        fontSize: AppSizes.font58,
+                        height: AppSizes.lineHeight1_1,
+                        fontWeight: AppFontWeights.black,
                       ),
                     ),
                     Text(
@@ -76,7 +83,7 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen> {
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
-                    const SizedBox(height: 28),
+                    const SizedBox(height: AppSizes.space28),
                     Row(
                       children: [
                         Expanded(
@@ -86,7 +93,7 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen> {
                             label: context.strings('correctAnswers'),
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: AppSizes.space12),
                         Expanded(
                           child: _ResultMetric(
                             icon: Icons.refresh_rounded,
@@ -94,7 +101,7 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen> {
                             label: context.strings('incorrect'),
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: AppSizes.space12),
                         Expanded(
                           child: _ResultMetric(
                             icon: Icons.timer_outlined,
@@ -104,7 +111,7 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 26),
+                    const SizedBox(height: AppSizes.space26),
                     FilledButton.icon(
                       onPressed: () => context.go('/quiz'),
                       icon: const Icon(Icons.replay_rounded),
@@ -113,7 +120,7 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen> {
                         minimumSize: const Size.fromHeight(56),
                       ),
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: AppSizes.space10),
                     TextButton(
                       onPressed: () => context.go('/home'),
                       child: Text(context.strings('backHome')),
@@ -142,18 +149,21 @@ class _ResultMetric extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(14),
+    padding: const EdgeInsets.all(AppSizes.size14),
     decoration: BoxDecoration(
       color: Theme.of(context).colorScheme.surface,
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(AppSizes.radius20),
     ),
     child: Column(
       children: [
         Icon(icon, color: Theme.of(context).colorScheme.primary),
-        const SizedBox(height: 9),
+        const SizedBox(height: AppSizes.space9),
         Text(
           value,
-          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
+          style: const TextStyle(
+            fontSize: AppSizes.font22,
+            fontWeight: AppFontWeights.extraBold,
+          ),
         ),
         Text(
           label,

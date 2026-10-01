@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/features/vocabulary/reorder/index_sticky_note.dart';
 import 'package:jlpt_practice/features/vocabulary/sentence_reorder_quiz.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
+import 'package:jlpt_practice/core/constants/app_colors.dart';
+import 'package:jlpt_practice/core/constants/app_font_weights.dart';
 
 class ReorderTilePool extends StatelessWidget {
   const ReorderTilePool({
@@ -22,17 +25,17 @@ class ReorderTilePool extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final surfaceColor = isDark
-        ? const Color(0xFF1D2C33)
-        : const Color(0xFFEAF7FC);
+        ? AppPalette.skyTintDark
+        : AppPalette.skyTintLight;
     final borderColor = isDark
-        ? const Color(0xFFA6D9EA)
-        : const Color(0xFF6EA9BE);
+        ? AppPalette.skyAccentDark
+        : AppPalette.skyAccentLight;
     final lineColor = isDark
-        ? const Color(0xFF31434A)
-        : const Color(0xFFC8E0E8);
+        ? AppPalette.skyBorderDark
+        : AppPalette.skyBorderLight;
     final chipBorderColor = isDark
-        ? const Color(0xFF5B565E)
-        : const Color(0xFF6F6A70);
+        ? AppPalette.mauveDark
+        : AppPalette.mauveLight;
     final reservedTiles = layoutTiles ?? tiles;
 
     return SizedBox(
@@ -40,8 +43,8 @@ class ReorderTilePool extends StatelessWidget {
       child: IndexStickyNote(
         noteKey: const ValueKey('reorder-tile-pool-container'),
         label: context.strings('words'),
-        labelColor: const Color(0xFF82D5EF),
-        labelTextColor: const Color(0xFF18323D),
+        labelColor: AppPalette.skyLabel,
+        labelTextColor: AppPalette.skyInk,
         surfaceColor: surfaceColor,
         borderColor: borderColor,
         child: CustomPaint(
@@ -51,9 +54,14 @@ class ReorderTilePool extends StatelessWidget {
             spacing: 52,
           ),
           child: ConstrainedBox(
-            constraints: const BoxConstraints(minHeight: 90),
+            constraints: const BoxConstraints(minHeight: AppSizes.size90),
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(24, 28, 24, 14),
+              padding: const EdgeInsets.fromLTRB(
+                AppSizes.size24,
+                AppSizes.size28,
+                AppSizes.size24,
+                AppSizes.size14,
+              ),
               child: Stack(
                 children: [
                   Visibility(
@@ -114,15 +122,20 @@ class _WordTile extends StatelessWidget {
   Widget build(BuildContext context) => ActionChip(
     label: Text(tile.text),
     labelStyle: const TextStyle(
-      color: Color(0xFFF8F8F6),
-      fontWeight: FontWeight.w700,
+      color: AppPalette.paperWhite,
+      fontWeight: AppFontWeights.bold700,
     ),
-    backgroundColor: const Color(0xFF181818),
-    disabledColor: const Color(0xFF242424),
+    backgroundColor: AppPalette.charcoal,
+    disabledColor: AppPalette.charcoalLight,
     side: BorderSide(color: borderColor),
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(AppSizes.radius6),
+    ),
     elevation: 0,
-    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+    padding: const EdgeInsets.symmetric(
+      horizontal: AppSizes.size10,
+      vertical: AppSizes.size9,
+    ),
     onPressed: onPressed,
   );
 }

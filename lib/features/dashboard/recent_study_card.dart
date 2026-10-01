@@ -11,6 +11,8 @@ import 'package:jlpt_practice/data/models/study_session.dart';
 import 'package:jlpt_practice/data/repositories/kanji_repository.dart';
 import 'package:jlpt_practice/features/grammar/grammar_study_session_provider.dart';
 import 'package:jlpt_practice/features/vocabulary/day_selection_screen.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
+import 'package:jlpt_practice/core/constants/app_font_weights.dart';
 
 class RecentStudyCard extends ConsumerWidget {
   const RecentStudyCard({required this.state, super.key});
@@ -80,11 +82,11 @@ class RecentStudyCard extends ConsumerWidget {
     final colors = Theme.of(context).colorScheme;
 
     return Padding(
-      padding: const EdgeInsets.only(top: 12),
+      padding: const EdgeInsets.only(top: AppSizes.size12),
       child: Material(
         color: colors.surface,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(AppSizes.radius22),
         ),
         clipBehavior: Clip.antiAlias,
         child: Column(
@@ -94,7 +96,7 @@ class RecentStudyCard extends ConsumerWidget {
               key: ValueKey('recent-study-${primary.route}'),
               onTap: () => _openEntry(context, primary),
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppSizes.size16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -102,15 +104,15 @@ class RecentStudyCard extends ConsumerWidget {
                       context.strings('recentStudy').toUpperCase(),
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
                         color: colors.onSurfaceVariant,
-                        fontWeight: FontWeight.w800,
+                        fontWeight: AppFontWeights.extraBold,
                         letterSpacing: 1.1,
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppSizes.space12),
                     Row(
                       children: [
                         _CourseSymbol(symbol: primary.symbol),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: AppSizes.space12),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -121,15 +123,17 @@ class RecentStudyCard extends ConsumerWidget {
                                 overflow: TextOverflow.ellipsis,
                                 style: Theme.of(context).textTheme.titleMedium,
                               ),
-                              const SizedBox(height: 2),
+                              const SizedBox(height: AppSizes.space2),
                               Text(
                                 primary.destination,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: Theme.of(context).textTheme.bodyMedium
-                                    ?.copyWith(fontWeight: FontWeight.w700),
+                                    ?.copyWith(
+                                      fontWeight: AppFontWeights.bold700,
+                                    ),
                               ),
-                              const SizedBox(height: 2),
+                              const SizedBox(height: AppSizes.space2),
                               Text(
                                 primary.detail,
                                 maxLines: 1,
@@ -140,10 +144,10 @@ class RecentStudyCard extends ConsumerWidget {
                             ],
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: AppSizes.space12),
                         Container(
-                          width: 44,
-                          height: 44,
+                          width: AppSizes.size44,
+                          height: AppSizes.size44,
                           decoration: BoxDecoration(
                             color: colors.primary,
                             shape: BoxShape.circle,
@@ -151,17 +155,17 @@ class RecentStudyCard extends ConsumerWidget {
                           child: Icon(
                             Icons.play_arrow_rounded,
                             color: colors.onPrimary,
-                            size: 28,
+                            size: AppSizes.size28,
                           ),
                         ),
                       ],
                     ),
                     if (primary.progress case final progress?) ...[
-                      const SizedBox(height: 14),
+                      const SizedBox(height: AppSizes.space14),
                       LinearProgressIndicator(
                         value: progress,
-                        minHeight: 6,
-                        borderRadius: BorderRadius.circular(6),
+                        minHeight: AppSizes.size6,
+                        borderRadius: BorderRadius.circular(AppSizes.radius6),
                         backgroundColor: colors.surfaceContainerHighest,
                       ),
                     ],
@@ -174,7 +178,12 @@ class RecentStudyCard extends ConsumerWidget {
                 key: ValueKey('recent-study-${previous.route}'),
                 onTap: () => _openEntry(context, previous),
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 12, 12),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSizes.size16,
+                    AppSizes.size12,
+                    AppSizes.size12,
+                    AppSizes.size12,
+                  ),
                   child: Row(
                     children: [
                       Text(
@@ -182,10 +191,10 @@ class RecentStudyCard extends ConsumerWidget {
                         style: Theme.of(context).textTheme.labelMedium
                             ?.copyWith(
                               color: colors.onSurfaceVariant,
-                              fontWeight: FontWeight.w700,
+                              fontWeight: AppFontWeights.bold700,
                             ),
                       ),
-                      const SizedBox(width: 10),
+                      const SizedBox(width: AppSizes.space10),
                       Expanded(
                         child: Text(
                           '${previous.course} · ${previous.destination}',
@@ -193,11 +202,14 @@ class RecentStudyCard extends ConsumerWidget {
                           overflow: TextOverflow.ellipsis,
                           textAlign: TextAlign.end,
                           style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(fontWeight: FontWeight.w600),
+                              ?.copyWith(fontWeight: AppFontWeights.semiBold),
                         ),
                       ),
-                      const SizedBox(width: 4),
-                      const Icon(Icons.chevron_right_rounded, size: 20),
+                      const SizedBox(width: AppSizes.space4),
+                      const Icon(
+                        Icons.chevron_right_rounded,
+                        size: AppSizes.size20,
+                      ),
                     ],
                   ),
                 ),
@@ -267,19 +279,19 @@ class _CourseSymbol extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     return Container(
-      width: 44,
-      height: 44,
+      width: AppSizes.size44,
+      height: AppSizes.size44,
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: colors.primaryContainer,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(AppSizes.radius14),
       ),
       child: Text(
         symbol,
         style: TextStyle(
           color: colors.onPrimaryContainer,
-          fontSize: 20,
-          fontWeight: FontWeight.w800,
+          fontSize: AppSizes.font20,
+          fontWeight: AppFontWeights.extraBold,
         ),
       ),
     );

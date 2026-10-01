@@ -8,6 +8,8 @@ import 'package:jlpt_practice/core/ads/ad_service.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/core/utils/study_batches.dart';
 import 'package:jlpt_practice/data/models/quiz.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
+import 'package:jlpt_practice/core/constants/app_font_weights.dart';
 
 class FillInTheBlankScreen extends ConsumerStatefulWidget {
   const FillInTheBlankScreen({this.day, super.key});
@@ -133,27 +135,39 @@ class _FillInTheBlankScreenState extends ConsumerState<FillInTheBlankScreen> {
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.fromLTRB(22, 6, 22, 0),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSizes.size22,
+                  AppSizes.size6,
+                  AppSizes.size22,
+                  0,
+                ),
                 child: Row(
                   children: [
                     Expanded(
                       child: LinearProgressIndicator(
                         value: (_index + 1) / questions.length,
-                        minHeight: 8,
-                        borderRadius: BorderRadius.circular(8),
+                        minHeight: AppSizes.size8,
+                        borderRadius: BorderRadius.circular(AppSizes.radius8),
                       ),
                     ),
-                    const SizedBox(width: 14),
+                    const SizedBox(width: AppSizes.space14),
                     Text(
                       '${_index + 1}/${questions.length}',
-                      style: const TextStyle(fontWeight: FontWeight.w700),
+                      style: const TextStyle(
+                        fontWeight: AppFontWeights.bold700,
+                      ),
                     ),
                   ],
                 ),
               ),
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(22, 30, 22, 16),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSizes.size22,
+                    AppSizes.size30,
+                    AppSizes.size22,
+                    AppSizes.size16,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -163,16 +177,18 @@ class _FillInTheBlankScreenState extends ConsumerState<FillInTheBlankScreen> {
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: AppSizes.space20),
                       Container(
                         width: double.infinity,
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 22,
-                          vertical: 34,
+                          horizontal: AppSizes.size22,
+                          vertical: AppSizes.size34,
                         ),
                         decoration: BoxDecoration(
                           color: Theme.of(context).colorScheme.surface,
-                          borderRadius: BorderRadius.circular(28),
+                          borderRadius: BorderRadius.circular(
+                            AppSizes.radius28,
+                          ),
                         ),
                         child: Column(
                           children: [
@@ -180,12 +196,12 @@ class _FillInTheBlankScreenState extends ConsumerState<FillInTheBlankScreen> {
                               question.vocabulary.example.quizSentence,
                               textAlign: TextAlign.center,
                               style: const TextStyle(
-                                fontSize: 25,
-                                height: 1.6,
-                                fontWeight: FontWeight.w700,
+                                fontSize: AppSizes.font25,
+                                height: AppSizes.lineHeight1_6,
+                                fontWeight: AppFontWeights.bold700,
                               ),
                             ),
-                            const SizedBox(height: 14),
+                            const SizedBox(height: AppSizes.space14),
                             Text(
                               question.vocabulary.example.translation(
                                 state.meaningLanguage,
@@ -200,7 +216,7 @@ class _FillInTheBlankScreenState extends ConsumerState<FillInTheBlankScreen> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppSizes.space24),
                       if (!_answered)
                         Align(
                           alignment: Alignment.centerRight,
@@ -232,13 +248,17 @@ class _FillInTheBlankScreenState extends ConsumerState<FillInTheBlankScreen> {
                       if (_hintRevealed && !_answered)
                         Container(
                           width: double.infinity,
-                          margin: const EdgeInsets.only(bottom: 12),
-                          padding: const EdgeInsets.all(14),
+                          margin: const EdgeInsets.only(
+                            bottom: AppSizes.size12,
+                          ),
+                          padding: const EdgeInsets.all(AppSizes.size14),
                           decoration: BoxDecoration(
                             color: Theme.of(
                               context,
                             ).colorScheme.secondaryContainer,
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(
+                              AppSizes.radius16,
+                            ),
                           ),
                           child: Text(
                             '${question.vocabulary.reading} · ${question.vocabulary.meaning(state.meaningLanguage)}',
@@ -259,7 +279,9 @@ class _FillInTheBlankScreenState extends ConsumerState<FillInTheBlankScreen> {
                           trailing = Icons.cancel_rounded;
                         }
                         return Padding(
-                          padding: const EdgeInsets.only(bottom: 10),
+                          padding: const EdgeInsets.only(
+                            bottom: AppSizes.size10,
+                          ),
                           child: Material(
                             color:
                                 color ??
@@ -268,7 +290,9 @@ class _FillInTheBlankScreenState extends ConsumerState<FillInTheBlankScreen> {
                                         context,
                                       ).colorScheme.secondaryContainer
                                     : Theme.of(context).colorScheme.surface),
-                            borderRadius: BorderRadius.circular(19),
+                            borderRadius: BorderRadius.circular(
+                              AppSizes.radius19,
+                            ),
                             child: InkWell(
                               onTap: _answered
                                   ? null
@@ -290,14 +314,16 @@ class _FillInTheBlankScreenState extends ConsumerState<FillInTheBlankScreen> {
                                         _advance,
                                       );
                                     },
-                              borderRadius: BorderRadius.circular(19),
+                              borderRadius: BorderRadius.circular(
+                                AppSizes.radius19,
+                              ),
                               child: Padding(
-                                padding: const EdgeInsets.all(17),
+                                padding: const EdgeInsets.all(AppSizes.size17),
                                 child: Row(
                                   children: [
                                     Container(
-                                      width: 30,
-                                      height: 30,
+                                      width: AppSizes.size30,
+                                      height: AppSizes.size30,
                                       alignment: Alignment.center,
                                       decoration: BoxDecoration(
                                         shape: BoxShape.circle,
@@ -308,17 +334,17 @@ class _FillInTheBlankScreenState extends ConsumerState<FillInTheBlankScreen> {
                                       child: Text(
                                         String.fromCharCode(65 + entry.key),
                                         style: const TextStyle(
-                                          fontWeight: FontWeight.w800,
+                                          fontWeight: AppFontWeights.extraBold,
                                         ),
                                       ),
                                     ),
-                                    const SizedBox(width: 14),
+                                    const SizedBox(width: AppSizes.space14),
                                     Expanded(
                                       child: Text(
                                         choice,
                                         style: const TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w600,
+                                          fontSize: AppSizes.font18,
+                                          fontWeight: AppFontWeights.semiBold,
                                         ),
                                       ),
                                     ),
@@ -333,13 +359,15 @@ class _FillInTheBlankScreenState extends ConsumerState<FillInTheBlankScreen> {
                       if (_answered)
                         Container(
                           width: double.infinity,
-                          margin: const EdgeInsets.only(top: 6),
-                          padding: const EdgeInsets.all(18),
+                          margin: const EdgeInsets.only(top: AppSizes.size6),
+                          padding: const EdgeInsets.all(AppSizes.size18),
                           decoration: BoxDecoration(
                             color: isCorrect
                                 ? Theme.of(context).colorScheme.primaryContainer
                                 : Theme.of(context).colorScheme.errorContainer,
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(
+                              AppSizes.radius20,
+                            ),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -350,11 +378,11 @@ class _FillInTheBlankScreenState extends ConsumerState<FillInTheBlankScreen> {
                                     : context.strings('incorrect'),
                                 style: Theme.of(context).textTheme.titleMedium,
                               ),
-                              const SizedBox(height: 6),
+                              const SizedBox(height: AppSizes.space6),
                               Text(
                                 '${question.vocabulary.reading} · ${question.vocabulary.meaning(state.meaningLanguage)}',
                               ),
-                              const SizedBox(height: 6),
+                              const SizedBox(height: AppSizes.space6),
                               Text(question.vocabulary.example.sentence),
                             ],
                           ),

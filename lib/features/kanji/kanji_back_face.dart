@@ -6,6 +6,7 @@ import 'package:jlpt_practice/features/kanji/widgets/hide_group.dart';
 import 'package:jlpt_practice/features/kanji/widgets/kanji_footer.dart';
 import 'package:jlpt_practice/features/kanji/widgets/dashed_divider.dart';
 import 'package:jlpt_practice/features/kanji/widgets/reading_section.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
 
 /// The back: every reading with its examples, in a scroll view that runs down to the hide group. The kanji itself is not repeated here.
 class KanjiBackFace extends StatelessWidget {
@@ -35,7 +36,7 @@ class KanjiBackFace extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final strings = context.strings;
-    const sideInset = EdgeInsets.symmetric(horizontal: 16);
+    const sideInset = EdgeInsets.symmetric(horizontal: AppSizes.size16);
     return Column(
       children: [
         // The scroll view runs down to the hide group; the footer floats over
@@ -46,10 +47,10 @@ class KanjiBackFace extends StatelessWidget {
               Positioned.fill(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.fromLTRB(
-                    16,
-                    16,
-                    16,
-                    12 + KanjiFooter.height,
+                    AppSizes.size16,
+                    AppSizes.size16,
+                    AppSizes.size16,
+                    AppSizes.size12 + KanjiFooter.height,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -72,7 +73,7 @@ class KanjiBackFace extends StatelessWidget {
                           (kanji.onYomi.isNotEmpty ||
                               kanji.onExamples.isNotEmpty))
                         Padding(
-                          padding: const EdgeInsets.only(top: 22),
+                          padding: const EdgeInsets.only(top: AppSizes.size22),
                           child: DashedDivider(
                             key: const ValueKey('kun-on-divider'),
                             color: Theme.of(context).colorScheme.outline,
@@ -98,7 +99,12 @@ class KanjiBackFace extends StatelessWidget {
                   ),
                 ),
               ),
-              Positioned(left: 16, right: 16, bottom: 0, child: footer),
+              Positioned(
+                left: AppSizes.size16,
+                right: AppSizes.size16,
+                bottom: AppSizes.size0,
+                child: footer,
+              ),
             ],
           ),
         ),

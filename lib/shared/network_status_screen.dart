@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:jlpt_practice/app/theme/app_theme.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/core/services/network_status_service.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
+import 'package:jlpt_practice/core/constants/app_font_weights.dart';
 
 class NetworkStatusGate extends StatefulWidget {
   const NetworkStatusGate({required this.child, this.source, super.key});
@@ -83,13 +85,13 @@ class NetworkDisconnectedScreen extends StatelessWidget {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(32),
+            padding: const EdgeInsets.all(AppSizes.size32),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  width: 104,
-                  height: 104,
+                  width: AppSizes.size104,
+                  height: AppSizes.size104,
                   decoration: BoxDecoration(
                     color: AppTheme.mint.withValues(alpha: 0.22),
                     shape: BoxShape.circle,
@@ -97,27 +99,27 @@ class NetworkDisconnectedScreen extends StatelessWidget {
                   child: const Icon(
                     Icons.wifi_off_rounded,
                     color: AppTheme.mint,
-                    size: 52,
+                    size: AppSizes.size52,
                   ),
                 ),
-                const SizedBox(height: 28),
+                const SizedBox(height: AppSizes.space28),
                 Text(
                   context.strings('networkDisconnectedTitle'),
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w800,
+                    fontWeight: AppFontWeights.extraBold,
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppSizes.space12),
                 Text(
                   context.strings('networkDisconnectedBody'),
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     color: colorScheme.onSurfaceVariant,
-                    height: 1.45,
+                    height: AppSizes.lineHeight1_45,
                   ),
                 ),
-                const SizedBox(height: 28),
+                const SizedBox(height: AppSizes.space28),
                 FilledButton.icon(
                   key: const Key('network-retry-button'),
                   onPressed: onRetry,

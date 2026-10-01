@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/features/vocabulary/sentence_reorder_quiz.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
 
 class ReorderFeedback extends StatelessWidget {
   const ReorderFeedback({required this.quiz, required this.attempt, super.key});
@@ -19,7 +20,7 @@ class ReorderFeedback extends StatelessWidget {
           style: Theme.of(context).textTheme.titleLarge,
         ),
         Text(quiz.entry.example.reading),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSizes.space16),
       ],
     );
   }

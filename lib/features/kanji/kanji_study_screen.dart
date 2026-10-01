@@ -17,6 +17,8 @@ import 'package:jlpt_practice/features/kanji/kanji_speech.dart';
 import 'package:jlpt_practice/features/kanji/kanji_visibility.dart';
 import 'package:jlpt_practice/features/kanji/widgets/kanji_footer.dart';
 import 'package:jlpt_practice/features/vocabulary/day_selection_screen.dart';
+import 'package:jlpt_practice/core/constants/app_font_weights.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
 
 class KanjiStudyScreen extends ConsumerStatefulWidget {
   const KanjiStudyScreen({required this.day, super.key});
@@ -141,9 +143,9 @@ class _KanjiStudyScreenState extends ConsumerState<KanjiStudyScreen>
               ),
             ),
             Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
+              left: AppSizes.size0,
+              right: AppSizes.size0,
+              bottom: AppSizes.size0,
               child: SafeArea(
                 top: false,
                 child: Padding(
@@ -151,7 +153,9 @@ class _KanjiStudyScreenState extends ConsumerState<KanjiStudyScreen>
                   child: Center(
                     child: Text(
                       '${_index + 1} / ${kanji.length}',
-                      style: const TextStyle(fontWeight: FontWeight.w700),
+                      style: const TextStyle(
+                        fontWeight: AppFontWeights.bold700,
+                      ),
                     ),
                   ),
                 ),

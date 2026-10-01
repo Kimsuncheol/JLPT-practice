@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/data/models/mock_test_problem.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
+import 'package:jlpt_practice/core/constants/app_font_weights.dart';
 
 class QuestionTypeScreen extends StatelessWidget {
   const QuestionTypeScreen({super.key, required this.level});
@@ -18,13 +20,18 @@ class QuestionTypeScreen extends StatelessWidget {
       body: SafeArea(
         top: false,
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+          padding: const EdgeInsets.fromLTRB(
+            AppSizes.size20,
+            AppSizes.size16,
+            AppSizes.size20,
+            AppSizes.size20,
+          ),
           children: [
             Text(
               strings('chooseQuestionType'),
               style: Theme.of(context).textTheme.titleMedium,
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: AppSizes.space14),
             _QuestionTypeGroup(
               children: [
                 _QuestionTypeTile(
@@ -75,7 +82,7 @@ class _QuestionTypeGroup extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Material(
     color: Theme.of(context).colorScheme.surface,
-    borderRadius: BorderRadius.circular(22),
+    borderRadius: BorderRadius.circular(AppSizes.radius22),
     clipBehavior: Clip.antiAlias,
     child: Column(
       children: [
@@ -83,8 +90,8 @@ class _QuestionTypeGroup extends StatelessWidget {
           children[index],
           if (index != children.length - 1)
             Divider(
-              height: 1,
-              indent: 72,
+              height: AppSizes.size1,
+              indent: AppSizes.size72,
               color: Theme.of(context).colorScheme.outlineVariant,
             ),
         ],
@@ -108,18 +115,24 @@ class _QuestionTypeTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ListTile(
-    contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
+    contentPadding: const EdgeInsets.symmetric(
+      horizontal: AppSizes.size18,
+      vertical: AppSizes.size6,
+    ),
     leading: Container(
-      width: 42,
-      height: 42,
+      width: AppSizes.size42,
+      height: AppSizes.size42,
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.secondaryContainer,
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(AppSizes.radius15),
       ),
       child: Icon(icon),
     ),
-    title: Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
+    title: Text(
+      title,
+      style: const TextStyle(fontWeight: AppFontWeights.bold700),
+    ),
     subtitle: Text(subtitle),
     trailing: const Icon(Icons.chevron_right_rounded),
     onTap: onTap,

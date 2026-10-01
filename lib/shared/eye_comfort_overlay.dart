@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
 
 /// Warm amber tint for a strength [level] in 0..1.
 Color eyeComfortTint(double level) => const Color(
@@ -100,28 +101,28 @@ class EyeComfortSystemBarTint extends ConsumerWidget {
             child,
             if (tint != null) ...[
               Positioned(
-                left: 0,
-                right: 0,
-                top: 0,
+                left: AppSizes.size0,
+                right: AppSizes.size0,
+                top: AppSizes.size0,
                 height: insets.top,
                 child: IgnorePointer(child: ColoredBox(color: tint)),
               ),
               Positioned(
-                left: 0,
-                right: 0,
-                bottom: 0,
+                left: AppSizes.size0,
+                right: AppSizes.size0,
+                bottom: AppSizes.size0,
                 height: insets.bottom,
                 child: IgnorePointer(child: ColoredBox(color: tint)),
               ),
               Positioned(
-                left: 0,
+                left: AppSizes.size0,
                 top: insets.top,
                 bottom: insets.bottom,
                 width: insets.left,
                 child: IgnorePointer(child: ColoredBox(color: tint)),
               ),
               Positioned(
-                right: 0,
+                right: AppSizes.size0,
                 top: insets.top,
                 bottom: insets.bottom,
                 width: insets.right,

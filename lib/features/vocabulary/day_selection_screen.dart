@@ -11,6 +11,8 @@ import 'package:jlpt_practice/core/services/cloud_sync_service.dart';
 import 'package:jlpt_practice/core/utils/study_batches.dart';
 import 'package:jlpt_practice/data/repositories/kanji_repository.dart';
 import 'package:jlpt_practice/features/vocabulary/day_selection_skeleton.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
+import 'package:jlpt_practice/core/constants/app_font_weights.dart';
 
 /// The course whose days [DaySelectionScreen] lists.
 enum StudyCourse {
@@ -179,19 +181,24 @@ class _DaySelectionScreenState extends ConsumerState<DaySelectionScreen> {
           return Column(
             children: [
               Padding(
-                padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSizes.size20,
+                  AppSizes.size8,
+                  AppSizes.size20,
+                  AppSizes.size16,
+                ),
                 child: Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(AppSizes.size20),
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(24),
+                    borderRadius: BorderRadius.circular(AppSizes.radius24),
                   ),
                   child: Row(
                     children: [
                       Container(
-                        width: 56,
-                        height: 56,
+                        width: AppSizes.size56,
+                        height: AppSizes.size56,
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
                           color: Theme.of(context).colorScheme.surface,
@@ -200,12 +207,12 @@ class _DaySelectionScreenState extends ConsumerState<DaySelectionScreen> {
                         child: Text(
                           state.selectedLevel,
                           style: const TextStyle(
-                            fontSize: 19,
-                            fontWeight: FontWeight.w800,
+                            fontSize: AppSizes.font19,
+                            fontWeight: AppFontWeights.extraBold,
                           ),
                         ),
                       ),
-                      const SizedBox(width: 16),
+                      const SizedBox(width: AppSizes.space16),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -214,7 +221,7 @@ class _DaySelectionScreenState extends ConsumerState<DaySelectionScreen> {
                               '$itemCount ${context.strings(widget.course == StudyCourse.kanji ? 'kanji' : 'words').toLowerCase()}',
                               style: Theme.of(context).textTheme.titleLarge,
                             ),
-                            const SizedBox(height: 3),
+                            const SizedBox(height: AppSizes.space3),
                             Text(
                               '${state.dailyGoal} ${context.strings(widget.course == StudyCourse.kanji ? 'kanjiPerDay' : 'wordsPerDay')} · $dayCount ${context.strings('days')}',
                               style: TextStyle(
@@ -232,7 +239,12 @@ class _DaySelectionScreenState extends ConsumerState<DaySelectionScreen> {
               ),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 28),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSizes.size20,
+                    0,
+                    AppSizes.size20,
+                    AppSizes.size28,
+                  ),
                   child: LayoutBuilder(
                     builder: (context, constraints) {
                       const spacing = 12.0;
@@ -279,16 +291,20 @@ class _DaySelectionScreenState extends ConsumerState<DaySelectionScreen> {
                                 : isComplete
                                 ? Theme.of(context).colorScheme.primaryContainer
                                 : Theme.of(context).colorScheme.surface,
-                            borderRadius: BorderRadius.circular(24),
+                            borderRadius: BorderRadius.circular(
+                              AppSizes.radius24,
+                            ),
                             child: InkWell(
-                              borderRadius: BorderRadius.circular(24),
+                              borderRadius: BorderRadius.circular(
+                                AppSizes.radius24,
+                              ),
                               onTap: () => _handleDayTap(
                                 progressKey,
                                 day,
                                 completedDays,
                               ),
                               child: Padding(
-                                padding: const EdgeInsets.all(8),
+                                padding: const EdgeInsets.all(AppSizes.size8),
                                 child: Center(
                                   child: FittedBox(
                                     fit: BoxFit.scaleDown,
@@ -306,7 +322,7 @@ class _DaySelectionScreenState extends ConsumerState<DaySelectionScreen> {
                                         if (isLocked)
                                           Icon(
                                             Icons.lock_outline_rounded,
-                                            size: 16,
+                                            size: AppSizes.size16,
                                             color: foreground,
                                           ),
                                       ],

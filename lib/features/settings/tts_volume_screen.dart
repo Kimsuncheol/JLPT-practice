@@ -6,6 +6,7 @@ import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/data/models/study_preferences.dart';
 import 'package:volume_controller/volume_controller.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
 
 /// Chooses whether pronunciation follows the system volume or a level of its
 /// own.
@@ -58,10 +59,20 @@ class _TtsVolumeScreenState extends ConsumerState<TtsVolumeScreen> {
           final useSlider = state.ttsVolumeMode == TtsVolumeMode.slider;
           final level = '${(state.ttsVolume * 100).round()}%';
           return ListView(
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
+            padding: const EdgeInsets.fromLTRB(
+              AppSizes.size20,
+              AppSizes.size12,
+              AppSizes.size20,
+              AppSizes.size28,
+            ),
             children: [
               Padding(
-                padding: const EdgeInsets.fromLTRB(4, 0, 4, 14),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSizes.size4,
+                  0,
+                  AppSizes.size4,
+                  AppSizes.size14,
+                ),
                 child: Text(
                   strings('ttsVolumeHint'),
                   style: TextStyle(color: colors.onSurfaceVariant),
@@ -69,7 +80,7 @@ class _TtsVolumeScreenState extends ConsumerState<TtsVolumeScreen> {
               ),
               Material(
                 color: colors.surface,
-                borderRadius: BorderRadius.circular(22),
+                borderRadius: BorderRadius.circular(AppSizes.radius22),
                 clipBehavior: Clip.antiAlias,
                 child: RadioGroup<TtsVolumeMode>(
                   groupValue: state.ttsVolumeMode,
@@ -93,7 +104,12 @@ class _TtsVolumeScreenState extends ConsumerState<TtsVolumeScreen> {
                       ),
                       if (useSlider) ...[
                         Padding(
-                          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                          padding: const EdgeInsets.fromLTRB(
+                            AppSizes.size20,
+                            0,
+                            AppSizes.size20,
+                            0,
+                          ),
                           child: Row(
                             children: [
                               Expanded(child: Text(strings('volumeLevel'))),
@@ -130,7 +146,12 @@ class _TtsVolumeScreenState extends ConsumerState<TtsVolumeScreen> {
     if (volume == null) return const SizedBox.shrink();
     final percent = '${(volume * 100).round()}%';
     return Padding(
-      padding: const EdgeInsets.fromLTRB(72, 0, 20, 12),
+      padding: const EdgeInsets.fromLTRB(
+        AppSizes.size72,
+        0,
+        AppSizes.size20,
+        AppSizes.size12,
+      ),
       child: Column(
         children: [
           Row(
@@ -139,11 +160,11 @@ class _TtsVolumeScreenState extends ConsumerState<TtsVolumeScreen> {
               Text(percent, style: Theme.of(context).textTheme.labelLarge),
             ],
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: AppSizes.space6),
           LinearProgressIndicator(
             value: volume.clamp(0.0, 1.0),
-            minHeight: 6,
-            borderRadius: BorderRadius.circular(6),
+            minHeight: AppSizes.size6,
+            borderRadius: BorderRadius.circular(AppSizes.radius6),
           ),
         ],
       ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
 
 /// The row of hide/show toggles at the foot of a card face, optionally ending
 /// with a [trailing] action such as start over.
@@ -54,17 +55,20 @@ class HideGroupAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => InkWell(
-    borderRadius: BorderRadius.circular(20),
+    borderRadius: BorderRadius.circular(AppSizes.radius20),
     splashFactory: NoSplash.splashFactory,
     highlightColor: Colors.transparent,
     onTap: onTap,
     child: Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+      padding: const EdgeInsets.symmetric(
+        vertical: AppSizes.size10,
+        horizontal: AppSizes.size8,
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSizes.space4),
           Text(
             label,
             textAlign: TextAlign.center,
@@ -94,19 +98,22 @@ class HideToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => InkWell(
-    borderRadius: BorderRadius.circular(20),
+    borderRadius: BorderRadius.circular(AppSizes.radius20),
     splashFactory: NoSplash.splashFactory,
     highlightColor: Colors.transparent,
     onTap: onTap,
     child: Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+      padding: const EdgeInsets.symmetric(
+        vertical: AppSizes.size10,
+        horizontal: AppSizes.size8,
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
             hidden ? Icons.visibility_rounded : Icons.visibility_off_rounded,
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSizes.space4),
           Text(
             hidden ? showLabel : hideLabel,
             maxLines: 2,

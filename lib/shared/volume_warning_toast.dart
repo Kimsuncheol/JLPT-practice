@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
+import 'package:jlpt_practice/core/constants/app_colors.dart';
+import 'package:jlpt_practice/core/constants/app_font_weights.dart';
 
 const volumeWarningToastDuration = Duration(seconds: 3);
 
@@ -20,23 +23,26 @@ void showVolumeWarningToast(BuildContext context, String message) {
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.inverseSurface,
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(AppSizes.radius24),
           boxShadow: const [
             BoxShadow(
-              color: Color(0x33000000),
+              color: AppPalette.shadow20,
               blurRadius: 12,
               offset: Offset(0, 4),
             ),
           ],
         ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSizes.size18,
+            vertical: AppSizes.size12,
+          ),
           child: Text(
             message,
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Theme.of(context).colorScheme.onInverseSurface,
-              fontWeight: FontWeight.w600,
+              fontWeight: AppFontWeights.semiBold,
             ),
           ),
         ),

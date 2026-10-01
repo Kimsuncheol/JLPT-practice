@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/features/vocabulary/reorder/index_sticky_note.dart';
 import 'package:jlpt_practice/features/vocabulary/sentence_reorder_quiz.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
+import 'package:jlpt_practice/core/constants/app_colors.dart';
+import 'package:jlpt_practice/core/constants/app_font_weights.dart';
+import 'package:jlpt_practice/core/constants/app_font_styles.dart';
 
 class ReorderAnswerArea extends StatelessWidget {
   const ReorderAnswerArea({
@@ -22,29 +26,27 @@ class ReorderAnswerArea extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final surfaceColor = isDark
-        ? const Color(0xFF35321D)
-        : const Color(0xFFFFF9DC);
+        ? AppPalette.butterDark
+        : AppPalette.butterLight;
     final borderColor = isDark
-        ? const Color(0xFFD4C45D)
-        : const Color(0xFFB19B32);
+        ? AppPalette.butterBorderDark
+        : AppPalette.butterAccentLight;
     final lineColor = isDark
-        ? const Color(0xFF514D32)
-        : const Color(0xFFDED5A5);
-    final chipColor = isDark
-        ? const Color(0xFF181818)
-        : const Color(0xFF262522);
+        ? AppPalette.butterBorderDeep
+        : AppPalette.butterBorderLight;
+    final chipColor = isDark ? AppPalette.charcoal : AppPalette.charcoalWarm;
     final chipBorderColor = isDark
-        ? const Color(0xFF5C565C)
-        : const Color(0xFF706B65);
+        ? AppPalette.taupeDark
+        : AppPalette.taupeLight;
     final foregroundColor = isDark
-        ? const Color(0xFFF3F1EC)
-        : const Color(0xFF292720);
+        ? AppPalette.linenLight
+        : AppPalette.linenDark;
 
     return IndexStickyNote(
       noteKey: const ValueKey('reorder-answer-container'),
       label: context.strings('answer'),
-      labelColor: const Color(0xFFFF8E78),
-      labelTextColor: const Color(0xFF402820),
+      labelColor: AppPalette.coralSoft,
+      labelTextColor: AppPalette.coralInk,
       surfaceColor: surfaceColor,
       borderColor: borderColor,
       tabOnRight: true,
@@ -59,24 +61,29 @@ class ReorderAnswerArea extends StatelessWidget {
               drawBottomRule: true,
             ),
             child: ConstrainedBox(
-              constraints: const BoxConstraints(minHeight: 88),
+              constraints: const BoxConstraints(minHeight: AppSizes.size88),
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(24, 18, 24, 10),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSizes.size24,
+                  AppSizes.size18,
+                  AppSizes.size24,
+                  AppSizes.size10,
+                ),
                 child: selected.isEmpty
                     ? Row(
                         children: [
                           Icon(
                             Icons.drag_indicator_rounded,
-                            size: 22,
+                            size: AppSizes.size22,
                             color: foregroundColor.withValues(alpha: 0.78),
                           ),
-                          const SizedBox(width: 10),
+                          const SizedBox(width: AppSizes.space10),
                           Expanded(
                             child: Text(
                               context.strings('chooseWordToBegin'),
                               style: theme.textTheme.bodyLarge?.copyWith(
                                 color: foregroundColor.withValues(alpha: 0.82),
-                                fontStyle: FontStyle.italic,
+                                fontStyle: AppFontStyles.italic,
                               ),
                             ),
                           ),
@@ -97,8 +104,8 @@ class ReorderAnswerArea extends StatelessWidget {
                                         ) ==
                                         true
                                     ? theme.colorScheme.onErrorContainer
-                                    : const Color(0xFFF8F8F6),
-                                fontWeight: FontWeight.w700,
+                                    : AppPalette.paperWhite,
+                                fontWeight: AppFontWeights.bold700,
                               ),
                               backgroundColor:
                                   attempt?.wrongPositions.contains(position) ==
@@ -107,7 +114,9 @@ class ReorderAnswerArea extends StatelessWidget {
                                   : chipColor,
                               side: BorderSide(color: chipBorderColor),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(6),
+                                borderRadius: BorderRadius.circular(
+                                  AppSizes.radius6,
+                                ),
                               ),
                               elevation: 0,
                               onPressed: attempt == null
@@ -120,13 +129,18 @@ class ReorderAnswerArea extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(24, 14, 24, 18),
+            padding: const EdgeInsets.fromLTRB(
+              AppSizes.size24,
+              AppSizes.size14,
+              AppSizes.size24,
+              AppSizes.size18,
+            ),
             child: Text(
               translation,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: foregroundColor,
-                fontWeight: FontWeight.w600,
-                height: 1.4,
+                fontWeight: AppFontWeights.semiBold,
+                height: AppSizes.lineHeight1_4,
               ),
             ),
           ),

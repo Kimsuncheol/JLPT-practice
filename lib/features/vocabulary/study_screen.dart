@@ -18,6 +18,9 @@ import 'package:jlpt_practice/features/vocabulary/cover_tape.dart';
 import 'package:jlpt_practice/features/vocabulary/example_furigana_text.dart';
 import 'package:jlpt_practice/features/vocabulary/masked_translation.dart';
 import 'package:jlpt_practice/features/vocabulary/start_over_button.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
+import 'package:jlpt_practice/core/constants/app_colors.dart';
+import 'package:jlpt_practice/core/constants/app_font_weights.dart';
 
 class StudyScreen extends ConsumerStatefulWidget {
   const StudyScreen({required this.day, super.key});
@@ -30,7 +33,7 @@ class StudyScreen extends ConsumerStatefulWidget {
 
 class _StudyScreenState extends ConsumerState<StudyScreen>
     with ImmersiveStudyMode<StudyScreen> {
-  static const _dialogBarrierColor = Colors.black54;
+  static const _dialogBarrierColor = AppPalette.black54;
 
   int _index = 0;
   final Map<String, _CardVisibility> _cardVisibility = {};
@@ -123,7 +126,12 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
                       (!showFurigana && word.reading == word.word);
                   final meaningsHidden = visibility.hideMeanings;
                   return Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 14),
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSizes.size16,
+                      AppSizes.size8,
+                      AppSizes.size16,
+                      AppSizes.size14,
+                    ),
                     child: _StudyCard(
                       vocabulary: word,
                       language: state.meaningLanguage,
@@ -141,19 +149,24 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.symmetric(horizontal: AppSizes.size20),
               child: SizedBox(
-                height: 82,
+                height: AppSizes.size82,
                 child: _buildActionArea(state, words, _index),
               ),
             ),
             SafeArea(
               top: false,
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 30, 20, 20),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSizes.size20,
+                  AppSizes.size30,
+                  AppSizes.size20,
+                  AppSizes.size20,
+                ),
                 child: Text(
                   '${_index + 1} / ${words.length}',
-                  style: const TextStyle(fontWeight: FontWeight.w700),
+                  style: const TextStyle(fontWeight: AppFontWeights.bold700),
                 ),
               ),
             ),
@@ -612,22 +625,25 @@ class _StudyCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _centeredScrollable(
-      padding: const EdgeInsets.only(top: 26, bottom: 24),
+      padding: const EdgeInsets.only(
+        top: AppSizes.size26,
+        bottom: AppSizes.size24,
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           _buildReading(context),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSizes.space4),
           _buildRomaji(context),
-          const SizedBox(height: 6),
+          const SizedBox(height: AppSizes.space6),
           _buildWord(context),
-          const SizedBox(height: 10),
-          const SizedBox(height: 18),
+          const SizedBox(height: AppSizes.space10),
+          const SizedBox(height: AppSizes.space18),
           _buildMeaning(context),
           if (vocabulary.hasExample) ...[
-            const SizedBox(height: 34),
+            const SizedBox(height: AppSizes.space34),
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20),
+              padding: const EdgeInsets.symmetric(vertical: AppSizes.size20),
               child: _buildExample(context),
             ),
           ],
@@ -669,7 +685,7 @@ class _StudyCard extends StatelessWidget {
           : coverTapeFor(
               characters: vocabulary.reading.length,
               fontSize: titleLarge?.fontSize ?? 22,
-              maxWidth: 220,
+              maxWidth: AppSizes.size220,
               glyphWidth: 0.9,
             ),
     );
@@ -687,7 +703,7 @@ class _StudyCard extends StatelessWidget {
           : coverTapeFor(
               characters: vocabulary.romaji.length,
               fontSize: style?.fontSize ?? 16,
-              maxWidth: 180,
+              maxWidth: AppSizes.size180,
               glyphWidth: 0.6,
             ),
     );
@@ -696,18 +712,21 @@ class _StudyCard extends StatelessWidget {
   Widget _buildWord(BuildContext context) => Semantics(
     button: true,
     child: InkWell(
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(AppSizes.radius16),
       splashFactory: NoSplash.splashFactory,
       overlayColor: const WidgetStatePropertyAll(Colors.transparent),
       onTap: onSpeakWord,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSizes.size12,
+          vertical: AppSizes.size4,
+        ),
         child: FittedBox(
           fit: BoxFit.scaleDown,
           child: hideWord
               ? coverTapeFor(
                   characters: vocabulary.word.length,
-                  fontSize: 56 * 1.15,
+                  fontSize: AppSizes.font56 * 1.15,
                   tilt: -0.02,
                 )
               : Text(
@@ -716,9 +735,9 @@ class _StudyCard extends StatelessWidget {
                   softWrap: false,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                    fontSize: 56,
-                    height: 1.15,
-                    fontWeight: FontWeight.w800,
+                    fontSize: AppSizes.font56,
+                    height: AppSizes.lineHeight1_15,
+                    fontWeight: AppFontWeights.extraBold,
                   ),
                 ),
         ),
@@ -731,11 +750,14 @@ class _StudyCard extends StatelessWidget {
         button: true,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppSizes.radius12),
           splashFactory: NoSplash.splashFactory,
           overlayColor: const WidgetStatePropertyAll(Colors.transparent),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSizes.size8,
+              vertical: AppSizes.size4,
+            ),
             child: child,
           ),
         ),
@@ -750,7 +772,7 @@ class _StudyCard extends StatelessWidget {
     return coverTapeFor(
       characters: meaning.length,
       fontSize: style?.fontSize ?? 28,
-      maxWidth: 260,
+      maxWidth: AppSizes.size260,
       glyphWidth: 0.7,
       tilt: 0.015,
     );
@@ -767,16 +789,20 @@ class _StudyCard extends StatelessWidget {
         Semantics(
           button: true,
           child: InkWell(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppSizes.radius12),
             splashFactory: NoSplash.splashFactory,
             overlayColor: const WidgetStatePropertyAll(Colors.transparent),
             onTap: onSpeakExample,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSizes.size8,
+                vertical: AppSizes.size4,
+              ),
               child: ExampleFuriganaText(
                 key: const ValueKey('example-furigana'),
                 segments: vocabulary.example.sentenceSegments,
-                style: sentenceStyle ?? const TextStyle(fontSize: 22),
+                style:
+                    sentenceStyle ?? const TextStyle(fontSize: AppSizes.font22),
                 wordTargets: hideWord
                     ? wordMaskTargets(vocabulary.word)
                     : const [],
@@ -785,7 +811,7 @@ class _StudyCard extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSizes.space4),
         _buildTranslation(context, translationStyle),
       ],
     );
@@ -860,16 +886,19 @@ class _CardAction extends StatelessWidget {
   Widget build(BuildContext context) => Opacity(
     opacity: onTap == null ? 0.38 : 1,
     child: InkWell(
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(AppSizes.radius16),
       splashFactory: NoSplash.splashFactory,
       highlightColor: Colors.transparent,
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+        padding: const EdgeInsets.symmetric(
+          vertical: AppSizes.size10,
+          horizontal: AppSizes.size12,
+        ),
         child: Column(
           children: [
             Icon(icon),
-            const SizedBox(height: 6),
+            const SizedBox(height: AppSizes.space6),
             Text(
               label,
               maxLines: 2,

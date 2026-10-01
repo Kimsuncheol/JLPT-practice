@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
 
 class ReorderActions extends StatelessWidget {
   const ReorderActions({
@@ -19,7 +20,7 @@ class ReorderActions extends StatelessWidget {
   final VoidCallback onContinue;
 
   static final _shape = RoundedRectangleBorder(
-    borderRadius: BorderRadius.circular(12),
+    borderRadius: BorderRadius.circular(AppSizes.radius12),
   );
   static const _minimumSize = Size.fromHeight(54);
 
@@ -47,7 +48,7 @@ class ReorderActions extends StatelessWidget {
           onPressed: canReset ? onReset : null,
           child: Text(strings('reset')),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSizes.space12),
         FilledButton(
           style: filled,
           onPressed: canCheck ? onCheck : null,

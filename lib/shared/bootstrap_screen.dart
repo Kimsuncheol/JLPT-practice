@@ -9,6 +9,9 @@ import 'package:jlpt_practice/app/theme/app_theme.dart';
 import 'package:jlpt_practice/core/services/app_startup.dart';
 import 'package:jlpt_practice/core/services/firebase_bootstrap.dart';
 import 'package:jlpt_practice/core/services/notification_service.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
+import 'package:jlpt_practice/core/constants/app_colors.dart';
+import 'package:jlpt_practice/core/constants/app_font_weights.dart';
 
 class BootstrapScreen extends ConsumerStatefulWidget {
   const BootstrapScreen({super.key});
@@ -125,9 +128,7 @@ class _SplashScreenContentState extends State<SplashScreenContent>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final background = isDark
-        ? const Color(0xFF101713)
-        : const Color(0xFFF8F5ED);
+    final background = isDark ? AppPalette.backgroundDark : AppPalette.cream;
     final muted = Theme.of(context).colorScheme.onSurfaceVariant;
 
     return ColoredBox(
@@ -136,18 +137,26 @@ class _SplashScreenContentState extends State<SplashScreenContent>
         child: Stack(
           children: [
             const Positioned(
-              top: 70,
+              top: AppSizes.size70,
               left: -34,
-              child: _DecorativeCircle(size: 112, color: Color(0x33E9755E)),
+              child: _DecorativeCircle(
+                size: AppSizes.size112,
+                color: AppPalette.coralAlpha20,
+              ),
             ),
             const Positioned(
               right: -46,
-              bottom: 104,
-              child: _DecorativeCircle(size: 152, color: Color(0x44567563)),
+              bottom: AppSizes.size104,
+              child: _DecorativeCircle(
+                size: AppSizes.size152,
+                color: AppPalette.sageAlpha27,
+              ),
             ),
             Center(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSizes.size32,
+                ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -155,7 +164,7 @@ class _SplashScreenContentState extends State<SplashScreenContent>
                       scale: _entrance,
                       child: const _StudyMark(),
                     ),
-                    const SizedBox(height: 36),
+                    const SizedBox(height: AppSizes.space36),
                     FadeTransition(
                       opacity: _controller,
                       child: Column(
@@ -165,12 +174,12 @@ class _SplashScreenContentState extends State<SplashScreenContent>
                             textAlign: TextAlign.center,
                             style: Theme.of(context).textTheme.headlineMedium
                                 ?.copyWith(
-                                  fontSize: 30,
-                                  height: 1.25,
-                                  fontWeight: FontWeight.w800,
+                                  fontSize: AppSizes.font30,
+                                  height: AppSizes.lineHeight1_25,
+                                  fontWeight: AppFontWeights.extraBold,
                                 ),
                           ),
-                          const SizedBox(height: 10),
+                          const SizedBox(height: AppSizes.space10),
                           Text(
                             '今日の一歩が、明日の自信に。',
                             textAlign: TextAlign.center,
@@ -178,7 +187,7 @@ class _SplashScreenContentState extends State<SplashScreenContent>
                               context,
                             ).textTheme.bodyLarge?.copyWith(color: muted),
                           ),
-                          const SizedBox(height: 30),
+                          const SizedBox(height: AppSizes.space30),
                           const _LoadingDots(),
                         ],
                       ),
@@ -188,16 +197,16 @@ class _SplashScreenContentState extends State<SplashScreenContent>
               ),
             ),
             Positioned(
-              left: 0,
-              right: 0,
-              bottom: 28,
+              left: AppSizes.size0,
+              right: AppSizes.size0,
+              bottom: AppSizes.size28,
               child: Text(
                 'JLPT',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: muted,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
+                  fontSize: AppSizes.font11,
+                  fontWeight: AppFontWeights.bold700,
                   letterSpacing: 2.1,
                 ),
               ),
@@ -215,14 +224,14 @@ class _StudyMark extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 132,
-      height: 132,
+      width: AppSizes.size132,
+      height: AppSizes.size132,
       decoration: BoxDecoration(
         color: AppTheme.mint,
-        borderRadius: BorderRadius.circular(40),
+        borderRadius: BorderRadius.circular(AppSizes.radius40),
         boxShadow: const [
           BoxShadow(
-            color: Color(0x24567563),
+            color: AppPalette.sageAlpha14,
             blurRadius: 30,
             offset: Offset(0, 14),
           ),
@@ -236,9 +245,9 @@ class _StudyMark extends StatelessWidget {
               '語',
               style: TextStyle(
                 color: AppTheme.ink,
-                fontSize: 62,
-                height: 1,
-                fontWeight: FontWeight.w800,
+                fontSize: AppSizes.font62,
+                height: AppSizes.size1,
+                fontWeight: AppFontWeights.extraBold,
               ),
             ),
           ),
@@ -246,16 +255,16 @@ class _StudyMark extends StatelessWidget {
             top: -9,
             right: -9,
             child: Container(
-              width: 38,
-              height: 38,
+              width: AppSizes.size38,
+              height: AppSizes.size38,
               decoration: const BoxDecoration(
-                color: Color(0xFFE9755E),
+                color: AppPalette.coral,
                 shape: BoxShape.circle,
               ),
               child: const Icon(
                 Icons.auto_awesome_rounded,
-                color: Colors.white,
-                size: 20,
+                color: AppPalette.white,
+                size: AppSizes.size20,
               ),
             ),
           ),
@@ -275,11 +284,11 @@ class _LoadingDots extends StatelessWidget {
       child: const Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _Dot(color: Color(0xFF567563)),
-          SizedBox(width: 7),
-          _Dot(color: Color(0xFF8BAD97)),
-          SizedBox(width: 7),
-          _Dot(color: Color(0xFFE9755E)),
+          _Dot(color: AppPalette.sage),
+          SizedBox(width: AppSizes.space7),
+          _Dot(color: AppPalette.sageLight),
+          SizedBox(width: AppSizes.space7),
+          _Dot(color: AppPalette.coral),
         ],
       ),
     );
@@ -293,8 +302,8 @@ class _Dot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    width: 8,
-    height: 8,
+    width: AppSizes.size8,
+    height: AppSizes.size8,
     decoration: BoxDecoration(color: color, shape: BoxShape.circle),
   );
 }
@@ -324,14 +333,14 @@ class _SplashError extends StatelessWidget {
     return SafeArea(
       child: Center(
         child: Padding(
-          padding: const EdgeInsets.all(32),
+          padding: const EdgeInsets.all(AppSizes.size32),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.cloud_off_rounded, size: 48),
-              const SizedBox(height: 16),
+              const Icon(Icons.cloud_off_rounded, size: AppSizes.size48),
+              const SizedBox(height: AppSizes.space16),
               Text(error.toString(), textAlign: TextAlign.center),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSizes.space16),
               FilledButton(onPressed: onRetry, child: const Text('Retry')),
             ],
           ),

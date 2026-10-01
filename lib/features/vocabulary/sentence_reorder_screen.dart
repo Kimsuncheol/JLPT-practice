@@ -13,6 +13,7 @@ import 'package:jlpt_practice/features/vocabulary/reorder/reorder_progress_bar.d
 import 'package:jlpt_practice/features/vocabulary/reorder/reorder_status_views.dart';
 import 'package:jlpt_practice/features/vocabulary/reorder/reorder_tile_pool.dart';
 import 'package:jlpt_practice/features/vocabulary/sentence_reorder_quiz.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
 
 class SentenceReorderScreen extends ConsumerStatefulWidget {
   const SentenceReorderScreen({required this.day, super.key});
@@ -156,10 +157,10 @@ class _SentenceReorderScreenState extends ConsumerState<SentenceReorderScreen> {
                   ReorderProgressBar(index: _index, total: set.actualCount),
                   Expanded(
                     child: ListView(
-                      padding: const EdgeInsets.all(20),
+                      padding: const EdgeInsets.all(AppSizes.size20),
                       children: [
                         Text(context.strings('reorderPrompt')),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: AppSizes.space24),
                         ReorderAnswerArea(
                           selected: _selected,
                           attempt: attempt,
@@ -169,7 +170,7 @@ class _SentenceReorderScreenState extends ConsumerState<SentenceReorderScreen> {
                           onRemove: (tile) =>
                               setState(() => _selected.remove(tile)),
                         ),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: AppSizes.space24),
                         ReorderTilePool(
                           tiles: remaining,
                           layoutTiles: quiz.shuffledTiles,
@@ -177,7 +178,7 @@ class _SentenceReorderScreenState extends ConsumerState<SentenceReorderScreen> {
                           onSelect: (tile) =>
                               setState(() => _selected.add(tile)),
                         ),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: AppSizes.space24),
                         if (attempt != null)
                           ReorderFeedback(quiz: quiz, attempt: attempt),
                         ReorderActions(

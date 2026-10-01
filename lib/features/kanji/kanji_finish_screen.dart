@@ -9,6 +9,7 @@ import 'package:jlpt_practice/data/repositories/kanji_repository.dart';
 import 'package:jlpt_practice/features/vocabulary/day_selection_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/study_finish/studied_words_section.dart';
 import 'package:jlpt_practice/features/vocabulary/study_finish/study_finish_header.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
 
 /// Shown after the last kanji of a day: a summary of what was studied and the
 /// button that completes the day.
@@ -39,7 +40,12 @@ class KanjiFinishScreen extends ConsumerWidget {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 24, 24, 20),
+          padding: const EdgeInsets.fromLTRB(
+            AppSizes.size24,
+            AppSizes.size24,
+            AppSizes.size24,
+            AppSizes.size20,
+          ),
           child: Column(
             children: [
               Expanded(
@@ -69,7 +75,7 @@ class KanjiFinishScreen extends ConsumerWidget {
                   },
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSizes.space16),
               SizedBox(
                 width: double.infinity,
                 child: FilledButton.icon(

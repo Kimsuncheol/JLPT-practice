@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
+import 'package:jlpt_practice/core/constants/app_font_weights.dart';
 
 class ReorderProgressBar extends StatelessWidget {
   const ReorderProgressBar({
@@ -11,20 +13,25 @@ class ReorderProgressBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.fromLTRB(22, 6, 22, 0),
+    padding: const EdgeInsets.fromLTRB(
+      AppSizes.size22,
+      AppSizes.size6,
+      AppSizes.size22,
+      0,
+    ),
     child: Row(
       children: [
         Expanded(
           child: LinearProgressIndicator(
             value: (index + 1) / total,
-            minHeight: 8,
-            borderRadius: BorderRadius.circular(8),
+            minHeight: AppSizes.size8,
+            borderRadius: BorderRadius.circular(AppSizes.radius8),
           ),
         ),
-        const SizedBox(width: 14),
+        const SizedBox(width: AppSizes.space14),
         Text(
           '${index + 1}/$total',
-          style: const TextStyle(fontWeight: FontWeight.w700),
+          style: const TextStyle(fontWeight: AppFontWeights.bold700),
         ),
       ],
     ),

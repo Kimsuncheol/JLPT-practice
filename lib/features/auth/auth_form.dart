@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
+import 'package:jlpt_practice/core/constants/app_colors.dart';
 
 class AuthForm extends StatelessWidget {
   const AuthForm({
@@ -41,7 +43,12 @@ class AuthForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SingleChildScrollView(
-    padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
+    padding: const EdgeInsets.fromLTRB(
+      AppSizes.size24,
+      AppSizes.size24,
+      AppSizes.size24,
+      AppSizes.size40,
+    ),
     child: Form(
       key: formKey,
       child: Column(
@@ -49,22 +56,22 @@ class AuthForm extends StatelessWidget {
         children: [
           Icon(
             Icons.cloud_done_outlined,
-            size: 58,
+            size: AppSizes.size58,
             color: Theme.of(context).colorScheme.primary,
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: AppSizes.space18),
           Text(
             title,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.headlineSmall,
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSizes.space8),
           Text(
             body,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyMedium,
           ),
-          const SizedBox(height: 28),
+          const SizedBox(height: AppSizes.space28),
           TextFormField(
             controller: emailController,
             enabled: !busy,
@@ -78,7 +85,7 @@ class AuthForm extends StatelessWidget {
                 ? null
                 : context.strings('enterValidEmail'),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSizes.space12),
           TextFormField(
             controller: passwordController,
             enabled: !busy,
@@ -110,14 +117,14 @@ class AuthForm extends StatelessWidget {
                       : context.strings('passwordRequirement')),
           ),
           if (createAccount) ...[
-            const SizedBox(height: 10),
+            const SizedBox(height: AppSizes.space10),
             AnimatedBuilder(
               animation: passwordController,
               builder: (context, _) => PasswordConstraintsChecklist(
                 password: passwordController.text,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSizes.space12),
             TextFormField(
               controller: confirmPasswordController,
               enabled: !busy,
@@ -141,31 +148,35 @@ class AuthForm extends StatelessWidget {
               ),
             )
           else
-            const SizedBox(height: 18),
+            const SizedBox(height: AppSizes.space18),
           FilledButton(
             onPressed: busy ? null : onSubmit,
             child: busy
                 ? const SizedBox.square(
                     dimension: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
+                    child: CircularProgressIndicator(
+                      strokeWidth: AppSizes.size2,
+                    ),
                   )
                 : Text(context.strings(createAccount ? 'signUp' : 'signIn')),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: AppSizes.space20),
           Row(
             children: [
               const Expanded(child: Divider()),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSizes.size12,
+                ),
                 child: Text(context.strings('orContinueWith')),
               ),
               const Expanded(child: Divider()),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: AppSizes.space20),
           OutlinedButton.icon(
             onPressed: busy ? null : onGoogle,
-            icon: const Icon(Icons.g_mobiledata_rounded, size: 28),
+            icon: const Icon(Icons.g_mobiledata_rounded, size: AppSizes.size28),
             label: Text(
               context.strings(
                 createAccount ? 'signUpWithGoogle' : 'signInWithGoogle',
@@ -173,14 +184,14 @@ class AuthForm extends StatelessWidget {
             ),
           ),
           if (onApple != null) ...[
-            const SizedBox(height: 10),
+            const SizedBox(height: AppSizes.space10),
             OutlinedButton.icon(
               onPressed: busy ? null : onApple,
               icon: const Icon(Icons.apple_rounded),
               label: Text(context.strings('continueWithApple')),
             ),
           ],
-          const SizedBox(height: 10),
+          const SizedBox(height: AppSizes.space10),
           TextButton(
             onPressed: busy ? null : onToggleMode,
             child: Text(
@@ -232,19 +243,19 @@ class PasswordConstraintsChecklist extends StatelessWidget {
       children: [
         for (final constraint in passwordConstraints(context))
           Padding(
-            padding: const EdgeInsets.only(bottom: 4),
+            padding: const EdgeInsets.only(bottom: AppSizes.size4),
             child: Row(
               children: [
                 Icon(
                   constraint.isSatisfied(password)
                       ? Icons.check_circle_rounded
                       : Icons.circle_outlined,
-                  size: 16,
+                  size: AppSizes.size16,
                   color: constraint.isSatisfied(password)
-                      ? Colors.green
+                      ? AppPalette.green
                       : theme.colorScheme.onSurfaceVariant,
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSizes.space8),
                 Text(
                   constraint.label,
                   style: theme.textTheme.bodySmall?.copyWith(

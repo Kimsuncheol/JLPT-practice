@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
+import 'package:jlpt_practice/core/constants/app_font_weights.dart';
 
 class IndexStickyNote extends StatelessWidget {
   const IndexStickyNote({
@@ -30,13 +32,13 @@ class IndexStickyNote extends StatelessWidget {
         SizedBox(
           width: double.infinity,
           child: Padding(
-            padding: const EdgeInsets.only(top: 16),
+            padding: const EdgeInsets.only(top: AppSizes.size16),
             child: Container(
               key: noteKey,
               decoration: BoxDecoration(
                 color: surfaceColor,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: borderColor, width: 1.5),
+                borderRadius: BorderRadius.circular(AppSizes.radius14),
+                border: Border.all(color: borderColor, width: AppSizes.size1_5),
               ),
               clipBehavior: Clip.antiAlias,
               child: child,
@@ -44,16 +46,19 @@ class IndexStickyNote extends StatelessWidget {
           ),
         ),
         Positioned(
-          top: 0,
+          top: AppSizes.size0,
           left: tabOnRight ? null : 32,
           right: tabOnRight ? 32 : null,
           child: Container(
-            constraints: const BoxConstraints(minWidth: 112),
-            padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 11),
+            constraints: const BoxConstraints(minWidth: AppSizes.size112),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSizes.size22,
+              vertical: AppSizes.size11,
+            ),
             decoration: BoxDecoration(
               color: labelColor,
               borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(12),
+                top: Radius.circular(AppSizes.radius12),
               ),
             ),
             child: Text(
@@ -61,10 +66,10 @@ class IndexStickyNote extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: labelTextColor,
-                fontSize: 13,
-                fontWeight: FontWeight.w800,
+                fontSize: AppSizes.font13,
+                fontWeight: AppFontWeights.extraBold,
                 letterSpacing: 0,
-                height: 1,
+                height: AppSizes.size1,
               ),
             ),
           ),

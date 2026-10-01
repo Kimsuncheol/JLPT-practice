@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
+import 'package:jlpt_practice/core/constants/app_colors.dart';
+import 'package:jlpt_practice/core/constants/app_font_weights.dart';
 
 class StudyQuizSelectionScreen extends StatelessWidget {
   const StudyQuizSelectionScreen({
@@ -45,11 +48,16 @@ class StudyQuizSelectionScreen extends StatelessWidget {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+          padding: const EdgeInsets.fromLTRB(
+            AppSizes.size24,
+            AppSizes.size16,
+            AppSizes.size24,
+            AppSizes.size32,
+          ),
           child: Align(
             alignment: Alignment.topCenter,
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 560),
+              constraints: const BoxConstraints(maxWidth: AppSizes.size560),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -57,10 +65,10 @@ class StudyQuizSelectionScreen extends StatelessWidget {
                     strings('chooseQuizGameSubtitle'),
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: scheme.onSurfaceVariant,
-                      fontSize: 17,
+                      fontSize: AppSizes.font17,
                     ),
                   ),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: AppSizes.space30),
                   _QuizChoiceButton(
                     icon: Icons.space_bar_rounded,
                     label: strings('fillInBlankGame'),
@@ -69,7 +77,7 @@ class StudyQuizSelectionScreen extends StatelessWidget {
                       levelComplete ? '/quiz' : '/quiz/day/$day',
                     ),
                   ),
-                  const SizedBox(height: 18),
+                  const SizedBox(height: AppSizes.space18),
                   _QuizChoiceButton(
                     icon: Icons.reorder_rounded,
                     label: strings('sentenceReordering'),
@@ -109,29 +117,32 @@ class _QuizChoiceButton extends StatelessWidget {
         onPressed: onPressed,
         style: FilledButton.styleFrom(
           minimumSize: const Size.fromHeight(132),
-          backgroundColor: isDark ? const Color(0xFF1A1A1A) : scheme.surface,
+          backgroundColor: isDark ? AppPalette.blackSoft : scheme.surface,
           foregroundColor: scheme.onSurface,
-          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 20),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSizes.size22,
+            vertical: AppSizes.size20,
+          ),
           side: BorderSide(
             color: scheme.outlineVariant.withValues(alpha: isDark ? 0.55 : 0.8),
           ),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppSizes.radius12),
           ),
         ),
         child: Row(
           children: [
             Container(
-              width: 64,
-              height: 64,
+              width: AppSizes.size64,
+              height: AppSizes.size64,
               decoration: BoxDecoration(
                 color: scheme.onSurface.withValues(alpha: 0.09),
-                borderRadius: BorderRadius.circular(18),
+                borderRadius: BorderRadius.circular(AppSizes.radius18),
               ),
               alignment: Alignment.center,
-              child: Icon(icon, size: 30),
+              child: Icon(icon, size: AppSizes.size30),
             ),
-            const SizedBox(width: 20),
+            const SizedBox(width: AppSizes.space20),
             Expanded(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -142,28 +153,28 @@ class _QuizChoiceButton extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      fontSize: 18,
-                      height: 1.2,
-                      fontWeight: FontWeight.w800,
+                      fontSize: AppSizes.font18,
+                      height: AppSizes.lineHeight1_2,
+                      fontWeight: AppFontWeights.extraBold,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppSizes.space8),
                   Text(
                     description,
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       color: scheme.onSurfaceVariant,
-                      fontSize: 16,
-                      height: 1.35,
-                      fontWeight: FontWeight.w400,
+                      fontSize: AppSizes.font16,
+                      height: AppSizes.lineHeight1_35,
+                      fontWeight: AppFontWeights.regular,
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 12),
-            const Icon(Icons.arrow_forward_rounded, size: 28),
+            const SizedBox(width: AppSizes.space12),
+            const Icon(Icons.arrow_forward_rounded, size: AppSizes.size28),
           ],
         ),
       ),
