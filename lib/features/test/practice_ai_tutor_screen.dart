@@ -8,6 +8,7 @@ import 'package:jlpt_practice/data/models/mock_test_problem.dart';
 import 'package:jlpt_practice/features/test/practice_ai_tutor_service.dart';
 import 'package:jlpt_practice/shared/chat_ui_style.dart';
 import 'package:jlpt_practice/shared/streaming_chat_reply.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
 
 Future<void> showPracticeAiTutorScreen({
   required BuildContext context,
@@ -214,15 +215,20 @@ class _PracticeAiTutorScreenState extends ConsumerState<PracticeAiTutorScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 6, 16, 8),
+              padding: const EdgeInsets.fromLTRB(
+                AppSizes.size16,
+                AppSizes.size6,
+                AppSizes.size16,
+                AppSizes.size8,
+              ),
               child: Row(
                 children: [
                   Icon(
                     Icons.history_toggle_off_rounded,
-                    size: 18,
+                    size: AppSizes.size18,
                     color: colors.onSurfaceVariant,
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppSizes.space8),
                   Expanded(
                     child: Text(
                       context.strings('temporaryChatNotice'),
@@ -266,7 +272,12 @@ class _PracticeAiTutorScreenState extends ConsumerState<PracticeAiTutorScreen> {
                 sendKey: const ValueKey('practice_ai_chat_send'),
               ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+              padding: const EdgeInsets.fromLTRB(
+                AppSizes.size16,
+                AppSizes.size8,
+                AppSizes.size16,
+                AppSizes.size12,
+              ),
               child: FilledButton(
                 key: const ValueKey('practice_ai_continue'),
                 onPressed: () {
@@ -289,12 +300,12 @@ class _PracticeAiTutorScreenState extends ConsumerState<PracticeAiTutorScreen> {
     if (_error != null && !_feedbackMessageAdded) {
       return Center(
         child: Padding(
-          padding: const EdgeInsets.all(28),
+          padding: const EdgeInsets.all(AppSizes.size28),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.cloud_off_rounded, size: 44),
-              const SizedBox(height: 14),
+              const Icon(Icons.cloud_off_rounded, size: AppSizes.size44),
+              const SizedBox(height: AppSizes.space14),
               Text(
                 context.strings(
                   _error is QuotaExceeded
@@ -303,7 +314,7 @@ class _PracticeAiTutorScreenState extends ConsumerState<PracticeAiTutorScreen> {
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: AppSizes.space14),
               OutlinedButton(
                 onPressed: _load,
                 child: Text(context.strings('tryAgain')),
@@ -348,7 +359,12 @@ class _PracticeAiTutorScreenState extends ConsumerState<PracticeAiTutorScreen> {
   ) {
     final done = _feedback != null;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(4, 8, 4, 12),
+      padding: const EdgeInsets.fromLTRB(
+        AppSizes.size4,
+        AppSizes.size8,
+        AppSizes.size4,
+        AppSizes.size12,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -376,14 +392,14 @@ class _PracticeAiTutorScreenState extends ConsumerState<PracticeAiTutorScreen> {
               items: feedback.learningPoints,
             ),
           if (done) ...[
-            const SizedBox(height: 20),
+            const SizedBox(height: AppSizes.space20),
             Text(
               context.strings('aiGeneratedNotice'),
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: AppSizes.space14),
             if (_feedbackSent)
               Text(context.strings('thanksFeedback'))
             else
@@ -422,15 +438,15 @@ class _TutorSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.only(bottom: 18),
+    padding: const EdgeInsets.only(bottom: AppSizes.size18),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (title != null) ...[
           Text(title!, style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 6),
+          const SizedBox(height: AppSizes.space6),
         ],
-        Text(body, style: const TextStyle(height: 1.5)),
+        Text(body, style: const TextStyle(height: AppSizes.lineHeight1_5)),
       ],
     ),
   );
@@ -449,18 +465,18 @@ class _TutorListSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.only(bottom: 18),
+    padding: const EdgeInsets.only(bottom: AppSizes.size18),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(title, style: Theme.of(context).textTheme.titleMedium),
-        const SizedBox(height: 6),
+        const SizedBox(height: AppSizes.space6),
         for (final item in items)
           Padding(
-            padding: const EdgeInsets.only(bottom: 4),
+            padding: const EdgeInsets.only(bottom: AppSizes.size4),
             child: Text(
               quote ? '“$item”' : '• $item',
-              style: const TextStyle(height: 1.45),
+              style: const TextStyle(height: AppSizes.lineHeight1_45),
             ),
           ),
       ],

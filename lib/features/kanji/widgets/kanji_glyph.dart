@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_tape.dart';
+import 'package:jlpt_practice/core/constants/app_font_weights.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
 
 /// The kanji, or tape of the same size while it is [hidden].
 class KanjiGlyph extends StatelessWidget {
@@ -29,8 +31,8 @@ class KanjiGlyph extends StatelessWidget {
       character,
       style: TextStyle(
         fontSize: fontSize,
-        height: 1.1,
-        fontWeight: FontWeight.w800,
+        height: AppSizes.lineHeight1_1,
+        fontWeight: AppFontWeights.extraBold,
       ),
     );
   }

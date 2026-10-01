@@ -1,7 +1,11 @@
+import 'package:jlpt_practice/data/models/kanji.dart'
+    show FuriganaSegment, parseFurigana;
+
 class VocabularyExample {
   const VocabularyExample({
     required this.sentence,
-    required this.reading,
+    this.reading = '',
+    this.sentenceFurigana = '',
     required this.translations,
     required this.quizSentence,
     required this.answer,
@@ -13,6 +17,7 @@ class VocabularyExample {
     return VocabularyExample(
       sentence: json['sentence'] as String,
       reading: json['reading'] as String? ?? '',
+      sentenceFurigana: json['sentence_furigana'] as String? ?? '',
       translations: Map<String, String>.from(
         json['translations'] as Map<String, dynamic>,
       ),
@@ -26,6 +31,21 @@ class VocabularyExample {
 
   final String sentence;
   final String reading;
+  final String sentenceFurigana;
+
+  List<FuriganaSegment> get sentenceSegments {
+    final segments = parseFurigana(sentenceFurigana);
+    return segments.map((segment) => segment.text).join() == sentence
+        ? segments
+        : [FuriganaSegment(sentence)];
+  }
+
+  /// Accepts kana text and the same `{base|reading}` markup as kanji examples.
+  String get sentenceReading => sentenceFurigana.isEmpty
+      ? reading
+      : parseFurigana(
+          sentenceFurigana,
+        ).map((segment) => segment.ruby ?? segment.text).join();
   final Map<String, String> translations;
   final String quizSentence;
   final String answer;
@@ -36,6 +56,11 @@ class VocabularyExample {
       VocabularyExample(
         sentence: sentence,
         reading: reading,
+        sentenceFurigana: sentenceFurigana.isNotEmpty
+            ? sentenceFurigana
+            : catalog.sentence == sentence
+            ? catalog.sentenceFurigana
+            : '',
         translations: translations,
         quizSentence: quizSentence,
         answer: answer,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:jlpt_practice/core/utils/system_bar_metrics.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
 
 mixin ImmersiveStudyMode<T extends StatefulWidget> on State<T> {
   Color? _outerBackgroundColor;
@@ -72,8 +73,8 @@ mixin ImmersiveStudyMode<T extends StatefulWidget> on State<T> {
           child,
           if (inset > 0)
             Positioned(
-              left: 0,
-              right: 0,
+              left: AppSizes.size0,
+              right: AppSizes.size0,
               bottom: -inset,
               height: inset,
               child: AnnotatedRegion<SystemUiOverlayStyle>(

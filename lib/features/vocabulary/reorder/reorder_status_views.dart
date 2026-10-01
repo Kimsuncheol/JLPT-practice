@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/features/vocabulary/sentence_reorder_quiz.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
 
 class ReorderErrorView extends StatelessWidget {
   const ReorderErrorView({
@@ -55,7 +56,7 @@ class ReorderSummaryView extends StatelessWidget {
             '${summary.correct} / ${summary.total}',
             style: Theme.of(context).textTheme.headlineLarge,
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: AppSizes.space18),
           FilledButton(
             onPressed: onRetry,
             child: Text(context.strings('retry')),

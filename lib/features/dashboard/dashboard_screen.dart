@@ -7,6 +7,9 @@ import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/features/dashboard/dashboard_skeleton.dart';
 import 'package:jlpt_practice/features/dashboard/recent_study_card.dart';
 import 'package:jlpt_practice/shared/rewarded_xp_card.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
+import 'package:jlpt_practice/core/constants/app_colors.dart';
+import 'package:jlpt_practice/core/constants/app_font_weights.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -24,13 +27,18 @@ class DashboardScreen extends ConsumerWidget {
             children: [
               Expanded(
                 child: ListView(
-                  padding: const EdgeInsets.fromLTRB(20, 22, 20, 12),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSizes.size20,
+                    AppSizes.size22,
+                    AppSizes.size20,
+                    AppSizes.size12,
+                  ),
                   children: [
                     Row(
                       children: [
                         Container(
-                          width: 46,
-                          height: 46,
+                          width: AppSizes.size46,
+                          height: AppSizes.size46,
                           decoration: const BoxDecoration(
                             color: AppTheme.mint,
                             shape: BoxShape.circle,
@@ -40,30 +48,33 @@ class DashboardScreen extends ConsumerWidget {
                             '語',
                             style: TextStyle(
                               color: AppTheme.ink,
-                              fontSize: 23,
-                              fontWeight: FontWeight.w800,
+                              fontSize: AppSizes.font23,
+                              fontWeight: AppFontWeights.extraBold,
                             ),
                           ),
                         ),
                         const Spacer(),
                         ActionChip(
-                          avatar: const Icon(Icons.school_rounded, size: 18),
+                          avatar: const Icon(
+                            Icons.school_rounded,
+                            size: AppSizes.size18,
+                          ),
                           label: Text(state.selectedLevel),
                           onPressed: () => context.push('/settings/levels'),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 26),
+                    const SizedBox(height: AppSizes.space26),
                     Text(
                       strings('welcomeBack'),
                       style: Theme.of(context).textTheme.headlineMedium,
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: AppSizes.space20),
                     Container(
-                      padding: const EdgeInsets.all(22),
+                      padding: const EdgeInsets.all(AppSizes.size22),
                       decoration: BoxDecoration(
                         color: Theme.of(context).colorScheme.primary,
-                        borderRadius: BorderRadius.circular(28),
+                        borderRadius: BorderRadius.circular(AppSizes.radius28),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -74,10 +85,10 @@ class DashboardScreen extends ConsumerWidget {
                               color: Theme.of(
                                 context,
                               ).colorScheme.onPrimary.withValues(alpha: 0.78),
-                              fontWeight: FontWeight.w600,
+                              fontWeight: AppFontWeights.semiBold,
                             ),
                           ),
-                          const SizedBox(height: 14),
+                          const SizedBox(height: AppSizes.space14),
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
@@ -87,15 +98,15 @@ class DashboardScreen extends ConsumerWidget {
                                   color: Theme.of(
                                     context,
                                   ).colorScheme.onPrimary,
-                                  fontSize: 42,
-                                  height: 1,
-                                  fontWeight: FontWeight.w800,
+                                  fontSize: AppSizes.font42,
+                                  height: AppSizes.size1,
+                                  fontWeight: AppFontWeights.extraBold,
                                 ),
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(
-                                  left: 8,
-                                  bottom: 4,
+                                  left: AppSizes.size8,
+                                  bottom: AppSizes.size4,
                                 ),
                                 child: Text(
                                   '/ ${state.dailyGoal} ${strings('wordsStudied')}',
@@ -109,17 +120,19 @@ class DashboardScreen extends ConsumerWidget {
                               ),
                             ],
                           ),
-                          const SizedBox(height: 18),
+                          const SizedBox(height: AppSizes.space18),
                           LinearProgressIndicator(
                             value: state.dailyProgress,
-                            minHeight: 9,
-                            borderRadius: BorderRadius.circular(9),
-                            backgroundColor: Colors.white24,
+                            minHeight: AppSizes.size9,
+                            borderRadius: BorderRadius.circular(
+                              AppSizes.radius9,
+                            ),
+                            backgroundColor: AppPalette.white24,
                             color: Theme.of(
                               context,
                             ).colorScheme.primaryContainer,
                           ),
-                          const SizedBox(height: 18),
+                          const SizedBox(height: AppSizes.space18),
                           Row(
                             children: [
                               _OnPrimaryMetric(
@@ -133,7 +146,7 @@ class DashboardScreen extends ConsumerWidget {
                       ),
                     ),
                     RecentStudyCard(state: state),
-                    const SizedBox(height: 18),
+                    const SizedBox(height: AppSizes.space18),
                     GridView.count(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
@@ -182,12 +195,12 @@ class DashboardScreen extends ConsumerWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: AppSizes.space24),
                     Text(
                       strings('recentActivity'),
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppSizes.space12),
                     Row(
                       children: [
                         Expanded(
@@ -197,7 +210,7 @@ class DashboardScreen extends ConsumerWidget {
                             icon: Icons.check_circle_rounded,
                           ),
                         ),
-                        const SizedBox(width: 10),
+                        const SizedBox(width: AppSizes.space10),
                         Expanded(
                           child: _MetricCard(
                             value: '${state.studiedCount - state.learnedCount}',
@@ -205,7 +218,7 @@ class DashboardScreen extends ConsumerWidget {
                             icon: Icons.trending_up_rounded,
                           ),
                         ),
-                        const SizedBox(width: 10),
+                        const SizedBox(width: AppSizes.space10),
                         Expanded(
                           child: _MetricCard(
                             value: '${state.totalXp}',
@@ -240,13 +253,17 @@ class _OnPrimaryMetric extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Row(
     children: [
-      Icon(icon, size: 20, color: Theme.of(context).colorScheme.onPrimary),
-      const SizedBox(width: 7),
+      Icon(
+        icon,
+        size: AppSizes.size20,
+        color: Theme.of(context).colorScheme.onPrimary,
+      ),
+      const SizedBox(width: AppSizes.space7),
       Text(
         '$value $label',
         style: TextStyle(
           color: Theme.of(context).colorScheme.onPrimary,
-          fontWeight: FontWeight.w600,
+          fontWeight: AppFontWeights.semiBold,
         ),
       ),
     ],
@@ -268,21 +285,21 @@ class _GridActionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Material(
     color: color,
-    borderRadius: BorderRadius.circular(24),
+    borderRadius: BorderRadius.circular(AppSizes.radius24),
     child: InkWell(
-      borderRadius: BorderRadius.circular(24),
+      borderRadius: BorderRadius.circular(AppSizes.radius24),
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSizes.size16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              width: 42,
-              height: 42,
+              width: AppSizes.size42,
+              height: AppSizes.size42,
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.surface,
-                borderRadius: BorderRadius.circular(15),
+                borderRadius: BorderRadius.circular(AppSizes.radius15),
               ),
               child: Icon(icon),
             ),
@@ -312,19 +329,26 @@ class _MetricCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(14),
+    padding: const EdgeInsets.all(AppSizes.size14),
     decoration: BoxDecoration(
       color: Theme.of(context).colorScheme.surface,
-      borderRadius: BorderRadius.circular(18),
+      borderRadius: BorderRadius.circular(AppSizes.radius18),
     ),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 20, color: Theme.of(context).colorScheme.primary),
-        const SizedBox(height: 12),
+        Icon(
+          icon,
+          size: AppSizes.size20,
+          color: Theme.of(context).colorScheme.primary,
+        ),
+        const SizedBox(height: AppSizes.space12),
         Text(
           value,
-          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800),
+          style: const TextStyle(
+            fontSize: AppSizes.font24,
+            fontWeight: AppFontWeights.extraBold,
+          ),
         ),
         Text(
           label,

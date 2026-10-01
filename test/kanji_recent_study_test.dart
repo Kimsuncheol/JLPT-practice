@@ -10,6 +10,7 @@ import 'package:jlpt_practice/app/theme/app_theme.dart';
 import 'package:jlpt_practice/data/models/study_session.dart';
 import 'package:jlpt_practice/data/repositories/kanji_repository.dart';
 import 'package:jlpt_practice/features/dashboard/recent_study_card.dart';
+import 'package:jlpt_practice/features/kanji/kanji_finish_screen.dart';
 import 'package:jlpt_practice/features/kanji/kanji_study_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -149,7 +150,12 @@ void main() {
         viaHome: true,
       );
       await _flipAndSwipe(tester, swipe: false);
-      await tester.tap(find.text('Finish').hitTestable());
+      await tester.drag(
+        find.byKey(const ValueKey('kanji-pages')),
+        const Offset(-500, 0),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Finish'));
       await tester.pumpAndSettle();
 
       expect(find.text('Leave kanji study?'), findsNothing);
@@ -214,7 +220,12 @@ void main() {
       );
       await _pumpStudy(tester, controller);
       await _flipAndSwipe(tester, swipe: false);
-      await tester.tap(find.text('Finish').hitTestable());
+      await tester.drag(
+        find.byKey(const ValueKey('kanji-pages')),
+        const Offset(-500, 0),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Finish'));
       await tester.pumpAndSettle();
 
       expect(controller.completions, [('kanji-N5', 1)]);
@@ -227,7 +238,10 @@ Future<void> _flipAndSwipe(WidgetTester tester, {bool swipe = true}) async {
   await tester.tapAt(face.topCenter + const Offset(0, 24));
   await tester.pumpAndSettle();
   if (!swipe) return;
-  await tester.drag(find.byType(PageView), const Offset(-500, 0));
+  await tester.drag(
+    find.byKey(const ValueKey('kanji-pages')),
+    const Offset(-500, 0),
+  );
   await tester.pumpAndSettle();
 }
 
@@ -264,6 +278,12 @@ Future<void> _pumpStudy(
       GoRoute(
         path: '/kanji/day/:day',
         builder: (_, state) => KanjiStudyScreen(
+          day: int.parse(state.pathParameters['day'] ?? '1'),
+        ),
+      ),
+      GoRoute(
+        path: '/kanji/day/:day/finish',
+        builder: (_, state) => KanjiFinishScreen(
           day: int.parse(state.pathParameters['day'] ?? '1'),
         ),
       ),

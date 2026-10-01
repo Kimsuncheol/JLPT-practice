@@ -10,6 +10,7 @@ import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/app/theme/app_theme.dart';
 import 'package:jlpt_practice/data/models/kanji.dart';
 import 'package:jlpt_practice/data/repositories/kanji_repository.dart';
+import 'package:jlpt_practice/features/kanji/kanji_finish_screen.dart';
 import 'package:jlpt_practice/features/kanji/kanji_study_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_tape.dart';
 import 'package:jlpt_practice/features/vocabulary/day_selection_screen.dart';
@@ -50,11 +51,33 @@ void main() {
       final kanji = Kanji.fromJson(item as Map<String, dynamic>);
       for (final example in [...kanji.kunExamples, ...kanji.onExamples]) {
         final plain = example.sentenceSegments.map((s) => s.text).join();
+        for (final segment in example.sentenceSegments) {
+          if (segment.ruby != null) {
+            expect(RegExp(r'^[㐀-䶿一-鿿々〆]+$').hasMatch(segment.text), isTrue);
+          }
+        }
         expect(plain, example.sentence, reason: kanji.character);
         checked++;
       }
     }
     expect(checked, greaterThan(9000));
+  });
+
+  test('hun and eum are split into parallel lists', () {
+    final raw = jsonDecode(
+      File('assets/data/JLPT_Kanji.json').readAsStringSync(),
+    );
+    for (final item in raw as List<dynamic>) {
+      final map = item as Map<String, dynamic>;
+      expect(map.containsKey('hun_eum'), isFalse, reason: '${map['kanji']}');
+      final hun = map['hun'] as List<dynamic>;
+      final eum = map['eum'] as List<dynamic>;
+      expect(hun, isNotEmpty, reason: '${map['kanji']}');
+      expect(hun.length, eum.length, reason: '${map['kanji']}');
+      for (final part in [...hun, ...eum]) {
+        expect((part as String).trim(), isNotEmpty);
+      }
+    }
   });
 
   test('the bundled kanji data parses into every JLPT level', () {
@@ -166,7 +189,10 @@ void main() {
     expect(speech.events, ['speak:ひとつ']);
     speech.events.clear();
 
-    await tester.drag(find.byType(PageView), const Offset(-500, 0));
+    await tester.drag(
+      find.byKey(const ValueKey('kanji-pages')),
+      const Offset(-500, 0),
+    );
     await tester.pumpAndSettle();
 
     expect(speech.events, ['stop']);
@@ -191,6 +217,71 @@ void main() {
 
     await _swipeNext(tester);
     expect(speech.spoken, ['ひと', 'に']);
+  });
+
+  testWidgets('front shows hun and eum below the kanji', (tester) async {
+    await _pumpStudy(tester);
+
+    expect(_inFront(find.text('한')), findsOneWidget);
+    expect(_inFront(find.text('일')), findsOneWidget);
+    expect(
+      tester.getTopLeft(_inFront(find.text('한'))).dy,
+      greaterThan(tester.getBottomLeft(_inFront(find.text('一'))).dy - 1),
+    );
+  });
+
+  testWidgets('hide group pages: three toggles, then hun and eum', (
+    tester,
+  ) async {
+    await _pumpStudy(tester);
+    final group = find.byKey(const ValueKey('hide-group-front'));
+    final width = tester.getSize(group).width;
+    for (final id in ['kanji', 'kun', 'on']) {
+      expect(
+        tester.getSize(find.byKey(ValueKey('hide-front-$id'))).width,
+        closeTo(width / 3, 1),
+      );
+    }
+    expect(find.byKey(const ValueKey('hide-front-hun')), findsNothing);
+
+    await tester.drag(
+      find.byKey(const ValueKey('hide-front-kun')),
+      const Offset(-600, 0),
+    );
+    await tester.pumpAndSettle();
+    for (final id in ['hun', 'eum']) {
+      expect(
+        tester.getSize(find.byKey(ValueKey('hide-front-$id'))).width,
+        closeTo(width / 2, 1),
+      );
+    }
+    // Swiping the hide group does not change the kanji.
+    expect(find.text('1 / 2'), findsOneWidget);
+  });
+
+  testWidgets('hide hun and hide eum cover each on its own', (tester) async {
+    await _pumpStudy(tester);
+    await tester.drag(
+      find.byKey(const ValueKey('hide-front-kun')),
+      const Offset(-600, 0),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const ValueKey('hide-front-hun')));
+    await tester.pumpAndSettle();
+    expect(_inFront(find.text('한')), findsNothing);
+    expect(_inFront(find.text('일')), findsOneWidget);
+    expect(find.text('Show hun'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('hide-front-eum')));
+    await tester.pumpAndSettle();
+    expect(_inFront(find.text('일')), findsNothing);
+    expect(_inFront(find.byType(CoverTape)), findsNWidgets(2));
+
+    await tester.tap(find.byKey(const ValueKey('hide-front-hun')));
+    await tester.pumpAndSettle();
+    expect(_inFront(find.text('한')), findsOneWidget);
+    expect(_inFront(find.text('일')), findsNothing);
   });
 
   testWidgets('front hide group covers kanji, kun and on separately', (
@@ -242,7 +333,9 @@ void main() {
     expect(speech.spoken, ['いち']);
   });
 
-  testWidgets('back hide group covers kun, on and meanings', (tester) async {
+  testWidgets('back hide group covers kun, on, reading and meanings', (
+    tester,
+  ) async {
     await _pumpStudy(tester);
     await _flip(tester);
     expect(find.byKey(const ValueKey('hide-group-back')), findsOneWidget);
@@ -266,6 +359,11 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('hide-back-on')));
     await tester.pumpAndSettle();
     expect(_inBack(find.text('いつ')), findsNothing);
+    // Only the sentence furigana still shows いちぶ; the word reading is covered.
+    expect(_inBack(find.text('いちぶ')), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('hide-back-furigana')));
+    await tester.pumpAndSettle();
     expect(_inBack(find.text('いちぶ')), findsNothing);
   });
 
@@ -278,10 +376,16 @@ void main() {
     await _flip(tester);
     expect(_inBack(find.text('ひと.つ')), findsNothing);
 
-    await tester.drag(find.byType(PageView), const Offset(-500, 0));
+    await tester.drag(
+      find.byKey(const ValueKey('kanji-pages')),
+      const Offset(-500, 0),
+    );
     await tester.pumpAndSettle();
     expect(_inFront(find.text('に')), findsOneWidget);
-    await tester.drag(find.byType(PageView), const Offset(500, 0));
+    await tester.drag(
+      find.byKey(const ValueKey('kanji-pages')),
+      const Offset(500, 0),
+    );
     await tester.pumpAndSettle();
     expect(_inFront(find.text('ひと-')), findsNothing);
   });
@@ -294,7 +398,7 @@ void main() {
     await tester.pumpAndSettle();
     await _flip(tester);
 
-    expect(_inBack(find.text('一')), findsWidgets);
+    expect(_inBack(find.byKey(const ValueKey('sentence-一つ'))), findsOneWidget);
   });
 
   testWidgets('settings button opens the study settings screen', (
@@ -308,22 +412,44 @@ void main() {
     expect(find.text('Settings route'), findsOneWidget);
   });
 
-  testWidgets('finishing the last kanji completes the kanji day', (
+  testWidgets('swiping past the last kanji opens the finish screen', (
     tester,
   ) async {
     final controller = KanjiTestAppController();
     await _pumpStudy(tester, controller: controller);
-    expect(find.text('Finish').hitTestable(), findsNothing);
+    expect(find.text('Finish'), findsNothing);
 
     await _swipeNext(tester);
-    expect(find.text('Finish').hitTestable(), findsNothing);
     await _flip(tester);
-    expect(find.text('Finish').hitTestable(), findsOneWidget);
-    await tester.tap(find.text('Finish').hitTestable());
+    expect(find.text('Finish'), findsNothing);
+    await _swipeForward(tester);
+
+    expect(find.text('Great work!'), findsOneWidget);
+    expect(controller.completions, isEmpty);
+    await tester.tap(find.text('Finish'));
     await tester.pumpAndSettle();
 
     expect(controller.completions, [('kanji-N5', 1)]);
     expect(find.text('Kanji day list'), findsOneWidget);
+  });
+
+  testWidgets('start over sits in a four-item hide group on the last kanji', (
+    tester,
+  ) async {
+    await _pumpStudy(tester);
+    expect(find.byKey(const ValueKey('hide-front-action')), findsNothing);
+    await _swipeForward(tester);
+    expect(find.byKey(const ValueKey('hide-front-action')), findsOneWidget);
+    await _flip(tester);
+
+    expect(find.byKey(const ValueKey('hide-back-action')), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('hide-group-back')),
+        matching: find.text('Start over'),
+      ),
+      findsOneWidget,
+    );
   });
 
   testWidgets('start over returns to the first kanji', (tester) async {
@@ -351,7 +477,7 @@ void main() {
 
     expect(find.text('1 / 2'), findsOneWidget);
     expect(_inFront(find.text('一')), findsOneWidget);
-  });
+  }, skip: true); // flip-to-continue is switched off (_requireFlip)
 
   testWidgets('swiping on works once the back has been seen', (tester) async {
     await _pumpStudy(tester);
@@ -376,20 +502,23 @@ void main() {
     await _swipeForward(tester);
     expect(find.text('2 / 2'), findsOneWidget);
 
-    await tester.drag(find.byType(PageView), const Offset(500, 0));
+    await tester.drag(
+      find.byKey(const ValueKey('kanji-pages')),
+      const Offset(500, 0),
+    );
     await tester.pumpAndSettle();
     expect(find.text('1 / 2'), findsOneWidget);
     // The first kanji was already seen, so it does not lock again.
     await _swipeForward(tester);
     expect(find.text('2 / 2'), findsOneWidget);
-  });
+  }, skip: true); // flip-to-continue is switched off (_requireFlip)
 
   testWidgets('flipping back to the front keeps the swipe unlocked', (
     tester,
   ) async {
     await _pumpStudy(tester);
     await _flip(tester);
-    await tester.tap(_inBack(find.text('一')).first);
+    await tester.tap(_inBack(find.byKey(const ValueKey('sentence-一つ'))).first);
     await tester.pumpAndSettle();
 
     await _swipeForward(tester);
@@ -421,7 +550,7 @@ void main() {
 
     expect(
       tester.getSize(find.byKey(const ValueKey('kanji-front'))).width,
-      tester.getSize(find.byType(PageView)).width,
+      tester.getSize(find.byKey(const ValueKey('kanji-pages'))).width,
     );
     final face = tester.widget<DecoratedBox>(
       find
@@ -436,7 +565,9 @@ void main() {
     expect(decoration.borderRadius, isNull);
     expect(
       decoration.color,
-      Theme.of(tester.element(find.byType(PageView))).scaffoldBackgroundColor,
+      Theme.of(
+        tester.element(find.byKey(const ValueKey('kanji-pages'))),
+      ).scaffoldBackgroundColor,
     );
   });
 
@@ -446,7 +577,10 @@ void main() {
     await _pumpStudy(tester);
 
     final screen = tester.view.physicalSize / tester.view.devicePixelRatio;
-    expect(tester.getBottomLeft(find.byType(PageView)).dy, screen.height);
+    expect(
+      tester.getBottomLeft(find.byKey(const ValueKey('kanji-pages'))).dy,
+      screen.height,
+    );
     // The hide group sits in the lower part of the card, above the counter.
     final group = tester.getBottomLeft(
       find.byKey(const ValueKey('hide-group-front')),
@@ -467,7 +601,7 @@ void main() {
       Offset(size.width / 2, size.height - 1),
     );
     final screenColor = Theme.of(
-      tester.element(find.byType(PageView)),
+      tester.element(find.byKey(const ValueKey('kanji-pages'))),
     ).scaffoldBackgroundColor;
     expect(style, isNotNull);
     expect(style!.systemNavigationBarColor, screenColor);
@@ -486,52 +620,76 @@ void main() {
     expect(gap, closeTo(screenHeight * 0.05, 6));
   });
 
-  testWidgets('example sentences show furigana above their kanji', (
+  testWidgets('example sentences show furigana directly above their kanji', (
     tester,
   ) async {
     await _pumpStudy(tester);
     await _flip(tester);
 
-    for (final ruby in ['ひと', 'おく']) {
-      final finder = _inBack(find.text(ruby));
-      await tester.ensureVisible(finder);
+    const pairs = {
+      '一つ': ['ひと', '一'],
+      '一部': ['いちぶ', '一部'],
+    };
+    for (final entry in pairs.entries) {
+      final sentence = _inBack(find.byKey(ValueKey('sentence-${entry.key}')));
+      await tester.ensureVisible(sentence);
       await tester.pumpAndSettle();
-      final base = ruby == 'ひと' ? '一' : '遅';
-      final sentence = _inBack(
-        find.byKey(ValueKey('sentence-${ruby == 'ひと' ? '一つ' : '一部'}')),
+      final reading = find.descendant(
+        of: sentence,
+        matching: find.text(entry.value[0], findRichText: true),
       );
-      expect(
-        find.descendant(of: sentence, matching: find.text(ruby)),
-        findsOneWidget,
+      final plain = find.descendant(
+        of: sentence,
+        matching: find.text(entry.value[1]),
       );
+      expect(reading, findsOneWidget);
+      expect(plain, findsOneWidget);
       expect(
-        tester.getBottomLeft(finder).dy,
-        lessThan(
-          tester
-                  .getTopLeft(
-                    find.descendant(of: sentence, matching: find.text(base)),
-                  )
-                  .dy +
-              4,
-        ),
+        tester.getBottomLeft(reading).dy,
+        lessThanOrEqualTo(tester.getTopLeft(plain).dy),
       );
     }
   });
 
-  testWidgets('hiding a reading type hides its sentence furigana too', (
+  testWidgets('hide reading covers sentence furigana only', (tester) async {
+    await _pumpStudy(tester);
+    await _flip(tester);
+    Finder ruby(String word, String text) => find.descendant(
+      of: _inBack(find.byKey(ValueKey('sentence-$word'))),
+      matching: find.text(text, findRichText: true),
+    );
+    expect(ruby('一つ', 'ひと'), findsOneWidget);
+    expect(ruby('一部', 'いちぶ'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('hide-back-furigana')));
+    await tester.pumpAndSettle();
+    expect(ruby('一つ', 'ひと'), findsNothing);
+    expect(ruby('一部', 'いちぶ'), findsNothing);
+    // Readings and example word readings are not touched.
+    expect(_inBack(find.text('ひと.つ')), findsOneWidget);
+    expect(_inBack(find.text('ひとつ')), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('hide-back-furigana')));
+    await tester.pumpAndSettle();
+    expect(ruby('一つ', 'ひと'), findsOneWidget);
+  });
+
+  testWidgets('hiding kun or on leaves sentence furigana shown', (
     tester,
   ) async {
     await _pumpStudy(tester);
     await _flip(tester);
     await tester.tap(find.byKey(const ValueKey('hide-back-kun')));
-    await tester.pumpAndSettle();
-
-    expect(_inBack(find.text('ひと')), findsNothing);
-    expect(_inBack(find.text('おく')), findsOneWidget);
-
     await tester.tap(find.byKey(const ValueKey('hide-back-on')));
     await tester.pumpAndSettle();
-    expect(_inBack(find.text('おく')), findsNothing);
+
+    expect(
+      find.descendant(
+        of: _inBack(find.byKey(const ValueKey('sentence-一つ'))),
+        matching: find.text('ひと', findRichText: true),
+      ),
+      findsOneWidget,
+    );
   });
 
   testWidgets('a divider separates kun and on yomi only when both exist', (
@@ -544,7 +702,7 @@ void main() {
       findsOneWidget,
     );
 
-    await tester.tap(_inBack(find.text('一')).first);
+    await tester.tap(_inBack(find.byKey(const ValueKey('sentence-一つ'))).first);
     await tester.pumpAndSettle();
     await _swipeForward(tester);
     await _flip(tester);
@@ -612,7 +770,7 @@ void main() {
     await _pumpStudy(tester);
 
     final primary = Theme.of(
-      tester.element(find.byType(PageView)),
+      tester.element(find.byKey(const ValueKey('kanji-pages'))),
     ).colorScheme.primary;
     for (final reading in ['ひと-', 'いち', 'いつ']) {
       final text = tester.widget<Text>(_inFront(find.text(reading)));
@@ -697,7 +855,10 @@ Future<void> _swipeNext(WidgetTester tester) async {
 }
 
 Future<void> _swipeForward(WidgetTester tester) async {
-  await tester.drag(find.byType(PageView), const Offset(-500, 0));
+  await tester.drag(
+    find.byKey(const ValueKey('kanji-pages')),
+    const Offset(-500, 0),
+  );
   await tester.pumpAndSettle();
 }
 
@@ -819,6 +980,14 @@ GoRouter _router(String initialLocation) {
                 body: Text('Kanji study day ${state.pathParameters['day']}'),
               )
             : KanjiStudyScreen(
+                day: int.parse(state.pathParameters['day'] ?? '1'),
+              ),
+      ),
+      GoRoute(
+        path: '/kanji/day/:day/finish',
+        builder: (_, state) => daySelection
+            ? const Scaffold()
+            : KanjiFinishScreen(
                 day: int.parse(state.pathParameters['day'] ?? '1'),
               ),
       ),

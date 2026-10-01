@@ -17,6 +17,8 @@ import 'package:jlpt_practice/features/kanji/kanji_speech.dart';
 import 'package:jlpt_practice/features/kanji/kanji_visibility.dart';
 import 'package:jlpt_practice/features/kanji/widgets/kanji_footer.dart';
 import 'package:jlpt_practice/features/vocabulary/day_selection_screen.dart';
+import 'package:jlpt_practice/core/constants/app_font_weights.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
 
 class KanjiStudyScreen extends ConsumerStatefulWidget {
   const KanjiStudyScreen({required this.day, super.key});
@@ -35,6 +37,11 @@ class _KanjiStudyScreenState extends ConsumerState<KanjiStudyScreen>
   /// Gap between the hide group and the page indicator, as a share of the
   /// screen height.
   static const _hideGroupGapShare = 0.05;
+
+  /// Whether a card's back must be seen before swiping on. Switched off for
+  /// now: with it off there is no lock, no hint, and start over is always
+  /// offered on the last kanji.
+  static const _requireFlip = false;
 
   PageController? _pageController;
   final Map<String, KanjiVisibility> _visibility = {};
@@ -92,7 +99,7 @@ class _KanjiStudyScreenState extends ConsumerState<KanjiStudyScreen>
       );
     }
     final controller = _pageController ?? _initializePage(kanji, state);
-    final seenBack = _seenBack.contains(kanji[_index].id);
+    final seenBack = !_requireFlip || _seenBack.contains(kanji[_index].id);
     _lockedPage = seenBack ? null : _index;
     return PopScope(
       canPop: false,
@@ -115,27 +122,31 @@ class _KanjiStudyScreenState extends ConsumerState<KanjiStudyScreen>
           children: [
             Positioned.fill(
               child: PageView.builder(
+                key: const ValueKey('kanji-pages'),
                 controller: controller,
                 physics: KanjiForwardLockPhysics(lockedPage: () => _lockedPage),
-                itemCount: kanji.length,
+                // One page past the last kanji: swiping onto it opens the finish screen.
+                itemCount: kanji.length + 1,
                 onPageChanged: (index) => _handlePageChanged(
                   index: index,
                   kanji: kanji,
                   state: state,
                 ),
-                itemBuilder: (context, index) => _buildCard(
-                  kanji[index],
-                  state: state,
-                  seenBack: seenBack,
-                  isLast: index == kanji.length - 1,
-                  controller: controller,
-                ),
+                itemBuilder: (context, index) => index == kanji.length
+                    ? const SizedBox.shrink()
+                    : _buildCard(
+                        kanji[index],
+                        state: state,
+                        seenBack: seenBack,
+                        isLast: index == kanji.length - 1,
+                        controller: controller,
+                      ),
               ),
             ),
             Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
+              left: AppSizes.size0,
+              right: AppSizes.size0,
+              bottom: AppSizes.size0,
               child: SafeArea(
                 top: false,
                 child: Padding(
@@ -143,7 +154,9 @@ class _KanjiStudyScreenState extends ConsumerState<KanjiStudyScreen>
                   child: Center(
                     child: Text(
                       '${_index + 1} / ${kanji.length}',
-                      style: const TextStyle(fontWeight: FontWeight.w700),
+                      style: const TextStyle(
+                        fontWeight: AppFontWeights.bold700,
+                      ),
                     ),
                   ),
                 ),
@@ -193,12 +206,8 @@ class _KanjiStudyScreenState extends ConsumerState<KanjiStudyScreen>
     language: state.meaningLanguage,
     visibility: _visibilityFor(item, state),
     bottomInset: _hideGroupBottomInset(context),
-    footer: KanjiFooter(
-      seenBack: seenBack,
-      isLast: isLast,
-      onStartOver: () => controller.jumpToPage(0),
-      onFinish: () => unawaited(_finish(state)),
-    ),
+    footer: KanjiFooter(seenBack: seenBack),
+    onStartOver: isLast && seenBack ? () => controller.jumpToPage(0) : null,
     onVisibilityChanged: (value) =>
         setState(() => _visibility[item.id] = value),
     onSpeakReading: (reading) =>
@@ -225,6 +234,9 @@ class _KanjiStudyScreenState extends ConsumerState<KanjiStudyScreen>
           hideKanji: state.hideWord,
           hideKunYomi: !state.showFurigana,
           hideOnYomi: !state.showFurigana,
+          hideFurigana: !state.showFurigana,
+          hideHun: state.hideMeanings,
+          hideEum: state.hideMeanings,
           hideMeanings: state.hideMeanings,
         ),
       );
@@ -241,7 +253,7 @@ class _KanjiStudyScreenState extends ConsumerState<KanjiStudyScreen>
     _index = canResume
         ? session.resolveIndex(kanji.map((item) => item.id).toList())
         : 0;
-    _lockedPage = _index;
+    _lockedPage = _requireFlip ? _index : null;
     final controller = _pageController = PageController(initialPage: _index);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
@@ -265,27 +277,16 @@ class _KanjiStudyScreenState extends ConsumerState<KanjiStudyScreen>
         ),
       );
 
-  Future<void> _finish(AppState state) async {
-    stopSpeech();
-    await ref
-        .read(appControllerProvider.notifier)
-        .completeStudySession(
-          StudyCourse.kanji.progressKey(state.selectedLevel),
-          widget.day,
-        );
-    if (!mounted) return;
-    // go('/kanji') would leave the day list as the only route, so the system
-    // back button would close the app. Rebuild home → day list instead.
-    context.go('/home');
-    context.push('/kanji');
-  }
-
   void _handlePageChanged({
     required int index,
     required List<Kanji> kanji,
     required AppState state,
   }) {
     stopSpeech();
+    if (index == kanji.length) {
+      context.pushReplacement('/kanji/day/${widget.day}/finish');
+      return;
+    }
     setState(() => _index = index);
     unawaited(_savePosition(state, kanji[index], index));
     if (state.autoPlayAudio) _speakFirstReading(kanji[index]);

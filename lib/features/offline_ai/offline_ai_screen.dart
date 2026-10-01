@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/features/offline_ai/offline_ai_controller.dart';
 import 'package:jlpt_practice/features/offline_ai/offline_ai_model.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
 
 class OfflineAiScreen extends ConsumerWidget {
   const OfflineAiScreen({super.key});
@@ -23,27 +24,32 @@ class OfflineAiScreen extends ConsumerWidget {
           final selected = controller.selected;
           final installed = controller.installed.contains(selected.id);
           return ListView(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+            padding: const EdgeInsets.fromLTRB(
+              AppSizes.size20,
+              AppSizes.size16,
+              AppSizes.size20,
+              AppSizes.size32,
+            ),
             children: [
               Icon(
                 Icons.offline_bolt_outlined,
-                size: 48,
+                size: AppSizes.size48,
                 color: Theme.of(context).colorScheme.primary,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSizes.space16),
               Text(
                 strings('offlineIntro'),
                 style: Theme.of(context).textTheme.titleLarge,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppSizes.space8),
               Text(strings('offlinePrivacy')),
-              const SizedBox(height: 20),
+              const SizedBox(height: AppSizes.space20),
               if (capacity != null) ...[
                 Text(
                   '${strings('offlineRam')}: ${_size(capacity.totalRam)} · '
                   '${strings('offlineStorage')}: ${_size(capacity.freeStorage)}',
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppSizes.space12),
               ],
               for (final model in OfflineAiModel.catalog)
                 Card(
@@ -77,7 +83,7 @@ class OfflineAiScreen extends ConsumerWidget {
                     onTap: () => controller.select(model),
                   ),
                 ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSizes.space12),
               SwitchListTile.adaptive(
                 contentPadding: EdgeInsets.zero,
                 title: Text(strings('offlineWifiOnly')),
@@ -90,14 +96,14 @@ class OfflineAiScreen extends ConsumerWidget {
                 strings('offlineQualityNote'),
                 style: Theme.of(context).textTheme.bodySmall,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSizes.space16),
               if (controller.busy) ...[
                 LinearProgressIndicator(
                   value: controller.phase == OfflineAiPhase.downloading
                       ? (controller.received / selected.bytes).clamp(0, 1)
                       : null,
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: AppSizes.space10),
                 Text(
                   strings(switch (controller.phase) {
                     OfflineAiPhase.downloading => 'offlineDownloading',
@@ -118,13 +124,13 @@ class OfflineAiScreen extends ConsumerWidget {
                 ],
               ],
               if (controller.errorKey case final key?) ...[
-                const SizedBox(height: 12),
+                const SizedBox(height: AppSizes.space12),
                 Text(
                   strings(key),
                   style: TextStyle(color: Theme.of(context).colorScheme.error),
                 ),
               ],
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSizes.space16),
               FilledButton.icon(
                 onPressed:
                     controller.busy ||
@@ -152,7 +158,7 @@ class OfflineAiScreen extends ConsumerWidget {
                 ),
               ),
               if (controller.ready) ...[
-                const SizedBox(height: 8),
+                const SizedBox(height: AppSizes.space8),
                 Text(strings('offlineReady')),
               ],
               if (installed || (controller.partialBytes[selected.id] ?? 0) > 0)

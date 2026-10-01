@@ -305,7 +305,19 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(CoverTape), findsNothing);
     expect(find.text('単語6'), findsOneWidget);
-    expect(find.text('毎日単語6を使います。'), findsOneWidget);
+    final example = find.byKey(const ValueKey('example-furigana'));
+    final dailyRuby = find.descendant(
+      of: example,
+      matching: find.text('まいにち', findRichText: true),
+    );
+    final dailyKanji = find.descendant(of: example, matching: find.text('毎日'));
+    expect(dailyRuby, findsOneWidget);
+    expect(dailyKanji, findsOneWidget);
+    expect(
+      tester.getBottomLeft(dailyRuby).dy,
+      lessThanOrEqualTo(tester.getTopLeft(dailyKanji).dy),
+    );
+    expect(find.text('まいにち たんごを つかいます。'), findsNothing);
     expect(find.text('word'), findsOneWidget);
 
     await tester.tap(find.text('Hide word'));
@@ -313,7 +325,10 @@ void main() {
     expect(find.text('単語6'), findsNothing);
     // The example sentence keeps its text but the word in it is taped.
     expect(find.byType(CoverTape), findsWidgets);
-    expect(find.textContaining('を使います。', findRichText: true), findsOneWidget);
+    expect(
+      find.descendant(of: example, matching: find.text('使')),
+      findsOneWidget,
+    );
     expect(find.textContaining('単語6を使います。', findRichText: true), findsNothing);
     expect(find.text('Show word'), findsOneWidget);
 
@@ -325,29 +340,29 @@ void main() {
     await tester.tap(find.text('Hide reading'));
     await tester.pumpAndSettle();
     expect(find.text('たんご'), findsNothing);
-    // The example furigana remains; only the studied pronunciation is taped.
+    // Every kanji reading in the example is taped as well.
     expect(
       find.descendant(
-        of: find.byKey(const ValueKey('example-furigana')),
+        of: find.byKey(const ValueKey('example-ruby-2')),
         matching: find.byType(CoverTape),
       ),
       findsOneWidget,
     );
-    final exampleFurigana = tester.widget<Text>(
+    expect(dailyRuby, findsNothing);
+    expect(
       find.descendant(
-        of: find.byKey(const ValueKey('example-furigana')),
-        matching: find.byType(Text),
+        of: example,
+        matching: find.text('つか', findRichText: true),
       ),
+      findsNothing,
     );
-    final visibleReading = exampleFurigana.textSpan!.toPlainText();
-    expect(visibleReading, startsWith('まいにち '));
-    expect(visibleReading, endsWith('を つかいます。'));
 
     await tester.tap(find.text('Show word'));
     await tester.tap(find.text('Show meanings'));
     await tester.tap(find.text('Show reading'));
     await tester.pumpAndSettle();
     expect(find.byType(CoverTape), findsNothing);
+    expect(dailyRuby, findsOneWidget);
     expect(find.text('単語6'), findsOneWidget);
     expect(find.text('word'), findsOneWidget);
   });
@@ -385,7 +400,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('単語7'), findsOneWidget);
-    expect(find.text('たんご'), findsOneWidget);
+    expect(find.text('たんご'), findsNWidgets(2));
     expect(find.text('word'), findsOneWidget);
     expect(find.text('Hide reading'), findsOneWidget);
     expect(find.text('Hide word'), findsOneWidget);
@@ -1300,7 +1315,7 @@ Vocabulary _word(int index, [bool withExample = false]) => Vocabulary(
   example: withExample
       ? VocabularyExample(
           sentence: '毎日単語${index + 1}を使います。',
-          reading: 'まいにち たんごを つかいます。',
+          sentenceFurigana: '{毎日|まいにち}{単語|たんご}${index + 1}を{使|つか}います。',
           translations: const {'en': 'I use the word every day.'},
           quizSentence: '',
           answer: '',

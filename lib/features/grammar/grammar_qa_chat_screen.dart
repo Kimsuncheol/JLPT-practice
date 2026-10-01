@@ -7,6 +7,7 @@ import 'package:jlpt_practice/features/grammar/grammar_qa_service.dart';
 import 'package:jlpt_practice/features/offline_ai/offline_ai_model.dart';
 import 'package:jlpt_practice/shared/chat_ui_style.dart';
 import 'package:jlpt_practice/shared/streaming_chat_reply.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
 
 Future<void> showGrammarQaChatScreen(
   BuildContext context, {
@@ -218,11 +219,16 @@ class _GrammarQaChatScreenState extends ConsumerState<GrammarQaChatScreen> {
             ),
             if (_pendingMessages.isNotEmpty)
               Padding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSizes.size16,
+                  0,
+                  AppSizes.size16,
+                  AppSizes.size8,
+                ),
                 child: Row(
                   children: [
-                    const Icon(Icons.schedule_rounded, size: 16),
-                    const SizedBox(width: 6),
+                    const Icon(Icons.schedule_rounded, size: AppSizes.size16),
+                    const SizedBox(width: AppSizes.space6),
                     Text(
                       context
                           .strings('queuedChatMessages')

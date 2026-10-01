@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
 
 class StudyFinishHeader extends StatelessWidget {
   const StudyFinishHeader({required this.title, required this.body, super.key});
@@ -13,21 +14,23 @@ class StudyFinishHeader extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         const SizedBox(
-          width: 92,
-          height: 92,
-          child: Icon(Icons.celebration_rounded, size: 42),
+          width: AppSizes.size92,
+          height: AppSizes.size92,
+          child: Icon(Icons.celebration_rounded, size: AppSizes.size42),
         ),
-        const SizedBox(height: 22),
+        const SizedBox(height: AppSizes.space22),
         Text(
           title,
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.headlineMedium,
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSizes.space8),
         Text(
           body,
           textAlign: TextAlign.center,
-          style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
         ),
       ],
     );

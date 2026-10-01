@@ -4,6 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/app/theme/app_theme.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
+import 'package:jlpt_practice/core/constants/app_font_weights.dart';
+import 'package:jlpt_practice/core/constants/app_spacing.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
@@ -27,7 +30,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         child: LayoutBuilder(
           builder: (context, constraints) {
             return SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(24, 24, 24, 32),
+              padding: const EdgeInsets.fromLTRB(
+                AppSizes.size24,
+                AppSizes.size24,
+                AppSizes.size24,
+                AppSizes.size32,
+              ),
               child: ConstrainedBox(
                 constraints: BoxConstraints(
                   minHeight: constraints.maxHeight - 56,
@@ -36,8 +44,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      width: 64,
-                      height: 64,
+                      width: AppSizes.size64,
+                      height: AppSizes.size64,
                       decoration: const BoxDecoration(
                         color: AppTheme.mint,
                         shape: BoxShape.circle,
@@ -47,28 +55,28 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         '語',
                         style: TextStyle(
                           color: AppTheme.ink,
-                          fontSize: 30,
-                          fontWeight: FontWeight.w800,
+                          fontSize: AppSizes.font30,
+                          fontWeight: AppFontWeights.extraBold,
                         ),
                       ),
                     ),
-                    const SizedBox(height: 30),
+                    const SizedBox(height: AppSizes.space30),
                     Text(
                       strings('onboardingTitle'),
                       style: Theme.of(context).textTheme.displaySmall,
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppSizes.space12),
                     Text(
                       strings('onboardingBody'),
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
-                    const SizedBox(height: 36),
+                    const SizedBox(height: AppSizes.space36),
                     _Label(strings('chooseLevel')),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppSizes.space12),
                     Wrap(
-                      spacing: 9,
+                      spacing: AppSpacing.item9,
                       children: ['N5', 'N4', 'N3', 'N2', 'N1']
                           .map(
                             (level) => ChoiceChip(
@@ -79,9 +87,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                           )
                           .toList(),
                     ),
-                    const SizedBox(height: 28),
+                    const SizedBox(height: AppSizes.space28),
                     _Label(strings('language')),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppSizes.space12),
                     SegmentedButton<String>(
                       segments: const [
                         ButtonSegment(value: 'system', label: Text('System')),
@@ -93,7 +101,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         setState(() => _language = value.first);
                       },
                     ),
-                    const SizedBox(height: 18),
+                    const SizedBox(height: AppSizes.space18),
                     SwitchListTile(
                       value: _autoAudio,
                       contentPadding: EdgeInsets.zero,
@@ -103,22 +111,22 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         setState(() => _autoAudio = value);
                       },
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: AppSizes.space14),
                     Container(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(AppSizes.size16),
                       decoration: BoxDecoration(
                         color: Theme.of(context).colorScheme.secondaryContainer,
-                        borderRadius: BorderRadius.circular(18),
+                        borderRadius: BorderRadius.circular(AppSizes.radius18),
                       ),
                       child: Row(
                         children: [
                           const Icon(Icons.swipe_rounded),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: AppSizes.space12),
                           Expanded(child: Text(strings('swipeHint'))),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: AppSizes.space32),
                     FilledButton(
                       onPressed: _submitting
                           ? null
@@ -139,7 +147,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       child: _submitting
                           ? const SizedBox.square(
                               dimension: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2),
+                              child: CircularProgressIndicator(
+                                strokeWidth: AppSizes.size2,
+                              ),
                             )
                           : Text(strings('getStarted')),
                     ),

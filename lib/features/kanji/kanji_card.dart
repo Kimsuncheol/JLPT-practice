@@ -5,6 +5,7 @@ import 'package:jlpt_practice/features/kanji/kanji_back_face.dart';
 import 'package:jlpt_practice/features/kanji/kanji_card_face.dart';
 import 'package:jlpt_practice/features/kanji/kanji_front_face.dart';
 import 'package:jlpt_practice/features/kanji/kanji_visibility.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
 
 /// A flip card: the kanji with its main readings on the front, every reading
 /// with its example words on the back.
@@ -18,6 +19,7 @@ class KanjiCard extends StatelessWidget {
     required this.onSpeakSentence,
     required this.onFlip,
     required this.footer,
+    this.onStartOver,
     this.bottomInset = 0,
     super.key,
   });
@@ -32,6 +34,9 @@ class KanjiCard extends StatelessWidget {
 
   /// Shown at the foot of both faces, just above the hide group.
   final Widget footer;
+
+  /// When set, the hide group of both faces ends with a start-over action.
+  final VoidCallback? onStartOver;
 
   /// Space kept clear at the foot of both faces for controls drawn over the
   /// card, so the hide group sits just above them.
@@ -50,13 +55,19 @@ class KanjiCard extends StatelessWidget {
     onFlipStart: (_, to) => onFlip(to == CardSide.back),
     front: KanjiFace(
       key: const ValueKey('kanji-front'),
-      padding: EdgeInsets.fromLTRB(16, 16, 16, bottomInset),
+      padding: EdgeInsets.fromLTRB(
+        AppSizes.size16,
+        AppSizes.size16,
+        AppSizes.size16,
+        bottomInset,
+      ),
       child: KanjiFrontFace(
         kanji: kanji,
         visibility: visibility,
         onVisibilityChanged: onVisibilityChanged,
         onSpeakReading: onSpeakReading,
         footer: footer,
+        onStartOver: onStartOver,
       ),
     ),
     back: KanjiFace(
@@ -72,6 +83,7 @@ class KanjiCard extends StatelessWidget {
         onSpeakReading: onSpeakReading,
         onSpeakSentence: onSpeakSentence,
         footer: footer,
+        onStartOver: onStartOver,
       ),
     ),
   );

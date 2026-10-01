@@ -3,8 +3,10 @@ import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/data/models/kanji.dart';
 import 'package:jlpt_practice/features/kanji/kanji_visibility.dart';
 import 'package:jlpt_practice/features/kanji/widgets/hide_group.dart';
+import 'package:jlpt_practice/features/kanji/widgets/hun_eum_line.dart';
 import 'package:jlpt_practice/features/kanji/widgets/kanji_glyph.dart';
 import 'package:jlpt_practice/features/kanji/widgets/reading_chip.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
 
 /// The front: the kanji with its first kun and first two on readings.
 class KanjiFrontFace extends StatelessWidget {
@@ -14,6 +16,7 @@ class KanjiFrontFace extends StatelessWidget {
     required this.onVisibilityChanged,
     required this.onSpeakReading,
     required this.footer,
+    this.onStartOver,
     super.key,
   });
 
@@ -22,6 +25,9 @@ class KanjiFrontFace extends StatelessWidget {
   final ValueChanged<KanjiVisibility> onVisibilityChanged;
   final ValueChanged<String> onSpeakReading;
   final Widget footer;
+
+  /// Shown as the hide group's last item when set: restarts the day.
+  final VoidCallback? onStartOver;
 
   @override
   Widget build(BuildContext context) {
@@ -39,26 +45,52 @@ class KanjiFrontFace extends StatelessWidget {
                 children: [
                   KanjiGlyph(
                     character: kanji.character,
-                    fontSize: 132,
+                    fontSize: AppSizes.font132,
                     hidden: visibility.hideKanji,
                   ),
-                  if (kanji.frontKunYomi.isNotEmpty) ...[
-                    const SizedBox(height: 22),
-                    ReadingGroup(
-                      label: strings('kunYomi'),
-                      readings: kanji.frontKunYomi,
-                      hidden: visibility.hideKunYomi,
-                      onSpeak: onSpeakReading,
-                    ),
+                  if (kanji.frontKunYomi.isNotEmpty ||
+                      kanji.uniqueHun.isNotEmpty) ...[
+                    const SizedBox(height: AppSizes.space60),
+                    if (kanji.frontKunYomi.isEmpty)
+                      HunEumLine(
+                        values: kanji.uniqueHun,
+                        hidden: visibility.hideHun,
+                      )
+                    else
+                      ReadingGroup(
+                        label: strings('kunYomi'),
+                        readings: kanji.frontKunYomi,
+                        hidden: visibility.hideKunYomi,
+                        onSpeak: onSpeakReading,
+                        extra: kanji.uniqueHun.isEmpty
+                            ? null
+                            : HunEumLine(
+                                values: kanji.uniqueHun,
+                                hidden: visibility.hideHun,
+                              ),
+                      ),
                   ],
-                  if (kanji.frontOnYomi.isNotEmpty) ...[
-                    const SizedBox(height: 18),
-                    ReadingGroup(
-                      label: strings('onYomi'),
-                      readings: kanji.frontOnYomi,
-                      hidden: visibility.hideOnYomi,
-                      onSpeak: onSpeakReading,
-                    ),
+                  if (kanji.frontOnYomi.isNotEmpty ||
+                      kanji.uniqueEum.isNotEmpty) ...[
+                    const SizedBox(height: AppSizes.space44),
+                    if (kanji.frontOnYomi.isEmpty)
+                      HunEumLine(
+                        values: kanji.uniqueEum,
+                        hidden: visibility.hideEum,
+                      )
+                    else
+                      ReadingGroup(
+                        label: strings('onYomi'),
+                        readings: kanji.frontOnYomi,
+                        hidden: visibility.hideOnYomi,
+                        onSpeak: onSpeakReading,
+                        extra: kanji.uniqueEum.isEmpty
+                            ? null
+                            : HunEumLine(
+                                values: kanji.uniqueEum,
+                                hidden: visibility.hideEum,
+                              ),
+                      ),
                   ],
                 ],
               ),
@@ -68,6 +100,35 @@ class KanjiFrontFace extends StatelessWidget {
         footer,
         HideGroup(
           side: 'front',
+          trailing: onStartOver == null
+              ? null
+              : HideGroupAction(
+                  icon: Icons.refresh_rounded,
+                  label: strings('startOver'),
+                  onTap: onStartOver!,
+                ),
+          morePages: [
+            [
+              HideToggle(
+                id: 'hun',
+                hidden: visibility.hideHun,
+                hideLabel: strings('hideHun'),
+                showLabel: strings('showHun'),
+                onTap: () => onVisibilityChanged(
+                  visibility.copyWith(hideHun: !visibility.hideHun),
+                ),
+              ),
+              HideToggle(
+                id: 'eum',
+                hidden: visibility.hideEum,
+                hideLabel: strings('hideEum'),
+                showLabel: strings('showEum'),
+                onTap: () => onVisibilityChanged(
+                  visibility.copyWith(hideEum: !visibility.hideEum),
+                ),
+              ),
+            ],
+          ],
           toggles: [
             HideToggle(
               id: 'kanji',

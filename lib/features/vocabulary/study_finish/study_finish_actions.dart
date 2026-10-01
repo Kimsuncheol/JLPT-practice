@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
 
 class LevelCompleteActions extends StatelessWidget {
   const LevelCompleteActions({
@@ -26,7 +27,7 @@ class LevelCompleteActions extends StatelessWidget {
             label: Text(strings('chooseAnotherLevel')),
           ),
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: AppSizes.space10),
         SizedBox(
           width: double.infinity,
           child: OutlinedButton.icon(
@@ -35,7 +36,7 @@ class LevelCompleteActions extends StatelessWidget {
             label: Text(strings('backToStudyDays')),
           ),
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: AppSizes.space10),
         SizedBox(
           width: double.infinity,
           child: OutlinedButton.icon(
@@ -78,7 +79,7 @@ class SessionActions extends StatelessWidget {
             label: Text(strings('finishSession')),
           ),
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: AppSizes.space10),
         SizedBox(
           width: double.infinity,
           child: OutlinedButton.icon(

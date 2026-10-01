@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
 
 class EyeComfortScreen extends ConsumerWidget {
   const EyeComfortScreen({super.key});
@@ -19,11 +20,16 @@ class EyeComfortScreen extends ConsumerWidget {
           final strings = context.strings;
           final percent = '${(state.eyeComfortLevel * 100).round()}%';
           return ListView(
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
+            padding: const EdgeInsets.fromLTRB(
+              AppSizes.size20,
+              AppSizes.size12,
+              AppSizes.size20,
+              AppSizes.size28,
+            ),
             children: [
               Material(
                 color: Theme.of(context).colorScheme.surface,
-                borderRadius: BorderRadius.circular(22),
+                borderRadius: BorderRadius.circular(AppSizes.radius22),
                 clipBehavior: Clip.antiAlias,
                 child: Column(
                   children: [
@@ -35,7 +41,12 @@ class EyeComfortScreen extends ConsumerWidget {
                       onChanged: controller.setEyeComfortEnabled,
                     ),
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                      padding: const EdgeInsets.fromLTRB(
+                        AppSizes.size20,
+                        0,
+                        AppSizes.size20,
+                        0,
+                      ),
                       child: Row(
                         children: [
                           Expanded(child: Text(strings('eyeComfortStrength'))),

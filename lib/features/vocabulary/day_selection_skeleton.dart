@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jlpt_practice/shared/skeleton.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
 
 /// Mirrors [DaySelectionScreen]'s layout so nothing jumps once data loads.
 class DaySelectionSkeleton extends StatelessWidget {
@@ -10,25 +11,38 @@ class DaySelectionSkeleton extends StatelessWidget {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+          padding: const EdgeInsets.fromLTRB(
+            AppSizes.size20,
+            AppSizes.size8,
+            AppSizes.size20,
+            AppSizes.size16,
+          ),
           child: Container(
             width: double.infinity,
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(AppSizes.size20),
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.primaryContainer,
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(AppSizes.radius24),
             ),
             child: const Row(
               children: [
-                ShimmerCircle(size: 56),
-                SizedBox(width: 16),
+                ShimmerCircle(size: AppSizes.size56),
+                SizedBox(width: AppSizes.space16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      ShimmerBone(width: 120, height: 20, radius: 6),
-                      SizedBox(height: 8),
-                      ShimmerBone(width: 160, height: 14, radius: 6),
+                      ShimmerBone(
+                        width: AppSizes.size120,
+                        height: AppSizes.size20,
+                        radius: 6,
+                      ),
+                      SizedBox(height: AppSizes.space8),
+                      ShimmerBone(
+                        width: AppSizes.size160,
+                        height: AppSizes.size14,
+                        radius: 6,
+                      ),
                     ],
                   ),
                 ),
@@ -38,7 +52,12 @@ class DaySelectionSkeleton extends StatelessWidget {
         ),
         Expanded(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 28),
+            padding: const EdgeInsets.fromLTRB(
+              AppSizes.size20,
+              0,
+              AppSizes.size20,
+              AppSizes.size28,
+            ),
             child: LayoutBuilder(
               builder: (context, constraints) {
                 const spacing = 12.0;

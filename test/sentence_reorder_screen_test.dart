@@ -29,7 +29,7 @@ void main() {
     expect(find.text('문장 뜻'), findsOneWidget);
     expect(find.text('ANSWER'), findsOneWidget);
     expect(find.text('WORDS'), findsOneWidget);
-    expect(find.text('Choose a word below to begin.'), findsOneWidget);
+    expect(find.text('Choose a word below to begin.'), findsNothing);
     expect(find.text('Your sentence'), findsNothing);
     expect(find.text('Hide meanings'), findsNothing);
     expect(find.byIcon(Icons.volume_up_rounded), findsNothing);
@@ -56,9 +56,13 @@ void main() {
     final tilePool = find.byKey(const ValueKey('reorder-tile-pool-container'));
     final initialTilePoolWidth = tester.getSize(tilePool).width;
     final initialTilePoolHeight = tester.getSize(tilePool).height;
+    final emptyAnswerHeight = tester.getSize(answerContainer).height;
     for (var index = 0; index < 3; index++) {
       await tester.tap(find.byKey(ValueKey('available-$index')));
       await tester.pump();
+      if (index == 0) {
+        expect(tester.getSize(answerContainer).height, emptyAnswerHeight);
+      }
     }
     expect(tester.getSize(tilePool).width, initialTilePoolWidth);
     expect(tester.getSize(tilePool).height, initialTilePoolHeight);
@@ -73,9 +77,13 @@ void main() {
       ),
       findsOneWidget,
     );
+    await tester.ensureVisible(find.text('Check answer'));
+    await tester.pump();
     await tester.tap(find.text('Check answer'));
     await tester.pump();
     expect(find.text('Correct'), findsOneWidget);
+    await tester.ensureVisible(find.text('Continue'));
+    await tester.pump();
     await tester.tap(find.text('Continue'));
     await tester.pump();
     expect(find.text('1 / 1'), findsOneWidget);
@@ -179,6 +187,8 @@ void main() {
       await tester.tap(find.byKey(ValueKey('available-$index')));
       await tester.pump();
     }
+    await tester.ensureVisible(find.text('Check answer'));
+    await tester.pump();
     await tester.tap(find.text('Check answer'));
     await tester.pump();
     expect(find.text('Correct'), findsOneWidget);
@@ -211,6 +221,8 @@ void main() {
       await tester.tap(find.byKey(ValueKey('available-$index')));
       await tester.pump();
     }
+    await tester.ensureVisible(find.text('Check answer'));
+    await tester.pump();
     await tester.tap(find.text('Check answer'));
     await tester.pump();
     await tester.tap(find.byIcon(Icons.close_rounded));

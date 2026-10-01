@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/ads/ad_service.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
+import 'package:jlpt_practice/core/constants/app_font_weights.dart';
 
 class RewardedXpCard extends ConsumerStatefulWidget {
   const RewardedXpCard({super.key});
@@ -41,26 +43,36 @@ class _RewardedXpCardState extends ConsumerState<RewardedXpCard> {
     return SafeArea(
       top: false,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 4, 20, 8),
+        padding: const EdgeInsets.fromLTRB(
+          AppSizes.size20,
+          AppSizes.size4,
+          AppSizes.size20,
+          AppSizes.size8,
+        ),
         child: Material(
           color: Theme.of(context).colorScheme.secondaryContainer,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppSizes.radius16),
           child: InkWell(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppSizes.radius16),
             onTap: _loading ? null : _watchAd,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSizes.size16,
+                vertical: AppSizes.size12,
+              ),
               child: Row(
                 children: [
                   const Icon(Icons.bolt_rounded),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppSizes.space12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           context.strings('earnBonusXp'),
-                          style: const TextStyle(fontWeight: FontWeight.w700),
+                          style: const TextStyle(
+                            fontWeight: AppFontWeights.bold700,
+                          ),
                         ),
                         Text(
                           '+${AdService.rewardedXpAmount} XP',
@@ -71,9 +83,11 @@ class _RewardedXpCardState extends ConsumerState<RewardedXpCard> {
                   ),
                   if (_loading)
                     const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
+                      width: AppSizes.size20,
+                      height: AppSizes.size20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: AppSizes.size2,
+                      ),
                     )
                   else
                     const Icon(Icons.play_circle_fill_rounded),

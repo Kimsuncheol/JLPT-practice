@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jlpt_practice/shared/skeleton.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
 
 /// Mirrors [StatisticsScreen]'s layout so nothing jumps once data loads.
 class StatisticsSkeleton extends StatelessWidget {
@@ -11,36 +12,54 @@ class StatisticsSkeleton extends StatelessWidget {
       children: [
         Expanded(
           child: ListView(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
+            padding: const EdgeInsets.fromLTRB(
+              AppSizes.size20,
+              AppSizes.size20,
+              AppSizes.size20,
+              AppSizes.size18,
+            ),
             children: [
-              const ShimmerBone(width: 140, height: 28, radius: 8),
-              const SizedBox(height: 20),
+              const ShimmerBone(
+                width: AppSizes.size140,
+                height: AppSizes.size28,
+                radius: 8,
+              ),
+              const SizedBox(height: AppSizes.space20),
               Row(
                 children: const [
                   Expanded(child: _StatCardSkeleton()),
-                  SizedBox(width: 10),
+                  SizedBox(width: AppSizes.space10),
                   Expanded(child: _StatCardSkeleton()),
                 ],
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: AppSizes.space10),
               Row(
                 children: const [
                   Expanded(child: _StatCardSkeleton()),
-                  SizedBox(width: 10),
+                  SizedBox(width: AppSizes.space10),
                   Expanded(child: _StatCardSkeleton()),
                 ],
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: AppSizes.space10),
               const _StatCardSkeleton(),
-              const SizedBox(height: 26),
-              const ShimmerBone(width: 160, height: 22, radius: 6),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSizes.space26),
+              const ShimmerBone(
+                width: AppSizes.size160,
+                height: AppSizes.size22,
+                radius: 6,
+              ),
+              const SizedBox(height: AppSizes.space12),
               Container(
-                height: 210,
-                padding: const EdgeInsets.fromLTRB(18, 24, 18, 14),
+                height: AppSizes.size210,
+                padding: const EdgeInsets.fromLTRB(
+                  AppSizes.size18,
+                  AppSizes.size24,
+                  AppSizes.size18,
+                  AppSizes.size14,
+                ),
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.surface,
-                  borderRadius: BorderRadius.circular(24),
+                  borderRadius: BorderRadius.circular(AppSizes.radius24),
                 ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -56,13 +75,19 @@ class StatisticsSkeleton extends StatelessWidget {
                     ];
                     return Expanded(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSizes.size4,
+                        ),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             ShimmerBone(height: heights[index], radius: 9),
-                            const SizedBox(height: 9),
-                            const ShimmerBone(width: 12, height: 10, radius: 4),
+                            const SizedBox(height: AppSizes.space9),
+                            const ShimmerBone(
+                              width: AppSizes.size12,
+                              height: AppSizes.size10,
+                              radius: 4,
+                            ),
                           ],
                         ),
                       ),
@@ -70,34 +95,48 @@ class StatisticsSkeleton extends StatelessWidget {
                   }),
                 ),
               ),
-              const SizedBox(height: 26),
-              const ShimmerBone(width: 130, height: 22, radius: 6),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSizes.space26),
+              const ShimmerBone(
+                width: AppSizes.size130,
+                height: AppSizes.size22,
+                radius: 6,
+              ),
+              const SizedBox(height: AppSizes.space12),
               Container(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(AppSizes.size20),
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.surface,
-                  borderRadius: BorderRadius.circular(24),
+                  borderRadius: BorderRadius.circular(AppSizes.radius24),
                 ),
                 child: Column(
                   children: List.generate(
                     5,
                     (_) => const Padding(
-                      padding: EdgeInsets.only(bottom: 16),
+                      padding: EdgeInsets.only(bottom: AppSizes.size16),
                       child: Row(
                         children: [
-                          ShimmerBone(width: 34, height: 16, radius: 6),
+                          ShimmerBone(
+                            width: AppSizes.size34,
+                            height: AppSizes.size16,
+                            radius: 6,
+                          ),
                           Expanded(
                             child: Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 10),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: AppSizes.size10,
+                              ),
                               child: ShimmerBone(
                                 width: double.infinity,
-                                height: 10,
+                                height: AppSizes.size10,
                                 radius: 10,
                               ),
                             ),
                           ),
-                          ShimmerBone(width: 38, height: 12, radius: 6),
+                          ShimmerBone(
+                            width: AppSizes.size38,
+                            height: AppSizes.size12,
+                            radius: 6,
+                          ),
                         ],
                       ),
                     ),
@@ -121,28 +160,44 @@ class _RewardedXpCardSkeleton extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 4, 20, 8),
+        padding: const EdgeInsets.fromLTRB(
+          AppSizes.size20,
+          AppSizes.size4,
+          AppSizes.size20,
+          AppSizes.size8,
+        ),
         child: Container(
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppSizes.radius16),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSizes.size16,
+            vertical: AppSizes.size12,
+          ),
           child: const Row(
             children: [
-              ShimmerCircle(size: 24),
-              SizedBox(width: 12),
+              ShimmerCircle(size: AppSizes.size24),
+              SizedBox(width: AppSizes.space12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    ShimmerBone(width: 120, height: 15, radius: 6),
-                    SizedBox(height: 6),
-                    ShimmerBone(width: 50, height: 12, radius: 6),
+                    ShimmerBone(
+                      width: AppSizes.size120,
+                      height: AppSizes.size15,
+                      radius: 6,
+                    ),
+                    SizedBox(height: AppSizes.space6),
+                    ShimmerBone(
+                      width: AppSizes.size50,
+                      height: AppSizes.size12,
+                      radius: 6,
+                    ),
                   ],
                 ),
               ),
-              ShimmerCircle(size: 20),
+              ShimmerCircle(size: AppSizes.size20),
             ],
           ),
         ),
@@ -157,19 +212,31 @@ class _StatCardSkeleton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(AppSizes.size18),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(AppSizes.radius22),
       ),
       child: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ShimmerBone(width: 24, height: 24, radius: 12),
-          SizedBox(height: 17),
-          ShimmerBone(width: 50, height: 26, radius: 6),
-          SizedBox(height: 6),
-          ShimmerBone(width: 70, height: 13, radius: 6),
+          ShimmerBone(
+            width: AppSizes.size24,
+            height: AppSizes.size24,
+            radius: 12,
+          ),
+          SizedBox(height: AppSizes.space17),
+          ShimmerBone(
+            width: AppSizes.size50,
+            height: AppSizes.size26,
+            radius: 6,
+          ),
+          SizedBox(height: AppSizes.space6),
+          ShimmerBone(
+            width: AppSizes.size70,
+            height: AppSizes.size13,
+            radius: 6,
+          ),
         ],
       ),
     );

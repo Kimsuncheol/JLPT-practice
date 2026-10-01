@@ -63,7 +63,8 @@ final kanjiTestCatalog = [
   Kanji.fromJson({
     'kanji': '一',
     'jlpt': 'N5',
-    'hun_eum': ['한 일'],
+    'hun': ['한'],
+    'eum': ['일'],
     'strokes': 1,
     'kun_yomi': ['ひと-', 'ひと.つ'],
     'on_yomi': ['いち', 'いつ', 'イチ'],
@@ -93,7 +94,8 @@ final kanjiTestCatalog = [
   Kanji.fromJson({
     'kanji': '二',
     'jlpt': 'N5',
-    'hun_eum': ['두 이'],
+    'hun': ['두'],
+    'eum': ['이'],
     'strokes': 2,
     'kun_yomi': <String>[],
     'on_yomi': ['に'],
@@ -103,7 +105,8 @@ final kanjiTestCatalog = [
   Kanji.fromJson({
     'kanji': '三',
     'jlpt': 'N5',
-    'hun_eum': ['석 삼'],
+    'hun': ['석'],
+    'eum': ['삼'],
     'strokes': 3,
     'kun_yomi': ['み'],
     'on_yomi': ['さん'],
@@ -113,7 +116,8 @@ final kanjiTestCatalog = [
   Kanji.fromJson({
     'kanji': '日',
     'jlpt': 'N4',
-    'hun_eum': ['날 일'],
+    'hun': ['날'],
+    'eum': ['일'],
     'strokes': 4,
     'kun_yomi': ['ひ'],
     'on_yomi': ['にち'],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jlpt_practice/shared/skeleton.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
 
 /// Mirrors [DashboardScreen]'s layout so nothing jumps once data loads.
 class DashboardSkeleton extends StatelessWidget {
@@ -11,78 +12,131 @@ class DashboardSkeleton extends StatelessWidget {
       children: [
         Expanded(
           child: ListView(
-            padding: const EdgeInsets.fromLTRB(20, 22, 20, 12),
+            padding: const EdgeInsets.fromLTRB(
+              AppSizes.size20,
+              AppSizes.size22,
+              AppSizes.size20,
+              AppSizes.size12,
+            ),
             children: [
               Row(
                 children: const [
-                  ShimmerCircle(size: 46),
+                  ShimmerCircle(size: AppSizes.size46),
                   Spacer(),
-                  ShimmerBone(width: 84, height: 32, radius: 16),
+                  ShimmerBone(
+                    width: AppSizes.size84,
+                    height: AppSizes.size32,
+                    radius: 16,
+                  ),
                 ],
               ),
-              const SizedBox(height: 26),
-              const ShimmerBone(width: 220, height: 30, radius: 8),
-              const SizedBox(height: 20),
+              const SizedBox(height: AppSizes.space26),
+              const ShimmerBone(
+                width: AppSizes.size220,
+                height: AppSizes.size30,
+                radius: 8,
+              ),
+              const SizedBox(height: AppSizes.space20),
               Container(
-                padding: const EdgeInsets.all(22),
+                padding: const EdgeInsets.all(AppSizes.size22),
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.surface,
-                  borderRadius: BorderRadius.circular(28),
+                  borderRadius: BorderRadius.circular(AppSizes.radius28),
                 ),
                 child: const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    ShimmerBone(width: 130, height: 14, radius: 6),
-                    SizedBox(height: 14),
-                    ShimmerBone(width: 100, height: 42, radius: 8),
-                    SizedBox(height: 18),
-                    ShimmerBone(width: double.infinity, height: 9, radius: 9),
-                    SizedBox(height: 18),
+                    ShimmerBone(
+                      width: AppSizes.size130,
+                      height: AppSizes.size14,
+                      radius: 6,
+                    ),
+                    SizedBox(height: AppSizes.space14),
+                    ShimmerBone(
+                      width: AppSizes.size100,
+                      height: AppSizes.size42,
+                      radius: 8,
+                    ),
+                    SizedBox(height: AppSizes.space18),
+                    ShimmerBone(
+                      width: double.infinity,
+                      height: AppSizes.size9,
+                      radius: 9,
+                    ),
+                    SizedBox(height: AppSizes.space18),
                     Row(
                       children: [
-                        ShimmerBone(width: 110, height: 20, radius: 6),
-                        SizedBox(width: 22),
-                        ShimmerBone(width: 90, height: 20, radius: 6),
+                        ShimmerBone(
+                          width: AppSizes.size110,
+                          height: AppSizes.size20,
+                          radius: 6,
+                        ),
+                        SizedBox(width: AppSizes.space22),
+                        ShimmerBone(
+                          width: AppSizes.size90,
+                          height: AppSizes.size20,
+                          radius: 6,
+                        ),
                       ],
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSizes.space12),
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppSizes.size16),
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.surface,
-                  borderRadius: BorderRadius.circular(22),
+                  borderRadius: BorderRadius.circular(AppSizes.radius22),
                 ),
                 child: const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    ShimmerBone(width: 92, height: 12, radius: 5),
-                    SizedBox(height: 12),
+                    ShimmerBone(
+                      width: AppSizes.size92,
+                      height: AppSizes.size12,
+                      radius: 5,
+                    ),
+                    SizedBox(height: AppSizes.space12),
                     Row(
                       children: [
-                        ShimmerBone(width: 44, height: 44, radius: 14),
-                        SizedBox(width: 12),
+                        ShimmerBone(
+                          width: AppSizes.size44,
+                          height: AppSizes.size44,
+                          radius: 14,
+                        ),
+                        SizedBox(width: AppSizes.space12),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              ShimmerBone(width: 120, height: 16, radius: 6),
-                              SizedBox(height: 7),
-                              ShimmerBone(width: 72, height: 13, radius: 5),
+                              ShimmerBone(
+                                width: AppSizes.size120,
+                                height: AppSizes.size16,
+                                radius: 6,
+                              ),
+                              SizedBox(height: AppSizes.space7),
+                              ShimmerBone(
+                                width: AppSizes.size72,
+                                height: AppSizes.size13,
+                                radius: 5,
+                              ),
                             ],
                           ),
                         ),
-                        ShimmerCircle(size: 44),
+                        ShimmerCircle(size: AppSizes.size44),
                       ],
                     ),
-                    SizedBox(height: 14),
-                    ShimmerBone(width: double.infinity, height: 6, radius: 6),
+                    SizedBox(height: AppSizes.space14),
+                    ShimmerBone(
+                      width: double.infinity,
+                      height: AppSizes.size6,
+                      radius: 6,
+                    ),
                   ],
                 ),
               ),
-              const SizedBox(height: 18),
+              const SizedBox(height: AppSizes.space18),
               GridView.count(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -97,15 +151,19 @@ class DashboardSkeleton extends StatelessWidget {
                   _GridActionTileSkeleton(),
                 ],
               ),
-              const SizedBox(height: 24),
-              const ShimmerBone(width: 150, height: 22, radius: 6),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSizes.space24),
+              const ShimmerBone(
+                width: AppSizes.size150,
+                height: AppSizes.size22,
+                radius: 6,
+              ),
+              const SizedBox(height: AppSizes.space12),
               Row(
                 children: const [
                   Expanded(child: _MetricCardSkeleton()),
-                  SizedBox(width: 10),
+                  SizedBox(width: AppSizes.space10),
                   Expanded(child: _MetricCardSkeleton()),
-                  SizedBox(width: 10),
+                  SizedBox(width: AppSizes.space10),
                   Expanded(child: _MetricCardSkeleton()),
                 ],
               ),
@@ -126,28 +184,44 @@ class _RewardedXpCardSkeleton extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 4, 20, 8),
+        padding: const EdgeInsets.fromLTRB(
+          AppSizes.size20,
+          AppSizes.size4,
+          AppSizes.size20,
+          AppSizes.size8,
+        ),
         child: Container(
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppSizes.radius16),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSizes.size16,
+            vertical: AppSizes.size12,
+          ),
           child: const Row(
             children: [
-              ShimmerCircle(size: 24),
-              SizedBox(width: 12),
+              ShimmerCircle(size: AppSizes.size24),
+              SizedBox(width: AppSizes.space12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    ShimmerBone(width: 120, height: 15, radius: 6),
-                    SizedBox(height: 6),
-                    ShimmerBone(width: 50, height: 12, radius: 6),
+                    ShimmerBone(
+                      width: AppSizes.size120,
+                      height: AppSizes.size15,
+                      radius: 6,
+                    ),
+                    SizedBox(height: AppSizes.space6),
+                    ShimmerBone(
+                      width: AppSizes.size50,
+                      height: AppSizes.size12,
+                      radius: 6,
+                    ),
                   ],
                 ),
               ),
-              ShimmerCircle(size: 20),
+              ShimmerCircle(size: AppSizes.size20),
             ],
           ),
         ),
@@ -164,17 +238,29 @@ class _GridActionTileSkeleton extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(AppSizes.radius24),
       ),
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(AppSizes.size18),
       child: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ShimmerBone(width: 46, height: 46, radius: 15),
+          ShimmerBone(
+            width: AppSizes.size46,
+            height: AppSizes.size46,
+            radius: 15,
+          ),
           Spacer(),
-          ShimmerBone(width: 100, height: 16, radius: 6),
-          SizedBox(height: 8),
-          ShimmerBone(width: 120, height: 13, radius: 6),
+          ShimmerBone(
+            width: AppSizes.size100,
+            height: AppSizes.size16,
+            radius: 6,
+          ),
+          SizedBox(height: AppSizes.space8),
+          ShimmerBone(
+            width: AppSizes.size120,
+            height: AppSizes.size13,
+            radius: 6,
+          ),
         ],
       ),
     );
@@ -187,19 +273,31 @@ class _MetricCardSkeleton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(AppSizes.size14),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(AppSizes.radius18),
       ),
       child: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ShimmerBone(width: 20, height: 20, radius: 10),
-          SizedBox(height: 12),
-          ShimmerBone(width: 40, height: 24, radius: 6),
-          SizedBox(height: 6),
-          ShimmerBone(width: 60, height: 12, radius: 6),
+          ShimmerBone(
+            width: AppSizes.size20,
+            height: AppSizes.size20,
+            radius: 10,
+          ),
+          SizedBox(height: AppSizes.space12),
+          ShimmerBone(
+            width: AppSizes.size40,
+            height: AppSizes.size24,
+            radius: 6,
+          ),
+          SizedBox(height: AppSizes.space6),
+          ShimmerBone(
+            width: AppSizes.size60,
+            height: AppSizes.size12,
+            radius: 6,
+          ),
         ],
       ),
     );

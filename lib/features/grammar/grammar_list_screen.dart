@@ -8,6 +8,9 @@ import 'package:jlpt_practice/data/models/grammar_progress.dart';
 import 'package:jlpt_practice/features/grammar/grammar_list_skeleton.dart';
 import 'package:jlpt_practice/features/grammar/grammar_providers.dart';
 import 'package:jlpt_practice/features/grammar/grammar_tutor_providers.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
+import 'package:jlpt_practice/core/constants/app_colors.dart';
+import 'package:jlpt_practice/core/constants/app_font_weights.dart';
 
 class GrammarListScreen extends ConsumerStatefulWidget {
   const GrammarListScreen({this.level, super.key});
@@ -57,7 +60,12 @@ class _GrammarListScreenState extends ConsumerState<GrammarListScreen> {
           return Column(
             children: [
               Padding(
-                padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSizes.size20,
+                  AppSizes.size12,
+                  AppSizes.size20,
+                  AppSizes.size12,
+                ),
                 child: TextField(
                   onChanged: (value) => setState(() => _query = value),
                   decoration: InputDecoration(
@@ -106,12 +114,12 @@ class _GrammarCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Material(
     color: Theme.of(context).colorScheme.surface,
-    borderRadius: BorderRadius.circular(20),
+    borderRadius: BorderRadius.circular(AppSizes.radius20),
     child: InkWell(
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(AppSizes.radius20),
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.all(17),
+        padding: const EdgeInsets.all(AppSizes.size17),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -120,12 +128,12 @@ class _GrammarCard extends StatelessWidget {
               child: Text(
                 '${grammar.rank}',
                 style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w800,
+                  fontSize: AppSizes.font12,
+                  fontWeight: AppFontWeights.extraBold,
                 ),
               ),
             ),
-            const SizedBox(width: 14),
+            const SizedBox(width: AppSizes.space14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -133,10 +141,10 @@ class _GrammarCard extends StatelessWidget {
                   Text(
                     grammar.title,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
+                      fontWeight: AppFontWeights.bold700,
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: AppSizes.space6),
                   Text(
                     grammar.localizedSummary(language),
                     style: TextStyle(
@@ -146,7 +154,7 @@ class _GrammarCard extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppSizes.space8),
             Column(
               children: [
                 _MasteryIcon(progress: progress),
@@ -184,9 +192,14 @@ class _PartList extends StatelessWidget {
       parts.putIfAbsent(((item.rank - 1) ~/ 10) + 1, () => []).add(item);
     }
     return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(20, 4, 20, 28),
+      padding: const EdgeInsets.fromLTRB(
+        AppSizes.size20,
+        AppSizes.size4,
+        AppSizes.size20,
+        AppSizes.size28,
+      ),
       itemCount: parts.length,
-      separatorBuilder: (_, _) => const SizedBox(height: 12),
+      separatorBuilder: (_, _) => const SizedBox(height: AppSizes.space12),
       itemBuilder: (context, index) {
         final number = parts.keys.elementAt(index);
         final items = parts[number]!;
@@ -195,30 +208,40 @@ class _PartList extends StatelessWidget {
             .length;
         return Material(
           color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(AppSizes.radius22),
           clipBehavior: Clip.antiAlias,
           child: ExpansionTile(
             initiallyExpanded: number == 1,
             shape: const Border(),
             collapsedShape: const Border(),
-            tilePadding: const EdgeInsets.fromLTRB(18, 8, 14, 8),
-            childrenPadding: const EdgeInsets.fromLTRB(12, 0, 12, 14),
+            tilePadding: const EdgeInsets.fromLTRB(
+              AppSizes.size18,
+              AppSizes.size8,
+              AppSizes.size14,
+              AppSizes.size8,
+            ),
+            childrenPadding: const EdgeInsets.fromLTRB(
+              AppSizes.size12,
+              0,
+              AppSizes.size12,
+              AppSizes.size14,
+            ),
             title: Text(
               '${context.strings('part')} $number · ${context.strings('ranks')} ${items.first.rank}–${items.last.rank}',
-              style: const TextStyle(fontWeight: FontWeight.w700),
+              style: const TextStyle(fontWeight: AppFontWeights.bold700),
             ),
             subtitle: Padding(
-              padding: const EdgeInsets.only(top: 7),
+              padding: const EdgeInsets.only(top: AppSizes.size7),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     '$practised ${context.strings('of')} ${items.length} ${context.strings('practised')}',
                   ),
-                  const SizedBox(height: 7),
+                  const SizedBox(height: AppSizes.space7),
                   LinearProgressIndicator(
                     value: items.isEmpty ? 0 : practised / items.length,
-                    borderRadius: BorderRadius.circular(99),
+                    borderRadius: BorderRadius.circular(AppSizes.radius99),
                   ),
                 ],
               ),
@@ -236,7 +259,7 @@ class _PartList extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: AppSizes.space10),
               for (final item in items) ...[
                 _GrammarCard(
                   grammar: item,
@@ -244,7 +267,7 @@ class _PartList extends StatelessWidget {
                   progress: progress[item.id],
                   onTap: () => context.push('/grammar/detail/${item.id}'),
                 ),
-                if (item != items.last) const SizedBox(height: 8),
+                if (item != items.last) const SizedBox(height: AppSizes.space8),
               ],
             ],
           ),
@@ -267,9 +290,14 @@ class _SearchResults extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ListView.separated(
-    padding: const EdgeInsets.fromLTRB(20, 4, 20, 28),
+    padding: const EdgeInsets.fromLTRB(
+      AppSizes.size20,
+      AppSizes.size4,
+      AppSizes.size20,
+      AppSizes.size28,
+    ),
     itemCount: grammar.length,
-    separatorBuilder: (_, _) => const SizedBox(height: 10),
+    separatorBuilder: (_, _) => const SizedBox(height: AppSizes.space10),
     itemBuilder: (context, index) {
       final item = grammar[index];
       return _GrammarCard(
@@ -294,13 +322,13 @@ class _MasteryIcon extends StatelessWidget {
         Icons.circle_outlined,
         Theme.of(context).colorScheme.outline,
       ),
-      GrammarMastery.learning => (Icons.timelapse_rounded, Colors.orange),
-      GrammarMastery.familiar => (Icons.check_circle_outline, Colors.blue),
-      GrammarMastery.mastered => (Icons.verified_rounded, Colors.green),
+      GrammarMastery.learning => (Icons.timelapse_rounded, AppPalette.orange),
+      GrammarMastery.familiar => (Icons.check_circle_outline, AppPalette.blue),
+      GrammarMastery.mastered => (Icons.verified_rounded, AppPalette.green),
     };
     return Tooltip(
       message: context.strings(mastery.name),
-      child: Icon(icon, size: 20, color: color),
+      child: Icon(icon, size: AppSizes.size20, color: color),
     );
   }
 }

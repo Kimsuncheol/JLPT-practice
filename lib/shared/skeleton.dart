@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer_ai/shimmer_ai.dart';
+import 'package:jlpt_practice/core/constants/app_colors.dart';
 
 /// A shimmering rectangular placeholder, sized to match the real
 /// content (text line, card, image, ...) it stands in for while loading.
@@ -40,7 +41,7 @@ class ShimmerCircle extends StatelessWidget {
       baseColor: scheme.surfaceContainerHighest,
       highlightColor: scheme.surface,
       decoration: const BoxDecoration(
-        color: Colors.white,
+        color: AppPalette.white,
         shape: BoxShape.circle,
       ),
     );

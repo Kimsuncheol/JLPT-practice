@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
 
 /// A strip of masking tape laid over text the learner wants to recall.
 class CoverTape extends StatelessWidget {
@@ -30,7 +31,7 @@ class CoverTape extends StatelessWidget {
             height: height,
             decoration: BoxDecoration(
               color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(3),
+              borderRadius: BorderRadius.circular(AppSizes.radius3),
             ),
           ),
         ),

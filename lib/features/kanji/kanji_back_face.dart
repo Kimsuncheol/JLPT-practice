@@ -4,11 +4,11 @@ import 'package:jlpt_practice/data/models/kanji.dart';
 import 'package:jlpt_practice/features/kanji/kanji_visibility.dart';
 import 'package:jlpt_practice/features/kanji/widgets/hide_group.dart';
 import 'package:jlpt_practice/features/kanji/widgets/kanji_footer.dart';
-import 'package:jlpt_practice/features/kanji/widgets/kanji_glyph.dart';
 import 'package:jlpt_practice/features/kanji/widgets/dashed_divider.dart';
 import 'package:jlpt_practice/features/kanji/widgets/reading_section.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
 
-/// The back: every reading with its examples, in a scroll view that runs down to the hide group. The kanji is always shown here, even if it was covered on the front.
+/// The back: every reading with its examples, in a scroll view that runs down to the hide group. The kanji itself is not repeated here.
 class KanjiBackFace extends StatelessWidget {
   const KanjiBackFace({
     required this.kanji,
@@ -18,6 +18,7 @@ class KanjiBackFace extends StatelessWidget {
     required this.onSpeakReading,
     required this.onSpeakSentence,
     required this.footer,
+    this.onStartOver,
     super.key,
   });
 
@@ -29,10 +30,13 @@ class KanjiBackFace extends StatelessWidget {
   final ValueChanged<String> onSpeakSentence;
   final Widget footer;
 
+  /// Shown as the hide group's last item when set: restarts the day.
+  final VoidCallback? onStartOver;
+
   @override
   Widget build(BuildContext context) {
     final strings = context.strings;
-    const sideInset = EdgeInsets.symmetric(horizontal: 16);
+    const sideInset = EdgeInsets.symmetric(horizontal: AppSizes.size16);
     return Column(
       children: [
         // The scroll view runs down to the hide group; the footer floats over
@@ -43,28 +47,24 @@ class KanjiBackFace extends StatelessWidget {
               Positioned.fill(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.fromLTRB(
-                    16,
-                    16,
-                    16,
-                    12 + KanjiFooter.height,
+                    AppSizes.size16,
+                    AppSizes.size16,
+                    AppSizes.size16,
+                    AppSizes.size12 + KanjiFooter.height,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Center(
-                        child: KanjiGlyph(
-                          character: kanji.character,
-                          fontSize: 56,
-                        ),
-                      ),
                       if (kanji.kunYomi.isNotEmpty ||
                           kanji.kunExamples.isNotEmpty)
                         ReadingSection(
                           label: strings('kunYomi'),
+                          topPadding: 0,
                           readings: kanji.kunYomi,
                           examples: kanji.kunExamples,
                           language: language,
                           hideReadings: visibility.hideKunYomi,
+                          hideFurigana: visibility.hideFurigana,
                           hideMeanings: visibility.hideMeanings,
                           onSpeak: onSpeakReading,
                           onSpeakSentence: onSpeakSentence,
@@ -74,7 +74,7 @@ class KanjiBackFace extends StatelessWidget {
                           (kanji.onYomi.isNotEmpty ||
                               kanji.onExamples.isNotEmpty))
                         Padding(
-                          padding: const EdgeInsets.only(top: 22),
+                          padding: const EdgeInsets.only(top: AppSizes.size22),
                           child: DashedDivider(
                             key: const ValueKey('kun-on-divider'),
                             color: Theme.of(context).colorScheme.outline,
@@ -84,10 +84,15 @@ class KanjiBackFace extends StatelessWidget {
                           kanji.onExamples.isNotEmpty)
                         ReadingSection(
                           label: strings('onYomi'),
+                          topPadding:
+                              kanji.kunYomi.isEmpty && kanji.kunExamples.isEmpty
+                              ? 0
+                              : 18,
                           readings: kanji.onYomi,
                           examples: kanji.onExamples,
                           language: language,
                           hideReadings: visibility.hideOnYomi,
+                          hideFurigana: visibility.hideFurigana,
                           hideMeanings: visibility.hideMeanings,
                           onSpeak: onSpeakReading,
                           onSpeakSentence: onSpeakSentence,
@@ -96,7 +101,12 @@ class KanjiBackFace extends StatelessWidget {
                   ),
                 ),
               ),
-              Positioned(left: 16, right: 16, bottom: 0, child: footer),
+              Positioned(
+                left: AppSizes.size16,
+                right: AppSizes.size16,
+                bottom: AppSizes.size0,
+                child: footer,
+              ),
             ],
           ),
         ),
@@ -104,6 +114,13 @@ class KanjiBackFace extends StatelessWidget {
           padding: sideInset,
           child: HideGroup(
             side: 'back',
+            trailing: onStartOver == null
+                ? null
+                : HideGroupAction(
+                    icon: Icons.refresh_rounded,
+                    label: strings('startOver'),
+                    onTap: onStartOver!,
+                  ),
             toggles: [
               HideToggle(
                 id: 'kun',
@@ -121,6 +138,15 @@ class KanjiBackFace extends StatelessWidget {
                 showLabel: strings('showOnYomi'),
                 onTap: () => onVisibilityChanged(
                   visibility.copyWith(hideOnYomi: !visibility.hideOnYomi),
+                ),
+              ),
+              HideToggle(
+                id: 'furigana',
+                hidden: visibility.hideFurigana,
+                hideLabel: strings('hideReading'),
+                showLabel: strings('showReading'),
+                onTap: () => onVisibilityChanged(
+                  visibility.copyWith(hideFurigana: !visibility.hideFurigana),
                 ),
               ),
               HideToggle(

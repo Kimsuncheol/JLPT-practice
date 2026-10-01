@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_tape.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
+import 'package:jlpt_practice/core/constants/app_spacing.dart';
 
 /// Size of the readings on the card front, larger than on the back.
 const frontFontSize = 32.0;
@@ -11,9 +13,12 @@ class ReadingGroup extends StatelessWidget {
     required this.readings,
     required this.hidden,
     required this.onSpeak,
+    this.extra,
     super.key,
   });
 
+  /// Shown below the readings, such as the hun of a kun'yomi group.
+  final Widget? extra;
   final String label;
   final List<String> readings;
   final bool hidden;
@@ -29,11 +34,11 @@ class ReadingGroup extends StatelessWidget {
           color: Theme.of(context).colorScheme.onSurfaceVariant,
         ),
       ),
-      const SizedBox(height: 6),
+      const SizedBox(height: AppSizes.space6),
       Wrap(
         alignment: WrapAlignment.center,
-        spacing: 8,
-        runSpacing: 8,
+        spacing: AppSpacing.item8,
+        runSpacing: AppSpacing.run8,
         children: [
           for (final reading in readings)
             ReadingChip(
@@ -45,6 +50,7 @@ class ReadingGroup extends StatelessWidget {
             ),
         ],
       ),
+      ?extra,
     ],
   );
 }
@@ -83,18 +89,21 @@ class ReadingChip extends StatelessWidget {
       child: Material(
         key: ValueKey('reading-$reading'),
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppSizes.radius16),
         child: InkWell(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppSizes.radius16),
           splashFactory: NoSplash.splashFactory,
           onTap: onTap,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSizes.size14,
+              vertical: AppSizes.size8,
+            ),
             child: hidden
                 ? coverTapeFor(
                     characters: reading.length,
                     fontSize: style?.fontSize ?? 22,
-                    maxWidth: 120,
+                    maxWidth: AppSizes.size120,
                     glyphWidth: 0.9,
                   )
                 : Text(reading, style: style),

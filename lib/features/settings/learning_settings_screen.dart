@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/data/models/study_preferences.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
 
 class LearningSettingsScreen extends ConsumerWidget {
   const LearningSettingsScreen({super.key});
@@ -20,7 +21,12 @@ class LearningSettingsScreen extends ConsumerWidget {
           final controller = ref.read(appControllerProvider.notifier);
           final strings = context.strings;
           return ListView(
-            padding: const EdgeInsets.fromLTRB(20, 4, 20, 28),
+            padding: const EdgeInsets.fromLTRB(
+              AppSizes.size20,
+              AppSizes.size4,
+              AppSizes.size20,
+              AppSizes.size28,
+            ),
             children: [
               _GroupLabel(strings('groupLanguage')),
               _Group(
@@ -95,7 +101,7 @@ class _Group extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Material(
     color: Theme.of(context).colorScheme.surface,
-    borderRadius: BorderRadius.circular(22),
+    borderRadius: BorderRadius.circular(AppSizes.radius22),
     clipBehavior: Clip.antiAlias,
     child: Column(children: children),
   );
@@ -107,7 +113,12 @@ class _GroupLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.fromLTRB(8, 20, 8, 8),
+    padding: const EdgeInsets.fromLTRB(
+      AppSizes.size8,
+      AppSizes.size20,
+      AppSizes.size8,
+      AppSizes.size8,
+    ),
     child: Text(
       text,
       style: Theme.of(context).textTheme.labelLarge?.copyWith(
