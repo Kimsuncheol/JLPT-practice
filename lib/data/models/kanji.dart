@@ -136,9 +136,9 @@ class Kanji {
   /// One kanji appears once per level, so the character identifies it.
   String get id => '$jlptLevel-$character';
 
-  /// The readings shown on the front of the card: the first kun'yomi and the
+  /// The readings shown on the front of the card: all kun'yomi and the
   /// first two on'yomi.
-  List<String> get frontKunYomi => kunYomi.take(1).toList(growable: false);
+  List<String> get frontKunYomi => kunYomi;
   List<String> get frontOnYomi => onYomi.take(2).toList(growable: false);
 
   static List<String> _strings(Object? value) =>

@@ -94,13 +94,13 @@ void main() {
     }
     final first = kanjiForLevel(catalog, 'N5').first;
     expect(first.character, '一');
-    expect(first.frontKunYomi, ['ひと-']);
+    expect(first.frontKunYomi, first.kunYomi);
     expect(first.frontOnYomi, ['いち', 'いつ']);
     expect(first.kunExamples, isNotEmpty);
     expect(first.onExamples.first.meaning('en'), isNotEmpty);
   });
 
-  testWidgets('front shows the kanji, first kun and first two on readings', (
+  testWidgets('front shows the kanji, all kun and first two on readings', (
     tester,
   ) async {
     await _pumpStudy(tester);
@@ -108,7 +108,7 @@ void main() {
     final front = find.byKey(const ValueKey('kanji-front'));
     expect(_inFront(find.text('一')), findsOneWidget);
     expect(_inFront(find.text('ひと-')), findsOneWidget);
-    expect(_inFront(find.text('ひと.つ')), findsNothing);
+    expect(_inFront(find.text('ひと.つ')), findsOneWidget);
     expect(_inFront(find.text('いち')), findsOneWidget);
     expect(_inFront(find.text('いつ')), findsOneWidget);
     expect(_inFront(find.text('イチ')), findsNothing);
@@ -124,6 +124,52 @@ void main() {
     expect(_inFront(find.text('に')), findsOneWidget);
     expect(_inFront(find.text("Kun'yomi")), findsNothing);
   });
+
+  for (final size in [const Size(390, 844), const Size(360, 640)]) {
+    testWidgets('full kun list wraps and fits at $size', (tester) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = size;
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.view.resetPhysicalSize);
+      final raw =
+          jsonDecode(File('assets/data/JLPT_Kanji.json').readAsStringSync())
+              as List<dynamic>;
+      final item = Kanji.fromJson(
+        raw.cast<Map<String, dynamic>>().firstWhere(
+          (entry) => entry['kanji'] == '下',
+        ),
+      );
+      final speech = await _pumpStudy(
+        tester,
+        catalog: [item, kanjiTestCatalog.last],
+      );
+      expect(tester.takeException(), isNull);
+      final hideTop = tester
+          .getTopLeft(find.byKey(const ValueKey('hide-group-front')))
+          .dy;
+      for (final reading in item.kunYomi) {
+        final chip = _inFront(find.byKey(ValueKey('reading-$reading')));
+        expect(chip, findsOneWidget);
+        final bounds = tester.getRect(chip);
+        expect(bounds.left, greaterThanOrEqualTo(0));
+        expect(bounds.right, lessThanOrEqualTo(size.width));
+        expect(bounds.bottom, lessThan(hideTop));
+      }
+      expect(
+        tester.getTopLeft(_inFront(find.text(item.kunYomi.last))).dy,
+        greaterThan(tester.getTopLeft(_inFront(find.text('した'))).dy),
+      );
+      await tester.tap(_inFront(find.text(item.kunYomi.last)));
+      await tester.pumpAndSettle();
+      expect(speech.spoken, [kanjiReadingForSpeech(item.kunYomi.last)]);
+      await tester.tap(find.byKey(const ValueKey('hide-front-kun')));
+      await tester.pumpAndSettle();
+      for (final reading in item.kunYomi) {
+        expect(_inFront(find.text(reading)), findsNothing);
+      }
+      expect(tester.takeException(), isNull);
+    });
+  }
 
   testWidgets('tapping a reading speaks that reading alone', (tester) async {
     final speech = await _pumpStudy(tester);
@@ -301,14 +347,15 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('hide-front-kun')));
     await tester.pumpAndSettle();
     expect(_inFront(find.text('ひと-')), findsNothing);
+    expect(_inFront(find.text('ひと.つ')), findsNothing);
     expect(_inFront(find.text('いち')), findsOneWidget);
-    expect(_inFront(find.byType(CoverTape)), findsNWidgets(2));
+    expect(_inFront(find.byType(CoverTape)), findsNWidgets(3));
 
     await tester.tap(find.byKey(const ValueKey('hide-front-on')));
     await tester.pumpAndSettle();
     expect(_inFront(find.text('いち')), findsNothing);
     expect(_inFront(find.text('いつ')), findsNothing);
-    expect(_inFront(find.byType(CoverTape)), findsNWidgets(4));
+    expect(_inFront(find.byType(CoverTape)), findsNWidgets(5));
 
     for (final id in ['kanji', 'kun', 'on']) {
       await tester.tap(find.byKey(ValueKey('hide-front-$id')));
@@ -892,6 +939,7 @@ Future<RecordingTtsService> _pumpStudy(
   bool autoPlayAudio = false,
   KanjiTestAppController? controller,
   double bottomInset = 0,
+  List<Kanji>? catalog,
 }) async {
   _mockAudibleVolume(tester);
   final speech = RecordingTtsService();
@@ -901,7 +949,9 @@ Future<RecordingTtsService> _pumpStudy(
         () =>
             controller ?? KanjiTestAppController(autoPlayAudio: autoPlayAudio),
       ),
-      kanjiCatalogProvider.overrideWith((ref) async => kanjiTestCatalog),
+      kanjiCatalogProvider.overrideWith(
+        (ref) async => catalog ?? kanjiTestCatalog,
+      ),
       ttsServiceProvider.overrideWithValue(speech),
     ],
   );
