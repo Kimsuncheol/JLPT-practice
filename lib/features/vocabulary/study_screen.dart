@@ -127,9 +127,9 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
                   final meaningsHidden = visibility.hideMeanings;
                   return Padding(
                     padding: const EdgeInsets.fromLTRB(
-                      AppSizes.size16,
+                      AppSizes.size20,
                       AppSizes.size8,
-                      AppSizes.size16,
+                      AppSizes.size20,
                       AppSizes.size14,
                     ),
                     child: _StudyCard(
@@ -625,9 +625,11 @@ class _StudyCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _centeredScrollable(
-      padding: const EdgeInsets.only(
-        top: AppSizes.size26,
-        bottom: AppSizes.size24,
+      padding: const EdgeInsets.fromLTRB(
+        AppSizes.size24,
+        AppSizes.size26,
+        AppSizes.size24,
+        AppSizes.size24,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,

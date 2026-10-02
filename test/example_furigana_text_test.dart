@@ -83,4 +83,38 @@ void main() {
     );
     expect(find.text('た', findRichText: true), findsNWidgets(2));
   });
+
+  for (final hideReadings in [false, true]) {
+    testWidgets(
+      'period wraps with preceding kana (hideReadings: $hideReadings)',
+      (tester) async {
+        await tester.pumpWidget(
+          example('あいう。', width: 70, hideReadings: hideReadings),
+        );
+
+        expect(tester.takeException(), isNull);
+        expect(
+          tester.getTopLeft(find.text('う')).dy,
+          greaterThan(tester.getTopLeft(find.text('あ')).dy),
+        );
+        expect(
+          tester.getTopLeft(find.text('。')).dy,
+          tester.getTopLeft(find.text('う')).dy,
+        );
+      },
+    );
+  }
+
+  testWidgets('period stays with kanji across segment boundaries', (
+    tester,
+  ) async {
+    await tester.pumpWidget(example('あい{犬|いぬ}。', width: 70));
+
+    expect(tester.takeException(), isNull);
+    expect(
+      tester.getTopLeft(find.text('。')).dy,
+      tester.getTopLeft(find.text('犬')).dy,
+    );
+    expect(find.text('いぬ', findRichText: true), findsOneWidget);
+  });
 }

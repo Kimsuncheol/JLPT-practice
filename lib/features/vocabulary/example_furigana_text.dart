@@ -59,8 +59,8 @@ class ExampleFuriganaText extends StatelessWidget {
     final lines = <List<Widget>>[[]];
     offset = 0;
     for (final segment in displaySegments) {
-      // Plain kana and punctuation can wrap individually; annotated kanji
-      // stay together with their reading. Explicit dialogue breaks stay intact.
+      // Plain kana can wrap individually; annotated kanji stay together with
+      // their reading. Explicit dialogue breaks stay intact.
       final parts = segment.ruby == null
           ? segment.text.runes.map(String.fromCharCode)
           : [segment.text];
@@ -77,33 +77,45 @@ class ExampleFuriganaText extends StatelessWidget {
             if (span.start < offset && span.end > start)
               (start: span.start - start, end: span.end - start),
         ]);
-        lines.last.add(
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SizedBox(
-                height: AppSizes.size16,
-                child: segment.ruby == null
-                    ? null
-                    : MaskedSegmentsText(
-                        key: ValueKey('example-ruby-$start'),
-                        segments: [
-                          MaskSegment(segment.ruby!, covered: hideReadings),
-                        ],
-                        style: rubyStyle,
-                        glyphWidth: 1,
-                      ),
-              ),
-              masks.any((mask) => mask.covered)
-                  ? MaskedSegmentsText(
-                      segments: masks,
-                      style: style,
+        final unit = Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              height: AppSizes.size16,
+              child: segment.ruby == null
+                  ? null
+                  : MaskedSegmentsText(
+                      key: ValueKey('example-ruby-$start'),
+                      segments: [
+                        MaskSegment(segment.ruby!, covered: hideReadings),
+                      ],
+                      style: rubyStyle,
                       glyphWidth: 1,
-                    )
-                  : Text(part, style: style),
-            ],
-          ),
+                    ),
+            ),
+            masks.any((mask) => mask.covered)
+                ? MaskedSegmentsText(
+                    segments: masks,
+                    style: style,
+                    glyphWidth: 1,
+                  )
+                : Text(part, style: style),
+          ],
         );
+        // Sentence-ending punctuation must wrap with the preceding unit,
+        // including when that unit is a kanji with a reading or a word mask.
+        if (lines.last.isNotEmpty && RegExp(r'^[。．.!?！？]+$').hasMatch(part)) {
+          final preceding = lines.last.removeLast();
+          lines.last.add(
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [preceding, unit],
+            ),
+          );
+        } else {
+          lines.last.add(unit);
+        }
       }
     }
     return Semantics(
