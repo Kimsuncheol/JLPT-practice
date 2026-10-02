@@ -117,4 +117,31 @@ void main() {
     );
     expect(find.text('いぬ', findRichText: true), findsOneWidget);
   });
+
+  testWidgets('wrapped kana-only rows use the hidden-reading spacing', (
+    tester,
+  ) async {
+    const marked = '{犬|いぬ}あいう。{毎朝|まいあさ}か。';
+    await tester.pumpWidget(example(marked, width: 70));
+
+    double gap(String before, String after) =>
+        tester.getTopLeft(find.text(after)).dy -
+        tester.getBottomLeft(find.text(before)).dy;
+
+    final kanaGap = gap('犬', 'う');
+    final readingGap = gap('う', '毎朝');
+    expect(kanaGap, greaterThanOrEqualTo(0));
+    expect(readingGap, greaterThan(kanaGap));
+    expect(gap('毎朝', 'か'), kanaGap);
+    expect(
+      tester.getTopLeft(find.text('まいあさ', findRichText: true)).dy,
+      greaterThanOrEqualTo(tester.getBottomLeft(find.text('う')).dy),
+    );
+
+    await tester.pumpWidget(example(marked, width: 70, hideReadings: true));
+    expect(gap('犬', 'う'), kanaGap);
+    expect(gap('う', '毎朝'), kanaGap);
+    expect(gap('毎朝', 'か'), kanaGap);
+    expect(tester.takeException(), isNull);
+  });
 }
