@@ -130,7 +130,7 @@ void main() {
 
     final kanaGap = gap('犬', 'う');
     final readingGap = gap('う', '毎朝');
-    expect(kanaGap, greaterThanOrEqualTo(0));
+    expect(kanaGap, closeTo(2, 0.01));
     expect(readingGap, greaterThan(kanaGap));
     expect(gap('毎朝', 'か'), kanaGap);
     expect(
@@ -140,7 +140,8 @@ void main() {
 
     await tester.pumpWidget(example(marked, width: 70, hideReadings: true));
     expect(gap('犬', 'う'), kanaGap);
-    expect(gap('う', '毎朝'), kanaGap);
+    // Hidden ruby still reserves space for its masking tape.
+    expect(gap('う', '毎朝'), closeTo(kanaGap + 16, 0.01));
     expect(gap('毎朝', 'か'), kanaGap);
     expect(tester.takeException(), isNull);
   });

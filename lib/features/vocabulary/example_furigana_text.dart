@@ -80,19 +80,16 @@ class ExampleFuriganaText extends StatelessWidget {
         final unit = Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            SizedBox(
-              height: AppSizes.size16,
-              child: segment.ruby == null
-                  ? null
-                  : MaskedSegmentsText(
-                      key: ValueKey('example-ruby-$start'),
-                      segments: [
-                        MaskSegment(segment.ruby!, covered: hideReadings),
-                      ],
-                      style: rubyStyle,
-                      glyphWidth: 1,
-                    ),
-            ),
+            if (segment.ruby != null)
+              SizedBox(
+                height: AppSizes.size16,
+                child: MaskedSegmentsText(
+                  key: ValueKey('example-ruby-$start'),
+                  segments: [MaskSegment(segment.ruby!, covered: hideReadings)],
+                  style: rubyStyle,
+                  glyphWidth: 1,
+                ),
+              ),
             masks.any((mask) => mask.covered)
                 ? MaskedSegmentsText(
                     segments: masks,
