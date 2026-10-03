@@ -370,14 +370,9 @@ void main() {
     await tester.tap(find.text('Hide reading'));
     await tester.pumpAndSettle();
     expect(find.text('たんご'), findsNothing);
-    // Every kanji reading in the example is taped as well.
-    expect(
-      find.descendant(
-        of: find.byKey(const ValueKey('example-ruby-2')),
-        matching: find.byType(CoverTape),
-      ),
-      findsOneWidget,
-    );
+    // Example ruby is removed from layout so it cannot keep widening the
+    // sentence while readings are hidden.
+    expect(find.byKey(const ValueKey('example-ruby-2')), findsNothing);
     expect(dailyRuby, findsNothing);
     expect(
       find.descendant(

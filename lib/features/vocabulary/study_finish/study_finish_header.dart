@@ -14,8 +14,8 @@ class StudyFinishHeader extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         const SizedBox(
-          width: AppSizes.size92,
-          height: AppSizes.size92,
+          width: AppSizes.size56,
+          height: AppSizes.size56,
           child: Icon(Icons.celebration_rounded, size: AppSizes.size42),
         ),
         const SizedBox(height: AppSizes.space22),

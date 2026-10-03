@@ -59,8 +59,10 @@ void main() {
           );
           final firstBase = find.text('手伝');
           final secondBase = find.text('願');
-          // Each ruby unit reserves 16px above its base, including its tape.
-          final secondRowTop = tester.getTopLeft(secondBase).dy - 16;
+          // Visible ruby reserves 16px above its base; hidden ruby is removed
+          // from layout.
+          final secondRowTop =
+              tester.getTopLeft(secondBase).dy - (hideReadings ? 0 : 16);
           expect(
             secondRowTop - tester.getBottomLeft(firstBase).dy,
             closeTo(20, 0.01),
@@ -102,14 +104,14 @@ void main() {
     expect(find.byType(Text), findsNWidgets(8));
   });
 
-  testWidgets('hiding readings covers all ruby, including inflected kanji', (
+  testWidgets('hiding readings removes all ruby, including inflected kanji', (
     tester,
   ) async {
     const marked = '{毎朝|まいあさ}パンを{食|た}べます。';
     await tester.pumpWidget(example(marked, hideReadings: true));
     expect(find.text('まいあさ', findRichText: true), findsNothing);
     expect(find.text('た', findRichText: true), findsNothing);
-    expect(find.byType(CoverTape), findsNWidgets(2));
+    expect(find.byType(CoverTape), findsNothing);
     expect(find.text('毎朝'), findsOneWidget);
     expect(find.text('食'), findsOneWidget);
     expect(find.text('べ'), findsOneWidget);
@@ -118,6 +120,32 @@ void main() {
     expect(find.text('まいあさ', findRichText: true), findsOneWidget);
     expect(find.text('た', findRichText: true), findsOneWidget);
     expect(find.byType(CoverTape), findsNothing);
+  });
+
+  testWidgets('hidden readings do not widen the base sentence', (tester) async {
+    const marked = '{先月|せんげつ}、{新|あたら}しい{仕事|しごと}を{始|はじ}めました。';
+
+    await tester.pumpWidget(
+      example(marked, width: 600, alignment: WrapAlignment.start),
+    );
+    final visibleGap =
+        tester.getTopLeft(find.text('し').first).dx -
+        tester.getTopRight(find.text('新')).dx;
+
+    await tester.pumpWidget(
+      example(
+        marked,
+        width: 600,
+        hideReadings: true,
+        alignment: WrapAlignment.start,
+      ),
+    );
+    final hiddenGap =
+        tester.getTopLeft(find.text('し').first).dx -
+        tester.getTopRight(find.text('新')).dx;
+
+    expect(visibleGap, greaterThan(hiddenGap));
+    expect(hiddenGap, closeTo(0, 0.01));
   });
 
   testWidgets('a long example wraps while each ruby stays with its kanji', (
@@ -193,8 +221,7 @@ void main() {
 
     await tester.pumpWidget(example(marked, width: 70, hideReadings: true));
     expect(gap('犬', 'う'), kanaGap);
-    // Hidden ruby still reserves space for its masking tape.
-    expect(gap('う', '毎朝'), closeTo(kanaGap + 16, 0.01));
+    expect(gap('う', '毎朝'), kanaGap);
     expect(gap('毎朝', 'か'), kanaGap);
     expect(tester.takeException(), isNull);
   });

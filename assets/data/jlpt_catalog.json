@@ -767,7 +767,7 @@
         "rank": 41,
         "example": {
             "sentence": "秋の山の紅葉は鮮やかな色彩で目を奪う。",
-            "sentence_furigana": "{秋|あき}の{山|やま}の{紅葉|こうよう}は{鮮|あざ}やかな{色彩|さいしき}で{目|め}を{奪|うば}う。",
+            "sentence_furigana": "{秋|あき}の{山|やま}の{紅葉|こうよう}は{鮮|あざ}やかな{色彩|しきさい}で{目|め}を{奪|うば}う。",
             "translations": {
                 "en": "The autumn mountain's foliage has vivid colors that captivate the eye.",
                 "ko": "가을 산의 단풍은 선명한 색채로 눈을 사로잡는다."
@@ -2496,7 +2496,7 @@
         "rank": 132,
         "example": {
             "sentence": "彼の話し方はいかにも専門家らしく、信頼できると思った。",
-            "sentence_furigana": "{彼|かれ}の{話|はな}し{方|かたい}はいかにも{専門家|せんもんか}らしく、{信頼|しんらい}できると{思|おも}った。",
+            "sentence_furigana": "{彼|かれ}の{話|はな}し{方|かた}はいかにも{専門家|せんもんか}らしく、{信頼|しんらい}できると{思|おも}った。",
             "translations": {
                 "en": "His manner of speaking was exactly like an expert's, and I thought he was trustworthy.",
                 "ko": "그의 말투는 정말 전문가답고 신뢰할 수 있다고 생각했다."
@@ -3408,7 +3408,7 @@
         "rank": 180,
         "example": {
             "sentence": "給料は一定の基準に基づいて決められる。",
-            "sentence_furigana": "{給料|きゅうりょう}は{一定|いちじょう}の{基準|きじゅん}に{基|もと}づいて{決|き}められる。",
+            "sentence_furigana": "{給料|きゅうりょう}は{一定|いってい}の{基準|きじゅん}に{基|もと}づいて{決|き}められる。",
             "translations": {
                 "en": "Salaries are determined based on fixed criteria.",
                 "ko": "급여는 일정한 기준에 따라 결정된다."
@@ -6334,7 +6334,7 @@
         "rank": 334,
         "example": {
             "sentence": "酔っ払いを店から追い出すのは店長の役目だ。",
-            "sentence_furigana": "{酔|よ}っ{払|ぱら}いを{店|みせん}から{追|お}い{出|だ}すのは{店長|てんちょう}の{役目|やくめ}だ。",
+            "sentence_furigana": "{酔|よ}っ{払|ぱら}いを{店|みせ}から{追|お}い{出|だ}すのは{店長|てんちょう}の{役目|やくめ}だ。",
             "translations": {
                 "en": "It's the manager's job to throw drunken customers out of the shop.",
                 "ko": "취객을 가게에서 내쫓는 것은 점장의 역할이다."
@@ -7588,7 +7588,7 @@
         "rank": 400,
         "example": {
             "sentence": "駅の御手洗いは改装されてとても清潔になった。",
-            "sentence_furigana": "{駅|えき}の{御手洗|おてあら}いは{改装|かいそう}されてとても{清潔|しせつ}になった。",
+            "sentence_furigana": "{駅|えき}の{御手洗|おてあら}いは{改装|かいそう}されてとても{清潔|せいけつ}になった。",
             "translations": {
                 "en": "The station restroom was renovated and became very clean.",
                 "ko": "역의 화장실이 리모델링되어 매우 깨끗해졌다."
@@ -10286,7 +10286,7 @@
         "rank": 542,
         "example": {
             "sentence": "化繊の衣類は速乾性があり旅行に便利だ。",
-            "sentence_furigana": "{化繊|かせん}の{衣類|いりょく}は{速乾性|そっかんせい}があり{旅行|りょこう}に{便利|べんり}だ。",
+            "sentence_furigana": "{化繊|かせん}の{衣類|いるい}は{速乾性|そっかんせい}があり{旅行|りょこう}に{便利|べんり}だ。",
             "translations": {
                 "en": "Clothing made of synthetic fibers dries quickly and is convenient for travel.",
                 "ko": "화학섬유 의류는 속건성이 있어 여행에 편리하다."
@@ -10932,7 +10932,7 @@
         "rank": 576,
         "example": {
             "sentence": "そんな言い方は下品で失礼だ。",
-            "sentence_furigana": "そんな{言|い}い{方|かた}は{下品|かひん}で{失礼|しつれい}だ。",
+            "sentence_furigana": "そんな{言|い}い{方|かた}は{下品|げひん}で{失礼|しつれい}だ。",
             "translations": {
                 "en": "That way of speaking is vulgar and rude.",
                 "ko": "그런 말투는 저속하고 무례하다."
@@ -11882,7 +11882,7 @@
         "rank": 626,
         "example": {
             "sentence": "警備員は建物を24時間監視している。",
-            "sentence_furigana": "{警備|けいび}{員|*}は{建物|たてもの}を24{時間|じかん}{監視|かんし}している。",
+            "sentence_furigana": "{警備|けいび}{員|いん}は{建物|たてもの}を24{時間|じかん}{監視|かんし}している。",
             "translations": {
                 "en": "Security guards monitor the building 24 hours a day.",
                 "ko": "경비원은 건물을 24시간 감시하고 있다."
@@ -12984,7 +12984,7 @@
         "rank": 684,
         "example": {
             "sentence": "彼は新しい眼鏡を買って、視界が驚くほどはっきりした。",
-            "sentence_furigana": "{彼|かれ}は{新|あたら}しい{眼鏡|がんきょう}を{買|か}って、{視界|しかい}が{驚|おどろ}くほどはっきりした。",
+            "sentence_furigana": "{彼|かれ}は{新|あたら}しい{眼鏡|めがね}を{買|か}って、{視界|しかい}が{驚|おどろ}くほどはっきりした。",
             "translations": {
                 "en": "He bought new glasses and his vision became remarkably clear.",
                 "ko": "그는 새 안경을 사서 시야가 놀랄 만큼 또렷해졌다."
@@ -14352,7 +14352,7 @@
         "rank": 756,
         "example": {
             "sentence": "客観的な立場からその問題を評価する必要がある。",
-            "sentence_furigana": "{客観的|きゃっかんてき}な{立場|りっぽう}からその{問題|もんだい}を{評価|ひょうか}する{必要|ひつよう}がある。",
+            "sentence_furigana": "{客観的|きゃっかんてき}な{立場|たちば}からその{問題|もんだい}を{評価|ひょうか}する{必要|ひつよう}がある。",
             "translations": {
                 "en": "It is necessary to evaluate that issue from an objective standpoint.",
                 "ko": "그 문제를 객관적인 입장에서 평가할 필요가 있다."
@@ -14979,7 +14979,7 @@
         "rank": 789,
         "example": {
             "sentence": "彼は教職に就くために大学院で研修を受けた。",
-            "sentence_furigana": "{彼|かれ}は{教職|きょうしょく}に{就|つ}くために{大学院|だいがくいん}で{研修|きんしゅう}を{受|う}けた。",
+            "sentence_furigana": "{彼|かれ}は{教職|きょうしょく}に{就|つ}くために{大学院|だいがくいん}で{研修|けんしゅう}を{受|う}けた。",
             "translations": {
                 "en": "He received training at graduate school to enter the teaching profession.",
                 "ko": "그는 교직에 종사하기 위해 대학원에서 연수를 받았다."
@@ -15093,7 +15093,7 @@
         "rank": 795,
         "example": {
             "sentence": "国際社会での協調を欠く政策は孤立を招く恐れがある。",
-            "sentence_furigana": "{国際社会|こくさいしゃかい}での{協調|きょうちょう}を{欠|か}く{政策|せいせいさく}は{孤立|こりつ}を{招|まね}く{恐|おそ}れがある。",
+            "sentence_furigana": "{国際社会|こくさいしゃかい}での{協調|きょうちょう}を{欠|か}く{政策|せいさく}は{孤立|こりつ}を{招|まね}く{恐|おそ}れがある。",
             "translations": {
                 "en": "Policies that lack cooperation in the international community risk causing isolation.",
                 "ko": "국제 사회에서의 협조를 결여한 정책은 고립을 초래할 우려가 있다."
@@ -18646,7 +18646,7 @@
         "rank": 982,
         "example": {
             "sentence": "事故の現場はまだ封鎖されている。",
-            "sentence_furigana": "{事故|じこ}の{現場|げんじょう}はまだ{封鎖|ふうさ}されている。",
+            "sentence_furigana": "{事故|じこ}の{現場|げんば}はまだ{封鎖|ふうさ}されている。",
             "translations": {
                 "en": "The accident scene is still cordoned off.",
                 "ko": "사고 현장은 아직 봉쇄되어 있다."
@@ -21705,7 +21705,7 @@
         "rank": 1143,
         "example": {
             "sentence": "語彙を増やすために、毎日新しい単語を五つ覚えることにした。",
-            "sentence_furigana": "{語彙|ごい}を{増|ふ}やすために、{毎日新|まいにちあたら}しい{単語|たんご}を{五|い}つ{覚|つおぼ}えることにした。",
+            "sentence_furigana": "{語彙|ごい}を{増|ふ}やすために、{毎日新|まいにちあたら}しい{単語|たんご}を{五|い}つ{覚|おぼ}えることにした。",
             "translations": {
                 "en": "To increase my vocabulary, I decided to learn five new words every day.",
                 "ko": "어휘를 늘리기 위해 매일 새로운 단어 다섯 개를 외우기로 했다."
@@ -23871,7 +23871,7 @@
         "rank": 1257,
         "example": {
             "sentence": "この地方の主な産物はぶどうとワインだ。",
-            "sentence_furigana": "この{地方|ちほう}の{主|おも}な{産物|しゃんぶつ}はぶどうとワインだ。",
+            "sentence_furigana": "この{地方|ちほう}の{主|おも}な{産物|さんぶつ}はぶどうとワインだ。",
             "translations": {
                 "en": "The main products of this region are grapes and wine.",
                 "ko": "이 지방의 주요 산물은 포도와 와인이다."
@@ -27196,7 +27196,7 @@
         "rank": 1432,
         "example": {
             "sentence": "裁判で重要な証言があり、被告の主張が覆された。",
-            "sentence_furigana": "{裁判|さいばん}で{重要|きょうじゅう}な{証言|しょうげん}があり、{被告|ひこく}の{主張|しゅちょう}が{覆|くつがえ}された。",
+            "sentence_furigana": "{裁判|さいばん}で{重要|じゅうよう}な{証言|しょうげん}があり、{被告|ひこく}の{主張|しゅちょう}が{覆|くつがえ}された。",
             "translations": {
                 "en": "There was important testimony at the trial, and the defendant's claim was overturned.",
                 "ko": "재판에서 중요한 증언이 있어 피고의 주장이 뒤집혔다."
@@ -31623,7 +31623,7 @@
         "rank": 1665,
         "example": {
             "sentence": "山での遭難は生死を分ける状況だった。",
-            "sentence_furigana": "{山|やま}での{遭難|さんなん}は{生死|せいし}を{分|わ}ける{状況|じょうきょう}だった。",
+            "sentence_furigana": "{山|やま}での{遭難|そうなん}は{生死|せいし}を{分|わ}ける{状況|じょうきょう}だった。",
             "translations": {
                 "en": "The mountain accident was a life-or-death situation.",
                 "ko": "산에서의 조난은 생사를 가르는 상황이었다."
@@ -32497,7 +32497,7 @@
         "rank": 1711,
         "example": {
             "sentence": "相手の攻めをうまくしのいで反撃した。",
-            "sentence_furigana": "{相手|あいて}の{攻|せ}めをうまくしのいで{反撃|はんげきを}した。",
+            "sentence_furigana": "{相手|あいて}の{攻|せ}めをうまくしのいで{反撃|はんげき}した。",
             "translations": {
                 "en": "I successfully withstood the opponent's attack and counterattacked.",
                 "ko": "상대의 공격을 잘 막아 역공했다."
@@ -35898,7 +35898,7 @@
         "rank": 1890,
         "example": {
             "sentence": "夜遅くになってようやく山小屋に辿り着くことができた。",
-            "sentence_furigana": "{夜遅|よるおそ}くになってようやく{山小屋|やまこや}に{辿|たど}り{着|つ}くことができた。",
+            "sentence_furigana": "{夜遅|よるおそ}くになってようやく{山小屋|やまごや}に{辿|たど}り{着|つ}くことができた。",
             "translations": {
                 "en": "It was late at night when we finally managed to reach the mountain hut.",
                 "ko": "밤이 깊어서야 간신히 산장의 도착할 수 있었다."
@@ -39204,7 +39204,7 @@
         "rank": 2064,
         "example": {
             "sentence": "途中で雨が降り出したので傘を取りに戻った。",
-            "sentence_furigana": "{途中|つちゅう}で{雨|あめ}が{降|ふ}り{出|だ}したので{傘|かさ}を{取|と}りに{戻|もど}った。",
+            "sentence_furigana": "{途中|とちゅう}で{雨|あめ}が{降|ふ}り{出|だ}したので{傘|かさ}を{取|と}りに{戻|もど}った。",
             "translations": {
                 "en": "It started to rain on the way, so I went back to get an umbrella.",
                 "ko": "가는 도중에 비가 내리기 시작해서 우산을 가지러 돌아갔다."
@@ -40648,7 +40648,7 @@
         "rank": 2140,
         "example": {
             "sentence": "転居の手続きが落ち着くまで荷物の整理に追われた。",
-            "sentence_furigana": "{転居|てんきょ}の{手続|てつづ}きが{落|お}ち{着|つ}くまで{荷物|もの}の{整理|せいり}に{追|お}われた。",
+            "sentence_furigana": "{転居|てんきょ}の{手続|てつづ}きが{落|お}ち{着|つ}くまで{荷物|にもつ}の{整理|せいり}に{追|お}われた。",
             "translations": {
                 "en": "I was busy sorting my belongings until the moving procedures settled down.",
                 "ko": "이사 절차가 정리될 때까지 짐 정리에 쫓겼다."
@@ -40800,7 +40800,7 @@
         "rank": 2148,
         "example": {
             "sentence": "古い旅館の天井には美しい絵が描かれていた。",
-            "sentence_furigana": "{古|ふる}い{旅館|たびやかん}の{天井|てんじょう}には{美|うつく}しい{絵|え}が{描|か}かれていた。",
+            "sentence_furigana": "{古|ふる}い{旅館|りょかん}の{天井|てんじょう}には{美|うつく}しい{絵|え}が{描|か}かれていた。",
             "translations": {
                 "en": "Beautiful paintings were drawn on the ceiling of the old inn.",
                 "ko": "오래된 여관의 천장에는 아름다운 그림이 그려져 있었다."
@@ -40933,7 +40933,7 @@
         "rank": 2155,
         "example": {
             "sentence": "政府は今後の経済展望を慎重に説明した。",
-            "sentence_furigana": "{政府|せいふ}は{今後|いご}の{経済展望|けいざいてんぼう}を{慎重|しんちょう}に{説明|せつめい}した。",
+            "sentence_furigana": "{政府|せいふ}は{今後|こんご}の{経済展望|けいざいてんぼう}を{慎重|しんちょう}に{説明|せつめい}した。",
             "translations": {
                 "en": "The government carefully explained the economic outlook for the future.",
                 "ko": "정부는 향후의 경제 전망을 신중하게 설명했다."
@@ -41617,7 +41617,7 @@
         "rank": 2191,
         "example": {
             "sentence": "武士たちの剣の音が丁々と響き、場の空気が引き締まった。",
-            "sentence_furigana": "{武士|ぶしっ}たちの{剣|けん}の{音|おと}が{丁々|とうとう}と{響|ひび}き、{場|ば}の{空気|くうき}が{引|ひ}き{締|し}まった。",
+            "sentence_furigana": "{武士|ぶし}たちの{剣|けん}の{音|おと}が{丁々|ちょうちょう}と{響|ひび}き、{場|ば}の{空気|くうき}が{引|ひ}き{締|し}まった。",
             "translations": {
                 "en": "The clashing of the warriors' swords rang out, and the atmosphere tightened.",
                 "ko": "무사들의 검 소리가 정겹게 울리며 현장의 공기가 엄숙해졌다."
@@ -78762,7 +78762,7 @@
         "rank": 670,
         "example": {
             "sentence": "必要な書類は面接の際に持参してください。",
-            "sentence_furigana": "{必要|ひつよう}な{書類|しょるい}は{面接|めんせつ}の{際|さい}に{持参|もってさん}してください。",
+            "sentence_furigana": "{必要|ひつよう}な{書類|しょるい}は{面接|めんせつ}の{際|さい}に{持参|じさん}してください。",
             "translations": {
                 "en": "Please bring the necessary documents to the interview.",
                 "ko": "필요한 서류는 면접 시에 지참해 주세요."
@@ -79066,7 +79066,7 @@
         "rank": 686,
         "example": {
             "sentence": "この部屋は湿気が多くてカビが生えやすい。",
-            "sentence_furigana": "この{部屋|へや}は{湿気|しっき}が{多|おお}くてカビが{生|は}えやすい。",
+            "sentence_furigana": "この{部屋|へや}は{湿気|しっけ}が{多|おお}くてカビが{生|は}えやすい。",
             "translations": {
                 "en": "This room has a lot of humidity and mold grows easily.",
                 "ko": "이 방은 습기가 많아 곰팡이가 잘 생긴다."
@@ -79598,7 +79598,7 @@
         "rank": 714,
         "example": {
             "sentence": "彼女は独立したジャーナリストとして世界中を取材している。",
-            "sentence_furigana": "{彼女|かのじょ}は{独立|どくりつ}したジャーナリストとして{世界中|せかいちゅう}を{取材|しゅざい}している。",
+            "sentence_furigana": "{彼女|かのじょ}は{独立|どくりつ}したジャーナリストとして{世界中|せかいじゅう}を{取材|しゅざい}している。",
             "translations": {
                 "en": "She travels the world covering stories as an independent journalist.",
                 "ko": "그녀는 독립 언론인으로서 전 세계를 취재하고 있다."
@@ -81042,7 +81042,7 @@
         "rank": 790,
         "example": {
             "sentence": "長時間の運転で車のバッテリーが消耗した。",
-            "sentence_furigana": "{長時間|ながじかん}の{運転|うんてん}で{車|くるま}のバッテリーが{消耗|しょうもう}した。",
+            "sentence_furigana": "{長時間|ちょうじかん}の{運転|うんてん}で{車|くるま}のバッテリーが{消耗|しょうもう}した。",
             "translations": {
                 "en": "The car battery was depleted by the long drive.",
                 "ko": "장시간 운전으로 자동차 배터리가 소모되었다."
@@ -83132,7 +83132,7 @@
         "rank": 900,
         "example": {
             "sentence": "このサプリメントにはビタミンとミネラルが主な成分として含まれている。",
-            "sentence_furigana": "このサプリメントにはビタミンとミネラルが{主|おも}な{成分|しゅせいぶん}として{含|ふく}まれている。",
+            "sentence_furigana": "このサプリメントにはビタミンとミネラルが{主|おも}な{成分|せいぶん}として{含|ふく}まれている。",
             "translations": {
                 "en": "This supplement contains vitamins and minerals as its main ingredients.",
                 "ko": "이 보충제에는 비타민과 미네랄이 주요 성분으로 포함되어 있다."
@@ -92385,7 +92385,7 @@
         "rank": 1387,
         "example": {
             "sentence": "新人たちは張り切る気持ちで研修に参加した。",
-            "sentence_furigana": "{新人|しんじん}たちは{張|は}り{切|き}る{気持|きも}ちで{研修|きょうしゅう}に{参加|さんか}した。",
+            "sentence_furigana": "{新人|しんじん}たちは{張|は}り{切|き}る{気持|きも}ちで{研修|けんしゅう}に{参加|さんか}した。",
             "translations": {
                 "en": "The newcomers participated in the training with enthusiasm.",
                 "ko": "신입사원들은 의욕적인 마음으로 연수에 참가했다."
@@ -94114,7 +94114,7 @@
         "rank": 1478,
         "example": {
             "sentence": "図の符号が分かりにくいので説明を加えた。",
-            "sentence_furigana": "{図|ず}の{符号|ふごう}が{分|わ}かりにくいので{説明|すめい}を{加|くわ}えた。",
+            "sentence_furigana": "{図|ず}の{符号|ふごう}が{分|わ}かりにくいので{説明|せつめい}を{加|くわ}えた。",
             "translations": {
                 "en": "The symbols in the diagram were hard to understand, so I added an explanation.",
                 "ko": "도표의 기호가 알아보기 어려워서 설명을 덧붙였다."
@@ -102569,7 +102569,7 @@
         "rank": 88,
         "example": {
             "sentence": "子供のいたずらで花壇が荒らされた。",
-            "sentence_furigana": "{子供|こども}のいたずらで{花壇|はなだん}が{荒|あ}らされた。",
+            "sentence_furigana": "{子供|こども}のいたずらで{花壇|かだん}が{荒|あ}らされた。",
             "translations": {
                 "en": "The flowerbed was ruined by children's mischief.",
                 "ko": "아이들의 장난 때문에 화단이 망가졌다."
@@ -107129,7 +107129,7 @@
         "rank": 328,
         "example": {
             "sentence": "あの金持ちは慈善事業に多く寄付している。",
-            "sentence_furigana": "あの{金持|かねも}ちは{慈善事業|こちらんじぎょう}に{多|おお}く{寄付|きふ}している。",
+            "sentence_furigana": "あの{金持|かねも}ちは{慈善事業|じぜんじぎょう}に{多|おお}く{寄付|きふ}している。",
             "translations": {
                 "en": "That rich man donates a lot to charitable causes.",
                 "ko": "저 부자는 자선사업에 많이 기부하고 있다."
@@ -115888,7 +115888,7 @@
         "rank": 789,
         "example": {
             "sentence": "首相が国民に重要な発表をした。",
-            "sentence_furigana": "{首相|しゅしょう}が{国民|こくみ}に{重要|じゅうよう}な{発表|はっぴょう}をした。",
+            "sentence_furigana": "{首相|しゅしょう}が{国民|こくみん}に{重要|じゅうよう}な{発表|はっぴょう}をした。",
             "translations": {
                 "en": "The Prime Minister made an important announcement to the nation.",
                 "ko": "수상이 국민에게 중요한 발표를 했다."
@@ -125141,7 +125141,7 @@
         "rank": 1276,
         "example": {
             "sentence": "重要な段落を飛ばすと、話の意味がわからなくなる。",
-            "sentence_furigana": "{重要|じゅうよう}な{段落|たんらく}を{飛|と}ばすと、{話|はなし}の{意味|いみ}がわからなくなる。",
+            "sentence_furigana": "{重要|じゅうよう}な{段落|だんらく}を{飛|と}ばすと、{話|はなし}の{意味|いみ}がわからなくなる。",
             "translations": {
                 "en": "If you skip an important paragraph, you won't understand the meaning of the passage.",
                 "ko": "중요한 단락을 건너뛰면 이야기의 의미를 알 수 없게 된다."
@@ -126300,7 +126300,7 @@
         "rank": 1337,
         "example": {
             "sentence": "忙しくても日常の小さな楽しみを忘れないようにしている。",
-            "sentence_furigana": "{忙|いそが}しくても{日常|ちじょう}の{小|ちい}さな{楽|たの}しみを{忘|わす}れないようにしている。",
+            "sentence_furigana": "{忙|いそが}しくても{日常|にちじょう}の{小|ちい}さな{楽|たの}しみを{忘|わす}れないようにしている。",
             "translations": {
                 "en": "Even when busy, I try not to forget the small pleasures of everyday life.",
                 "ko": "바빠도 일상의 작은 즐거움을 잊지 않으려고 한다."
@@ -129454,7 +129454,7 @@
         "rank": 1503,
         "example": {
             "sentence": "彼は無関心な態度をとった。",
-            "sentence_furigana": "{彼|かれ}は{無関心|ぶかんしん}な{態度|たいど}をとった。",
+            "sentence_furigana": "{彼|かれ}は{無関心|むかんしん}な{態度|たいど}をとった。",
             "translations": {
                 "en": "He took an indifferent attitude.",
                 "ko": "그는 무관심한 태도를 보였다."
@@ -129834,7 +129834,7 @@
         "rank": 1523,
         "example": {
             "sentence": "睡眠不足で仕事に集中できない。",
-            "sentence_furigana": "{睡眠不足|すいみんふそく}で{仕事|しごと}に{集中|しゅうちゅう}できない。",
+            "sentence_furigana": "{睡眠不足|すいみんぶそく}で{仕事|しごと}に{集中|しゅうちゅう}できない。",
             "translations": {
                 "en": "I can't concentrate on work due to lack of sleep.",
                 "ko": "수면 부족으로 일에 집중할 수 없다."
@@ -141272,7 +141272,7 @@
         "rank": 290,
         "example": {
             "sentence": "明日の会議に出席します。",
-            "sentence_furigana": "{明日|あす}の{会議|かいぎ}に{出席|しゅっせき・する}します。",
+            "sentence_furigana": "{明日|あす}の{会議|かいぎ}に{出席|しゅっせき}します。",
             "translations": {
                 "en": "I will attend tomorrow's meeting.",
                 "ko": "내일 회의에 참석하겠습니다."
@@ -141291,7 +141291,7 @@
         "rank": 291,
         "example": {
             "sentence": "電車は五分後に出発する。",
-            "sentence_furigana": "{電車|でんしゃ}は{五分後|ごふんご}に{出発|しゅっぱつ・する}する。",
+            "sentence_furigana": "{電車|でんしゃ}は{五分後|ごふんご}に{出発|しゅっぱつ}する。",
             "translations": {
                 "en": "The train departs in five minutes.",
                 "ko": "전철은 5분 후에 출발한다."
@@ -141329,7 +141329,7 @@
         "rank": 293,
         "example": {
             "sentence": "明日の試験の準備をしている。",
-            "sentence_furigana": "{明日|あす}の{試験|しけん}の{準備|じゅんび・する}をしている。",
+            "sentence_furigana": "{明日|あす}の{試験|しけん}の{準備|じゅんび}をしている。",
             "translations": {
                 "en": "I'm preparing for tomorrow's exam.",
                 "ko": "내일 시험 준비를 하고 있다."
@@ -142089,7 +142089,7 @@
         "rank": 333,
         "example": {
             "sentence": "日本での生活は楽しいです。",
-            "sentence_furigana": "{日本|にっぽん}での{生活|せいかつ・する}は{楽|たの}しいです。",
+            "sentence_furigana": "{日本|にっぽん}での{生活|せいかつ}は{楽|たの}しいです。",
             "translations": {
                 "en": "Living in Japan is enjoyable.",
                 "ko": "일본에서의 생활은 즐겁다."
@@ -142108,7 +142108,7 @@
         "rank": 334,
         "example": {
             "sentence": "この工場は年間に多くの車を生産している。",
-            "sentence_furigana": "この{工場|こうじょう}は{年間|ねんかん}に{多|おお}くの{車|くるま}を{生産|せいさん・する}している。",
+            "sentence_furigana": "この{工場|こうじょう}は{年間|ねんかん}に{多|おお}くの{車|くるま}を{生産|せいさん}している。",
             "translations": {
                 "en": "This factory produces many cars each year.",
                 "ko": "이 공장은 연간 많은 차량을 생산하고 있다."
@@ -145889,7 +145889,7 @@
         "rank": 533,
         "example": {
             "sentence": "誕生日に友達から素敵なプレゼントをもらった。",
-            "sentence_furigana": "{誕生日|たんじょうひ}に{友達|ともだち}から{素敵|すてき}なプレゼントをもらった。",
+            "sentence_furigana": "{誕生日|たんじょうび}に{友達|ともだち}から{素敵|すてき}なプレゼントをもらった。",
             "translations": {
                 "en": "I received a lovely present from a friend on my birthday.",
                 "ko": "생일에 친구에게서 멋진 선물을 받았어요."
@@ -154040,7 +154040,7 @@
         "rank": 328,
         "example": {
             "sentence": "私は日曜日に洗濯をします。",
-            "sentence_furigana": "{私|わたくし}は{日曜日|にちようひ}に{洗濯|せんたく}をします。",
+            "sentence_furigana": "{私|わたくし}は{日曜日|にちようび}に{洗濯|せんたく}をします。",
             "translations": {
                 "en": "I do the laundry on Sundays.",
                 "ko": "저는 일요일에 빨래를 합니다."
@@ -154078,7 +154078,7 @@
         "rank": 330,
         "example": {
             "sentence": "毎朝、部屋を掃除します。",
-            "sentence_furigana": "{毎朝|まいあさ}、{部屋|へや}を{掃除|そうじする}します。",
+            "sentence_furigana": "{毎朝|まいあさ}、{部屋|へや}を{掃除|そうじ}します。",
             "translations": {
                 "en": "I clean my room every morning.",
                 "ko": "매일 아침 방을 청소합니다."

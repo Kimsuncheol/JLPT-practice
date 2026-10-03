@@ -73,34 +73,41 @@ class SessionActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final strings = context.strings;
-    return Column(
-      children: [
-        SizedBox(
-          width: double.infinity,
-          child: FilledButton.icon(
-            style: FilledButton.styleFrom(
-              minimumSize: const Size.fromHeight(54),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSizes.size8),
+      child: Column(
+        children: [
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton.icon(
+              style: FilledButton.styleFrom(
+                minimumSize: const Size.fromHeight(AppSizes.size50),
+              ),
+              onPressed: onFinish,
+              icon: const Icon(Icons.check_rounded),
+              label: Text(strings('finishSession')),
             ),
-            onPressed: onFinish,
-            icon: const Icon(Icons.check_rounded),
-            label: Text(strings('finishSession')),
           ),
-        ),
-        const SizedBox(height: AppSizes.space10),
-        StartOverButton(label: strings('startOver'), onPressed: onStartOver),
-        const SizedBox(height: AppSizes.space10),
-        SizedBox(
-          width: double.infinity,
-          child: OutlinedButton.icon(
-            style: OutlinedButton.styleFrom(
-              minimumSize: const Size.fromHeight(54),
+          const SizedBox(height: AppSizes.space10),
+          StartOverButton(
+            label: strings('startOver'),
+            minimumHeight: AppSizes.size50,
+            onPressed: onStartOver,
+          ),
+          const SizedBox(height: AppSizes.space10),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size.fromHeight(AppSizes.size50),
+              ),
+              onPressed: onChooseQuizGame,
+              icon: const Icon(Icons.quiz_rounded),
+              label: Text(strings('chooseQuizGame')),
             ),
-            onPressed: onChooseQuizGame,
-            icon: const Icon(Icons.quiz_rounded),
-            label: Text(strings('chooseQuizGame')),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
