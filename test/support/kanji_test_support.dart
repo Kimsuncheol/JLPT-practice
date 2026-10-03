@@ -12,11 +12,13 @@ class KanjiTestAppController extends AppController {
     this.autoPlayAudio = false,
     this.completed = const {},
     this.sessions = const {},
+    this.exampleFontScale = 1,
   });
 
   final bool autoPlayAudio;
   final Map<String, Set<int>> completed;
   final Map<String, StudySession> sessions;
+  final double exampleFontScale;
   final List<(String, int)> completions = [];
   final List<StudySession> savedSessions = [];
 
@@ -32,6 +34,7 @@ class KanjiTestAppController extends AppController {
     dailyGoal: 2,
     showFurigana: true,
     autoPlayAudio: autoPlayAudio,
+    exampleFontScale: exampleFontScale,
     themeMode: ThemeMode.system,
     notificationsEnabled: false,
     studySeconds: 0,

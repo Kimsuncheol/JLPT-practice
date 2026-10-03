@@ -17,15 +17,16 @@ import 'package:jlpt_practice/features/vocabulary/cover_masking.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_tape.dart';
 import 'package:jlpt_practice/features/vocabulary/example_furigana_text.dart';
 import 'package:jlpt_practice/features/vocabulary/masked_translation.dart';
-import 'package:jlpt_practice/features/vocabulary/start_over_button.dart';
 import 'package:jlpt_practice/core/constants/app_sizes.dart';
 import 'package:jlpt_practice/core/constants/app_colors.dart';
 import 'package:jlpt_practice/core/constants/app_font_weights.dart';
+import 'package:jlpt_practice/shared/day_chip.dart';
 
 class StudyScreen extends ConsumerStatefulWidget {
-  const StudyScreen({required this.day, super.key});
+  const StudyScreen({required this.day, this.startOver = false, super.key});
 
   final int day;
+  final bool startOver;
 
   @override
   ConsumerState<StudyScreen> createState() => _StudyScreenState();
@@ -42,7 +43,6 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   bool _resumeDecisionPending = false;
   bool _resumeDialogVisible = false;
   bool _leaveDialogVisible = false;
-  bool _startOverDialogVisible = false;
   bool _suppressAutoAudio = false;
   int _pageChangeRequest = 0;
   int _readingsRequest = 0;
@@ -60,8 +60,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   Widget build(BuildContext context) {
     final asyncState = ref.watch(appControllerProvider);
     final scaffoldBackgroundColor = Theme.of(context).scaffoldBackgroundColor;
-    final systemBarColor =
-        _resumeDialogVisible || _leaveDialogVisible || _startOverDialogVisible
+    final systemBarColor = _resumeDialogVisible || _leaveDialogVisible
         ? Color.alphaBlend(_dialogBarrierColor, scaffoldBackgroundColor)
         : scaffoldBackgroundColor;
     return wrapImmersive(
@@ -110,49 +109,63 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
         body: Column(
           children: [
             Expanded(
-              child: PageView.builder(
-                controller: _pageController,
-                itemCount: words.length + 1,
-                onPageChanged: (index) => unawaited(
-                  _handlePageChanged(index: index, words: words, state: state),
-                ),
-                itemBuilder: (context, index) {
-                  if (index == words.length) return const SizedBox.shrink();
-                  final word = words[index];
-                  final visibility = _visibilityFor(word, state);
-                  final showFurigana = visibility.showFurigana;
-                  final hideWord =
-                      visibility.hideWord ||
-                      (!showFurigana && word.reading == word.word);
-                  final meaningsHidden = visibility.hideMeanings;
-                  return Padding(
-                    padding: const EdgeInsets.fromLTRB(
-                      AppSizes.size16,
-                      AppSizes.size8,
-                      AppSizes.size16,
-                      AppSizes.size14,
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: PageView.builder(
+                      controller: _pageController,
+                      itemCount: words.length + 1,
+                      onPageChanged: (index) => unawaited(
+                        _handlePageChanged(
+                          index: index,
+                          words: words,
+                          state: state,
+                        ),
+                      ),
+                      itemBuilder: (context, index) {
+                        if (index == words.length) {
+                          return const SizedBox.shrink();
+                        }
+                        final word = words[index];
+                        final visibility = _visibilityFor(word, state);
+                        final showFurigana = visibility.showFurigana;
+                        final hideWord =
+                            visibility.hideWord ||
+                            (!showFurigana && word.reading == word.word);
+                        final meaningsHidden = visibility.hideMeanings;
+                        return Padding(
+                          padding: const EdgeInsets.fromLTRB(
+                            AppSizes.size20,
+                            AppSizes.size8,
+                            AppSizes.size20,
+                            AppSizes.size14,
+                          ),
+                          child: _StudyCard(
+                            vocabulary: word,
+                            language: state.meaningLanguage,
+                            showFurigana: showFurigana,
+                            hideWord: hideWord,
+                            hideMeaning: meaningsHidden,
+                            maskMeaningInTranslation: meaningsHidden,
+                            exampleFontScale: state.exampleFontScale,
+                            onSpeakWord: () =>
+                                _speakIfAudible(word.reading, word: word),
+                            onSpeakExample: () =>
+                                _speakIfAudible(word.example.sentence),
+                          ),
+                        );
+                      },
                     ),
-                    child: _StudyCard(
-                      vocabulary: word,
-                      language: state.meaningLanguage,
-                      showFurigana: showFurigana,
-                      hideWord: hideWord,
-                      hideMeaning: meaningsHidden,
-                      maskMeaningInTranslation: meaningsHidden,
-                      onSpeakWord: () =>
-                          _speakIfAudible(word.reading, word: word),
-                      onSpeakExample: () =>
-                          _speakIfAudible(word.example.sentence),
-                    ),
-                  );
-                },
+                  ),
+                  PositionedDayChip(day: widget.day),
+                ],
               ),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: AppSizes.size20),
               child: SizedBox(
                 height: AppSizes.size82,
-                child: _buildActionArea(state, words, _index),
+                child: _actionPage(_manualActions(state, words[_index])),
               ),
             ),
             SafeArea(
@@ -177,9 +190,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   }
 
   Future<void> _confirmLeave() async {
-    if (_leaveDialogVisible ||
-        _resumeDialogVisible ||
-        _startOverDialogVisible) {
+    if (_leaveDialogVisible || _resumeDialogVisible) {
       return;
     }
     final dimmedBackground = Color.alphaBlend(
@@ -223,73 +234,11 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
     if (mounted && shouldLeave) context.pop();
   }
 
-  Future<void> _confirmStartOver(List<Vocabulary> words) async {
-    if (_leaveDialogVisible ||
-        _resumeDialogVisible ||
-        _startOverDialogVisible) {
-      return;
-    }
-    final dimmedBackground = Color.alphaBlend(
-      _dialogBarrierColor,
-      Theme.of(context).scaffoldBackgroundColor,
-    );
-    setImmersiveOuterBackgroundColor(dimmedBackground);
-    setState(() => _startOverDialogVisible = true);
-    bool shouldStartOver = false;
-    try {
-      final dialogResult = showDialog<bool>(
-        context: context,
-        barrierColor: _dialogBarrierColor,
-        builder: (dialogContext) => wrapImmersiveSystemBarGesture(
-          AlertDialog(
-            title: Text(dialogContext.strings('startOverTitle')),
-            content: Text(dialogContext.strings('startOverBody')),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(dialogContext, false),
-                child: Text(dialogContext.strings('cancel')),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.pop(dialogContext, true),
-                child: Text(dialogContext.strings('startOver')),
-              ),
-            ],
-          ),
-        ),
-      );
-      _applySystemBarColorAfterFrame(modalVisible: true);
-      shouldStartOver = await dialogResult ?? false;
-    } finally {
-      if (mounted) {
-        setImmersiveOuterBackgroundColor(null);
-        setState(() => _startOverDialogVisible = false);
-        reassertImmersiveMode();
-        _applySystemBarColorAfterFrame(modalVisible: false);
-      }
-    }
-    if (!mounted || !shouldStartOver || _pageController == null) return;
-    _pageController!.jumpToPage(0);
-  }
-
   Widget _actionPage(List<Widget> actions) => Row(
     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [for (final action in actions) Flexible(child: action)],
   );
-
-  Widget _buildActionArea(AppState state, List<Vocabulary> words, int index) {
-    final word = words[index];
-    final actions = _manualActions(state, word);
-    if (index == words.length - 1) {
-      actions.add(
-        StartOverButton(
-          label: context.strings('startOver'),
-          onPressed: () => unawaited(_confirmStartOver(words)),
-        ),
-      );
-    }
-    return _actionPage(actions);
-  }
 
   _CardVisibility _visibilityFor(Vocabulary word, AppState state) =>
       _cardVisibility.putIfAbsent(
@@ -373,6 +322,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
     if (_pageController != null) return;
     final session = state.studySessions[state.selectedLevel];
     final canResume =
+        !widget.startOver &&
         session != null &&
         session.day == widget.day &&
         session.isCompatible(
@@ -464,10 +414,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   void _applySystemBarColorAfterFrame({required bool modalVisible}) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted ||
-          (_resumeDialogVisible ||
-                  _leaveDialogVisible ||
-                  _startOverDialogVisible) !=
-              modalVisible) {
+          (_resumeDialogVisible || _leaveDialogVisible) != modalVisible) {
         return;
       }
       final scaffoldBackgroundColor = Theme.of(context).scaffoldBackgroundColor;
@@ -609,6 +556,7 @@ class _StudyCard extends StatelessWidget {
     required this.hideWord,
     required this.hideMeaning,
     required this.maskMeaningInTranslation,
+    required this.exampleFontScale,
     required this.onSpeakWord,
     required this.onSpeakExample,
   });
@@ -619,15 +567,18 @@ class _StudyCard extends StatelessWidget {
   final bool hideWord;
   final bool hideMeaning;
   final bool maskMeaningInTranslation;
+  final double exampleFontScale;
   final VoidCallback onSpeakWord;
   final VoidCallback onSpeakExample;
 
   @override
   Widget build(BuildContext context) {
     return _centeredScrollable(
-      padding: const EdgeInsets.only(
-        top: AppSizes.size26,
-        bottom: AppSizes.size24,
+      padding: const EdgeInsets.fromLTRB(
+        AppSizes.size24,
+        AppSizes.size26,
+        AppSizes.size24,
+        AppSizes.size24,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -677,7 +628,8 @@ class _StudyCard extends StatelessWidget {
       onTap: onSpeakWord,
       child: showFurigana
           ? Text(
-              vocabulary.reading,
+              breakLongSlashSeparatedLabel(vocabulary.reading),
+              textAlign: TextAlign.center,
               style: titleLarge?.copyWith(
                 color: Theme.of(context).colorScheme.primary,
               ),
@@ -699,7 +651,11 @@ class _StudyCard extends StatelessWidget {
     return _speechTarget(
       onTap: onSpeakWord,
       child: showFurigana
-          ? Text(vocabulary.romaji, style: style)
+          ? Text(
+              breakLongSlashSeparatedLabel(vocabulary.romaji),
+              textAlign: TextAlign.center,
+              style: style,
+            )
           : coverTapeFor(
               characters: vocabulary.romaji.length,
               fontSize: style?.fontSize ?? 16,
@@ -709,41 +665,44 @@ class _StudyCard extends StatelessWidget {
     );
   }
 
-  Widget _buildWord(BuildContext context) => Semantics(
-    button: true,
-    child: InkWell(
-      borderRadius: BorderRadius.circular(AppSizes.radius16),
-      splashFactory: NoSplash.splashFactory,
-      overlayColor: const WidgetStatePropertyAll(Colors.transparent),
-      onTap: onSpeakWord,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSizes.size12,
-          vertical: AppSizes.size4,
-        ),
-        child: FittedBox(
-          fit: BoxFit.scaleDown,
-          child: hideWord
-              ? coverTapeFor(
-                  characters: vocabulary.word.length,
-                  fontSize: AppSizes.font56 * 1.15,
-                  tilt: -0.02,
-                )
-              : Text(
-                  vocabulary.word,
-                  maxLines: 1,
-                  softWrap: false,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: AppSizes.font56,
-                    height: AppSizes.lineHeight1_15,
-                    fontWeight: AppFontWeights.extraBold,
+  Widget _buildWord(BuildContext context) {
+    final displayWord = breakLongSlashSeparatedLabel(vocabulary.word);
+    return Semantics(
+      button: true,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppSizes.radius16),
+        splashFactory: NoSplash.splashFactory,
+        overlayColor: const WidgetStatePropertyAll(Colors.transparent),
+        onTap: onSpeakWord,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSizes.size12,
+            vertical: AppSizes.size4,
+          ),
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: hideWord
+                ? coverTapeFor(
+                    characters: vocabulary.word.length,
+                    fontSize: AppSizes.font56 * 1.15,
+                    tilt: -0.02,
+                  )
+                : Text(
+                    displayWord,
+                    maxLines: displayWord.contains('\n') ? null : 1,
+                    softWrap: false,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: AppSizes.font56,
+                      height: AppSizes.lineHeight1_15,
+                      fontWeight: AppFontWeights.extraBold,
+                    ),
                   ),
-                ),
+          ),
         ),
       ),
-    ),
-  );
+    );
+  }
 
   Widget _speechTarget({required VoidCallback onTap, required Widget child}) =>
       Semantics(
@@ -807,6 +766,8 @@ class _StudyCard extends StatelessWidget {
                     ? wordMaskTargets(vocabulary.word)
                     : const [],
                 hideReadings: !showFurigana,
+                alignment: WrapAlignment.start,
+                fontScale: exampleFontScale,
               ),
             ),
           ),
@@ -831,6 +792,7 @@ class _StudyCard extends StatelessWidget {
         hideMeanings: maskMeaningInTranslation,
         style: style,
         glyphWidth: 0.55,
+        textAlign: TextAlign.start,
       );
     }
     return _maskedText(
@@ -847,7 +809,7 @@ class _StudyCard extends StatelessWidget {
     );
   }
 
-  /// Renders [text] centered, laying tape over every run matching [targets].
+  /// Renders [text] from the leading edge, laying tape over matching runs.
   Widget _maskedText(
     String text, {
     required TextStyle? style,
@@ -855,12 +817,13 @@ class _StudyCard extends StatelessWidget {
     required double glyphWidth,
   }) {
     if (targets.isEmpty) {
-      return Text(text, textAlign: TextAlign.center, style: style);
+      return Text(text, textAlign: TextAlign.start, style: style);
     }
     return MaskedSegmentsText(
       segments: maskSegments(text, targets),
       style: style,
       glyphWidth: glyphWidth,
+      textAlign: TextAlign.start,
     );
   }
 }
@@ -869,6 +832,15 @@ String _withRolePlayLineBreaks(String text) => text.replaceAllMapped(
   RegExp(r'([.!?。！？])\s*(?=[A-Za-z][A-Za-z0-9]{0,2}\s*[：:])'),
   (match) => '${match.group(1)}\n',
 );
+
+/// Keeps short alternatives on one line and gives long slash-separated words
+/// a predictable break point instead of shrinking the whole label.
+String breakLongSlashSeparatedLabel(String text) {
+  if (!text.contains('/') || text.replaceAll(RegExp(r'\s'), '').length < 12) {
+    return text;
+  }
+  return text.replaceAllMapped(RegExp(r'\s*/\s*'), (_) => ' /\n');
+}
 
 class _CardAction extends StatelessWidget {
   const _CardAction({

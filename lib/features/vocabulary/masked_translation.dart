@@ -5,18 +5,20 @@ import 'package:jlpt_practice/core/services/meaning_mask_service.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_masking.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_tape.dart';
 
-/// Renders [segments] centered, laying tape over the covered runs.
+/// Renders [segments], laying tape over the covered runs.
 class MaskedSegmentsText extends StatelessWidget {
   const MaskedSegmentsText({
     required this.segments,
     required this.style,
     required this.glyphWidth,
+    this.textAlign = TextAlign.center,
     super.key,
   });
 
   final List<MaskSegment> segments;
   final TextStyle? style;
   final double glyphWidth;
+  final TextAlign textAlign;
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +41,7 @@ class MaskedSegmentsText extends StatelessWidget {
               TextSpan(text: segment.text),
         ],
       ),
-      textAlign: TextAlign.center,
+      textAlign: textAlign,
     );
   }
 }
@@ -57,6 +59,7 @@ class MaskedTranslation extends ConsumerStatefulWidget {
     required this.hideMeanings,
     required this.style,
     required this.glyphWidth,
+    this.textAlign = TextAlign.center,
     super.key,
   });
 
@@ -67,6 +70,7 @@ class MaskedTranslation extends ConsumerStatefulWidget {
   final bool hideMeanings;
   final TextStyle? style;
   final double glyphWidth;
+  final TextAlign textAlign;
 
   @override
   ConsumerState<MaskedTranslation> createState() => _MaskedTranslationState();
@@ -103,7 +107,7 @@ class _MaskedTranslationState extends ConsumerState<MaskedTranslation> {
     if (!widget.hideMeanings) {
       return Text(
         widget.translation,
-        textAlign: TextAlign.center,
+        textAlign: widget.textAlign,
         style: widget.style,
       );
     }
@@ -122,6 +126,7 @@ class _MaskedTranslationState extends ConsumerState<MaskedTranslation> {
             : baseline,
         style: widget.style,
         glyphWidth: widget.glyphWidth,
+        textAlign: widget.textAlign,
       ),
     );
   }

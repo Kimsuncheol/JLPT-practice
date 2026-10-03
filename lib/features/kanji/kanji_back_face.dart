@@ -18,7 +18,7 @@ class KanjiBackFace extends StatelessWidget {
     required this.onSpeakReading,
     required this.onSpeakSentence,
     required this.footer,
-    this.onStartOver,
+    this.exampleFontScale = 1,
     super.key,
   });
 
@@ -29,9 +29,7 @@ class KanjiBackFace extends StatelessWidget {
   final ValueChanged<String> onSpeakReading;
   final ValueChanged<String> onSpeakSentence;
   final Widget footer;
-
-  /// Shown as the hide group's last item when set: restarts the day.
-  final VoidCallback? onStartOver;
+  final double exampleFontScale;
 
   @override
   Widget build(BuildContext context) {
@@ -68,6 +66,7 @@ class KanjiBackFace extends StatelessWidget {
                           hideMeanings: visibility.hideMeanings,
                           onSpeak: onSpeakReading,
                           onSpeakSentence: onSpeakSentence,
+                          exampleFontScale: exampleFontScale,
                         ),
                       if ((kanji.kunYomi.isNotEmpty ||
                               kanji.kunExamples.isNotEmpty) &&
@@ -96,6 +95,7 @@ class KanjiBackFace extends StatelessWidget {
                           hideMeanings: visibility.hideMeanings,
                           onSpeak: onSpeakReading,
                           onSpeakSentence: onSpeakSentence,
+                          exampleFontScale: exampleFontScale,
                         ),
                     ],
                   ),
@@ -114,13 +114,6 @@ class KanjiBackFace extends StatelessWidget {
           padding: sideInset,
           child: HideGroup(
             side: 'back',
-            trailing: onStartOver == null
-                ? null
-                : HideGroupAction(
-                    icon: Icons.refresh_rounded,
-                    label: strings('startOver'),
-                    onTap: onStartOver!,
-                  ),
             toggles: [
               HideToggle(
                 id: 'kun',

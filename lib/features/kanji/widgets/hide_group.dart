@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jlpt_practice/core/constants/app_sizes.dart';
 
-/// The row of hide/show toggles at the foot of a card face, optionally ending
-/// with a [trailing] action such as start over.
+/// The row of hide/show toggles at the foot of a card face.
 ///
 /// [morePages] adds further rows of toggles that the learner swipes to; the
 /// group is then as tall as one row.
@@ -10,14 +9,12 @@ class HideGroup extends StatefulWidget {
   const HideGroup({
     required this.side,
     required this.toggles,
-    this.trailing,
     this.morePages = const [],
     super.key,
   });
 
   final String side;
   final List<HideToggle> toggles;
-  final HideGroupAction? trailing;
   final List<List<HideToggle>> morePages;
 
   @override
@@ -53,10 +50,7 @@ class _HideGroupState extends State<HideGroup> {
 
   @override
   Widget build(BuildContext context) {
-    final first = <Widget>[
-      ...widget.toggles,
-      if (widget.trailing != null) widget.trailing!,
-    ];
+    final first = <Widget>[...widget.toggles];
     if (widget.morePages.isEmpty) {
       return Container(
         key: ValueKey('hide-group-${widget.side}'),
@@ -85,47 +79,6 @@ class _HideGroupState extends State<HideGroup> {
       ),
     );
   }
-}
-
-/// An action that sits in the hide group's row, laid out like a [HideToggle].
-/// Its label wraps onto as many lines as it needs.
-class HideGroupAction extends StatelessWidget {
-  const HideGroupAction({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-    super.key,
-  });
-
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) => InkWell(
-    borderRadius: BorderRadius.circular(AppSizes.radius20),
-    splashFactory: NoSplash.splashFactory,
-    highlightColor: Colors.transparent,
-    onTap: onTap,
-    child: Padding(
-      padding: const EdgeInsets.symmetric(
-        vertical: AppSizes.size10,
-        horizontal: AppSizes.size8,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon),
-          const SizedBox(height: AppSizes.space4),
-          Text(
-            label,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.labelSmall,
-          ),
-        ],
-      ),
-    ),
-  );
 }
 
 class HideToggle extends StatelessWidget {

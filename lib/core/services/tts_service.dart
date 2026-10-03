@@ -9,8 +9,14 @@ final _furiganaAfterKanji = RegExp(
   r'([\u3400-\u4DBF\u4E00-\u9FFF々〆ヵヶ])[\u0020\u3000]*(?:（[ぁ-ゖァ-ヺー・]+）|\([ぁ-ゖァ-ヺー・]+\))',
 );
 
-String prepareJapaneseTextForSpeech(String text) =>
-    text.replaceAllMapped(_furiganaAfterKanji, (match) => match.group(1)!);
+final _inlineDialogueSpeaker = RegExp(
+  r'(^|[\n.!?。！？]\s*)([A-Za-z][A-Za-z0-9]{0,2})\s*[：:]\s*',
+  multiLine: true,
+);
+
+String prepareJapaneseTextForSpeech(String text) => text
+    .replaceAllMapped(_furiganaAfterKanji, (match) => match.group(1)!)
+    .replaceAllMapped(_inlineDialogueSpeaker, (match) => match.group(1)!);
 
 List<String> splitReadings(String reading) => reading
     .split(RegExp(r'[/／]'))

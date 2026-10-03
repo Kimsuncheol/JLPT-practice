@@ -331,12 +331,9 @@ class AppStrings {
     'lowVolumeTitle': 'Volume is too low',
     'lowVolumeBody':
         'Turn up your device volume or unmute it to hear the pronunciation.',
-    'lowSystemVolumeBody':
-        'Your device is unmuted, but its volume is too low. Turn it up to hear the pronunciation.',
-    'mutedSystemVolumeBody':
-        'Your device is muted. Unmute it to hear the pronunciation.',
-    'lowCustomVolumeBody':
-        'Increase the custom pronunciation volume to hear the pronunciation.',
+    'lowSystemVolumeBody': 'Volume is low. Turn it up.',
+    'mutedSystemVolumeBody': 'Device muted. Unmute to hear audio.',
+    'lowCustomVolumeBody': 'Pronunciation volume is low. Turn it up.',
     'sectionReading': 'Reading',
     'practiceTest': 'Practice',
     'readingQuizInstruction': 'Read the passage, then choose the best answer.',
@@ -408,6 +405,9 @@ class AppStrings {
     'volumeCurrentSystem': 'Current system volume',
     'volumeLevel': 'Volume',
     'eyeComfortSubtitle': 'Warm tint while you study',
+    'exampleFontSize': 'Example sentence size',
+    'exampleFontSizeHint':
+        'Changes the size of example sentences and their furigana together.',
   };
 
   static const _ko = <String, String>{
@@ -711,9 +711,9 @@ class AppStrings {
     'sectionResults': '섹션별 결과',
     'lowVolumeTitle': '볼륨이 너무 낮습니다',
     'lowVolumeBody': '발음을 들으려면 기기 볼륨을 높이거나 음소거를 해제하세요.',
-    'lowSystemVolumeBody': '기기가 음소거 상태는 아니지만 볼륨이 너무 낮습니다. 발음을 들으려면 볼륨을 높이세요.',
-    'mutedSystemVolumeBody': '기기가 음소거 상태입니다. 발음을 들으려면 음소거를 해제하세요.',
-    'lowCustomVolumeBody': '발음을 들으려면 직접 설정한 발음 볼륨을 높이세요.',
+    'lowSystemVolumeBody': '볼륨이 낮습니다. 볼륨을 높이세요.',
+    'mutedSystemVolumeBody': '기기가 음소거 상태입니다. 음소거를 해제하세요.',
+    'lowCustomVolumeBody': '발음 볼륨이 낮습니다. 볼륨을 높이세요.',
     'sectionReading': '독해',
     'practiceTest': '연습',
     'readingQuizInstruction': '지문을 읽고 가장 알맞은 답을 고르세요.',
@@ -778,6 +778,8 @@ class AppStrings {
     'volumeCurrentSystem': '현재 시스템 볼륨',
     'volumeLevel': '볼륨',
     'eyeComfortSubtitle': '학습하는 동안 따뜻한 색조 적용',
+    'exampleFontSize': '예문 글자 크기',
+    'exampleFontSizeHint': '예문과 후리가나의 글자 크기를 함께 조절합니다.',
   };
 
   String call(String key) =>

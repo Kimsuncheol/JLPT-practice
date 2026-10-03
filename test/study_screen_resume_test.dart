@@ -17,11 +17,20 @@ import 'package:jlpt_practice/features/settings/levels_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/study_finish_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/study_quiz_selection_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_tape.dart';
+import 'package:jlpt_practice/features/vocabulary/example_furigana_text.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
+import 'package:jlpt_practice/shared/day_chip.dart';
 import 'package:jlpt_practice/features/vocabulary/study_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
+
+  test('long slash-separated labels break after the slash', () {
+    expect(breakLongSlashSeparatedLabel('ラジカセ / ラジオカセット'), 'ラジカセ /\nラジオカセット');
+    expect(breakLongSlashSeparatedLabel('なん/なに'), 'なん/なに');
+    expect(breakLongSlashSeparatedLabel('長いスラッシュなしの単語'), '長いスラッシュなしの単語');
+  });
 
   testWidgets('leaving day 6 shows recent study below streak and reopens day 6', (
     tester,
@@ -163,17 +172,8 @@ void main() {
   });
 
   for (final scenario in [
-    (
-      muted: false,
-      volume: 0.02,
-      message:
-          'Your device is unmuted, but its volume is too low. Turn it up to hear the pronunciation.',
-    ),
-    (
-      muted: true,
-      volume: 0.8,
-      message: 'Your device is muted. Unmute it to hear the pronunciation.',
-    ),
+    (muted: false, volume: 0.02, message: 'Volume is low. Turn it up.'),
+    (muted: true, volume: 0.8, message: 'Device muted. Unmute to hear audio.'),
   ]) {
     testWidgets(
       'system volume warning distinguishes ${scenario.muted ? 'muted' : 'unmuted low'} volume',
@@ -218,6 +218,12 @@ void main() {
         expect(
           find.byKey(const ValueKey('volume-warning-toast')),
           findsOneWidget,
+        );
+        expect(
+          tester
+              .getTopLeft(find.byKey(const ValueKey('volume-warning-toast')))
+              .dy,
+          lessThan(tester.getTopLeft(find.text('単語6')).dy),
         );
         expect(find.byType(SnackBar), findsNothing);
         expect(speech.spoken, scenario.muted ? isEmpty : ['たんご']);
@@ -282,6 +288,59 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(speech.events, isEmpty);
+  });
+
+  testWidgets('a pill at the top left names the day, and the example scales', (
+    tester,
+  ) async {
+    final container = ProviderContainer(
+      overrides: [
+        appControllerProvider.overrideWith(
+          () => _ResumeAppController(
+            'word_0',
+            0,
+            withExamples: true,
+            exampleFontScale: 1.5,
+          ),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container.read(appControllerProvider.future);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp(
+          theme: AppTheme.light(),
+          home: const StudyScreen(day: 2),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final chip = find.byType(DayChip);
+    expect(
+      find.descendant(of: chip, matching: find.text('Day 2')),
+      findsOneWidget,
+    );
+    final pages = tester.getRect(find.byType(PageView));
+    expect(tester.getTopLeft(chip).dy, greaterThanOrEqualTo(pages.top));
+    expect(
+      tester.getTopRight(chip).dx,
+      closeTo(pages.right - AppSizes.dayChipEnd, 0.01),
+    );
+    expect(
+      tester.getTopRight(chip).dy,
+      closeTo(pages.top + AppSizes.dayChipTop, 0.01),
+    );
+    expect(
+      tester
+          .widget<ExampleFuriganaText>(
+            find.byKey(const ValueKey('example-furigana')),
+          )
+          .fontScale,
+      1.5,
+    );
   });
 
   testWidgets('bottom buttons cover the reading, word and meanings with tape', (
@@ -1014,6 +1073,49 @@ void main() {
     expect(find.text('Great work!'), findsOneWidget);
   });
 
+  testWidgets('start over is on the finish screen and returns to word one', (
+    tester,
+  ) async {
+    final speech = _RecordingTtsService();
+    final container = ProviderContainer(
+      overrides: [
+        appControllerProvider.overrideWith(
+          () => _ResumeAppController('word_2', 2),
+        ),
+        ttsServiceProvider.overrideWithValue(speech),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container.read(appControllerProvider.future);
+    final router = _createRouter(initialLocation: '/study/day/1/finish');
+    addTearDown(router.dispose);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp.router(routerConfig: router),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Start over'), findsOneWidget);
+    await tester.tap(find.text('Start over'));
+    await tester.pumpAndSettle();
+    expect(find.text('Start over?'), findsOneWidget);
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+    expect(find.text('Great work!'), findsOneWidget);
+
+    await tester.tap(find.text('Start over'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Start over'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('1 / 5'), findsOneWidget);
+    expect(find.text('単語1'), findsOneWidget);
+    expect(find.text('Start over'), findsNothing);
+    expect(find.text('Continue where you left off?'), findsNothing);
+  });
+
   testWidgets('level completion selection keeps the full-level quiz', (
     tester,
   ) async {
@@ -1169,8 +1271,10 @@ GoRouter _createRouter({String initialLocation = '/'}) => GoRouter(
     ),
     GoRoute(
       path: '/study/day/:day',
-      builder: (_, state) =>
-          StudyScreen(day: int.parse(state.pathParameters['day']!)),
+      builder: (_, state) => StudyScreen(
+        day: int.parse(state.pathParameters['day']!),
+        startOver: state.uri.queryParameters['startOver'] == 'true',
+      ),
     ),
     GoRoute(
       path: '/study/day/:day/finish',
@@ -1217,6 +1321,7 @@ class _ResumeAppController extends AppController {
     this.hideMeanings = false,
     this.withExamples = false,
     this.sameWordAndReading = false,
+    this.exampleFontScale = 1,
   });
 
   final String wordId;
@@ -1225,6 +1330,7 @@ class _ResumeAppController extends AppController {
   final bool hideMeanings;
   final bool withExamples;
   final bool sameWordAndReading;
+  final double exampleFontScale;
   final List<StudySession> savedSessions = [];
 
   @override
@@ -1246,6 +1352,7 @@ class _ResumeAppController extends AppController {
       showFurigana: true,
       autoPlayAudio: autoPlayAudio,
       hideMeanings: hideMeanings,
+      exampleFontScale: exampleFontScale,
       themeMode: ThemeMode.system,
       notificationsEnabled: false,
       studySeconds: 0,

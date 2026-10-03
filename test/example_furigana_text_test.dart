@@ -9,6 +9,8 @@ void main() {
     String marked, {
     double width = 300,
     bool hideReadings = false,
+    WrapAlignment alignment = WrapAlignment.center,
+    double fontScale = 1,
   }) => MaterialApp(
     home: Scaffold(
       body: Center(
@@ -19,6 +21,8 @@ void main() {
             style: const TextStyle(fontSize: 22),
             wordTargets: const [],
             hideReadings: hideReadings,
+            alignment: alignment,
+            fontScale: fontScale,
           ),
         ),
       ),
@@ -41,6 +45,85 @@ void main() {
     expect(find.text('パンをたべます。'), findsNothing);
     expect(find.text('(た)'), findsNothing);
     expect(find.text('（た）'), findsNothing);
+  });
+
+  for (final hideReadings in [false, true]) {
+    for (final separator in [' ', '\n']) {
+      testWidgets(
+        'speaker turns have a 20px gap (hidden: $hideReadings, separator: ${separator.codeUnits})',
+        (tester) async {
+          await tester.pumpWidget(
+            example(
+              'A: {手伝|てつだ}いましょうか?${separator}B: ええ、{願|ねが}います。',
+              width: 600,
+              hideReadings: hideReadings,
+            ),
+          );
+          final firstBase = find.text('手伝');
+          final secondBase = find.text('願');
+          // Each ruby unit reserves 16px above its base, including its tape.
+          final secondRowTop = tester.getTopLeft(secondBase).dy - 16;
+          expect(
+            secondRowTop - tester.getBottomLeft(firstBase).dy,
+            closeTo(20, 0.01),
+          );
+          expect(tester.takeException(), isNull);
+        },
+      );
+    }
+  }
+
+  testWidgets('kana-only dialogue also separates speaker turns by 20px', (
+    tester,
+  ) async {
+    await tester.pumpWidget(example('A: はい。 B: ええ。', width: 600));
+    expect(
+      tester.getTopLeft(find.text('B')).dy -
+          tester.getBottomLeft(find.text('A')).dy,
+      closeTo(20, 0.01),
+    );
+  });
+
+  testWidgets('speaker turns align to the leading edge', (tester) async {
+    await tester.pumpWidget(
+      example(
+        'A: {手伝|てつだ}いましょうか? B: ええ、{願|ねが}います。',
+        width: 600,
+        alignment: WrapAlignment.start,
+      ),
+    );
+    expect(
+      tester.getTopLeft(find.text('A')).dx,
+      tester.getTopLeft(find.text('B')).dx,
+    );
+  });
+
+  testWidgets('font scale resizes the sentence and its furigana together', (
+    tester,
+  ) async {
+    // Text.rich nests its own style under the inherited one, so the size in
+    // effect is the innermost one set.
+    double? size(String text) {
+      double? fontSize;
+      void visit(InlineSpan span) {
+        if (span is! TextSpan) return;
+        fontSize = span.style?.fontSize ?? fontSize;
+        span.children?.forEach(visit);
+      }
+
+      visit(tester.widget<RichText>(find.text(text, findRichText: true)).text);
+      return fontSize;
+    }
+
+    await tester.pumpWidget(example('パンを{食|た}べます。'));
+    expect(size('食'), 22);
+    expect(size('た'), 12);
+
+    await tester.pumpWidget(example('パンを{食|た}べます。', fontScale: 1.5));
+    expect(size('食'), 33);
+    expect(size('た'), 18);
+    expect(size('パ'), 33);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('kana-only sentences have no ruby', (tester) async {
@@ -82,5 +165,67 @@ void main() {
       greaterThan(tester.getTopLeft(first).dy),
     );
     expect(find.text('た', findRichText: true), findsNWidgets(2));
+  });
+
+  for (final hideReadings in [false, true]) {
+    testWidgets(
+      'period wraps with preceding kana (hideReadings: $hideReadings)',
+      (tester) async {
+        await tester.pumpWidget(
+          example('あいう。', width: 70, hideReadings: hideReadings),
+        );
+
+        expect(tester.takeException(), isNull);
+        expect(
+          tester.getTopLeft(find.text('う')).dy,
+          greaterThan(tester.getTopLeft(find.text('あ')).dy),
+        );
+        expect(
+          tester.getTopLeft(find.text('。')).dy,
+          tester.getTopLeft(find.text('う')).dy,
+        );
+      },
+    );
+  }
+
+  testWidgets('period stays with kanji across segment boundaries', (
+    tester,
+  ) async {
+    await tester.pumpWidget(example('あい{犬|いぬ}。', width: 70));
+
+    expect(tester.takeException(), isNull);
+    expect(
+      tester.getTopLeft(find.text('。')).dy,
+      tester.getTopLeft(find.text('犬')).dy,
+    );
+    expect(find.text('いぬ', findRichText: true), findsOneWidget);
+  });
+
+  testWidgets('wrapped kana-only rows use the hidden-reading spacing', (
+    tester,
+  ) async {
+    const marked = '{犬|いぬ}あいう。{毎朝|まいあさ}か。';
+    await tester.pumpWidget(example(marked, width: 70));
+
+    double gap(String before, String after) =>
+        tester.getTopLeft(find.text(after)).dy -
+        tester.getBottomLeft(find.text(before)).dy;
+
+    final kanaGap = gap('犬', 'う');
+    final readingGap = gap('う', '毎朝');
+    expect(kanaGap, closeTo(2, 0.01));
+    expect(readingGap, greaterThan(kanaGap));
+    expect(gap('毎朝', 'か'), kanaGap);
+    expect(
+      tester.getTopLeft(find.text('まいあさ', findRichText: true)).dy,
+      greaterThanOrEqualTo(tester.getBottomLeft(find.text('う')).dy),
+    );
+
+    await tester.pumpWidget(example(marked, width: 70, hideReadings: true));
+    expect(gap('犬', 'う'), kanaGap);
+    // Hidden ruby still reserves space for its masking tape.
+    expect(gap('う', '毎朝'), closeTo(kanaGap + 16, 0.01));
+    expect(gap('毎朝', 'か'), kanaGap);
+    expect(tester.takeException(), isNull);
   });
 }

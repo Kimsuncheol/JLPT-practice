@@ -19,8 +19,8 @@ class KanjiCard extends StatelessWidget {
     required this.onSpeakSentence,
     required this.onFlip,
     required this.footer,
-    this.onStartOver,
     this.bottomInset = 0,
+    this.exampleFontScale = 1,
     super.key,
   });
 
@@ -35,12 +35,12 @@ class KanjiCard extends StatelessWidget {
   /// Shown at the foot of both faces, just above the hide group.
   final Widget footer;
 
-  /// When set, the hide group of both faces ends with a start-over action.
-  final VoidCallback? onStartOver;
-
   /// Space kept clear at the foot of both faces for controls drawn over the
   /// card, so the hide group sits just above them.
   final double bottomInset;
+
+  /// Scales the example sentences on the back together with their furigana.
+  final double exampleFontScale;
 
   /// Called with the example sentence that was tapped.
   final ValueChanged<String> onSpeakSentence;
@@ -67,7 +67,6 @@ class KanjiCard extends StatelessWidget {
         onVisibilityChanged: onVisibilityChanged,
         onSpeakReading: onSpeakReading,
         footer: footer,
-        onStartOver: onStartOver,
       ),
     ),
     back: KanjiFace(
@@ -83,7 +82,7 @@ class KanjiCard extends StatelessWidget {
         onSpeakReading: onSpeakReading,
         onSpeakSentence: onSpeakSentence,
         footer: footer,
-        onStartOver: onStartOver,
+        exampleFontScale: exampleFontScale,
       ),
     ),
   );

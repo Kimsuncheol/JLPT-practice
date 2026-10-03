@@ -7,6 +7,9 @@ import 'package:jlpt_practice/data/models/study_session.dart';
 import 'package:jlpt_practice/data/models/vocabulary.dart';
 
 class AppState {
+  static const double minExampleFontScale = 0.8;
+  static const double maxExampleFontScale = 1.6;
+
   const AppState({
     required this.vocabulary,
     required this.progress,
@@ -21,6 +24,7 @@ class AppState {
     required this.themeMode,
     this.eyeComfortEnabled = false,
     this.eyeComfortLevel = 0.5,
+    this.exampleFontScale = 1.0,
     this.hideWord = false,
     this.hideMeanings = false,
     this.meaningCoverMode = MeaningCoverMode.meaningAndTranslation,
@@ -55,6 +59,9 @@ class AppState {
   final ThemeMode themeMode;
   final bool eyeComfortEnabled;
   final double eyeComfortLevel;
+
+  /// Multiplier for example sentences and their furigana; 1.0 is the default size.
+  final double exampleFontScale;
   final bool hideWord;
   final bool hideMeanings;
   final MeaningCoverMode meaningCoverMode;
@@ -102,6 +109,7 @@ class AppState {
     ThemeMode? themeMode,
     bool? eyeComfortEnabled,
     double? eyeComfortLevel,
+    double? exampleFontScale,
     bool? hideWord,
     bool? hideMeanings,
     MeaningCoverMode? meaningCoverMode,
@@ -136,6 +144,7 @@ class AppState {
       themeMode: themeMode ?? this.themeMode,
       eyeComfortEnabled: eyeComfortEnabled ?? this.eyeComfortEnabled,
       eyeComfortLevel: eyeComfortLevel ?? this.eyeComfortLevel,
+      exampleFontScale: exampleFontScale ?? this.exampleFontScale,
       hideWord: hideWord ?? this.hideWord,
       hideMeanings: hideMeanings ?? this.hideMeanings,
       meaningCoverMode: meaningCoverMode ?? this.meaningCoverMode,

@@ -24,6 +24,17 @@ void main() {
         '東京（日本の首都）で（たぶん）会います。',
       );
     });
+
+    test('removes inline dialogue speaker labels', () {
+      expect(
+        prepareJapaneseTextForSpeech('A: 手伝いましょうか? B: ええ、お願いします。'),
+        '手伝いましょうか? ええ、お願いします。',
+      );
+      expect(
+        prepareJapaneseTextForSpeech('A：手伝いましょうか？\nB：ええ、お願いします。'),
+        '手伝いましょうか？\nええ、お願いします。',
+      );
+    });
   });
 
   group('parseDialogueScript', () {
