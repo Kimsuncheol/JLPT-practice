@@ -20,7 +20,6 @@ import 'package:jlpt_practice/features/vocabulary/masked_translation.dart';
 import 'package:jlpt_practice/core/constants/app_sizes.dart';
 import 'package:jlpt_practice/core/constants/app_colors.dart';
 import 'package:jlpt_practice/core/constants/app_font_weights.dart';
-import 'package:jlpt_practice/shared/day_chip.dart';
 
 class StudyScreen extends ConsumerStatefulWidget {
   const StudyScreen({required this.day, this.startOver = false, super.key});
@@ -99,6 +98,9 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
             onPressed: _confirmLeave,
             icon: const Icon(Icons.close_rounded),
           ),
+          title: Text('${context.strings('day')} ${widget.day}'),
+          centerTitle: false,
+          titleSpacing: AppSizes.size0,
           actions: [
             IconButton(
               onPressed: () => context.push('/settings/learning'),
@@ -109,55 +111,44 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
         body: Column(
           children: [
             Expanded(
-              child: Stack(
-                children: [
-                  Positioned.fill(
-                    child: PageView.builder(
-                      controller: _pageController,
-                      itemCount: words.length + 1,
-                      onPageChanged: (index) => unawaited(
-                        _handlePageChanged(
-                          index: index,
-                          words: words,
-                          state: state,
-                        ),
-                      ),
-                      itemBuilder: (context, index) {
-                        if (index == words.length) {
-                          return const SizedBox.shrink();
-                        }
-                        final word = words[index];
-                        final visibility = _visibilityFor(word, state);
-                        final showFurigana = visibility.showFurigana;
-                        final hideWord =
-                            visibility.hideWord ||
-                            (!showFurigana && word.reading == word.word);
-                        final meaningsHidden = visibility.hideMeanings;
-                        return Padding(
-                          padding: const EdgeInsets.fromLTRB(
-                            AppSizes.size20,
-                            AppSizes.size8,
-                            AppSizes.size20,
-                            AppSizes.size14,
-                          ),
-                          child: _StudyCard(
-                            vocabulary: word,
-                            language: state.meaningLanguage,
-                            showFurigana: showFurigana,
-                            hideWord: hideWord,
-                            hideMeaning: meaningsHidden,
-                            maskMeaningInTranslation: meaningsHidden,
-                            onSpeakWord: () =>
-                                _speakIfAudible(word.reading, word: word),
-                            onSpeakExample: () =>
-                                _speakIfAudible(word.example.sentence),
-                          ),
-                        );
-                      },
+              child: PageView.builder(
+                controller: _pageController,
+                itemCount: words.length + 1,
+                onPageChanged: (index) => unawaited(
+                  _handlePageChanged(index: index, words: words, state: state),
+                ),
+                itemBuilder: (context, index) {
+                  if (index == words.length) {
+                    return const SizedBox.shrink();
+                  }
+                  final word = words[index];
+                  final visibility = _visibilityFor(word, state);
+                  final showFurigana = visibility.showFurigana;
+                  final hideWord =
+                      visibility.hideWord ||
+                      (!showFurigana && word.reading == word.word);
+                  final meaningsHidden = visibility.hideMeanings;
+                  return Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSizes.size20,
+                      AppSizes.size8,
+                      AppSizes.size20,
+                      AppSizes.size14,
                     ),
-                  ),
-                  PositionedDayChip(day: widget.day),
-                ],
+                    child: _StudyCard(
+                      vocabulary: word,
+                      language: state.meaningLanguage,
+                      showFurigana: showFurigana,
+                      hideWord: hideWord,
+                      hideMeaning: meaningsHidden,
+                      maskMeaningInTranslation: meaningsHidden,
+                      onSpeakWord: () =>
+                          _speakIfAudible(word.reading, word: word),
+                      onSpeakExample: () =>
+                          _speakIfAudible(word.example.sentence),
+                    ),
+                  );
+                },
               ),
             ),
             Padding(

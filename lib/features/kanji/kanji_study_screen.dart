@@ -19,7 +19,6 @@ import 'package:jlpt_practice/features/kanji/widgets/kanji_footer.dart';
 import 'package:jlpt_practice/features/vocabulary/day_selection_screen.dart';
 import 'package:jlpt_practice/core/constants/app_font_weights.dart';
 import 'package:jlpt_practice/core/constants/app_sizes.dart';
-import 'package:jlpt_practice/shared/day_chip.dart';
 
 class KanjiStudyScreen extends ConsumerStatefulWidget {
   const KanjiStudyScreen({
@@ -115,6 +114,8 @@ class _KanjiStudyScreenState extends ConsumerState<KanjiStudyScreen>
       child: Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: AppBar(
+          title: Text('${context.strings('day')} ${widget.day}'),
+          centerTitle: false,
           actions: [
             IconButton(
               onPressed: () => context.push('/settings/learning'),
@@ -147,7 +148,6 @@ class _KanjiStudyScreenState extends ConsumerState<KanjiStudyScreen>
                       ),
               ),
             ),
-            PositionedDayChip(day: widget.day),
             Positioned(
               left: AppSizes.size0,
               right: AppSizes.size0,
