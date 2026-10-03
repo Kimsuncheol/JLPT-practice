@@ -17,15 +17,15 @@ import 'package:jlpt_practice/features/vocabulary/cover_masking.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_tape.dart';
 import 'package:jlpt_practice/features/vocabulary/example_furigana_text.dart';
 import 'package:jlpt_practice/features/vocabulary/masked_translation.dart';
-import 'package:jlpt_practice/features/vocabulary/start_over_button.dart';
 import 'package:jlpt_practice/core/constants/app_sizes.dart';
 import 'package:jlpt_practice/core/constants/app_colors.dart';
 import 'package:jlpt_practice/core/constants/app_font_weights.dart';
 
 class StudyScreen extends ConsumerStatefulWidget {
-  const StudyScreen({required this.day, super.key});
+  const StudyScreen({required this.day, this.startOver = false, super.key});
 
   final int day;
+  final bool startOver;
 
   @override
   ConsumerState<StudyScreen> createState() => _StudyScreenState();
@@ -42,7 +42,6 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   bool _resumeDecisionPending = false;
   bool _resumeDialogVisible = false;
   bool _leaveDialogVisible = false;
-  bool _startOverDialogVisible = false;
   bool _suppressAutoAudio = false;
   int _pageChangeRequest = 0;
   int _readingsRequest = 0;
@@ -60,8 +59,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   Widget build(BuildContext context) {
     final asyncState = ref.watch(appControllerProvider);
     final scaffoldBackgroundColor = Theme.of(context).scaffoldBackgroundColor;
-    final systemBarColor =
-        _resumeDialogVisible || _leaveDialogVisible || _startOverDialogVisible
+    final systemBarColor = _resumeDialogVisible || _leaveDialogVisible
         ? Color.alphaBlend(_dialogBarrierColor, scaffoldBackgroundColor)
         : scaffoldBackgroundColor;
     return wrapImmersive(
@@ -152,7 +150,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
               padding: const EdgeInsets.symmetric(horizontal: AppSizes.size20),
               child: SizedBox(
                 height: AppSizes.size82,
-                child: _buildActionArea(state, words, _index),
+                child: _actionPage(_manualActions(state, words[_index])),
               ),
             ),
             SafeArea(
@@ -177,9 +175,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   }
 
   Future<void> _confirmLeave() async {
-    if (_leaveDialogVisible ||
-        _resumeDialogVisible ||
-        _startOverDialogVisible) {
+    if (_leaveDialogVisible || _resumeDialogVisible) {
       return;
     }
     final dimmedBackground = Color.alphaBlend(
@@ -223,73 +219,11 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
     if (mounted && shouldLeave) context.pop();
   }
 
-  Future<void> _confirmStartOver(List<Vocabulary> words) async {
-    if (_leaveDialogVisible ||
-        _resumeDialogVisible ||
-        _startOverDialogVisible) {
-      return;
-    }
-    final dimmedBackground = Color.alphaBlend(
-      _dialogBarrierColor,
-      Theme.of(context).scaffoldBackgroundColor,
-    );
-    setImmersiveOuterBackgroundColor(dimmedBackground);
-    setState(() => _startOverDialogVisible = true);
-    bool shouldStartOver = false;
-    try {
-      final dialogResult = showDialog<bool>(
-        context: context,
-        barrierColor: _dialogBarrierColor,
-        builder: (dialogContext) => wrapImmersiveSystemBarGesture(
-          AlertDialog(
-            title: Text(dialogContext.strings('startOverTitle')),
-            content: Text(dialogContext.strings('startOverBody')),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(dialogContext, false),
-                child: Text(dialogContext.strings('cancel')),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.pop(dialogContext, true),
-                child: Text(dialogContext.strings('startOver')),
-              ),
-            ],
-          ),
-        ),
-      );
-      _applySystemBarColorAfterFrame(modalVisible: true);
-      shouldStartOver = await dialogResult ?? false;
-    } finally {
-      if (mounted) {
-        setImmersiveOuterBackgroundColor(null);
-        setState(() => _startOverDialogVisible = false);
-        reassertImmersiveMode();
-        _applySystemBarColorAfterFrame(modalVisible: false);
-      }
-    }
-    if (!mounted || !shouldStartOver || _pageController == null) return;
-    _pageController!.jumpToPage(0);
-  }
-
   Widget _actionPage(List<Widget> actions) => Row(
     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [for (final action in actions) Flexible(child: action)],
   );
-
-  Widget _buildActionArea(AppState state, List<Vocabulary> words, int index) {
-    final word = words[index];
-    final actions = _manualActions(state, word);
-    if (index == words.length - 1) {
-      actions.add(
-        StartOverButton(
-          label: context.strings('startOver'),
-          onPressed: () => unawaited(_confirmStartOver(words)),
-        ),
-      );
-    }
-    return _actionPage(actions);
-  }
 
   _CardVisibility _visibilityFor(Vocabulary word, AppState state) =>
       _cardVisibility.putIfAbsent(
@@ -373,6 +307,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
     if (_pageController != null) return;
     final session = state.studySessions[state.selectedLevel];
     final canResume =
+        !widget.startOver &&
         session != null &&
         session.day == widget.day &&
         session.isCompatible(
@@ -464,10 +399,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   void _applySystemBarColorAfterFrame({required bool modalVisible}) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted ||
-          (_resumeDialogVisible ||
-                  _leaveDialogVisible ||
-                  _startOverDialogVisible) !=
-              modalVisible) {
+          (_resumeDialogVisible || _leaveDialogVisible) != modalVisible) {
         return;
       }
       final scaffoldBackgroundColor = Theme.of(context).scaffoldBackgroundColor;

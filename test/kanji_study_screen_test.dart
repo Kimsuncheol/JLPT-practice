@@ -480,35 +480,21 @@ void main() {
     expect(find.text('Kanji day list'), findsOneWidget);
   });
 
-  testWidgets('start over sits in a four-item hide group on the last kanji', (
-    tester,
-  ) async {
-    await _pumpStudy(tester);
-    expect(find.byKey(const ValueKey('hide-front-action')), findsNothing);
-    await _swipeForward(tester);
-    expect(find.byKey(const ValueKey('hide-front-action')), findsOneWidget);
-    await _flip(tester);
+  testWidgets(
+    'start over is on the finish screen and returns to the first kanji',
+    (tester) async {
+      await _pumpStudy(tester);
+      await _swipeNext(tester);
+      await _flip(tester);
+      expect(find.text('Start over'), findsNothing);
+      await _swipeForward(tester);
 
-    expect(find.byKey(const ValueKey('hide-back-action')), findsOneWidget);
-    expect(
-      find.descendant(
-        of: find.byKey(const ValueKey('hide-group-back')),
-        matching: find.text('Start over'),
-      ),
-      findsOneWidget,
-    );
-  });
+      await tester.tap(find.text('Start over').hitTestable());
+      await tester.pumpAndSettle();
 
-  testWidgets('start over returns to the first kanji', (tester) async {
-    await _pumpStudy(tester);
-    await _swipeNext(tester);
-    await _flip(tester);
-
-    await tester.tap(find.text('Start over').hitTestable());
-    await tester.pumpAndSettle();
-
-    expect(find.text('1 / 2'), findsOneWidget);
-  });
+      expect(find.text('1 / 2'), findsOneWidget);
+    },
+  );
 
   testWidgets('cannot swipe to the next kanji before flipping to the back', (
     tester,
@@ -1031,6 +1017,7 @@ GoRouter _router(String initialLocation) {
               )
             : KanjiStudyScreen(
                 day: int.parse(state.pathParameters['day'] ?? '1'),
+                startOver: state.uri.queryParameters['startOver'] == 'true',
               ),
       ),
       GoRoute(

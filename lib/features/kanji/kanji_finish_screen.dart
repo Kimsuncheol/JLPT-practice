@@ -9,6 +9,7 @@ import 'package:jlpt_practice/data/repositories/kanji_repository.dart';
 import 'package:jlpt_practice/features/vocabulary/day_selection_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/study_finish/studied_words_section.dart';
 import 'package:jlpt_practice/features/vocabulary/study_finish/study_finish_header.dart';
+import 'package:jlpt_practice/features/vocabulary/start_over_button.dart';
 import 'package:jlpt_practice/core/constants/app_sizes.dart';
 
 /// Shown after the last kanji of a day: a summary of what was studied and the
@@ -49,7 +50,7 @@ class KanjiFinishScreen extends ConsumerWidget {
           child: Column(
             children: [
               Expanded(
-                flex: 2,
+                flex: 3,
                 child: Center(
                   child: StudyFinishHeader(
                     title: strings('studyComplete'),
@@ -58,7 +59,7 @@ class KanjiFinishScreen extends ConsumerWidget {
                 ),
               ),
               Expanded(
-                flex: 3,
+                flex: 2,
                 child: StudiedWordsSection(
                   words: [for (final item in todaysKanji) item.character],
                   onWordTap: (character) {
@@ -76,6 +77,11 @@ class KanjiFinishScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: AppSizes.space16),
+              StartOverButton(
+                label: strings('startOver'),
+                onPressed: () => _startOver(context, ref),
+              ),
+              const SizedBox(height: AppSizes.space10),
               SizedBox(
                 width: double.infinity,
                 child: FilledButton.icon(
@@ -92,6 +98,11 @@ class KanjiFinishScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  void _startOver(BuildContext context, WidgetRef ref) {
+    ref.read(ttsServiceProvider).stop();
+    context.pushReplacement('/kanji/day/$day?startOver=true');
   }
 
   Future<void> _finish(

@@ -1017,6 +1017,49 @@ void main() {
     expect(find.text('Great work!'), findsOneWidget);
   });
 
+  testWidgets('start over is on the finish screen and returns to word one', (
+    tester,
+  ) async {
+    final speech = _RecordingTtsService();
+    final container = ProviderContainer(
+      overrides: [
+        appControllerProvider.overrideWith(
+          () => _ResumeAppController('word_2', 2),
+        ),
+        ttsServiceProvider.overrideWithValue(speech),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container.read(appControllerProvider.future);
+    final router = _createRouter(initialLocation: '/study/day/1/finish');
+    addTearDown(router.dispose);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp.router(routerConfig: router),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Start over'), findsOneWidget);
+    await tester.tap(find.text('Start over'));
+    await tester.pumpAndSettle();
+    expect(find.text('Start over?'), findsOneWidget);
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+    expect(find.text('Great work!'), findsOneWidget);
+
+    await tester.tap(find.text('Start over'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Start over'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('1 / 5'), findsOneWidget);
+    expect(find.text('単語1'), findsOneWidget);
+    expect(find.text('Start over'), findsNothing);
+    expect(find.text('Continue where you left off?'), findsNothing);
+  });
+
   testWidgets('level completion selection keeps the full-level quiz', (
     tester,
   ) async {
@@ -1172,8 +1215,10 @@ GoRouter _createRouter({String initialLocation = '/'}) => GoRouter(
     ),
     GoRoute(
       path: '/study/day/:day',
-      builder: (_, state) =>
-          StudyScreen(day: int.parse(state.pathParameters['day']!)),
+      builder: (_, state) => StudyScreen(
+        day: int.parse(state.pathParameters['day']!),
+        startOver: state.uri.queryParameters['startOver'] == 'true',
+      ),
     ),
     GoRoute(
       path: '/study/day/:day/finish',

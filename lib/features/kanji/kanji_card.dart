@@ -19,7 +19,6 @@ class KanjiCard extends StatelessWidget {
     required this.onSpeakSentence,
     required this.onFlip,
     required this.footer,
-    this.onStartOver,
     this.bottomInset = 0,
     super.key,
   });
@@ -34,9 +33,6 @@ class KanjiCard extends StatelessWidget {
 
   /// Shown at the foot of both faces, just above the hide group.
   final Widget footer;
-
-  /// When set, the hide group of both faces ends with a start-over action.
-  final VoidCallback? onStartOver;
 
   /// Space kept clear at the foot of both faces for controls drawn over the
   /// card, so the hide group sits just above them.
@@ -67,7 +63,6 @@ class KanjiCard extends StatelessWidget {
         onVisibilityChanged: onVisibilityChanged,
         onSpeakReading: onSpeakReading,
         footer: footer,
-        onStartOver: onStartOver,
       ),
     ),
     back: KanjiFace(
@@ -83,7 +78,6 @@ class KanjiCard extends StatelessWidget {
         onSpeakReading: onSpeakReading,
         onSpeakSentence: onSpeakSentence,
         footer: footer,
-        onStartOver: onStartOver,
       ),
     ),
   );

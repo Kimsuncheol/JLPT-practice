@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/core/constants/app_sizes.dart';
+import 'package:jlpt_practice/features/vocabulary/start_over_button.dart';
 
 class LevelCompleteActions extends StatelessWidget {
   const LevelCompleteActions({
     required this.onChooseAnotherLevel,
     required this.onBackToStudyDays,
     required this.onChooseQuizGame,
+    required this.onStartOver,
     super.key,
   });
 
   final VoidCallback onChooseAnotherLevel;
   final VoidCallback onBackToStudyDays;
   final VoidCallback onChooseQuizGame;
+  final VoidCallback onStartOver;
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +30,8 @@ class LevelCompleteActions extends StatelessWidget {
             label: Text(strings('chooseAnotherLevel')),
           ),
         ),
+        const SizedBox(height: AppSizes.space10),
+        StartOverButton(label: strings('startOver'), onPressed: onStartOver),
         const SizedBox(height: AppSizes.space10),
         SizedBox(
           width: double.infinity,
@@ -57,11 +62,13 @@ class SessionActions extends StatelessWidget {
   const SessionActions({
     required this.onFinish,
     required this.onChooseQuizGame,
+    required this.onStartOver,
     super.key,
   });
 
   final VoidCallback onFinish;
   final VoidCallback onChooseQuizGame;
+  final VoidCallback onStartOver;
 
   @override
   Widget build(BuildContext context) {
@@ -79,6 +86,8 @@ class SessionActions extends StatelessWidget {
             label: Text(strings('finishSession')),
           ),
         ),
+        const SizedBox(height: AppSizes.space10),
+        StartOverButton(label: strings('startOver'), onPressed: onStartOver),
         const SizedBox(height: AppSizes.space10),
         SizedBox(
           width: double.infinity,

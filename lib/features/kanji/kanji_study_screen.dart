@@ -21,9 +21,14 @@ import 'package:jlpt_practice/core/constants/app_font_weights.dart';
 import 'package:jlpt_practice/core/constants/app_sizes.dart';
 
 class KanjiStudyScreen extends ConsumerStatefulWidget {
-  const KanjiStudyScreen({required this.day, super.key});
+  const KanjiStudyScreen({
+    required this.day,
+    this.startOver = false,
+    super.key,
+  });
 
   final int day;
+  final bool startOver;
 
   @override
   ConsumerState<KanjiStudyScreen> createState() => _KanjiStudyScreenState();
@@ -138,8 +143,6 @@ class _KanjiStudyScreenState extends ConsumerState<KanjiStudyScreen>
                         kanji[index],
                         state: state,
                         seenBack: seenBack,
-                        isLast: index == kanji.length - 1,
-                        controller: controller,
                       ),
               ),
             ),
@@ -198,8 +201,6 @@ class _KanjiStudyScreenState extends ConsumerState<KanjiStudyScreen>
     Kanji item, {
     required AppState state,
     required bool seenBack,
-    required bool isLast,
-    required PageController controller,
   }) => KanjiCard(
     key: ValueKey(item.id),
     kanji: item,
@@ -207,7 +208,6 @@ class _KanjiStudyScreenState extends ConsumerState<KanjiStudyScreen>
     visibility: _visibilityFor(item, state),
     bottomInset: _hideGroupBottomInset(context),
     footer: KanjiFooter(seenBack: seenBack),
-    onStartOver: isLast && seenBack ? () => controller.jumpToPage(0) : null,
     onVisibilityChanged: (value) =>
         setState(() => _visibility[item.id] = value),
     onSpeakReading: (reading) =>
@@ -247,6 +247,7 @@ class _KanjiStudyScreenState extends ConsumerState<KanjiStudyScreen>
     final key = StudyCourse.kanji.progressKey(state.selectedLevel);
     final session = state.studySessions[key];
     final canResume =
+        !widget.startOver &&
         session != null &&
         session.day == widget.day &&
         session.isCompatible(level: key, dailyGoal: state.dailyGoal);

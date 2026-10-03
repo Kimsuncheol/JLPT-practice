@@ -76,6 +76,7 @@ GoRouter createAppRouter({String initialLocation = '/'}) => GoRouter(
       builder: (_, state) => EyeComfortOverlay(
         child: KanjiStudyScreen(
           day: int.tryParse(state.pathParameters['day'] ?? '') ?? 1,
+          startOver: state.uri.queryParameters['startOver'] == 'true',
         ),
       ),
     ),
@@ -94,6 +95,7 @@ GoRouter createAppRouter({String initialLocation = '/'}) => GoRouter(
       builder: (_, state) => EyeComfortOverlay(
         child: StudyScreen(
           day: int.tryParse(state.pathParameters['day'] ?? '') ?? 1,
+          startOver: state.uri.queryParameters['startOver'] == 'true',
         ),
       ),
     ),

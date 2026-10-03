@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jlpt_practice/core/constants/app_sizes.dart';
 
-/// Action shown once the day's last word is reached, letting the user
-/// restart today's study session from its first word. Styled like the
-/// other card actions (icon + label, no background) so it fits the row.
+/// Full-width action on a finish screen that restarts the current study day.
 class StartOverButton extends StatelessWidget {
   const StartOverButton({
     required this.label,
@@ -15,29 +13,15 @@ class StartOverButton extends StatelessWidget {
   final VoidCallback onPressed;
 
   @override
-  Widget build(BuildContext context) => InkWell(
-    borderRadius: BorderRadius.circular(AppSizes.radius16),
-    splashFactory: NoSplash.splashFactory,
-    highlightColor: Colors.transparent,
-    onTap: onPressed,
-    child: Padding(
-      padding: const EdgeInsets.symmetric(
-        vertical: AppSizes.size10,
-        horizontal: AppSizes.size12,
+  Widget build(BuildContext context) => SizedBox(
+    width: double.infinity,
+    child: OutlinedButton.icon(
+      style: OutlinedButton.styleFrom(
+        minimumSize: const Size.fromHeight(AppSizes.size54),
       ),
-      child: Column(
-        children: [
-          const Icon(Icons.refresh_rounded),
-          const SizedBox(height: AppSizes.space6),
-          Text(
-            label,
-            maxLines: 2,
-            textAlign: TextAlign.center,
-            overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.labelSmall,
-          ),
-        ],
-      ),
+      onPressed: onPressed,
+      icon: const Icon(Icons.refresh_rounded),
+      label: Text(label),
     ),
   );
 }

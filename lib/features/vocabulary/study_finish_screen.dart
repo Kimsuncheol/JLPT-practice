@@ -61,13 +61,13 @@ class StudyFinishScreen extends ConsumerWidget {
           child: Column(
             children: [
               Expanded(
-                flex: 2,
+                flex: 3,
                 child: Center(
                   child: StudyFinishHeader(title: title, body: body),
                 ),
               ),
               Expanded(
-                flex: 3,
+                flex: 2,
                 child: StudiedWordsSection(
                   words: [for (final word in todaysWords) word.word],
                   onWordTap: (word) => ref.read(ttsServiceProvider).speak(word),
@@ -94,10 +94,12 @@ class StudyFinishScreen extends ConsumerWidget {
                     level: level,
                     destination: _LevelCompletionDestination.quizSelection,
                   ),
+                  onStartOver: () => _startOver(context, ref),
                 )
               else
                 SessionActions(
                   onFinish: () => _finish(context, ref),
+                  onStartOver: () => _startOver(context, ref),
                   onChooseQuizGame: () {
                     ref.read(ttsServiceProvider).stop();
                     context.push('/study/day/$day/quiz-selection');
@@ -108,6 +110,29 @@ class StudyFinishScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _startOver(BuildContext context, WidgetRef ref) async {
+    ref.read(ttsServiceProvider).stop();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(dialogContext.strings('startOverTitle')),
+        content: Text(dialogContext.strings('startOverBody')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(dialogContext.strings('cancel')),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(dialogContext.strings('startOver')),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !context.mounted) return;
+    context.pushReplacement('/study/day/$day?startOver=true');
   }
 
   Future<void> _completeLevel(
