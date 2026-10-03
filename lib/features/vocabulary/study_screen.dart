@@ -98,7 +98,10 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
             onPressed: _confirmLeave,
             icon: const Icon(Icons.close_rounded),
           ),
-          title: Text('${context.strings('day')} ${widget.day}'),
+          title: Text(
+            '${context.strings('day')} ${widget.day}',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
           centerTitle: false,
           titleSpacing: AppSizes.size0,
           actions: [

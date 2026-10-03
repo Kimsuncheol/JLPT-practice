@@ -114,7 +114,10 @@ class _KanjiStudyScreenState extends ConsumerState<KanjiStudyScreen>
       child: Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: AppBar(
-          title: Text('${context.strings('day')} ${widget.day}'),
+          title: Text(
+            '${context.strings('day')} ${widget.day}',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
           centerTitle: false,
           actions: [
             IconButton(
