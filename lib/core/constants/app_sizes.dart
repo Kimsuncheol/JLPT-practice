@@ -75,6 +75,10 @@ class AppSizes {
   static const double radius99 = 99;
   static const double radius999 = 999;
 
+  // Day chip offsets from the top-right corner of the study content area
+  static const double dayChipTop = 20;
+  static const double dayChipEnd = 40;
+
   // General dimensions (width / height / icon size / padding)
   static const double size0 = 0;
   static const double size0_5 = 0.5;

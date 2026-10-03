@@ -10,6 +10,7 @@ void main() {
     double width = 300,
     bool hideReadings = false,
     WrapAlignment alignment = WrapAlignment.center,
+    double fontScale = 1,
   }) => MaterialApp(
     home: Scaffold(
       body: Center(
@@ -21,6 +22,7 @@ void main() {
             wordTargets: const [],
             hideReadings: hideReadings,
             alignment: alignment,
+            fontScale: fontScale,
           ),
         ),
       ),
@@ -94,6 +96,34 @@ void main() {
       tester.getTopLeft(find.text('A')).dx,
       tester.getTopLeft(find.text('B')).dx,
     );
+  });
+
+  testWidgets('font scale resizes the sentence and its furigana together', (
+    tester,
+  ) async {
+    // Text.rich nests its own style under the inherited one, so the size in
+    // effect is the innermost one set.
+    double? size(String text) {
+      double? fontSize;
+      void visit(InlineSpan span) {
+        if (span is! TextSpan) return;
+        fontSize = span.style?.fontSize ?? fontSize;
+        span.children?.forEach(visit);
+      }
+
+      visit(tester.widget<RichText>(find.text(text, findRichText: true)).text);
+      return fontSize;
+    }
+
+    await tester.pumpWidget(example('パンを{食|た}べます。'));
+    expect(size('食'), 22);
+    expect(size('た'), 12);
+
+    await tester.pumpWidget(example('パンを{食|た}べます。', fontScale: 1.5));
+    expect(size('食'), 33);
+    expect(size('た'), 18);
+    expect(size('パ'), 33);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('kana-only sentences have no ruby', (tester) async {

@@ -15,10 +15,13 @@ class ExampleFuriganaText extends StatelessWidget {
     required this.hideReadings,
     this.alignment = WrapAlignment.center,
     this.runSpacingWithFurigana,
+    this.fontScale = 1,
     super.key,
   });
 
   final List<FuriganaSegment> segments;
+
+  /// The sentence's style at [fontScale] 1.
   final TextStyle style;
   final List<String> wordTargets;
   final bool hideReadings;
@@ -26,6 +29,9 @@ class ExampleFuriganaText extends StatelessWidget {
 
   /// Space above wrapped lines with visible furigana; the default when null.
   final double? runSpacingWithFurigana;
+
+  /// Scales the sentence and its furigana together.
+  final double fontScale;
 
   @override
   Widget build(BuildContext context) {
@@ -49,8 +55,11 @@ class ExampleFuriganaText extends StatelessWidget {
       }
       offset += mask.text.length;
     }
+    final sentenceStyle = style.fontSize == null
+        ? style
+        : style.copyWith(fontSize: style.fontSize! * fontScale);
     final rubyStyle = style.copyWith(
-      fontSize: AppSizes.font12,
+      fontSize: AppSizes.font12 * fontScale,
       height: AppSizes.lineHeight1_2,
       color: Theme.of(context).colorScheme.primary,
     );
@@ -82,7 +91,7 @@ class ExampleFuriganaText extends StatelessWidget {
           children: [
             if (segment.ruby != null)
               SizedBox(
-                height: AppSizes.size16,
+                height: AppSizes.size16 * fontScale,
                 child: MaskedSegmentsText(
                   key: ValueKey('example-ruby-$start'),
                   segments: [MaskSegment(segment.ruby!, covered: hideReadings)],
@@ -93,10 +102,10 @@ class ExampleFuriganaText extends StatelessWidget {
             masks.any((mask) => mask.covered)
                 ? MaskedSegmentsText(
                     segments: masks,
-                    style: style,
+                    style: sentenceStyle,
                     glyphWidth: 1,
                   )
-                : Text(part, style: style),
+                : Text(part, style: sentenceStyle),
           ],
         );
         // Sentence-ending punctuation must wrap with the preceding unit,

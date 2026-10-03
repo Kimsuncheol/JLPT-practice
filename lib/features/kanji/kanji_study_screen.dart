@@ -19,6 +19,7 @@ import 'package:jlpt_practice/features/kanji/widgets/kanji_footer.dart';
 import 'package:jlpt_practice/features/vocabulary/day_selection_screen.dart';
 import 'package:jlpt_practice/core/constants/app_font_weights.dart';
 import 'package:jlpt_practice/core/constants/app_sizes.dart';
+import 'package:jlpt_practice/shared/day_chip.dart';
 
 class KanjiStudyScreen extends ConsumerStatefulWidget {
   const KanjiStudyScreen({
@@ -146,6 +147,7 @@ class _KanjiStudyScreenState extends ConsumerState<KanjiStudyScreen>
                       ),
               ),
             ),
+            PositionedDayChip(day: widget.day),
             Positioned(
               left: AppSizes.size0,
               right: AppSizes.size0,
@@ -207,6 +209,7 @@ class _KanjiStudyScreenState extends ConsumerState<KanjiStudyScreen>
     language: state.meaningLanguage,
     visibility: _visibilityFor(item, state),
     bottomInset: _hideGroupBottomInset(context),
+    exampleFontScale: state.exampleFontScale,
     footer: KanjiFooter(seenBack: seenBack),
     onVisibilityChanged: (value) =>
         setState(() => _visibility[item.id] = value),

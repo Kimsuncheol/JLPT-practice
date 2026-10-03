@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jlpt_practice/core/services/local_store.dart';
+import 'package:jlpt_practice/data/models/app_state.dart';
 import 'package:jlpt_practice/data/models/grammar_progress.dart';
 import 'package:jlpt_practice/data/models/grammar_study_session.dart';
 import 'package:jlpt_practice/data/models/study_session.dart';
@@ -139,4 +140,21 @@ void main() {
       expect(restored.lastMistake, 'Particle choice');
     },
   );
+
+  test('example font scale survives reload and is clamped when read', () async {
+    SharedPreferences.setMockInitialValues({});
+    final store = await LocalStore.create();
+    await store.setValue('exampleFontScale', 1.3);
+
+    expect(
+      (await LocalStore.create()).loadSettings('en').exampleFontScale,
+      1.3,
+    );
+
+    await store.setValue('exampleFontScale', 9.0);
+    expect(
+      (await LocalStore.create()).loadSettings('en').exampleFontScale,
+      AppState.maxExampleFontScale,
+    );
+  });
 }

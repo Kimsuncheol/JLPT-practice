@@ -17,6 +17,9 @@ import 'package:jlpt_practice/features/settings/levels_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/study_finish_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/study_quiz_selection_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_tape.dart';
+import 'package:jlpt_practice/features/vocabulary/example_furigana_text.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
+import 'package:jlpt_practice/shared/day_chip.dart';
 import 'package:jlpt_practice/features/vocabulary/study_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -285,6 +288,59 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(speech.events, isEmpty);
+  });
+
+  testWidgets('a pill at the top left names the day, and the example scales', (
+    tester,
+  ) async {
+    final container = ProviderContainer(
+      overrides: [
+        appControllerProvider.overrideWith(
+          () => _ResumeAppController(
+            'word_0',
+            0,
+            withExamples: true,
+            exampleFontScale: 1.5,
+          ),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container.read(appControllerProvider.future);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp(
+          theme: AppTheme.light(),
+          home: const StudyScreen(day: 2),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final chip = find.byType(DayChip);
+    expect(
+      find.descendant(of: chip, matching: find.text('Day 2')),
+      findsOneWidget,
+    );
+    final pages = tester.getRect(find.byType(PageView));
+    expect(tester.getTopLeft(chip).dy, greaterThanOrEqualTo(pages.top));
+    expect(
+      tester.getTopRight(chip).dx,
+      closeTo(pages.right - AppSizes.dayChipEnd, 0.01),
+    );
+    expect(
+      tester.getTopRight(chip).dy,
+      closeTo(pages.top + AppSizes.dayChipTop, 0.01),
+    );
+    expect(
+      tester
+          .widget<ExampleFuriganaText>(
+            find.byKey(const ValueKey('example-furigana')),
+          )
+          .fontScale,
+      1.5,
+    );
   });
 
   testWidgets('bottom buttons cover the reading, word and meanings with tape', (
@@ -1265,6 +1321,7 @@ class _ResumeAppController extends AppController {
     this.hideMeanings = false,
     this.withExamples = false,
     this.sameWordAndReading = false,
+    this.exampleFontScale = 1,
   });
 
   final String wordId;
@@ -1273,6 +1330,7 @@ class _ResumeAppController extends AppController {
   final bool hideMeanings;
   final bool withExamples;
   final bool sameWordAndReading;
+  final double exampleFontScale;
   final List<StudySession> savedSessions = [];
 
   @override
@@ -1294,6 +1352,7 @@ class _ResumeAppController extends AppController {
       showFurigana: true,
       autoPlayAudio: autoPlayAudio,
       hideMeanings: hideMeanings,
+      exampleFontScale: exampleFontScale,
       themeMode: ThemeMode.system,
       notificationsEnabled: false,
       studySeconds: 0,

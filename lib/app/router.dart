@@ -13,6 +13,7 @@ import 'package:jlpt_practice/features/onboarding/onboarding_screen.dart';
 import 'package:jlpt_practice/features/quiz/quiz_result_screen.dart';
 import 'package:jlpt_practice/features/quiz/fill_in_the_blank_screen.dart';
 import 'package:jlpt_practice/features/settings/appearance_screen.dart';
+import 'package:jlpt_practice/features/settings/example_font_size_screen.dart';
 import 'package:jlpt_practice/features/settings/eye_comfort_screen.dart';
 import 'package:jlpt_practice/features/settings/languages_screen.dart';
 import 'package:jlpt_practice/features/settings/learning_language_screen.dart';
@@ -56,6 +57,11 @@ GoRouter createAppRouter({String initialLocation = '/'}) => GoRouter(
     GoRoute(
       path: '/settings/tts-volume',
       builder: (_, _) => const EyeComfortOverlay(child: TtsVolumeScreen()),
+    ),
+    GoRoute(
+      path: '/settings/example-font-size',
+      builder: (_, _) =>
+          const EyeComfortOverlay(child: ExampleFontSizeScreen()),
     ),
     GoRoute(
       path: '/settings/eye-comfort',

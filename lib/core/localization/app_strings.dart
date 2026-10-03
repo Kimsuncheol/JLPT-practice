@@ -405,6 +405,9 @@ class AppStrings {
     'volumeCurrentSystem': 'Current system volume',
     'volumeLevel': 'Volume',
     'eyeComfortSubtitle': 'Warm tint while you study',
+    'exampleFontSize': 'Example sentence size',
+    'exampleFontSizeHint':
+        'Changes the size of example sentences and their furigana together.',
   };
 
   static const _ko = <String, String>{
@@ -775,6 +778,8 @@ class AppStrings {
     'volumeCurrentSystem': '현재 시스템 볼륨',
     'volumeLevel': '볼륨',
     'eyeComfortSubtitle': '학습하는 동안 따뜻한 색조 적용',
+    'exampleFontSize': '예문 글자 크기',
+    'exampleFontSizeHint': '예문과 후리가나의 글자 크기를 함께 조절합니다.',
   };
 
   String call(String key) =>
