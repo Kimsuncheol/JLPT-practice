@@ -9,6 +9,7 @@ void main() {
     String marked, {
     double width = 300,
     bool hideReadings = false,
+    WrapAlignment alignment = WrapAlignment.center,
   }) => MaterialApp(
     home: Scaffold(
       body: Center(
@@ -19,6 +20,7 @@ void main() {
             style: const TextStyle(fontSize: 22),
             wordTargets: const [],
             hideReadings: hideReadings,
+            alignment: alignment,
           ),
         ),
       ),
@@ -41,6 +43,57 @@ void main() {
     expect(find.text('パンをたべます。'), findsNothing);
     expect(find.text('(た)'), findsNothing);
     expect(find.text('（た）'), findsNothing);
+  });
+
+  for (final hideReadings in [false, true]) {
+    for (final separator in [' ', '\n']) {
+      testWidgets(
+        'speaker turns have a 20px gap (hidden: $hideReadings, separator: ${separator.codeUnits})',
+        (tester) async {
+          await tester.pumpWidget(
+            example(
+              'A: {手伝|てつだ}いましょうか?${separator}B: ええ、{願|ねが}います。',
+              width: 600,
+              hideReadings: hideReadings,
+            ),
+          );
+          final firstBase = find.text('手伝');
+          final secondBase = find.text('願');
+          // Each ruby unit reserves 16px above its base, including its tape.
+          final secondRowTop = tester.getTopLeft(secondBase).dy - 16;
+          expect(
+            secondRowTop - tester.getBottomLeft(firstBase).dy,
+            closeTo(20, 0.01),
+          );
+          expect(tester.takeException(), isNull);
+        },
+      );
+    }
+  }
+
+  testWidgets('kana-only dialogue also separates speaker turns by 20px', (
+    tester,
+  ) async {
+    await tester.pumpWidget(example('A: はい。 B: ええ。', width: 600));
+    expect(
+      tester.getTopLeft(find.text('B')).dy -
+          tester.getBottomLeft(find.text('A')).dy,
+      closeTo(20, 0.01),
+    );
+  });
+
+  testWidgets('speaker turns align to the leading edge', (tester) async {
+    await tester.pumpWidget(
+      example(
+        'A: {手伝|てつだ}いましょうか? B: ええ、{願|ねが}います。',
+        width: 600,
+        alignment: WrapAlignment.start,
+      ),
+    );
+    expect(
+      tester.getTopLeft(find.text('A')).dx,
+      tester.getTopLeft(find.text('B')).dx,
+    );
   });
 
   testWidgets('kana-only sentences have no ruby', (tester) async {

@@ -127,7 +127,10 @@ class ExampleFuriganaText extends StatelessWidget {
               ? CrossAxisAlignment.start
               : CrossAxisAlignment.center,
           children: [
-            for (var index = 0; index < lines.length; index++)
+            for (var index = 0; index < lines.length; index++) ...[
+              // Speaker turns are separate blocks, so keep their gap even
+              // when a turn has no kanji or its readings are hidden.
+              if (index > 0) const SizedBox(height: AppSpacing.run20),
               _FuriganaWrap(
                 alignment: alignment,
                 textDirection: Directionality.of(context),
@@ -135,6 +138,7 @@ class ExampleFuriganaText extends StatelessWidget {
                 hasReadings: readingsByLine[index],
                 children: lines[index],
               ),
+            ],
           ],
         ),
       ),

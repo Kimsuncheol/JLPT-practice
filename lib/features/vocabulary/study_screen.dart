@@ -809,6 +809,7 @@ class _StudyCard extends StatelessWidget {
                     ? wordMaskTargets(vocabulary.word)
                     : const [],
                 hideReadings: !showFurigana,
+                alignment: WrapAlignment.start,
               ),
             ),
           ),
@@ -833,6 +834,7 @@ class _StudyCard extends StatelessWidget {
         hideMeanings: maskMeaningInTranslation,
         style: style,
         glyphWidth: 0.55,
+        textAlign: TextAlign.start,
       );
     }
     return _maskedText(
@@ -849,7 +851,7 @@ class _StudyCard extends StatelessWidget {
     );
   }
 
-  /// Renders [text] centered, laying tape over every run matching [targets].
+  /// Renders [text] from the leading edge, laying tape over matching runs.
   Widget _maskedText(
     String text, {
     required TextStyle? style,
@@ -857,12 +859,13 @@ class _StudyCard extends StatelessWidget {
     required double glyphWidth,
   }) {
     if (targets.isEmpty) {
-      return Text(text, textAlign: TextAlign.center, style: style);
+      return Text(text, textAlign: TextAlign.start, style: style);
     }
     return MaskedSegmentsText(
       segments: maskSegments(text, targets),
       style: style,
       glyphWidth: glyphWidth,
+      textAlign: TextAlign.start,
     );
   }
 }
