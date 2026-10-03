@@ -15,7 +15,7 @@ void showVolumeWarningToast(BuildContext context, String message) {
   toast.showToast(
     toastDuration: volumeWarningToastDuration,
     fadeDuration: const Duration(milliseconds: 150),
-    gravity: ToastGravity.BOTTOM,
+    gravity: ToastGravity.TOP,
     ignorePointer: true,
     child: Material(
       key: const ValueKey('volume-warning-toast'),

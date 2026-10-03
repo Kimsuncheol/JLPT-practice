@@ -23,6 +23,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
+  test('long slash-separated labels break after the slash', () {
+    expect(breakLongSlashSeparatedLabel('ラジカセ / ラジオカセット'), 'ラジカセ /\nラジオカセット');
+    expect(breakLongSlashSeparatedLabel('なん/なに'), 'なん/なに');
+    expect(breakLongSlashSeparatedLabel('長いスラッシュなしの単語'), '長いスラッシュなしの単語');
+  });
+
   testWidgets('leaving day 6 shows recent study below streak and reopens day 6', (
     tester,
   ) async {
@@ -163,17 +169,8 @@ void main() {
   });
 
   for (final scenario in [
-    (
-      muted: false,
-      volume: 0.02,
-      message:
-          'Your device is unmuted, but its volume is too low. Turn it up to hear the pronunciation.',
-    ),
-    (
-      muted: true,
-      volume: 0.8,
-      message: 'Your device is muted. Unmute it to hear the pronunciation.',
-    ),
+    (muted: false, volume: 0.02, message: 'Volume is low. Turn it up.'),
+    (muted: true, volume: 0.8, message: 'Device muted. Unmute to hear audio.'),
   ]) {
     testWidgets(
       'system volume warning distinguishes ${scenario.muted ? 'muted' : 'unmuted low'} volume',
@@ -218,6 +215,12 @@ void main() {
         expect(
           find.byKey(const ValueKey('volume-warning-toast')),
           findsOneWidget,
+        );
+        expect(
+          tester
+              .getTopLeft(find.byKey(const ValueKey('volume-warning-toast')))
+              .dy,
+          lessThan(tester.getTopLeft(find.text('単語6')).dy),
         );
         expect(find.byType(SnackBar), findsNothing);
         expect(speech.spoken, scenario.muted ? isEmpty : ['たんご']);

@@ -679,7 +679,8 @@ class _StudyCard extends StatelessWidget {
       onTap: onSpeakWord,
       child: showFurigana
           ? Text(
-              vocabulary.reading,
+              breakLongSlashSeparatedLabel(vocabulary.reading),
+              textAlign: TextAlign.center,
               style: titleLarge?.copyWith(
                 color: Theme.of(context).colorScheme.primary,
               ),
@@ -701,7 +702,11 @@ class _StudyCard extends StatelessWidget {
     return _speechTarget(
       onTap: onSpeakWord,
       child: showFurigana
-          ? Text(vocabulary.romaji, style: style)
+          ? Text(
+              breakLongSlashSeparatedLabel(vocabulary.romaji),
+              textAlign: TextAlign.center,
+              style: style,
+            )
           : coverTapeFor(
               characters: vocabulary.romaji.length,
               fontSize: style?.fontSize ?? 16,
@@ -711,41 +716,44 @@ class _StudyCard extends StatelessWidget {
     );
   }
 
-  Widget _buildWord(BuildContext context) => Semantics(
-    button: true,
-    child: InkWell(
-      borderRadius: BorderRadius.circular(AppSizes.radius16),
-      splashFactory: NoSplash.splashFactory,
-      overlayColor: const WidgetStatePropertyAll(Colors.transparent),
-      onTap: onSpeakWord,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSizes.size12,
-          vertical: AppSizes.size4,
-        ),
-        child: FittedBox(
-          fit: BoxFit.scaleDown,
-          child: hideWord
-              ? coverTapeFor(
-                  characters: vocabulary.word.length,
-                  fontSize: AppSizes.font56 * 1.15,
-                  tilt: -0.02,
-                )
-              : Text(
-                  vocabulary.word,
-                  maxLines: 1,
-                  softWrap: false,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: AppSizes.font56,
-                    height: AppSizes.lineHeight1_15,
-                    fontWeight: AppFontWeights.extraBold,
+  Widget _buildWord(BuildContext context) {
+    final displayWord = breakLongSlashSeparatedLabel(vocabulary.word);
+    return Semantics(
+      button: true,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppSizes.radius16),
+        splashFactory: NoSplash.splashFactory,
+        overlayColor: const WidgetStatePropertyAll(Colors.transparent),
+        onTap: onSpeakWord,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSizes.size12,
+            vertical: AppSizes.size4,
+          ),
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: hideWord
+                ? coverTapeFor(
+                    characters: vocabulary.word.length,
+                    fontSize: AppSizes.font56 * 1.15,
+                    tilt: -0.02,
+                  )
+                : Text(
+                    displayWord,
+                    maxLines: displayWord.contains('\n') ? null : 1,
+                    softWrap: false,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: AppSizes.font56,
+                      height: AppSizes.lineHeight1_15,
+                      fontWeight: AppFontWeights.extraBold,
+                    ),
                   ),
-                ),
+          ),
         ),
       ),
-    ),
-  );
+    );
+  }
 
   Widget _speechTarget({required VoidCallback onTap, required Widget child}) =>
       Semantics(
@@ -874,6 +882,15 @@ String _withRolePlayLineBreaks(String text) => text.replaceAllMapped(
   RegExp(r'([.!?。！？])\s*(?=[A-Za-z][A-Za-z0-9]{0,2}\s*[：:])'),
   (match) => '${match.group(1)}\n',
 );
+
+/// Keeps short alternatives on one line and gives long slash-separated words
+/// a predictable break point instead of shrinking the whole label.
+String breakLongSlashSeparatedLabel(String text) {
+  if (!text.contains('/') || text.replaceAll(RegExp(r'\s'), '').length < 12) {
+    return text;
+  }
+  return text.replaceAllMapped(RegExp(r'\s*/\s*'), (_) => ' /\n');
+}
 
 class _CardAction extends StatelessWidget {
   const _CardAction({
