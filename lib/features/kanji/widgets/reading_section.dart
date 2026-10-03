@@ -20,7 +20,6 @@ class ReadingSection extends StatelessWidget {
     required this.onSpeak,
     required this.onSpeakSentence,
     this.topPadding = 18,
-    this.exampleFontScale = 1,
     super.key,
   });
 
@@ -35,7 +34,6 @@ class ReadingSection extends StatelessWidget {
   final bool hideMeanings;
   final ValueChanged<String> onSpeak;
   final ValueChanged<String> onSpeakSentence;
-  final double exampleFontScale;
 
   @override
   Widget build(BuildContext context) => Padding(
@@ -70,7 +68,6 @@ class ReadingSection extends StatelessWidget {
             hideFurigana: hideFurigana,
             hideMeanings: hideMeanings,
             onSpeakSentence: onSpeakSentence,
-            fontScale: exampleFontScale,
           ),
       ],
     ),
@@ -85,7 +82,6 @@ class ExampleTile extends StatelessWidget {
     required this.hideFurigana,
     required this.hideMeanings,
     required this.onSpeakSentence,
-    this.fontScale = 1,
     super.key,
   });
 
@@ -97,7 +93,6 @@ class ExampleTile extends StatelessWidget {
   final bool hideFurigana;
   final bool hideMeanings;
   final ValueChanged<String> onSpeakSentence;
-  final double fontScale;
 
   @override
   Widget build(BuildContext context) {
@@ -157,7 +152,6 @@ class ExampleTile extends StatelessWidget {
                     wordTargets: const [],
                     hideReadings: hideFurigana,
                     runSpacingWithFurigana: AppSizes.space6,
-                    fontScale: fontScale,
                     alignment: WrapAlignment.start,
                   ),
                 ),

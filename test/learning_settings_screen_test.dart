@@ -6,9 +6,7 @@ import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/app/theme/app_theme.dart';
 import 'package:jlpt_practice/data/models/app_state.dart';
 import 'package:jlpt_practice/data/models/study_preferences.dart';
-import 'package:jlpt_practice/features/settings/example_font_size_screen.dart';
 import 'package:jlpt_practice/features/settings/eye_comfort_screen.dart';
-import 'package:jlpt_practice/features/vocabulary/example_furigana_text.dart';
 import 'package:jlpt_practice/features/settings/learning_language_screen.dart';
 import 'package:jlpt_practice/features/settings/learning_settings_screen.dart';
 import 'package:jlpt_practice/features/settings/tts_volume_screen.dart';
@@ -38,10 +36,6 @@ void main() {
         GoRoute(
           path: '/settings/tts-volume',
           builder: (_, _) => const TtsVolumeScreen(),
-        ),
-        GoRoute(
-          path: '/settings/example-font-size',
-          builder: (_, _) => const ExampleFontSizeScreen(),
         ),
         GoRoute(
           path: '/settings/eye-comfort',
@@ -108,7 +102,6 @@ void main() {
 
     for (final (tile, screen) in [
       ('Pronunciation volume', TtsVolumeScreen),
-      ('Example sentence size', ExampleFontSizeScreen),
       ('Eye comfort mode', EyeComfortScreen),
     ]) {
       await tester.scrollUntilVisible(find.text(tile), 200);
@@ -142,53 +135,6 @@ void main() {
     await tester.pumpAndSettle();
     expect(state().ttsVolumeMode, TtsVolumeMode.system);
     expect(find.byType(Slider), findsNothing);
-  });
-
-  testWidgets('example size slider scales the sentence and its furigana', (
-    tester,
-  ) async {
-    final container = await pump(tester, const ExampleFontSizeScreen());
-    AppState state() => container.read(appControllerProvider).requireValue;
-    // Text.rich nests its own style under the inherited one, so the size in
-    // effect is the innermost one set.
-    double? fontSize(String text) {
-      double? size;
-      void visit(InlineSpan span) {
-        if (span is! TextSpan) return;
-        size = span.style?.fontSize ?? size;
-        span.children?.forEach(visit);
-      }
-
-      visit(tester.widget<RichText>(find.text(text, findRichText: true)).text);
-      return size;
-    }
-
-    expect(state().exampleFontScale, 1);
-    expect(find.text('100%'), findsOneWidget);
-    final sentenceBefore = fontSize('私')!;
-    final rubyBefore = fontSize('わたし')!;
-    final rubyRatio = rubyBefore / sentenceBefore;
-
-    await tester.drag(find.byType(Slider), const Offset(300, 0));
-    await tester.pumpAndSettle();
-
-    expect(state().exampleFontScale, 1.6);
-    expect(find.text('160%'), findsOneWidget);
-    expect(fontSize('私'), closeTo(sentenceBefore * 1.6, 0.01));
-    expect(fontSize('わたし'), closeTo(rubyBefore * 1.6, 0.01));
-    expect(fontSize('わたし')! / fontSize('私')!, closeTo(rubyRatio, 0.001));
-
-    await tester.drag(find.byType(Slider), const Offset(-600, 0));
-    await tester.pumpAndSettle();
-
-    expect(state().exampleFontScale, 0.8);
-    expect(fontSize('わたし'), closeTo(rubyBefore * 0.8, 0.01));
-    expect(
-      tester
-          .widget<ExampleFuriganaText>(find.byType(ExampleFuriganaText))
-          .fontScale,
-      0.8,
-    );
   });
 
   testWidgets('slider is disabled until eye comfort mode is on', (
@@ -292,11 +238,6 @@ class _FakeAppController extends AppController {
   @override
   Future<void> setTtsVolume(double value) async {
     state = AsyncData(state.requireValue.copyWith(ttsVolume: value));
-  }
-
-  @override
-  Future<void> setExampleFontScale(double value) async {
-    state = AsyncData(state.requireValue.copyWith(exampleFontScale: value));
   }
 
   @override

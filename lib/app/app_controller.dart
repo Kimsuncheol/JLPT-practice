@@ -101,7 +101,6 @@ class AppController extends AsyncNotifier<AppState> {
       themeMode: settings.themeMode,
       eyeComfortEnabled: settings.eyeComfortEnabled,
       eyeComfortLevel: settings.eyeComfortLevel,
-      exampleFontScale: settings.exampleFontScale,
       hideWord: settings.hideWord,
       hideMeanings: settings.hideMeanings,
       meaningCoverMode: settings.meaningCoverMode,
@@ -398,16 +397,6 @@ class AppController extends AsyncNotifier<AppState> {
     final level = value.clamp(0.0, 1.0);
     return _updatePreference('eyeComfortLevel', level, (current) {
       return current.copyWith(eyeComfortLevel: level);
-    });
-  }
-
-  Future<void> setExampleFontScale(double value) {
-    final scale = value.clamp(
-      AppState.minExampleFontScale,
-      AppState.maxExampleFontScale,
-    );
-    return _updatePreference('exampleFontScale', scale, (current) {
-      return current.copyWith(exampleFontScale: scale);
     });
   }
 
