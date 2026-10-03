@@ -80,12 +80,17 @@ class ExampleFuriganaText extends StatelessWidget {
         final unit = Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (segment.ruby != null)
+            // Hidden ruby must not participate in layout. Keeping an invisible
+            // reading here makes this column as wide as the reading (for
+            // example, `新` becomes as wide as `あたら`), so the base
+            // sentence retains the expanded furigana spacing after readings
+            // are hidden.
+            if (!hideReadings && segment.ruby != null)
               SizedBox(
                 height: AppSizes.size16,
                 child: MaskedSegmentsText(
                   key: ValueKey('example-ruby-$start'),
-                  segments: [MaskSegment(segment.ruby!, covered: hideReadings)],
+                  segments: [MaskSegment(segment.ruby!, covered: false)],
                   style: rubyStyle,
                   glyphWidth: 1,
                 ),
