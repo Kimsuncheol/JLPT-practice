@@ -6,18 +6,20 @@ class StartOverButton extends StatelessWidget {
   const StartOverButton({
     required this.label,
     required this.onPressed,
+    this.minimumHeight = AppSizes.size54,
     super.key,
   });
 
   final String label;
   final VoidCallback onPressed;
+  final double minimumHeight;
 
   @override
   Widget build(BuildContext context) => SizedBox(
     width: double.infinity,
     child: OutlinedButton.icon(
       style: OutlinedButton.styleFrom(
-        minimumSize: const Size.fromHeight(AppSizes.size54),
+        minimumSize: Size.fromHeight(minimumHeight),
       ),
       onPressed: onPressed,
       icon: const Icon(Icons.refresh_rounded),

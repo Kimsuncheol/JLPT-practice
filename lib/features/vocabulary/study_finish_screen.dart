@@ -67,7 +67,7 @@ class StudyFinishScreen extends ConsumerWidget {
                 ),
               ),
               Expanded(
-                flex: 2,
+                flex: 5,
                 child: StudiedWordsSection(
                   words: [for (final word in todaysWords) word.word],
                   onWordTap: (word) => ref.read(ttsServiceProvider).speak(word),
