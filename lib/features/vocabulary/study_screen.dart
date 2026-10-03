@@ -147,7 +147,6 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
                             hideWord: hideWord,
                             hideMeaning: meaningsHidden,
                             maskMeaningInTranslation: meaningsHidden,
-                            exampleFontScale: state.exampleFontScale,
                             onSpeakWord: () =>
                                 _speakIfAudible(word.reading, word: word),
                             onSpeakExample: () =>
@@ -556,7 +555,6 @@ class _StudyCard extends StatelessWidget {
     required this.hideWord,
     required this.hideMeaning,
     required this.maskMeaningInTranslation,
-    required this.exampleFontScale,
     required this.onSpeakWord,
     required this.onSpeakExample,
   });
@@ -567,7 +565,6 @@ class _StudyCard extends StatelessWidget {
   final bool hideWord;
   final bool hideMeaning;
   final bool maskMeaningInTranslation;
-  final double exampleFontScale;
   final VoidCallback onSpeakWord;
   final VoidCallback onSpeakExample;
 
@@ -767,7 +764,6 @@ class _StudyCard extends StatelessWidget {
                     : const [],
                 hideReadings: !showFurigana,
                 alignment: WrapAlignment.start,
-                fontScale: exampleFontScale,
               ),
             ),
           ),

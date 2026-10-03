@@ -22,7 +22,6 @@ class LocalSettings {
     required this.themeMode,
     this.eyeComfortEnabled = false,
     this.eyeComfortLevel = 0.5,
-    this.exampleFontScale = 1.0,
     this.hideWord = false,
     this.hideMeanings = false,
     this.meaningCoverMode = MeaningCoverMode.meaningAndTranslation,
@@ -50,7 +49,6 @@ class LocalSettings {
   final ThemeMode themeMode;
   final bool eyeComfortEnabled;
   final double eyeComfortLevel;
-  final double exampleFontScale;
   final bool hideWord;
   final bool hideMeanings;
   final MeaningCoverMode meaningCoverMode;
@@ -104,8 +102,6 @@ class LocalStore {
         0.0,
         1.0,
       ),
-      exampleFontScale: (_preferences.getDouble('exampleFontScale') ?? 1.0)
-          .clamp(AppState.minExampleFontScale, AppState.maxExampleFontScale),
       hideWord: _preferences.getBool('hideWord') ?? false,
       hideMeanings: _preferences.getBool('hideMeanings') ?? false,
       meaningCoverMode: MeaningCoverMode.parse(
@@ -142,7 +138,6 @@ class LocalStore {
       setValue('themeMode', state.themeMode.name),
       setValue('eyeComfortEnabled', state.eyeComfortEnabled),
       setValue('eyeComfortLevel', state.eyeComfortLevel),
-      setValue('exampleFontScale', state.exampleFontScale),
       setValue('hideWord', state.hideWord),
       setValue('hideMeanings', state.hideMeanings),
       setValue('meaningCoverMode', state.meaningCoverMode.name),
@@ -337,7 +332,6 @@ class LocalStore {
       'themeMode',
       'eyeComfortEnabled',
       'eyeComfortLevel',
-      'exampleFontScale',
       'hideWord',
       'hideMeanings',
       'meaningCoverMode',

@@ -76,15 +76,6 @@ class LearningSettingsScreen extends ConsumerWidget {
               _Group(
                 children: [
                   ListTile(
-                    leading: const Icon(Icons.format_size_rounded),
-                    title: Text(strings('exampleFontSize')),
-                    subtitle: Text(
-                      '${(state.exampleFontScale * 100).round()}%',
-                    ),
-                    trailing: const Icon(Icons.chevron_right_rounded),
-                    onTap: () => context.push('/settings/example-font-size'),
-                  ),
-                  ListTile(
                     leading: const Icon(Icons.wb_twilight_rounded),
                     title: Text(strings('eyeComfort')),
                     subtitle: Text(

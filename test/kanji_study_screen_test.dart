@@ -14,7 +14,6 @@ import 'package:jlpt_practice/features/kanji/kanji_finish_screen.dart';
 import 'package:jlpt_practice/features/kanji/kanji_study_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_tape.dart';
 import 'package:jlpt_practice/features/vocabulary/day_selection_screen.dart';
-import 'package:jlpt_practice/features/vocabulary/example_furigana_text.dart';
 import 'package:jlpt_practice/core/constants/app_sizes.dart';
 import 'package:jlpt_practice/shared/day_chip.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -470,22 +469,6 @@ void main() {
       tester.getTopRight(chip).dy,
       closeTo(pages.top + AppSizes.dayChipTop, 0.01),
     );
-  });
-
-  testWidgets('the back sizes example sentences by the saved scale', (
-    tester,
-  ) async {
-    await _pumpStudy(
-      tester,
-      controller: KanjiTestAppController(exampleFontScale: 1.5),
-    );
-    await _flip(tester);
-
-    final sentences = tester.widgetList<ExampleFuriganaText>(
-      find.byType(ExampleFuriganaText),
-    );
-    expect(sentences, isNotEmpty);
-    expect(sentences.map((sentence) => sentence.fontScale), everyElement(1.5));
   });
 
   testWidgets('settings button opens the study settings screen', (

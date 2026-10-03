@@ -209,7 +209,6 @@ class _KanjiStudyScreenState extends ConsumerState<KanjiStudyScreen>
     language: state.meaningLanguage,
     visibility: _visibilityFor(item, state),
     bottomInset: _hideGroupBottomInset(context),
-    exampleFontScale: state.exampleFontScale,
     footer: KanjiFooter(seenBack: seenBack),
     onVisibilityChanged: (value) =>
         setState(() => _visibility[item.id] = value),

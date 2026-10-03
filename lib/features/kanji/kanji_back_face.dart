@@ -18,7 +18,6 @@ class KanjiBackFace extends StatelessWidget {
     required this.onSpeakReading,
     required this.onSpeakSentence,
     required this.footer,
-    this.exampleFontScale = 1,
     super.key,
   });
 
@@ -29,7 +28,6 @@ class KanjiBackFace extends StatelessWidget {
   final ValueChanged<String> onSpeakReading;
   final ValueChanged<String> onSpeakSentence;
   final Widget footer;
-  final double exampleFontScale;
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +64,6 @@ class KanjiBackFace extends StatelessWidget {
                           hideMeanings: visibility.hideMeanings,
                           onSpeak: onSpeakReading,
                           onSpeakSentence: onSpeakSentence,
-                          exampleFontScale: exampleFontScale,
                         ),
                       if ((kanji.kunYomi.isNotEmpty ||
                               kanji.kunExamples.isNotEmpty) &&
@@ -95,7 +92,6 @@ class KanjiBackFace extends StatelessWidget {
                           hideMeanings: visibility.hideMeanings,
                           onSpeak: onSpeakReading,
                           onSpeakSentence: onSpeakSentence,
-                          exampleFontScale: exampleFontScale,
                         ),
                     ],
                   ),
