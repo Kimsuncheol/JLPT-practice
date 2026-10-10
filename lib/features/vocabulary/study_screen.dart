@@ -16,6 +16,8 @@ import 'package:jlpt_practice/features/vocabulary/audible_speech.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_masking.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_tape.dart';
 import 'package:jlpt_practice/features/vocabulary/example_furigana_text.dart';
+import 'package:jlpt_practice/features/vocabulary/short_quiz.dart';
+import 'package:jlpt_practice/features/vocabulary/short_quiz_game.dart';
 import 'package:jlpt_practice/features/vocabulary/masked_translation.dart';
 import 'package:jlpt_practice/core/constants/app_sizes.dart';
 import 'package:jlpt_practice/core/constants/app_colors.dart';
@@ -36,6 +38,10 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   static const _dialogBarrierColor = AppPalette.black54;
 
   int _index = 0;
+  bool _shortQuizEnabled = false;
+  int _actionPageIndex = 0;
+  final Map<String, ShortQuiz?> _shortQuizzes = {};
+  final Map<String, String?> _shortQuizSelections = {};
   final Map<String, _CardVisibility> _cardVisibility = {};
   PageController? _pageController;
   TtsService? _ttsService;
@@ -46,6 +52,16 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   int _pageChangeRequest = 0;
   int _readingsRequest = 0;
   static const _readingGap = Duration(milliseconds: 500);
+
+  @override
+  void reassemble() {
+    super.reassemble();
+    // Hot reload preserves cached model instances without running their new
+    // constructors. Rebuild quizzes so newly added fields are initialized.
+    _shortQuizEnabled = false;
+    _shortQuizzes.clear();
+    _shortQuizSelections.clear();
+  }
 
   @override
   void dispose() {
@@ -115,6 +131,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
           children: [
             Expanded(
               child: PageView.builder(
+                key: const ValueKey('study-word-pages'),
                 controller: _pageController,
                 itemCount: words.length + 1,
                 onPageChanged: (index) => unawaited(
@@ -126,20 +143,27 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
                   }
                   final word = words[index];
                   final visibility = _visibilityFor(word, state);
+                  final quiz = _shortQuizEnabled ? _quizFor(word, state) : null;
                   final showFurigana = visibility.showFurigana;
                   final hideWord =
+                      quiz != null ||
                       visibility.hideWord ||
                       (!showFurigana && word.reading == word.word);
                   final meaningsHidden = visibility.hideMeanings;
                   return Padding(
-                    padding: const EdgeInsets.fromLTRB(
+                    padding: EdgeInsets.fromLTRB(
                       AppSizes.size20,
                       AppSizes.size8,
                       AppSizes.size20,
-                      AppSizes.size14,
+                      quiz == null ? AppSizes.size14 : 0,
                     ),
                     child: _StudyCard(
                       vocabulary: word,
+                      quiz: quiz,
+                      quizSelection: _shortQuizSelections[word.id],
+                      onQuizSelected: (answer) => setState(
+                        () => _shortQuizSelections[word.id] = answer,
+                      ),
                       language: state.meaningLanguage,
                       showFurigana: showFurigana,
                       hideWord: hideWord,
@@ -155,10 +179,70 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
               ),
             ),
             Padding(
+              key: const ValueKey('study-hide-container'),
               padding: const EdgeInsets.symmetric(horizontal: AppSizes.size20),
               child: SizedBox(
-                height: AppSizes.size82,
-                child: _actionPage(_manualActions(state, words[_index])),
+                height:
+                    94 + (MediaQuery.textScalerOf(context).scale(11) - 11) * 3,
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: PageView(
+                        key: const ValueKey('study-hide-pages'),
+                        onPageChanged: (page) =>
+                            setState(() => _actionPageIndex = page),
+                        children: [
+                          _actionPage(_manualActions(state, words[_index])),
+                          _actionPage([
+                            _CardAction(
+                              icon: _shortQuizEnabled
+                                  ? Icons.quiz
+                                  : Icons.quiz_outlined,
+                              label: context.strings(
+                                _shortQuizEnabled
+                                    ? 'stopShortQuiz'
+                                    : 'shortQuiz',
+                              ),
+                              onTap:
+                                  !_shortQuizEnabled &&
+                                      _quizFor(words[_index], state) == null
+                                  ? null
+                                  : () {
+                                      setState(
+                                        () => _shortQuizEnabled =
+                                            !_shortQuizEnabled,
+                                      );
+                                      _shortQuizSelections.clear();
+                                      _readingsRequest++;
+                                      if (_ttsService != null) {
+                                        unawaited(_ttsService!.stop());
+                                      }
+                                    },
+                            ),
+                          ]),
+                        ],
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        for (var page = 0; page < 2; page++)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 3),
+                            child: Icon(
+                              Icons.circle,
+                              size: 6,
+                              color: _actionPageIndex == page
+                                  ? Theme.of(context).colorScheme.primary
+                                  : Theme.of(
+                                      context,
+                                    ).colorScheme.outlineVariant,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
             SafeArea(
@@ -241,6 +325,12 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
           hideWord: state.hideWord,
           hideMeanings: state.hideMeanings,
         ),
+      );
+
+  ShortQuiz? _quizFor(Vocabulary word, AppState state) =>
+      _shortQuizzes.putIfAbsent(
+        word.id,
+        () => buildShortQuiz(word, state.selectedVocabulary),
       );
 
   List<Widget> _manualActions(AppState state, Vocabulary word) {
@@ -492,6 +582,12 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
     required AppState state,
   }) async {
     final request = ++_pageChangeRequest;
+    if (_shortQuizEnabled && index != _index) {
+      setState(() {
+        _shortQuizEnabled = false;
+        _shortQuizSelections.clear();
+      });
+    }
     if (_ttsService != null) await _ttsService!.stop();
     if (!mounted || request != _pageChangeRequest) return;
 
@@ -502,7 +598,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
     setState(() => _index = index);
     if (_resumeDecisionPending) return;
     unawaited(_savePosition(state, words[index], index));
-    if (state.autoPlayAudio && !_suppressAutoAudio) {
+    if (state.autoPlayAudio && !_suppressAutoAudio && !_shortQuizEnabled) {
       _speakWord(words[index]);
     }
     _suppressAutoAudio = false;
@@ -544,6 +640,9 @@ class _CardVisibility {
 class _StudyCard extends StatelessWidget {
   const _StudyCard({
     required this.vocabulary,
+    this.quiz,
+    this.quizSelection,
+    this.onQuizSelected,
     required this.language,
     required this.showFurigana,
     required this.hideWord,
@@ -554,6 +653,9 @@ class _StudyCard extends StatelessWidget {
   });
 
   final Vocabulary vocabulary;
+  final ShortQuiz? quiz;
+  final String? quizSelection;
+  final ValueChanged<String?>? onQuizSelected;
   final String language;
   final bool showFurigana;
   final bool hideWord;
@@ -564,6 +666,7 @@ class _StudyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (quiz != null) return _buildShortQuizCard(context);
     return _centeredScrollable(
       padding: const EdgeInsets.fromLTRB(
         AppSizes.size24,
@@ -594,6 +697,59 @@ class _StudyCard extends StatelessWidget {
     );
   }
 
+  Widget _buildShortQuizCard(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) => Column(
+        children: [
+          // Anchor the heading to the viewport, independently of answers,
+          // wrapped option rows, feedback, and scrolling in the example.
+          SizedBox(height: constraints.maxHeight * 0.22),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSizes.size24),
+            child: _buildMeaning(context),
+          ),
+          const SizedBox(height: AppSizes.space32),
+          Expanded(
+            child: LayoutBuilder(
+              builder: (context, remaining) => SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: remaining.maxHeight),
+                  child: IntrinsicHeight(
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSizes.size24,
+                          ),
+                          child: _buildExample(context),
+                        ),
+                        Expanded(
+                          child: Center(
+                            child: quizSelection == null
+                                ? const SizedBox.shrink()
+                                : Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: AppSizes.space20,
+                                    ),
+                                    child: ShortQuizFeedback(
+                                      quiz: quiz!,
+                                      selection: quizSelection!,
+                                    ),
+                                  ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _centeredScrollable({
     required EdgeInsets padding,
     required Widget child,
@@ -617,7 +773,7 @@ class _StudyCard extends StatelessWidget {
     final titleLarge = Theme.of(context).textTheme.titleLarge;
     return _speechTarget(
       onTap: onSpeakWord,
-      child: showFurigana
+      child: showFurigana && quiz == null
           ? Text(
               breakLongSlashSeparatedLabel(vocabulary.reading),
               textAlign: TextAlign.center,
@@ -641,7 +797,7 @@ class _StudyCard extends StatelessWidget {
     );
     return _speechTarget(
       onTap: onSpeakWord,
-      child: showFurigana
+      child: showFurigana && quiz == null
           ? Text(
               breakLongSlashSeparatedLabel(vocabulary.romaji),
               textAlign: TextAlign.center,
@@ -736,34 +892,47 @@ class _StudyCard extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Semantics(
-          button: true,
-          child: InkWell(
-            borderRadius: BorderRadius.circular(AppSizes.radius12),
-            splashFactory: NoSplash.splashFactory,
-            overlayColor: const WidgetStatePropertyAll(Colors.transparent),
-            onTap: onSpeakExample,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSizes.size8,
-                vertical: AppSizes.size4,
-              ),
-              child: ExampleFuriganaText(
-                key: const ValueKey('example-furigana'),
-                segments: vocabulary.example.sentenceSegments,
-                style:
-                    sentenceStyle ?? const TextStyle(fontSize: AppSizes.font22),
-                wordTargets: hideWord
-                    ? wordMaskTargets(vocabulary.word)
-                    : const [],
-                hideReadings: !showFurigana,
-                alignment: WrapAlignment.start,
+        if (quiz != null)
+          ShortQuizGame(
+            key: ValueKey('short-quiz-${vocabulary.id}'),
+            quiz: quiz!,
+            initialSelection: quizSelection,
+            onSelected: onQuizSelected,
+            showFurigana: showFurigana,
+            translation: _buildTranslation(context, translationStyle),
+          )
+        else
+          Semantics(
+            button: true,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(AppSizes.radius12),
+              splashFactory: NoSplash.splashFactory,
+              overlayColor: const WidgetStatePropertyAll(Colors.transparent),
+              onTap: onSpeakExample,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSizes.size8,
+                  vertical: AppSizes.size4,
+                ),
+                child: ExampleFuriganaText(
+                  key: const ValueKey('example-furigana'),
+                  segments: vocabulary.example.sentenceSegments,
+                  style:
+                      sentenceStyle ??
+                      const TextStyle(fontSize: AppSizes.font22),
+                  wordTargets: hideWord
+                      ? wordMaskTargets(vocabulary.word)
+                      : const [],
+                  hideReadings: !showFurigana,
+                  alignment: WrapAlignment.start,
+                ),
               ),
             ),
           ),
-        ),
-        const SizedBox(height: AppSizes.space4),
-        _buildTranslation(context, translationStyle),
+        if (quiz == null) ...[
+          const SizedBox(height: AppSizes.space4),
+          _buildTranslation(context, translationStyle),
+        ],
       ],
     );
   }
@@ -772,6 +941,9 @@ class _StudyCard extends StatelessWidget {
     final translation = _withRolePlayLineBreaks(
       vocabulary.example.translation(language),
     );
+    final highlightStyle = quiz == null
+        ? null
+        : const TextStyle(fontWeight: AppFontWeights.bold700);
     // Korean meanings are inflected inside Korean translations, so they are
     // matched by lemma; other languages keep the plain substring mask.
     final koreanMeanings = vocabulary.meanings['ko'];
@@ -779,7 +951,8 @@ class _StudyCard extends StatelessWidget {
       return MaskedTranslation(
         translation: translation,
         meanings: koreanMeanings,
-        hideMeanings: maskMeaningInTranslation,
+        hideMeanings: quiz == null && maskMeaningInTranslation,
+        highlightStyle: highlightStyle,
         style: style,
         glyphWidth: 0.55,
         textAlign: TextAlign.start,
@@ -788,7 +961,7 @@ class _StudyCard extends StatelessWidget {
     return _maskedText(
       translation,
       style: style,
-      targets: maskMeaningInTranslation
+      targets: quiz != null || maskMeaningInTranslation
           ? meaningMaskTargets(
               vocabulary.meanings[language] ??
                   vocabulary.meanings['en'] ??
@@ -796,6 +969,7 @@ class _StudyCard extends StatelessWidget {
             )
           : const [],
       glyphWidth: 0.55,
+      highlightStyle: highlightStyle,
     );
   }
 
@@ -805,6 +979,7 @@ class _StudyCard extends StatelessWidget {
     required TextStyle? style,
     required List<String> targets,
     required double glyphWidth,
+    TextStyle? highlightStyle,
   }) {
     if (targets.isEmpty) {
       return Text(text, textAlign: TextAlign.start, style: style);
@@ -813,6 +988,7 @@ class _StudyCard extends StatelessWidget {
       segments: maskSegments(text, targets),
       style: style,
       glyphWidth: glyphWidth,
+      highlightStyle: highlightStyle,
       textAlign: TextAlign.start,
     );
   }

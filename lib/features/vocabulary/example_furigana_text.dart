@@ -15,9 +15,15 @@ class ExampleFuriganaText extends StatelessWidget {
     required this.hideReadings,
     this.alignment = WrapAlignment.center,
     this.runSpacingWithFurigana,
+    this.replacements = const {},
+    this.replacementLabels = const {},
+    this.hideCoveredReadings = false,
     super.key,
   });
 
+  final Map<String, Widget> replacements;
+  final Map<String, String> replacementLabels;
+  final bool hideCoveredReadings;
   final List<FuriganaSegment> segments;
   final TextStyle style;
   final List<String> wordTargets;
@@ -72,11 +78,21 @@ class ExampleFuriganaText extends StatelessWidget {
         }
         final start = offset;
         offset += part.length;
+        final replacement = replacements[part];
+        if (replacement != null) {
+          lines.last.add(replacement);
+          readingsByLine.last.add(false);
+          continue;
+        }
         final masks = maskSegmentsFromSpans(part, [
           for (final span in covered)
             if (span.start < offset && span.end > start)
               (start: span.start - start, end: span.end - start),
         ]);
+        final showReading =
+            !hideReadings &&
+            segment.ruby != null &&
+            !(hideCoveredReadings && masks.any((mask) => mask.covered));
         final unit = Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -85,7 +101,7 @@ class ExampleFuriganaText extends StatelessWidget {
             // example, `新` becomes as wide as `あたら`), so the base
             // sentence retains the expanded furigana spacing after readings
             // are hidden.
-            if (!hideReadings && segment.ruby != null)
+            if (showReading)
               SizedBox(
                 height: AppSizes.size16,
                 child: MaskedSegmentsText(
@@ -118,13 +134,17 @@ class ExampleFuriganaText extends StatelessWidget {
         } else {
           lines.last.add(unit);
           readingsByLine.last.add(
-            !hideReadings && (segment.ruby?.isNotEmpty ?? false),
+            showReading && (segment.ruby?.isNotEmpty ?? false),
           );
         }
       }
     }
+    var label = baseMasks.map((mask) => mask.covered ? '…' : mask.text).join();
+    for (final replacement in replacementLabels.entries) {
+      label = label.replaceAll(replacement.key, replacement.value);
+    }
     return Semantics(
-      label: baseMasks.map((mask) => mask.covered ? '…' : mask.text).join(),
+      label: label,
       child: ExcludeSemantics(
         child: Column(
           mainAxisSize: MainAxisSize.min,
