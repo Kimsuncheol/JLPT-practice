@@ -674,12 +674,14 @@ class _StudyCard extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _buildReading(context),
-          const SizedBox(height: AppSizes.space4),
-          _buildRomaji(context),
-          const SizedBox(height: AppSizes.space6),
-          _buildWord(context),
-          if (quiz == null) ...[
+          if (quiz != null)
+            _buildMeaning(context)
+          else ...[
+            _buildReading(context),
+            const SizedBox(height: AppSizes.space4),
+            _buildRomaji(context),
+            const SizedBox(height: AppSizes.space6),
+            _buildWord(context),
             const SizedBox(height: AppSizes.space10),
             const SizedBox(height: AppSizes.space18),
             _buildMeaning(context),

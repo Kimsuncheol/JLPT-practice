@@ -345,7 +345,7 @@ void main() {
       await tester.tap(find.text('Short quiz'));
       await tester.pumpAndSettle();
       expect(find.byType(ShortQuizGame), findsOneWidget);
-      expect(find.text('word'), findsNothing);
+      expect(find.text('word'), findsOneWidget);
       expect(
         tester
             .widget<Text>(find.byKey(const ValueKey('short-quiz-blank')))
@@ -372,7 +372,9 @@ void main() {
       expect(find.text('tango'), findsNothing);
       expect(find.text('たんご', findRichText: true), findsNothing);
       expect(find.widgetWithText(ActionChip, '単語6'), findsOneWidget);
-      expect(find.byType(CoverTape), findsWidgets);
+      // Quiz meanings replace the word heading; hidden word/reading tape
+      // must not reserve extra space above them.
+      expect(find.byType(CoverTape), findsNothing);
       await tester.ensureVisible(find.widgetWithText(ActionChip, '単語6'));
       await tester.pumpAndSettle();
       await tester.tap(find.widgetWithText(ActionChip, '単語6'));
