@@ -107,7 +107,7 @@ class _ShortQuizGameState extends State<ShortQuizGame> {
                 child: Material(
                   color: Colors.transparent,
                   child: Chip(
-                    label: Text(option),
+                    label: _optionLabel(context, option),
                     backgroundColor: correct
                         ? colors.primaryContainer
                         : colors.errorContainer,
@@ -120,6 +120,51 @@ class _ShortQuizGameState extends State<ShortQuizGame> {
       );
       overlay.insert(_flight!);
     });
+  }
+
+  Widget _optionLabel(
+    BuildContext context,
+    String option, {
+    Key? wordKey,
+    TextStyle? style,
+  }) {
+    final reading = widget.quiz.optionReadings[option] ?? '';
+    final readingStyle = TextStyle(
+      fontSize: 11,
+      height: 1.2,
+      color: Theme.of(context).colorScheme.primary,
+    );
+    final word = Text(
+      option,
+      key: wordKey,
+      textAlign: TextAlign.center,
+      style: style,
+    );
+    if (reading.isEmpty) {
+      final readingLine = TextPainter(
+        text: TextSpan(text: ' ', style: readingStyle),
+        textDirection: Directionality.of(context),
+        textScaler: MediaQuery.textScalerOf(context),
+      )..layout();
+      final padding = readingLine.height / 2;
+      readingLine.dispose();
+      return Padding(
+        padding: EdgeInsets.symmetric(vertical: padding),
+        child: word,
+      );
+    }
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          reading,
+          key: ValueKey('short-quiz-reading-$option'),
+          textAlign: TextAlign.center,
+          style: readingStyle,
+        ),
+        word,
+      ],
+    );
   }
 
   @override
@@ -148,10 +193,10 @@ class _ShortQuizGameState extends State<ShortQuizGame> {
       ),
       child: Opacity(
         opacity: _moving ? 0 : 1,
-        child: Text(
-          _selected ?? '＿＿＿',
-          key: const ValueKey('short-quiz-blank'),
-          textAlign: TextAlign.center,
+        child: _optionLabel(
+          context,
+          _selected ?? '',
+          wordKey: const ValueKey('short-quiz-blank'),
           style: Theme.of(context).textTheme.titleLarge,
         ),
       ),
@@ -181,7 +226,7 @@ class _ShortQuizGameState extends State<ShortQuizGame> {
               if (option != _selected)
                 ActionChip(
                   key: _optionKeys.putIfAbsent(option, GlobalKey.new),
-                  label: Text(option),
+                  label: _optionLabel(context, option),
                   color: WidgetStateProperty.resolveWith((states) {
                     if (states.contains(WidgetState.hovered) ||
                         states.contains(WidgetState.pressed)) {

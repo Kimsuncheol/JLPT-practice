@@ -54,6 +54,16 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   static const _readingGap = Duration(milliseconds: 500);
 
   @override
+  void reassemble() {
+    super.reassemble();
+    // Hot reload preserves cached model instances without running their new
+    // constructors. Rebuild quizzes so newly added fields are initialized.
+    _shortQuizEnabled = false;
+    _shortQuizzes.clear();
+    _shortQuizSelections.clear();
+  }
+
+  @override
   void dispose() {
     _pageController?.dispose();
     _readingsRequest++;
@@ -570,6 +580,12 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
     required AppState state,
   }) async {
     final request = ++_pageChangeRequest;
+    if (_shortQuizEnabled && index != _index) {
+      setState(() {
+        _shortQuizEnabled = false;
+        _shortQuizSelections.clear();
+      });
+    }
     if (_ttsService != null) await _ttsService!.stop();
     if (!mounted || request != _pageChangeRequest) return;
 
@@ -663,9 +679,11 @@ class _StudyCard extends StatelessWidget {
           _buildRomaji(context),
           const SizedBox(height: AppSizes.space6),
           _buildWord(context),
-          const SizedBox(height: AppSizes.space10),
-          SizedBox(height: quiz == null ? AppSizes.space18 : 0),
-          _buildMeaning(context),
+          if (quiz == null) ...[
+            const SizedBox(height: AppSizes.space10),
+            const SizedBox(height: AppSizes.space18),
+            _buildMeaning(context),
+          ],
           if (vocabulary.hasExample) ...[
             SizedBox(height: quiz == null ? AppSizes.space34 : AppSizes.size20),
             Padding(
@@ -868,6 +886,9 @@ class _StudyCard extends StatelessWidget {
     final translation = _withRolePlayLineBreaks(
       vocabulary.example.translation(language),
     );
+    final highlightStyle = quiz == null
+        ? null
+        : const TextStyle(fontWeight: AppFontWeights.bold700);
     // Korean meanings are inflected inside Korean translations, so they are
     // matched by lemma; other languages keep the plain substring mask.
     final koreanMeanings = vocabulary.meanings['ko'];
@@ -875,7 +896,8 @@ class _StudyCard extends StatelessWidget {
       return MaskedTranslation(
         translation: translation,
         meanings: koreanMeanings,
-        hideMeanings: maskMeaningInTranslation,
+        hideMeanings: quiz == null && maskMeaningInTranslation,
+        highlightStyle: highlightStyle,
         style: style,
         glyphWidth: 0.55,
         textAlign: TextAlign.start,
@@ -884,7 +906,7 @@ class _StudyCard extends StatelessWidget {
     return _maskedText(
       translation,
       style: style,
-      targets: maskMeaningInTranslation
+      targets: quiz != null || maskMeaningInTranslation
           ? meaningMaskTargets(
               vocabulary.meanings[language] ??
                   vocabulary.meanings['en'] ??
@@ -892,6 +914,7 @@ class _StudyCard extends StatelessWidget {
             )
           : const [],
       glyphWidth: 0.55,
+      highlightStyle: highlightStyle,
     );
   }
 
@@ -901,6 +924,7 @@ class _StudyCard extends StatelessWidget {
     required TextStyle? style,
     required List<String> targets,
     required double glyphWidth,
+    TextStyle? highlightStyle,
   }) {
     if (targets.isEmpty) {
       return Text(text, textAlign: TextAlign.start, style: style);
@@ -909,6 +933,7 @@ class _StudyCard extends StatelessWidget {
       segments: maskSegments(text, targets),
       style: style,
       glyphWidth: glyphWidth,
+      highlightStyle: highlightStyle,
       textAlign: TextAlign.start,
     );
   }

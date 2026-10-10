@@ -11,6 +11,7 @@ class ShortQuiz {
     required this.end,
     required this.answer,
     required this.options,
+    this.optionReadings = const {},
   });
 
   final Vocabulary entry;
@@ -18,6 +19,9 @@ class ShortQuiz {
   final int end;
   final String answer;
   final List<String> options;
+
+  /// Kana for each surface form, including the answer's conjugation.
+  final Map<String, String> optionReadings;
   static const placeholder = '\uFFFC';
 
   bool grade(String selected) =>
@@ -115,5 +119,53 @@ ShortQuiz? buildShortQuiz(
     end: start + answer.length,
     answer: answer,
     options: List.unmodifiable(options),
+    optionReadings: Map.unmodifiable({
+      for (final option in options)
+        option: _optionReading(option, [entry, ...candidates]),
+    }),
   );
+}
+
+/// Prefer the authored sentence reading over the dictionary reading, because
+/// options may be conjugated (食べます rather than 食べる).
+String _optionReading(String option, List<Vocabulary> candidates) {
+  if (!RegExp(r'[㐀-䶿一-鿿々〆]').hasMatch(option)) return '';
+  final matching = candidates
+      .where(
+        (item) => item.word == option || item.example.answer.trim() == option,
+      )
+      .toList();
+  for (final item in matching) {
+    final start = item.example.sentence.indexOf(option);
+    if (start < 0) continue;
+    final end = start + option.length;
+    final reading = StringBuffer();
+    var offset = 0;
+    var complete = true;
+    for (final segment in item.example.sentenceSegments) {
+      final segmentEnd = offset + segment.text.length;
+      if (offset < end && segmentEnd > start) {
+        final from = (start - offset).clamp(0, segment.text.length);
+        final to = (end - offset).clamp(0, segment.text.length);
+        if (segment.ruby != null && (from != 0 || to != segment.text.length)) {
+          complete = false;
+          break;
+        }
+        reading.write(segment.ruby ?? segment.text.substring(from, to));
+      }
+      offset = segmentEnd;
+    }
+    final kana = reading.toString();
+    if (complete && kana.isNotEmpty && !RegExp(r'[㐀-䶿一-鿿々〆]').hasMatch(kana)) {
+      return kana;
+    }
+  }
+  for (final item in matching) {
+    if (item.word == option &&
+        item.reading.isNotEmpty &&
+        item.reading != option) {
+      return item.reading;
+    }
+  }
+  return '';
 }

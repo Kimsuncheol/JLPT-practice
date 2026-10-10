@@ -345,6 +345,30 @@ void main() {
       await tester.tap(find.text('Short quiz'));
       await tester.pumpAndSettle();
       expect(find.byType(ShortQuizGame), findsOneWidget);
+      expect(find.text('word'), findsNothing);
+      expect(
+        tester
+            .widget<Text>(find.byKey(const ValueKey('short-quiz-blank')))
+            .data,
+        isEmpty,
+      );
+      final translation = tester.widget<Text>(
+        find.byWidgetPredicate(
+          (widget) =>
+              widget is Text &&
+              widget.textSpan?.toPlainText() == 'I use the word every day.',
+        ),
+      );
+      final runs = (translation.textSpan! as TextSpan).children!
+          .whereType<TextSpan>();
+      expect(
+        runs.singleWhere((run) => run.text == 'word').style?.fontWeight,
+        FontWeight.bold,
+      );
+      expect(
+        runs.singleWhere((run) => run.text == 'word').style?.backgroundColor,
+        isNull,
+      );
       expect(find.text('tango'), findsNothing);
       expect(find.text('たんご', findRichText: true), findsNothing);
       expect(find.widgetWithText(ActionChip, '単語6'), findsOneWidget);
@@ -354,18 +378,55 @@ void main() {
       await tester.tap(find.widgetWithText(ActionChip, '単語6'));
       await tester.pumpAndSettle();
       expect(find.text('Correct'), findsOneWidget);
+      final quizBeforeReload = tester
+          .widget<ShortQuizGame>(find.byType(ShortQuizGame))
+          .quiz;
+      final reload = tester.binding.reassembleApplication();
+      await tester.pump();
+      await reload;
+      await tester.pumpAndSettle();
+      expect(find.byType(ShortQuizGame), findsNothing);
+      expect(find.text('Correct'), findsNothing);
+      await tester.tap(find.text('Short quiz'));
+      await tester.pumpAndSettle();
+      final quizAfterReload = tester
+          .widget<ShortQuizGame>(find.byType(ShortQuizGame))
+          .quiz;
+      expect(identical(quizAfterReload, quizBeforeReload), isFalse);
+      expect(quizAfterReload.optionReadings, isNotEmpty);
+      expect(tester.takeException(), isNull);
       final pages = find.byKey(const ValueKey('study-word-pages'));
       await tester.drag(pages, const Offset(-600, 0));
       await tester.pumpAndSettle();
-      expect(find.byType(ShortQuizGame), findsOneWidget);
+      expect(find.byType(ShortQuizGame), findsNothing);
       expect(find.text('Correct'), findsNothing);
+      expect(find.text('単語7'), findsOneWidget);
+      await tester.tap(find.text('Short quiz'));
+      await tester.pumpAndSettle();
+      expect(find.byType(ShortQuizGame), findsOneWidget);
       await tester.drag(pages, const Offset(600, 0));
       await tester.pumpAndSettle();
-      expect(find.text('Correct'), findsOneWidget);
+      expect(find.byType(ShortQuizGame), findsNothing);
+      expect(find.text('Correct'), findsNothing);
+      expect(find.text('単語6'), findsOneWidget);
+      await tester.tap(find.text('Short quiz'));
+      await tester.pumpAndSettle();
+      expect(find.text('Correct'), findsNothing);
+      expect(
+        tester
+            .widget<Text>(find.byKey(const ValueKey('short-quiz-blank')))
+            .data,
+        isEmpty,
+      );
       await tester.tap(find.text('End short quiz'));
       await tester.pumpAndSettle();
       expect(find.byType(ShortQuizGame), findsNothing);
       expect(find.text('単語6'), findsOneWidget);
+      expect(find.text('word'), findsOneWidget);
+      expect(
+        tester.widget<Text>(find.text('I use the word every day.')).textSpan,
+        isNull,
+      );
       expect(find.text('tango'), findsOneWidget);
       expect(find.text('たんご', findRichText: true), findsWidgets);
       expect(tester.takeException(), isNull);
