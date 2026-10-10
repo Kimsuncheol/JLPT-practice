@@ -413,6 +413,16 @@ void main() {
       lessThan(tester.getRect(controls).top),
     );
 
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(find.text('Correct'), findsOneWidget);
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
+    expect(find.byType(ShortQuizGame), findsNothing);
+    expect(find.text('Correct'), findsNothing);
+    expect(find.text('単語6'), findsOneWidget);
+    await tester.tap(find.text('Short\nquiz'));
+    await tester.pumpAndSettle();
+
     final quizBeforeReload = tester
         .widget<ShortQuizGame>(find.byType(ShortQuizGame))
         .quiz;
@@ -430,6 +440,9 @@ void main() {
     expect(identical(quizAfterReload, quizBeforeReload), isFalse);
     expect(quizAfterReload.optionReadings, isNotEmpty);
     expect(tester.takeException(), isNull);
+    await tester.ensureVisible(find.widgetWithText(ActionChip, '単語6'));
+    await tester.tap(find.widgetWithText(ActionChip, '単語6'));
+    await tester.pump();
     final pages = find.byKey(const ValueKey('study-word-pages'));
     await tester.drag(pages, const Offset(-600, 0));
     await tester.pumpAndSettle();
@@ -438,6 +451,8 @@ void main() {
     expect(find.text('単語7'), findsOneWidget);
     await tester.tap(find.text('Short\nquiz'));
     await tester.pumpAndSettle();
+    expect(find.byType(ShortQuizGame), findsOneWidget);
+    await tester.pump(const Duration(seconds: 2));
     expect(find.byType(ShortQuizGame), findsOneWidget);
     await tester.drag(pages, const Offset(600, 0));
     await tester.pumpAndSettle();

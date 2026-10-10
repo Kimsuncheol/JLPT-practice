@@ -39,6 +39,8 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
 
   int _index = 0;
   bool _shortQuizEnabled = false;
+  Timer? _shortQuizFeedbackTimer;
+  static const _shortQuizFeedbackDuration = Duration(milliseconds: 1500);
   final Map<String, ShortQuiz?> _shortQuizzes = {};
   final Map<String, String?> _shortQuizSelections = {};
   final Map<String, _CardVisibility> _cardVisibility = {};
@@ -55,6 +57,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   @override
   void reassemble() {
     super.reassemble();
+    _shortQuizFeedbackTimer?.cancel();
     // Hot reload preserves cached model instances without running their new
     // constructors. Rebuild quizzes so newly added fields are initialized.
     _shortQuizEnabled = false;
@@ -64,6 +67,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
 
   @override
   void dispose() {
+    _shortQuizFeedbackTimer?.cancel();
     _pageController?.dispose();
     _readingsRequest++;
     if (_ttsService != null) unawaited(_ttsService!.stop());
@@ -160,9 +164,8 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
                       vocabulary: word,
                       quiz: quiz,
                       quizSelection: _shortQuizSelections[word.id],
-                      onQuizSelected: (answer) => setState(
-                        () => _shortQuizSelections[word.id] = answer,
-                      ),
+                      onQuizSelected: (answer) =>
+                          _handleQuizSelected(word, answer),
                       language: state.meaningLanguage,
                       showFurigana: showFurigana,
                       hideWord: hideWord,
@@ -201,6 +204,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
                                       _quizFor(words[_index], state) == null
                                   ? null
                                   : () {
+                                      _shortQuizFeedbackTimer?.cancel();
                                       setState(
                                         () => _shortQuizEnabled =
                                             !_shortQuizEnabled,
@@ -307,6 +311,19 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
         word.id,
         () => buildShortQuiz(word, state.selectedVocabulary),
       );
+
+  void _handleQuizSelected(Vocabulary word, String? answer) {
+    _shortQuizFeedbackTimer?.cancel();
+    setState(() => _shortQuizSelections[word.id] = answer);
+    if (answer == null) return;
+    _shortQuizFeedbackTimer = Timer(_shortQuizFeedbackDuration, () {
+      if (!mounted) return;
+      setState(() {
+        _shortQuizEnabled = false;
+        _shortQuizSelections.clear();
+      });
+    });
+  }
 
   List<Widget> _manualActions(AppState state, Vocabulary word) {
     final visibility = _visibilityFor(word, state);
@@ -558,6 +575,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   }) async {
     final request = ++_pageChangeRequest;
     if (_shortQuizEnabled && index != _index) {
+      _shortQuizFeedbackTimer?.cancel();
       setState(() {
         _shortQuizEnabled = false;
         _shortQuizSelections.clear();
