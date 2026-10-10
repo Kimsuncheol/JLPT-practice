@@ -315,162 +315,155 @@ void main() {
     );
   });
 
-  testWidgets(
-    'short quiz lives on the second hide page and restores the card',
-    (tester) async {
-      final container = ProviderContainer(
-        overrides: [
-          appControllerProvider.overrideWith(
-            () => _ResumeAppController('word_0', 0, withExamples: true),
-          ),
-        ],
-      );
-      addTearDown(container.dispose);
-      await container.read(appControllerProvider.future);
-      await tester.pumpWidget(
-        UncontrolledProviderScope(
-          container: container,
-          child: MaterialApp(
-            theme: AppTheme.light(),
-            home: const StudyScreen(day: 2),
-          ),
+  testWidgets('short quiz lives on the first hide page and restores the card', (
+    tester,
+  ) async {
+    final container = ProviderContainer(
+      overrides: [
+        appControllerProvider.overrideWith(
+          () => _ResumeAppController('word_0', 0, withExamples: true),
         ),
-      );
-      await tester.pumpAndSettle();
-      expect(find.text('Hide word'), findsOneWidget);
-      expect(find.text('Short quiz'), findsNothing);
-      final controls = find.byKey(const ValueKey('study-hide-pages'));
-      await tester.drag(controls, const Offset(-600, 0));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Short quiz'));
-      await tester.pumpAndSettle();
-      expect(find.byType(ShortQuizGame), findsOneWidget);
-      expect(find.text('word'), findsOneWidget);
-      final meaningPosition = tester.getTopLeft(find.text('word'));
-      expect(
-        tester
-            .widget<Text>(find.byKey(const ValueKey('short-quiz-blank')))
-            .data,
-        isEmpty,
-      );
-      final translation = tester.widget<Text>(
-        find.byWidgetPredicate(
-          (widget) =>
-              widget is Text &&
-              widget.textSpan?.toPlainText() == 'I use the word every day.',
+      ],
+    );
+    addTearDown(container.dispose);
+    await container.read(appControllerProvider.future);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp(
+          theme: AppTheme.light(),
+          home: const StudyScreen(day: 2),
         ),
-      );
-      final runs = (translation.textSpan! as TextSpan).children!
-          .whereType<TextSpan>();
-      expect(
-        runs.singleWhere((run) => run.text == 'word').style?.fontWeight,
-        FontWeight.bold,
-      );
-      expect(
-        runs.singleWhere((run) => run.text == 'word').style?.backgroundColor,
-        isNull,
-      );
-      expect(find.text('tango'), findsNothing);
-      expect(find.text('たんご', findRichText: true), findsNothing);
-      expect(find.widgetWithText(ActionChip, '単語6'), findsOneWidget);
-      expect(
-        tester.getRect(find.byWidget(translation)).bottom,
-        lessThan(tester.getRect(find.widgetWithText(ActionChip, '単語6')).top),
-      );
-      // Quiz meanings replace the word heading; hidden word/reading tape
-      // must not reserve extra space above them.
-      expect(find.byType(CoverTape), findsNothing);
-      await tester.ensureVisible(find.widgetWithText(ActionChip, '単語6'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.widgetWithText(ActionChip, '単語6'));
-      await tester.pump();
-      expect(tester.getTopLeft(find.text('word')), meaningPosition);
-      await tester.pumpAndSettle();
-      expect(find.text('Correct'), findsOneWidget);
-      expect(tester.getTopLeft(find.text('word')), meaningPosition);
-      expect(find.text('Try again'), findsNothing);
-      final feedback = find.byKey(const ValueKey('short-quiz-feedback'));
-      expect(
-        tester.getCenter(feedback).dy,
-        closeTo(
-          (tester.getRect(find.byType(ShortQuizGame)).bottom +
-                  tester.getRect(controls).top) /
-              2,
-          0.01,
-        ),
-      );
-      expect(
-        tester.getCenter(feedback).dx,
-        closeTo(tester.getCenter(find.byType(Scaffold)).dx, 0.01),
-      );
-      final translationFinder = find.byWidgetPredicate(
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Hide\nword'), findsOneWidget);
+    expect(find.text('Short\nquiz'), findsOneWidget);
+    final controls = find.byKey(const ValueKey('study-hide-pages'));
+    await tester.tap(find.text('Short\nquiz'));
+    await tester.pumpAndSettle();
+    expect(find.byType(ShortQuizGame), findsOneWidget);
+    expect(find.text('word'), findsOneWidget);
+    final meaningPosition = tester.getTopLeft(find.text('word'));
+    expect(
+      tester.widget<Text>(find.byKey(const ValueKey('short-quiz-blank'))).data,
+      isEmpty,
+    );
+    final translation = tester.widget<Text>(
+      find.byWidgetPredicate(
         (widget) =>
             widget is Text &&
             widget.textSpan?.toPlainText() == 'I use the word every day.',
-      );
-      expect(
-        tester.getRect(feedback).top,
-        greaterThan(tester.getRect(translationFinder).bottom),
-      );
-      expect(
-        tester.getRect(feedback).bottom,
-        lessThan(tester.getRect(controls).top),
-      );
+      ),
+    );
+    final runs = (translation.textSpan! as TextSpan).children!
+        .whereType<TextSpan>();
+    expect(
+      runs.singleWhere((run) => run.text == 'word').style?.fontWeight,
+      FontWeight.bold,
+    );
+    expect(
+      runs.singleWhere((run) => run.text == 'word').style?.backgroundColor,
+      isNull,
+    );
+    expect(find.text('tango'), findsNothing);
+    expect(find.text('たんご', findRichText: true), findsNothing);
+    expect(find.widgetWithText(ActionChip, '単語6'), findsOneWidget);
+    expect(
+      tester.getRect(find.byWidget(translation)).bottom,
+      lessThan(tester.getRect(find.widgetWithText(ActionChip, '単語6')).top),
+    );
+    // Quiz meanings replace the word heading; hidden word/reading tape
+    // must not reserve extra space above them.
+    expect(find.byType(CoverTape), findsNothing);
+    await tester.ensureVisible(find.widgetWithText(ActionChip, '単語6'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(ActionChip, '単語6'));
+    await tester.pump();
+    expect(tester.getTopLeft(find.text('word')), meaningPosition);
+    await tester.pumpAndSettle();
+    expect(find.text('Correct'), findsOneWidget);
+    expect(tester.getTopLeft(find.text('word')), meaningPosition);
+    expect(find.text('Try again'), findsNothing);
+    final feedback = find.byKey(const ValueKey('short-quiz-feedback'));
+    expect(
+      tester.getCenter(feedback).dy,
+      closeTo(
+        (tester.getRect(find.byType(ShortQuizGame)).bottom +
+                tester.getRect(controls).top) /
+            2,
+        0.01,
+      ),
+    );
+    expect(
+      tester.getCenter(feedback).dx,
+      closeTo(tester.getCenter(find.byType(Scaffold)).dx, 0.01),
+    );
+    final translationFinder = find.byWidgetPredicate(
+      (widget) =>
+          widget is Text &&
+          widget.textSpan?.toPlainText() == 'I use the word every day.',
+    );
+    expect(
+      tester.getRect(feedback).top,
+      greaterThan(tester.getRect(translationFinder).bottom),
+    );
+    expect(
+      tester.getRect(feedback).bottom,
+      lessThan(tester.getRect(controls).top),
+    );
 
-      final quizBeforeReload = tester
-          .widget<ShortQuizGame>(find.byType(ShortQuizGame))
-          .quiz;
-      final reload = tester.binding.reassembleApplication();
-      await tester.pump();
-      await reload;
-      await tester.pumpAndSettle();
-      expect(find.byType(ShortQuizGame), findsNothing);
-      expect(find.text('Correct'), findsNothing);
-      await tester.tap(find.text('Short quiz'));
-      await tester.pumpAndSettle();
-      final quizAfterReload = tester
-          .widget<ShortQuizGame>(find.byType(ShortQuizGame))
-          .quiz;
-      expect(identical(quizAfterReload, quizBeforeReload), isFalse);
-      expect(quizAfterReload.optionReadings, isNotEmpty);
-      expect(tester.takeException(), isNull);
-      final pages = find.byKey(const ValueKey('study-word-pages'));
-      await tester.drag(pages, const Offset(-600, 0));
-      await tester.pumpAndSettle();
-      expect(find.byType(ShortQuizGame), findsNothing);
-      expect(find.text('Correct'), findsNothing);
-      expect(find.text('単語7'), findsOneWidget);
-      await tester.tap(find.text('Short quiz'));
-      await tester.pumpAndSettle();
-      expect(find.byType(ShortQuizGame), findsOneWidget);
-      await tester.drag(pages, const Offset(600, 0));
-      await tester.pumpAndSettle();
-      expect(find.byType(ShortQuizGame), findsNothing);
-      expect(find.text('Correct'), findsNothing);
-      expect(find.text('単語6'), findsOneWidget);
-      await tester.tap(find.text('Short quiz'));
-      await tester.pumpAndSettle();
-      expect(find.text('Correct'), findsNothing);
-      expect(
-        tester
-            .widget<Text>(find.byKey(const ValueKey('short-quiz-blank')))
-            .data,
-        isEmpty,
-      );
-      await tester.tap(find.text('End short quiz'));
-      await tester.pumpAndSettle();
-      expect(find.byType(ShortQuizGame), findsNothing);
-      expect(find.text('単語6'), findsOneWidget);
-      expect(find.text('word'), findsOneWidget);
-      expect(
-        tester.widget<Text>(find.text('I use the word every day.')).textSpan,
-        isNull,
-      );
-      expect(find.text('tango'), findsOneWidget);
-      expect(find.text('たんご', findRichText: true), findsWidgets);
-      expect(tester.takeException(), isNull);
-    },
-  );
+    final quizBeforeReload = tester
+        .widget<ShortQuizGame>(find.byType(ShortQuizGame))
+        .quiz;
+    final reload = tester.binding.reassembleApplication();
+    await tester.pump();
+    await reload;
+    await tester.pumpAndSettle();
+    expect(find.byType(ShortQuizGame), findsNothing);
+    expect(find.text('Correct'), findsNothing);
+    await tester.tap(find.text('Short\nquiz'));
+    await tester.pumpAndSettle();
+    final quizAfterReload = tester
+        .widget<ShortQuizGame>(find.byType(ShortQuizGame))
+        .quiz;
+    expect(identical(quizAfterReload, quizBeforeReload), isFalse);
+    expect(quizAfterReload.optionReadings, isNotEmpty);
+    expect(tester.takeException(), isNull);
+    final pages = find.byKey(const ValueKey('study-word-pages'));
+    await tester.drag(pages, const Offset(-600, 0));
+    await tester.pumpAndSettle();
+    expect(find.byType(ShortQuizGame), findsNothing);
+    expect(find.text('Correct'), findsNothing);
+    expect(find.text('単語7'), findsOneWidget);
+    await tester.tap(find.text('Short\nquiz'));
+    await tester.pumpAndSettle();
+    expect(find.byType(ShortQuizGame), findsOneWidget);
+    await tester.drag(pages, const Offset(600, 0));
+    await tester.pumpAndSettle();
+    expect(find.byType(ShortQuizGame), findsNothing);
+    expect(find.text('Correct'), findsNothing);
+    expect(find.text('単語6'), findsOneWidget);
+    await tester.tap(find.text('Short\nquiz'));
+    await tester.pumpAndSettle();
+    expect(find.text('Correct'), findsNothing);
+    expect(
+      tester.widget<Text>(find.byKey(const ValueKey('short-quiz-blank'))).data,
+      isEmpty,
+    );
+    await tester.tap(find.text('Short\nquiz'));
+    await tester.pumpAndSettle();
+    expect(find.byType(ShortQuizGame), findsNothing);
+    expect(find.text('単語6'), findsOneWidget);
+    expect(find.text('word'), findsOneWidget);
+    expect(
+      tester.widget<Text>(find.text('I use the word every day.')).textSpan,
+      isNull,
+    );
+    expect(find.text('tango'), findsOneWidget);
+    expect(find.text('たんご', findRichText: true), findsWidgets);
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets('bottom buttons cover the reading, word and meanings with tape', (
     tester,
@@ -508,7 +501,7 @@ void main() {
     expect(find.text('まいにち たんごを つかいます。'), findsNothing);
     expect(find.text('word'), findsOneWidget);
 
-    await tester.tap(find.text('Hide word'));
+    await tester.tap(find.text('Hide\nword'));
     await tester.pumpAndSettle();
     expect(find.text('単語6'), findsNothing);
     // The example sentence keeps its text but the word in it is taped.
@@ -518,14 +511,14 @@ void main() {
       findsOneWidget,
     );
     expect(find.textContaining('単語6を使います。', findRichText: true), findsNothing);
-    expect(find.text('Show word'), findsOneWidget);
+    expect(find.text('Show\nword'), findsOneWidget);
 
-    await tester.tap(find.text('Hide meanings'));
+    await tester.tap(find.text('Hide\nmeanings'));
     await tester.pumpAndSettle();
     expect(find.text('word'), findsNothing);
     expect(find.text('I use the word every day.'), findsNothing);
 
-    await tester.tap(find.text('Hide reading'));
+    await tester.tap(find.text('Hide\nreading'));
     await tester.pumpAndSettle();
     expect(find.text('たんご'), findsNothing);
     // Example ruby is removed from layout so it cannot keep widening the
@@ -540,9 +533,9 @@ void main() {
       findsNothing,
     );
 
-    await tester.tap(find.text('Show word'));
-    await tester.tap(find.text('Show meanings'));
-    await tester.tap(find.text('Show reading'));
+    await tester.tap(find.text('Show\nword'));
+    await tester.tap(find.text('Show\nmeanings'));
+    await tester.tap(find.text('Show\nreading'));
     await tester.pumpAndSettle();
     expect(find.byType(CoverTape), findsNothing);
     expect(dailyRuby, findsOneWidget);
@@ -570,9 +563,9 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Hide reading'));
-    await tester.tap(find.text('Hide word'));
-    await tester.tap(find.text('Hide meanings'));
+    await tester.tap(find.text('Hide\nreading'));
+    await tester.tap(find.text('Hide\nword'));
+    await tester.tap(find.text('Hide\nmeanings'));
     await tester.pumpAndSettle();
     expect(find.text('単語6'), findsNothing);
     expect(find.text('たんご'), findsNothing);
@@ -585,17 +578,17 @@ void main() {
     expect(find.text('単語7'), findsOneWidget);
     expect(find.text('たんご'), findsNWidgets(2));
     expect(find.text('word'), findsOneWidget);
-    expect(find.text('Hide reading'), findsOneWidget);
-    expect(find.text('Hide word'), findsOneWidget);
-    expect(find.text('Hide meanings'), findsOneWidget);
+    expect(find.text('Hide\nreading'), findsOneWidget);
+    expect(find.text('Hide\nword'), findsOneWidget);
+    expect(find.text('Hide\nmeanings'), findsOneWidget);
     expect(find.text('Auto review'), findsNothing);
 
     await tester.drag(pageView, Offset(tester.getSize(pageView).width, 0));
     await tester.pumpAndSettle();
     expect(find.text('単語6'), findsNothing);
-    expect(find.text('Show reading'), findsOneWidget);
-    expect(find.text('Show word'), findsOneWidget);
-    expect(find.text('Show meanings'), findsOneWidget);
+    expect(find.text('Show\nreading'), findsOneWidget);
+    expect(find.text('Show\nword'), findsOneWidget);
+    expect(find.text('Show\nmeanings'), findsOneWidget);
   });
 
   testWidgets('system back asks before leaving and cancel keeps hide state', (
@@ -616,7 +609,7 @@ void main() {
     router.push('/study/day/2');
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Hide word'));
+    await tester.tap(find.text('Hide\nword'));
     await tester.pumpAndSettle();
     expect(find.text('単語6'), findsNothing);
 
@@ -628,7 +621,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Leave word study?'), findsNothing);
     expect(find.text('単語6'), findsNothing);
-    expect(find.text('Show word'), findsOneWidget);
+    expect(find.text('Show\nword'), findsOneWidget);
 
     await tester.binding.handlePopRoute();
     await tester.pumpAndSettle();
@@ -660,20 +653,20 @@ void main() {
 
     expect(find.text('ことば'), findsOneWidget);
     expect(find.text('kotoba'), findsOneWidget);
-    expect(find.text('Hide reading'), findsNothing);
-    expect(find.text('Hide word'), findsNothing);
-    expect(find.text('Hide word & reading'), findsOneWidget);
+    expect(find.text('Hide\nreading'), findsNothing);
+    expect(find.text('Hide\nword'), findsNothing);
+    expect(find.text('Hide\nword & reading'), findsOneWidget);
     expect(find.byKey(const ValueKey('study-action-carousel')), findsNothing);
 
-    await tester.tap(find.text('Hide word & reading'));
+    await tester.tap(find.text('Hide\nword & reading'));
     await tester.pumpAndSettle();
 
     expect(find.text('ことば'), findsNothing);
     expect(find.text('kotoba'), findsNothing);
-    expect(find.text('Show word & reading'), findsOneWidget);
+    expect(find.text('Show\nword & reading'), findsOneWidget);
     expect(find.byType(CoverTape), findsWidgets);
 
-    await tester.tap(find.text('Show word & reading'));
+    await tester.tap(find.text('Show\nword & reading'));
     await tester.pumpAndSettle();
     expect(find.text('ことば'), findsOneWidget);
     expect(find.text('kotoba'), findsOneWidget);

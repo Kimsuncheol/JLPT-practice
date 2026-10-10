@@ -39,7 +39,6 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
 
   int _index = 0;
   bool _shortQuizEnabled = false;
-  int _actionPageIndex = 0;
   final Map<String, ShortQuiz?> _shortQuizzes = {};
   final Map<String, String?> _shortQuizSelections = {};
   final Map<String, _CardVisibility> _cardVisibility = {};
@@ -189,20 +188,14 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
                     Expanded(
                       child: PageView(
                         key: const ValueKey('study-hide-pages'),
-                        onPageChanged: (page) =>
-                            setState(() => _actionPageIndex = page),
                         children: [
-                          _actionPage(_manualActions(state, words[_index])),
                           _actionPage([
+                            ..._manualActions(state, words[_index]),
                             _CardAction(
                               icon: _shortQuizEnabled
                                   ? Icons.quiz
                                   : Icons.quiz_outlined,
-                              label: context.strings(
-                                _shortQuizEnabled
-                                    ? 'stopShortQuiz'
-                                    : 'shortQuiz',
-                              ),
+                              label: context.strings('shortQuiz'),
                               onTap:
                                   !_shortQuizEnabled &&
                                       _quizFor(words[_index], state) == null
@@ -222,24 +215,6 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
                           ]),
                         ],
                       ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        for (var page = 0; page < 2; page++)
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 3),
-                            child: Icon(
-                              Icons.circle,
-                              size: 6,
-                              color: _actionPageIndex == page
-                                  ? Theme.of(context).colorScheme.primary
-                                  : Theme.of(
-                                      context,
-                                    ).colorScheme.outlineVariant,
-                            ),
-                          ),
-                      ],
                     ),
                   ],
                 ),
@@ -1038,7 +1013,8 @@ class _CardAction extends StatelessWidget {
             Icon(icon),
             const SizedBox(height: AppSizes.space6),
             Text(
-              label,
+              label.replaceFirst(' ', '\n'),
+              semanticsLabel: label,
               maxLines: 2,
               textAlign: TextAlign.center,
               overflow: TextOverflow.ellipsis,
