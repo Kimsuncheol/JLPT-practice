@@ -18,6 +18,7 @@ import 'package:jlpt_practice/features/vocabulary/study_finish_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/study_quiz_selection_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_tape.dart';
 import 'package:jlpt_practice/features/vocabulary/study_screen.dart';
+import 'package:jlpt_practice/features/vocabulary/short_quiz_game.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -49,7 +50,7 @@ void main() {
     await tester.pumpAndSettle();
     router.push('/study/day/6');
     await tester.pumpAndSettle();
-    final pageView = find.byType(PageView);
+    final pageView = find.byKey(const ValueKey('study-word-pages'));
     await tester.drag(pageView, Offset(-tester.getSize(pageView).width, 0));
     await tester.pumpAndSettle();
     await tester.tap(find.byIcon(Icons.close_rounded));
@@ -314,6 +315,63 @@ void main() {
     );
   });
 
+  testWidgets(
+    'short quiz lives on the second hide page and restores the card',
+    (tester) async {
+      final container = ProviderContainer(
+        overrides: [
+          appControllerProvider.overrideWith(
+            () => _ResumeAppController('word_0', 0, withExamples: true),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+      await container.read(appControllerProvider.future);
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp(
+            theme: AppTheme.light(),
+            home: const StudyScreen(day: 2),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Hide word'), findsOneWidget);
+      expect(find.text('Short quiz'), findsNothing);
+      final controls = find.byKey(const ValueKey('study-hide-pages'));
+      await tester.drag(controls, const Offset(-600, 0));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Short quiz'));
+      await tester.pumpAndSettle();
+      expect(find.byType(ShortQuizGame), findsOneWidget);
+      expect(find.text('tango'), findsNothing);
+      expect(find.text('たんご', findRichText: true), findsNothing);
+      expect(find.widgetWithText(ActionChip, '単語6'), findsOneWidget);
+      expect(find.byType(CoverTape), findsWidgets);
+      await tester.ensureVisible(find.widgetWithText(ActionChip, '単語6'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(ActionChip, '単語6'));
+      await tester.pumpAndSettle();
+      expect(find.text('Correct'), findsOneWidget);
+      final pages = find.byKey(const ValueKey('study-word-pages'));
+      await tester.drag(pages, const Offset(-600, 0));
+      await tester.pumpAndSettle();
+      expect(find.byType(ShortQuizGame), findsOneWidget);
+      expect(find.text('Correct'), findsNothing);
+      await tester.drag(pages, const Offset(600, 0));
+      await tester.pumpAndSettle();
+      expect(find.text('Correct'), findsOneWidget);
+      await tester.tap(find.text('End short quiz'));
+      await tester.pumpAndSettle();
+      expect(find.byType(ShortQuizGame), findsNothing);
+      expect(find.text('単語6'), findsOneWidget);
+      expect(find.text('tango'), findsOneWidget);
+      expect(find.text('たんご', findRichText: true), findsWidgets);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
   testWidgets('bottom buttons cover the reading, word and meanings with tape', (
     tester,
   ) async {
@@ -420,7 +478,7 @@ void main() {
     expect(find.text('たんご'), findsNothing);
     expect(find.text('word'), findsNothing);
 
-    final pageView = find.byType(PageView);
+    final pageView = find.byKey(const ValueKey('study-word-pages'));
     await tester.drag(pageView, Offset(-tester.getSize(pageView).width, 0));
     await tester.pumpAndSettle();
 
@@ -598,7 +656,7 @@ void main() {
     await tester.tap(find.text('単語1'));
     await tester.pumpAndSettle();
 
-    final pageView = find.byType(PageView);
+    final pageView = find.byKey(const ValueKey('study-word-pages'));
     await tester.drag(pageView, Offset(-tester.getSize(pageView).width, 0));
     await tester.pumpAndSettle();
 
@@ -819,7 +877,7 @@ void main() {
     expect(controller.savedSessions.last.day, 2);
     expect(controller.savedSessions.last.wordId, 'word_5');
 
-    final pageView = find.byType(PageView);
+    final pageView = find.byKey(const ValueKey('study-word-pages'));
     await tester.drag(pageView, Offset(-tester.getSize(pageView).width, 0));
     await tester.pumpAndSettle();
     expect(find.text('2 / 5'), findsOneWidget);
@@ -856,7 +914,7 @@ void main() {
     expect(find.text('5 / 5'), findsOneWidget);
     expect(find.text('単語5'), findsOneWidget);
 
-    final pageView = find.byType(PageView);
+    final pageView = find.byKey(const ValueKey('study-word-pages'));
     await tester.drag(pageView, Offset(-tester.getSize(pageView).width, 0));
     await tester.pumpAndSettle();
 

@@ -16,6 +16,8 @@ import 'package:jlpt_practice/features/vocabulary/audible_speech.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_masking.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_tape.dart';
 import 'package:jlpt_practice/features/vocabulary/example_furigana_text.dart';
+import 'package:jlpt_practice/features/vocabulary/short_quiz.dart';
+import 'package:jlpt_practice/features/vocabulary/short_quiz_game.dart';
 import 'package:jlpt_practice/features/vocabulary/masked_translation.dart';
 import 'package:jlpt_practice/core/constants/app_sizes.dart';
 import 'package:jlpt_practice/core/constants/app_colors.dart';
@@ -36,6 +38,10 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   static const _dialogBarrierColor = AppPalette.black54;
 
   int _index = 0;
+  bool _shortQuizEnabled = false;
+  int _actionPageIndex = 0;
+  final Map<String, ShortQuiz?> _shortQuizzes = {};
+  final Map<String, String?> _shortQuizSelections = {};
   final Map<String, _CardVisibility> _cardVisibility = {};
   PageController? _pageController;
   TtsService? _ttsService;
@@ -115,6 +121,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
           children: [
             Expanded(
               child: PageView.builder(
+                key: const ValueKey('study-word-pages'),
                 controller: _pageController,
                 itemCount: words.length + 1,
                 onPageChanged: (index) => unawaited(
@@ -126,8 +133,10 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
                   }
                   final word = words[index];
                   final visibility = _visibilityFor(word, state);
+                  final quiz = _shortQuizEnabled ? _quizFor(word, state) : null;
                   final showFurigana = visibility.showFurigana;
                   final hideWord =
+                      quiz != null ||
                       visibility.hideWord ||
                       (!showFurigana && word.reading == word.word);
                   final meaningsHidden = visibility.hideMeanings;
@@ -140,6 +149,10 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
                     ),
                     child: _StudyCard(
                       vocabulary: word,
+                      quiz: quiz,
+                      quizSelection: _shortQuizSelections[word.id],
+                      onQuizSelected: (answer) =>
+                          _shortQuizSelections[word.id] = answer,
                       language: state.meaningLanguage,
                       showFurigana: showFurigana,
                       hideWord: hideWord,
@@ -157,8 +170,67 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: AppSizes.size20),
               child: SizedBox(
-                height: AppSizes.size82,
-                child: _actionPage(_manualActions(state, words[_index])),
+                height:
+                    94 + (MediaQuery.textScalerOf(context).scale(11) - 11) * 3,
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: PageView(
+                        key: const ValueKey('study-hide-pages'),
+                        onPageChanged: (page) =>
+                            setState(() => _actionPageIndex = page),
+                        children: [
+                          _actionPage(_manualActions(state, words[_index])),
+                          _actionPage([
+                            _CardAction(
+                              icon: _shortQuizEnabled
+                                  ? Icons.quiz
+                                  : Icons.quiz_outlined,
+                              label: context.strings(
+                                _shortQuizEnabled
+                                    ? 'stopShortQuiz'
+                                    : 'shortQuiz',
+                              ),
+                              onTap:
+                                  !_shortQuizEnabled &&
+                                      _quizFor(words[_index], state) == null
+                                  ? null
+                                  : () {
+                                      setState(
+                                        () => _shortQuizEnabled =
+                                            !_shortQuizEnabled,
+                                      );
+                                      _shortQuizSelections.clear();
+                                      _readingsRequest++;
+                                      if (_ttsService != null) {
+                                        unawaited(_ttsService!.stop());
+                                      }
+                                    },
+                            ),
+                          ]),
+                        ],
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        for (var page = 0; page < 2; page++)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 3),
+                            child: Icon(
+                              Icons.circle,
+                              size: 6,
+                              color: _actionPageIndex == page
+                                  ? Theme.of(context).colorScheme.primary
+                                  : Theme.of(
+                                      context,
+                                    ).colorScheme.outlineVariant,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
             SafeArea(
@@ -241,6 +313,12 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
           hideWord: state.hideWord,
           hideMeanings: state.hideMeanings,
         ),
+      );
+
+  ShortQuiz? _quizFor(Vocabulary word, AppState state) =>
+      _shortQuizzes.putIfAbsent(
+        word.id,
+        () => buildShortQuiz(word, state.selectedVocabulary),
       );
 
   List<Widget> _manualActions(AppState state, Vocabulary word) {
@@ -502,7 +580,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
     setState(() => _index = index);
     if (_resumeDecisionPending) return;
     unawaited(_savePosition(state, words[index], index));
-    if (state.autoPlayAudio && !_suppressAutoAudio) {
+    if (state.autoPlayAudio && !_suppressAutoAudio && !_shortQuizEnabled) {
       _speakWord(words[index]);
     }
     _suppressAutoAudio = false;
@@ -544,6 +622,9 @@ class _CardVisibility {
 class _StudyCard extends StatelessWidget {
   const _StudyCard({
     required this.vocabulary,
+    this.quiz,
+    this.quizSelection,
+    this.onQuizSelected,
     required this.language,
     required this.showFurigana,
     required this.hideWord,
@@ -554,6 +635,9 @@ class _StudyCard extends StatelessWidget {
   });
 
   final Vocabulary vocabulary;
+  final ShortQuiz? quiz;
+  final String? quizSelection;
+  final ValueChanged<String?>? onQuizSelected;
   final String language;
   final bool showFurigana;
   final bool hideWord;
@@ -580,12 +664,14 @@ class _StudyCard extends StatelessWidget {
           const SizedBox(height: AppSizes.space6),
           _buildWord(context),
           const SizedBox(height: AppSizes.space10),
-          const SizedBox(height: AppSizes.space18),
+          SizedBox(height: quiz == null ? AppSizes.space18 : 0),
           _buildMeaning(context),
           if (vocabulary.hasExample) ...[
-            const SizedBox(height: AppSizes.space34),
+            SizedBox(height: quiz == null ? AppSizes.space34 : AppSizes.size20),
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: AppSizes.size20),
+              padding: EdgeInsets.symmetric(
+                vertical: quiz == null ? AppSizes.size20 : AppSizes.size12,
+              ),
               child: _buildExample(context),
             ),
           ],
@@ -617,7 +703,7 @@ class _StudyCard extends StatelessWidget {
     final titleLarge = Theme.of(context).textTheme.titleLarge;
     return _speechTarget(
       onTap: onSpeakWord,
-      child: showFurigana
+      child: showFurigana && quiz == null
           ? Text(
               breakLongSlashSeparatedLabel(vocabulary.reading),
               textAlign: TextAlign.center,
@@ -641,7 +727,7 @@ class _StudyCard extends StatelessWidget {
     );
     return _speechTarget(
       onTap: onSpeakWord,
-      child: showFurigana
+      child: showFurigana && quiz == null
           ? Text(
               breakLongSlashSeparatedLabel(vocabulary.romaji),
               textAlign: TextAlign.center,
@@ -736,32 +822,42 @@ class _StudyCard extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Semantics(
-          button: true,
-          child: InkWell(
-            borderRadius: BorderRadius.circular(AppSizes.radius12),
-            splashFactory: NoSplash.splashFactory,
-            overlayColor: const WidgetStatePropertyAll(Colors.transparent),
-            onTap: onSpeakExample,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSizes.size8,
-                vertical: AppSizes.size4,
-              ),
-              child: ExampleFuriganaText(
-                key: const ValueKey('example-furigana'),
-                segments: vocabulary.example.sentenceSegments,
-                style:
-                    sentenceStyle ?? const TextStyle(fontSize: AppSizes.font22),
-                wordTargets: hideWord
-                    ? wordMaskTargets(vocabulary.word)
-                    : const [],
-                hideReadings: !showFurigana,
-                alignment: WrapAlignment.start,
+        if (quiz != null)
+          ShortQuizGame(
+            key: ValueKey('short-quiz-${vocabulary.id}'),
+            quiz: quiz!,
+            initialSelection: quizSelection,
+            onSelected: onQuizSelected,
+            showFurigana: showFurigana,
+          )
+        else
+          Semantics(
+            button: true,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(AppSizes.radius12),
+              splashFactory: NoSplash.splashFactory,
+              overlayColor: const WidgetStatePropertyAll(Colors.transparent),
+              onTap: onSpeakExample,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSizes.size8,
+                  vertical: AppSizes.size4,
+                ),
+                child: ExampleFuriganaText(
+                  key: const ValueKey('example-furigana'),
+                  segments: vocabulary.example.sentenceSegments,
+                  style:
+                      sentenceStyle ??
+                      const TextStyle(fontSize: AppSizes.font22),
+                  wordTargets: hideWord
+                      ? wordMaskTargets(vocabulary.word)
+                      : const [],
+                  hideReadings: !showFurigana,
+                  alignment: WrapAlignment.start,
+                ),
               ),
             ),
           ),
-        ),
         const SizedBox(height: AppSizes.space4),
         _buildTranslation(context, translationStyle),
       ],
