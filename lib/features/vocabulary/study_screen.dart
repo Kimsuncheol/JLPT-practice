@@ -151,18 +151,19 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
                       (!showFurigana && word.reading == word.word);
                   final meaningsHidden = visibility.hideMeanings;
                   return Padding(
-                    padding: const EdgeInsets.fromLTRB(
+                    padding: EdgeInsets.fromLTRB(
                       AppSizes.size20,
                       AppSizes.size8,
                       AppSizes.size20,
-                      AppSizes.size14,
+                      quiz == null ? AppSizes.size14 : 0,
                     ),
                     child: _StudyCard(
                       vocabulary: word,
                       quiz: quiz,
                       quizSelection: _shortQuizSelections[word.id],
-                      onQuizSelected: (answer) =>
-                          _shortQuizSelections[word.id] = answer,
+                      onQuizSelected: (answer) => setState(
+                        () => _shortQuizSelections[word.id] = answer,
+                      ),
                       language: state.meaningLanguage,
                       showFurigana: showFurigana,
                       hideWord: hideWord,
@@ -178,6 +179,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
               ),
             ),
             Padding(
+              key: const ValueKey('study-hide-container'),
               padding: const EdgeInsets.symmetric(horizontal: AppSizes.size20),
               child: SizedBox(
                 height:
@@ -664,6 +666,7 @@ class _StudyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (quiz != null) return _buildShortQuizCard(context);
     return _centeredScrollable(
       padding: const EdgeInsets.fromLTRB(
         AppSizes.size24,
@@ -674,27 +677,74 @@ class _StudyCard extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (quiz != null)
-            _buildMeaning(context)
-          else ...[
-            _buildReading(context),
-            const SizedBox(height: AppSizes.space4),
-            _buildRomaji(context),
-            const SizedBox(height: AppSizes.space6),
-            _buildWord(context),
-            const SizedBox(height: AppSizes.space10),
-            const SizedBox(height: AppSizes.space18),
-            _buildMeaning(context),
-          ],
+          _buildReading(context),
+          const SizedBox(height: AppSizes.space4),
+          _buildRomaji(context),
+          const SizedBox(height: AppSizes.space6),
+          _buildWord(context),
+          const SizedBox(height: AppSizes.space10),
+          const SizedBox(height: AppSizes.space18),
+          _buildMeaning(context),
           if (vocabulary.hasExample) ...[
-            SizedBox(height: quiz == null ? AppSizes.space34 : AppSizes.size20),
+            const SizedBox(height: AppSizes.space34),
             Padding(
-              padding: EdgeInsets.symmetric(
-                vertical: quiz == null ? AppSizes.size20 : AppSizes.size12,
-              ),
+              padding: const EdgeInsets.symmetric(vertical: AppSizes.size20),
               child: _buildExample(context),
             ),
           ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildShortQuizCard(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) => Column(
+        children: [
+          // Anchor the heading to the viewport, independently of answers,
+          // wrapped option rows, feedback, and scrolling in the example.
+          SizedBox(height: constraints.maxHeight * 0.22),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSizes.size24),
+            child: _buildMeaning(context),
+          ),
+          const SizedBox(height: AppSizes.space32),
+          Expanded(
+            child: LayoutBuilder(
+              builder: (context, remaining) => SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: remaining.maxHeight),
+                  child: IntrinsicHeight(
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSizes.size24,
+                          ),
+                          child: _buildExample(context),
+                        ),
+                        Expanded(
+                          child: Center(
+                            child: quizSelection == null
+                                ? const SizedBox.shrink()
+                                : Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: AppSizes.space20,
+                                    ),
+                                    child: ShortQuizFeedback(
+                                      quiz: quiz!,
+                                      selection: quizSelection!,
+                                    ),
+                                  ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -849,6 +899,7 @@ class _StudyCard extends StatelessWidget {
             initialSelection: quizSelection,
             onSelected: onQuizSelected,
             showFurigana: showFurigana,
+            translation: _buildTranslation(context, translationStyle),
           )
         else
           Semantics(
@@ -878,8 +929,10 @@ class _StudyCard extends StatelessWidget {
               ),
             ),
           ),
-        const SizedBox(height: AppSizes.space4),
-        _buildTranslation(context, translationStyle),
+        if (quiz == null) ...[
+          const SizedBox(height: AppSizes.space4),
+          _buildTranslation(context, translationStyle),
+        ],
       ],
     );
   }

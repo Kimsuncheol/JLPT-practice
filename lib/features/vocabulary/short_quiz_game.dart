@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jlpt_practice/core/constants/app_spacing.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_masking.dart';
 import 'package:jlpt_practice/features/vocabulary/example_furigana_text.dart';
@@ -10,6 +11,7 @@ class ShortQuizGame extends StatefulWidget {
     required this.showFurigana,
     this.initialSelection,
     this.onSelected,
+    this.translation,
     super.key,
   });
 
@@ -17,6 +19,7 @@ class ShortQuizGame extends StatefulWidget {
   final ValueChanged<String?>? onSelected;
   final ShortQuiz quiz;
   final bool showFurigana;
+  final Widget? translation;
 
   @override
   State<ShortQuizGame> createState() => _ShortQuizGameState();
@@ -217,7 +220,11 @@ class _ShortQuizGameState extends State<ShortQuizGame> {
           replacementLabels: {ShortQuiz.placeholder: _selected ?? '…'},
           hideCoveredReadings: true,
         ),
-        const SizedBox(height: 12),
+        if (widget.translation != null) ...[
+          const SizedBox(height: 8),
+          Center(child: widget.translation!),
+        ],
+        const SizedBox(height: AppSpacing.shortQuizTranslationOptions),
         Wrap(
           spacing: 8,
           runSpacing: 8,
@@ -238,39 +245,47 @@ class _ShortQuizGameState extends State<ShortQuizGame> {
                 ),
           ],
         ),
-        if (_selected != null) ...[
-          const SizedBox(height: 12),
-          Semantics(
-            liveRegion: true,
-            child: Row(
-              key: const ValueKey('short-quiz-feedback'),
-              children: [
-                Icon(
-                  correct ? Icons.check_circle_rounded : Icons.cancel_rounded,
-                  color: correct ? colors.primary : colors.error,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    correct
-                        ? context.strings('correct')
-                        : '${context.strings('incorrect')} · ${context.strings('answer')}: ${quiz.answer}',
-                  ),
-                ),
-              ],
+      ],
+    );
+  }
+}
+
+class ShortQuizFeedback extends StatelessWidget {
+  const ShortQuizFeedback({
+    required this.quiz,
+    required this.selection,
+    super.key,
+  });
+
+  final ShortQuiz quiz;
+  final String selection;
+
+  @override
+  Widget build(BuildContext context) {
+    final correct = quiz.grade(selection);
+    final colors = Theme.of(context).colorScheme;
+    return Semantics(
+      liveRegion: true,
+      child: Row(
+        key: const ValueKey('short-quiz-feedback'),
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            correct ? Icons.check_circle_rounded : Icons.cancel_rounded,
+            color: correct ? colors.primary : colors.error,
+          ),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text(
+              correct
+                  ? context.strings('correct')
+                  : '${context.strings('incorrect')} · ${context.strings('answer')}: ${quiz.answer}',
+              textAlign: TextAlign.center,
             ),
           ),
-          TextButton(
-            onPressed: _moving
-                ? null
-                : () {
-                    setState(() => _selected = null);
-                    widget.onSelected?.call(null);
-                  },
-            child: Text(context.strings('tryAgain')),
-          ),
         ],
-      ],
+      ),
     );
   }
 }

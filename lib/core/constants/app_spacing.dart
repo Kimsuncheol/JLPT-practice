@@ -2,6 +2,9 @@
 class AppSpacing {
   AppSpacing._();
 
+  // Study short quiz: gap between the translation and answer chips.
+  static const double shortQuizTranslationOptions = 20;
+
   // Gap between items along the main axis (spacing)
   static const double item8 = 8;
   static const double item9 = 9;

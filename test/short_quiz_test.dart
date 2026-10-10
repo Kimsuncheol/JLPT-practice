@@ -101,19 +101,38 @@ void main() {
     }
   });
 
-  testWidgets('hover, answer travel, immediate feedback and retry', (
+  testWidgets('hover, answer travel and immediate centered feedback', (
     tester,
   ) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: Padding(
-            padding: const EdgeInsets.all(20),
-            child: ShortQuizGame(quiz: quiz, showFurigana: false),
+    Future<void> mountGame() async {
+      String? selection;
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: StatefulBuilder(
+              builder: (context, setState) => Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    ShortQuizGame(
+                      quiz: quiz,
+                      showFurigana: false,
+                      onSelected: (answer) =>
+                          setState(() => selection = answer),
+                    ),
+                    if (selection != null)
+                      ShortQuizFeedback(quiz: quiz, selection: selection!),
+                  ],
+                ),
+              ),
+            ),
           ),
         ),
-      ),
-    );
+      );
+    }
+
+    await mountGame();
     expect(find.text('たべます'), findsOneWidget);
     expect(
       find.byKey(const ValueKey('short-quiz-reading-飲みます')),
@@ -138,7 +157,8 @@ void main() {
       '飲みます',
     );
     expect(tester.takeException(), isNull);
-    await tester.tap(find.text('Try again'));
+    expect(find.text('Try again'), findsNothing);
+    await mountGame();
     await tester.pumpAndSettle();
     await tester.tap(find.widgetWithText(ActionChip, '食べます'));
     await tester.pump();
