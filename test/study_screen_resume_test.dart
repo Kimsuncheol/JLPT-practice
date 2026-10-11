@@ -315,6 +315,122 @@ void main() {
     );
   });
 
+  testWidgets('one-second hold toggles continuous short quizzes across words', (
+    tester,
+  ) async {
+    final container = ProviderContainer(
+      overrides: [
+        appControllerProvider.overrideWith(
+          () => _ResumeAppController('word_0', 0, withExamples: true),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container.read(appControllerProvider.future);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp(
+          theme: AppTheme.light(),
+          home: const StudyScreen(day: 2),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    final trigger = find.text('Short\nquiz');
+    final pages = find.byKey(const ValueKey('study-word-pages'));
+
+    final hold = await tester.startGesture(tester.getCenter(trigger));
+    await tester.pump(const Duration(milliseconds: 999));
+    expect(find.byType(ShortQuizGame), findsNothing);
+    await tester.pump(const Duration(milliseconds: 1));
+    expect(find.byType(ShortQuizGame), findsOneWidget);
+    expect(find.byIcon(Icons.all_inclusive), findsOneWidget);
+    await hold.up();
+    await tester.pumpAndSettle();
+    expect(find.byType(ShortQuizGame), findsOneWidget);
+
+    // A short tap switches to a one-time quiz even before answering.
+    await tester.tap(trigger);
+    await tester.pumpAndSettle();
+    expect(find.byType(ShortQuizGame), findsOneWidget);
+    expect(find.byIcon(Icons.all_inclusive), findsNothing);
+    await tester.drag(pages, const Offset(-600, 0));
+    await tester.pumpAndSettle();
+    expect(find.byType(ShortQuizGame), findsNothing);
+
+    final enableAgain = await tester.startGesture(tester.getCenter(trigger));
+    await tester.pump(const Duration(seconds: 1));
+    await enableAgain.up();
+    await tester.pumpAndSettle();
+
+    // Switching during feedback restarts the current quiz without continuous mode.
+    final answer = tester
+        .widget<ShortQuizGame>(find.byType(ShortQuizGame))
+        .quiz
+        .answer;
+    await tester.tap(find.widgetWithText(ActionChip, answer));
+    await tester.pumpAndSettle();
+    expect(find.text('Correct'), findsOneWidget);
+    await tester.tap(trigger);
+    await tester.pumpAndSettle();
+    expect(find.text('Correct'), findsNothing);
+    expect(find.widgetWithText(ActionChip, answer), findsOneWidget);
+    expect(find.byIcon(Icons.all_inclusive), findsNothing);
+    await tester.pump(const Duration(seconds: 2));
+    expect(find.byType(ShortQuizGame), findsOneWidget);
+
+    await tester.tap(find.widgetWithText(ActionChip, answer));
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 2));
+    await tester.pumpAndSettle();
+    expect(find.byType(ShortQuizGame), findsNothing);
+    expect(find.byIcon(Icons.all_inclusive), findsNothing);
+
+    final continuousHold = await tester.startGesture(tester.getCenter(trigger));
+    await tester.pump(const Duration(seconds: 1));
+    await continuousHold.up();
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(ActionChip, answer));
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 2));
+    await tester.pumpAndSettle();
+    expect(find.byType(ShortQuizGame), findsNothing);
+    expect(find.byIcon(Icons.all_inclusive), findsOneWidget);
+
+    for (final word in ['単語8', '単語9']) {
+      await tester.drag(pages, const Offset(-600, 0));
+      await tester.pumpAndSettle();
+      expect(find.byType(ShortQuizGame), findsOneWidget);
+      expect(
+        tester
+            .widget<ShortQuizGame>(find.byType(ShortQuizGame))
+            .quiz
+            .entry
+            .word,
+        word,
+      );
+      expect(find.text('Correct'), findsNothing);
+    }
+
+    final secondHold = await tester.startGesture(tester.getCenter(trigger));
+    await tester.pump(const Duration(seconds: 1));
+    await secondHold.up();
+    await tester.pumpAndSettle();
+    expect(find.byType(ShortQuizGame), findsNothing);
+    expect(find.byIcon(Icons.all_inclusive), findsNothing);
+    await tester.drag(pages, const Offset(-600, 0));
+    await tester.pumpAndSettle();
+    expect(find.byType(ShortQuizGame), findsNothing);
+    await tester.tap(trigger);
+    await tester.pumpAndSettle();
+    expect(find.byType(ShortQuizGame), findsOneWidget);
+    await tester.drag(pages, const Offset(600, 0));
+    await tester.pumpAndSettle();
+    expect(find.byType(ShortQuizGame), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('short quiz lives on the first hide page and restores the card', (
     tester,
   ) async {

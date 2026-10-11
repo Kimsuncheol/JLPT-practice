@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -39,6 +40,8 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
 
   int _index = 0;
   bool _shortQuizEnabled = false;
+  bool _continuousShortQuizEnabled = false;
+  int _shortQuizRun = 0;
   Timer? _shortQuizFeedbackTimer;
   static const _shortQuizFeedbackDuration = Duration(milliseconds: 1500);
   final Map<String, ShortQuiz?> _shortQuizzes = {};
@@ -61,6 +64,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
     // Hot reload preserves cached model instances without running their new
     // constructors. Rebuild quizzes so newly added fields are initialized.
     _shortQuizEnabled = false;
+    _continuousShortQuizEnabled = false;
     _shortQuizzes.clear();
     _shortQuizSelections.clear();
   }
@@ -161,6 +165,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
                       quiz == null ? AppSizes.size14 : 0,
                     ),
                     child: _StudyCard(
+                      key: ValueKey('${word.id}-$_shortQuizRun'),
                       vocabulary: word,
                       quiz: quiz,
                       quizSelection: _shortQuizSelections[word.id],
@@ -195,7 +200,9 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
                           _actionPage([
                             ..._manualActions(state, words[_index]),
                             _CardAction(
-                              icon: _shortQuizEnabled
+                              icon: _continuousShortQuizEnabled
+                                  ? Icons.all_inclusive
+                                  : _shortQuizEnabled
                                   ? Icons.quiz
                                   : Icons.quiz_outlined,
                               label: context.strings('shortQuiz'),
@@ -204,17 +211,19 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
                                       _quizFor(words[_index], state) == null
                                   ? null
                                   : () {
-                                      _shortQuizFeedbackTimer?.cancel();
-                                      setState(
-                                        () => _shortQuizEnabled =
-                                            !_shortQuizEnabled,
-                                      );
-                                      _shortQuizSelections.clear();
-                                      _readingsRequest++;
-                                      if (_ttsService != null) {
-                                        unawaited(_ttsService!.stop());
-                                      }
+                                      final enabled =
+                                          _continuousShortQuizEnabled ||
+                                          !_shortQuizEnabled;
+                                      _continuousShortQuizEnabled = false;
+                                      _setShortQuizEnabled(enabled);
                                     },
+                              onLongPress: () {
+                                _continuousShortQuizEnabled =
+                                    !_continuousShortQuizEnabled;
+                                _setShortQuizEnabled(
+                                  _continuousShortQuizEnabled,
+                                );
+                              },
                             ),
                           ]),
                         ],
@@ -311,6 +320,17 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
         word.id,
         () => buildShortQuiz(word, state.selectedVocabulary),
       );
+
+  void _setShortQuizEnabled(bool enabled) {
+    _shortQuizFeedbackTimer?.cancel();
+    setState(() {
+      _shortQuizEnabled = enabled;
+      _shortQuizSelections.clear();
+      _shortQuizRun++;
+    });
+    _readingsRequest++;
+    if (_ttsService != null) unawaited(_ttsService!.stop());
+  }
 
   void _handleQuizSelected(Vocabulary word, String? answer) {
     _shortQuizFeedbackTimer?.cancel();
@@ -574,11 +594,12 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
     required AppState state,
   }) async {
     final request = ++_pageChangeRequest;
-    if (_shortQuizEnabled && index != _index) {
+    if (index != _index) {
       _shortQuizFeedbackTimer?.cancel();
       setState(() {
-        _shortQuizEnabled = false;
+        _shortQuizEnabled = _continuousShortQuizEnabled;
         _shortQuizSelections.clear();
+        _shortQuizRun++;
       });
     }
     if (_ttsService != null) await _ttsService!.stop();
@@ -643,6 +664,7 @@ class _StudyCard extends StatelessWidget {
     required this.maskMeaningInTranslation,
     required this.onSpeakWord,
     required this.onSpeakExample,
+    super.key,
   });
 
   final Vocabulary vocabulary;
@@ -1006,39 +1028,53 @@ class _CardAction extends StatelessWidget {
     required this.icon,
     required this.label,
     required this.onTap,
+    this.onLongPress,
   });
   final IconData icon;
   final String label;
 
-  /// Null makes the action inert and draws it semi-transparent.
+  /// With no callbacks the action is inert and semi-transparent.
   final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
 
   @override
   Widget build(BuildContext context) => Opacity(
-    opacity: onTap == null ? 0.38 : 1,
-    child: InkWell(
-      borderRadius: BorderRadius.circular(AppSizes.radius16),
-      splashFactory: NoSplash.splashFactory,
-      highlightColor: Colors.transparent,
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          vertical: AppSizes.size10,
-          horizontal: AppSizes.size12,
-        ),
-        child: Column(
-          children: [
-            Icon(icon),
-            const SizedBox(height: AppSizes.space6),
-            Text(
-              label.replaceFirst(' ', '\n'),
-              semanticsLabel: label,
-              maxLines: 2,
-              textAlign: TextAlign.center,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.labelSmall,
-            ),
-          ],
+    opacity: onTap == null && onLongPress == null ? 0.38 : 1,
+    child: RawGestureDetector(
+      gestures: {
+        if (onLongPress != null)
+          LongPressGestureRecognizer:
+              GestureRecognizerFactoryWithHandlers<LongPressGestureRecognizer>(
+                () => LongPressGestureRecognizer(
+                  duration: const Duration(seconds: 1),
+                ),
+                (recognizer) => recognizer.onLongPress = onLongPress,
+              ),
+      },
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppSizes.radius16),
+        splashFactory: NoSplash.splashFactory,
+        highlightColor: Colors.transparent,
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            vertical: AppSizes.size10,
+            horizontal: AppSizes.size12,
+          ),
+          child: Column(
+            children: [
+              Icon(icon),
+              const SizedBox(height: AppSizes.space6),
+              Text(
+                label.replaceFirst(' ', '\n'),
+                semanticsLabel: label,
+                maxLines: 2,
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.labelSmall,
+              ),
+            ],
+          ),
         ),
       ),
     ),
