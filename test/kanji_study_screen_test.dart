@@ -693,7 +693,7 @@ void main() {
     }
   });
 
-  testWidgets('hide reading covers sentence furigana only', (tester) async {
+  testWidgets('hide reading covers word and sentence furigana', (tester) async {
     await _pumpStudy(tester);
     await _flip(tester);
     Finder ruby(String word, String text) => find.descendant(
@@ -707,12 +707,29 @@ void main() {
     await tester.pumpAndSettle();
     expect(ruby('一つ', 'ひと'), findsNothing);
     expect(ruby('一部', 'いちぶ'), findsNothing);
-    // Readings and example word readings are not touched.
+    // Kun/on reading chips stay visible, while example word readings are covered.
     expect(_inBack(find.text('ひと.つ')), findsOneWidget);
-    expect(_inBack(find.text('ひとつ')), findsOneWidget);
+    expect(_inBack(find.text('いつ')), findsOneWidget);
+    expect(_inBack(find.text('ひとつ')), findsNothing);
+    expect(_inBack(find.text('いちぶ')), findsNothing);
+    expect(_inBack(find.text('一つ')), findsOneWidget);
+    expect(_inBack(find.text('一部')), findsWidgets);
 
     await tester.tap(find.byKey(const ValueKey('hide-back-furigana')));
     await tester.pumpAndSettle();
+    expect(ruby('一つ', 'ひと'), findsOneWidget);
+    expect(ruby('一部', 'いちぶ'), findsOneWidget);
+    expect(_inBack(find.text('ひとつ')), findsOneWidget);
+    expect(_inBack(find.text('いちぶ')), findsNWidgets(2));
+
+    await tester.tap(find.byKey(const ValueKey('hide-back-kun')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('hide-back-furigana')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('hide-back-furigana')));
+    await tester.pumpAndSettle();
+    // Showing furigana preserves the separately hidden kun readings.
+    expect(_inBack(find.text('ひとつ')), findsNothing);
     expect(ruby('一つ', 'ひと'), findsOneWidget);
   });
 

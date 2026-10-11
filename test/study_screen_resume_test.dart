@@ -17,6 +17,7 @@ import 'package:jlpt_practice/features/settings/levels_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/study_finish_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/study_quiz_selection_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_tape.dart';
+import 'package:jlpt_practice/features/vocabulary/masked_translation.dart';
 import 'package:jlpt_practice/features/vocabulary/study_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/short_quiz_game.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -573,7 +574,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('bottom buttons cover the reading, word and meanings with tape', (
+  testWidgets('hide controls preserve a transparent meanings area', (
     tester,
   ) async {
     final container = ProviderContainer(
@@ -621,10 +622,40 @@ void main() {
     expect(find.textContaining('単語6を使います。', findRichText: true), findsNothing);
     expect(find.text('Show\nword'), findsOneWidget);
 
+    final meaningsArea = find.byKey(const ValueKey('study-meanings-area'));
+    final meaningsSize = tester.getSize(meaningsArea);
+    final meaningsPosition = tester.getTopLeft(meaningsArea);
+    final examplePosition = tester.getTopLeft(example);
     await tester.tap(find.text('Hide\nmeanings'));
     await tester.pumpAndSettle();
-    expect(find.text('word'), findsNothing);
+    expect(find.text('word').hitTestable(), findsNothing);
+    expect(tester.getSize(meaningsArea), meaningsSize);
+    expect(tester.getTopLeft(meaningsArea), meaningsPosition);
+    expect(tester.getTopLeft(example), examplePosition);
+    expect(tester.widget<Container>(meaningsArea).color, Colors.transparent);
+    expect(
+      find.descendant(of: meaningsArea, matching: find.byType(CoverTape)),
+      findsNothing,
+    );
     expect(find.text('I use the word every day.'), findsNothing);
+    final translationText = tester.widget<Text>(
+      find.descendant(
+        of: find.byType(MaskedSegmentsText),
+        matching: find.byWidgetPredicate(
+          (widget) =>
+              widget is Text &&
+              widget.textSpan is TextSpan &&
+              ((widget.textSpan! as TextSpan).children ?? [])
+                  .whereType<TextSpan>()
+                  .any((span) => span.text == 'word'),
+        ),
+      ),
+    );
+    final hiddenMeaning = (translationText.textSpan! as TextSpan).children!
+        .whereType<TextSpan>()
+        .singleWhere((span) => span.text == 'word');
+    expect(hiddenMeaning.style!.foreground!.color, Colors.transparent);
+    expect(hiddenMeaning.semanticsLabel, isEmpty);
 
     await tester.tap(find.text('Hide\nreading'));
     await tester.pumpAndSettle();
@@ -677,7 +708,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('単語6'), findsNothing);
     expect(find.text('たんご'), findsNothing);
-    expect(find.text('word'), findsNothing);
+    expect(find.text('word').hitTestable(), findsNothing);
 
     final pageView = find.byKey(const ValueKey('study-word-pages'));
     await tester.drag(pageView, Offset(-tester.getSize(pageView).width, 0));
@@ -685,7 +716,7 @@ void main() {
 
     expect(find.text('単語7'), findsOneWidget);
     expect(find.text('たんご'), findsNWidgets(2));
-    expect(find.text('word'), findsOneWidget);
+    expect(find.text('word').hitTestable(), findsOneWidget);
     expect(find.text('Hide\nreading'), findsOneWidget);
     expect(find.text('Hide\nword'), findsOneWidget);
     expect(find.text('Hide\nmeanings'), findsOneWidget);
@@ -805,7 +836,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('word'), findsNothing);
+    expect(find.text('word').hitTestable(), findsNothing);
     expect(find.text('I use the word every day.'), findsNothing);
     expect(
       find.textContaining('I use the', findRichText: true),

@@ -873,15 +873,16 @@ class _StudyCard extends StatelessWidget {
   Widget _buildMeaning(BuildContext context) {
     final style = Theme.of(context).textTheme.headlineMedium;
     final meaning = vocabulary.meaning(language);
-    if (!hideMeaning) {
-      return Text(meaning, textAlign: TextAlign.center, style: style);
-    }
-    return coverTapeFor(
-      characters: meaning.length,
-      fontSize: style?.fontSize ?? 28,
-      maxWidth: AppSizes.size260,
-      glyphWidth: 0.7,
-      tilt: 0.015,
+    return Container(
+      key: const ValueKey('study-meanings-area'),
+      color: Colors.transparent,
+      child: Visibility(
+        visible: !hideMeaning,
+        maintainState: true,
+        maintainAnimation: true,
+        maintainSize: true,
+        child: Text(meaning, textAlign: TextAlign.center, style: style),
+      ),
     );
   }
 

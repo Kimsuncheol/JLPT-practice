@@ -89,7 +89,7 @@ class ExampleTile extends StatelessWidget {
   final String language;
   final bool hideReadings;
 
-  /// Covers the furigana of the sentence only.
+  /// Covers the readings of both the example word and sentence.
   final bool hideFurigana;
   final bool hideMeanings;
   final ValueChanged<String> onSpeakSentence;
@@ -106,7 +106,7 @@ class ExampleTile extends StatelessWidget {
         children: [
           // The reading is stacked above the word, with no brackets around it.
           if (example.reading.isNotEmpty)
-            hideReadings
+            hideReadings || hideFurigana
                 ? coverTapeFor(
                     characters: example.reading.length,
                     fontSize: AppSizes.font12,
