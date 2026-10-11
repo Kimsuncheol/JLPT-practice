@@ -610,9 +610,21 @@ void main() {
     expect(find.text('まいにち たんごを つかいます。'), findsNothing);
     expect(find.text('word'), findsOneWidget);
 
+    final wordArea = find.byKey(const ValueKey('study-word-area'));
+    final wordRect = tester.getRect(wordArea);
+    final exampleRect = tester.getRect(example);
+    final meaningRect = tester.getRect(
+      find.byKey(const ValueKey('study-meanings-area')),
+    );
     await tester.tap(find.text('Hide\nword'));
     await tester.pumpAndSettle();
     expect(find.text('単語6'), findsNothing);
+    expect(tester.getRect(wordArea), wordRect);
+    expect(tester.getRect(example), exampleRect);
+    expect(
+      tester.getRect(find.byKey(const ValueKey('study-meanings-area'))),
+      meaningRect,
+    );
     // The example sentence keeps its text but the word in it is taped.
     expect(find.byType(CoverTape), findsWidgets);
     expect(
@@ -660,9 +672,11 @@ void main() {
     await tester.tap(find.text('Hide\nreading'));
     await tester.pumpAndSettle();
     expect(find.text('たんご'), findsNothing);
-    // Example ruby is removed from layout so it cannot keep widening the
-    // sentence while readings are hidden.
-    expect(find.byKey(const ValueKey('example-ruby-2')), findsNothing);
+    // Hidden ruby retains its space to keep the whole card stationary.
+    expect(find.byKey(const ValueKey('example-ruby-2')), findsOneWidget);
+    expect(tester.getRect(wordArea), wordRect);
+    expect(tester.getRect(example), exampleRect);
+    expect(tester.getTopLeft(meaningsArea), meaningsPosition);
     expect(dailyRuby, findsNothing);
     expect(
       find.descendant(
@@ -797,6 +811,11 @@ void main() {
     expect(find.text('Hide\nword & reading'), findsOneWidget);
     expect(find.byKey(const ValueKey('study-action-carousel')), findsNothing);
 
+    final wordArea = find.byKey(const ValueKey('study-word-area'));
+    final meaningsArea = find.byKey(const ValueKey('study-meanings-area'));
+    final wordRect = tester.getRect(wordArea);
+    final meaningsRect = tester.getRect(meaningsArea);
+    final romajiRect = tester.getRect(find.text('kotoba'));
     await tester.tap(find.text('Hide\nword & reading'));
     await tester.pumpAndSettle();
 
@@ -804,6 +823,15 @@ void main() {
     expect(find.text('kotoba'), findsNothing);
     expect(find.text('Show\nword & reading'), findsOneWidget);
     expect(find.byType(CoverTape), findsWidgets);
+    expect(tester.getRect(wordArea), wordRect);
+    expect(tester.getRect(meaningsArea), meaningsRect);
+    final romajiText = find.byWidgetPredicate(
+      (widget) =>
+          widget is Text &&
+          widget.textSpan is TextSpan &&
+          (widget.textSpan! as TextSpan).text == 'kotoba',
+    );
+    expect(tester.getRect(romajiText), romajiRect);
 
     await tester.tap(find.text('Show\nword & reading'));
     await tester.pumpAndSettle();

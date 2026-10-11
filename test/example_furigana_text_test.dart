@@ -9,6 +9,7 @@ void main() {
     String marked, {
     double width = 300,
     bool hideReadings = false,
+    bool maintainReadingLayout = false,
     WrapAlignment alignment = WrapAlignment.center,
   }) => MaterialApp(
     home: Scaffold(
@@ -20,12 +21,43 @@ void main() {
             style: const TextStyle(fontSize: 22),
             wordTargets: const [],
             hideReadings: hideReadings,
+            maintainReadingLayout: maintainReadingLayout,
             alignment: alignment,
           ),
         ),
       ),
     ),
   );
+
+  testWidgets('study ruby keeps sentence positions when hidden', (
+    tester,
+  ) async {
+    const marked = '{新|あたら}しい{言葉|ことば}を{毎日|まいにち}{勉強|べんきょう}します。';
+    for (final width in [120.0, 300.0]) {
+      await tester.pumpWidget(
+        example(marked, width: width, maintainReadingLayout: true),
+      );
+      final sentenceSize = tester.getSize(find.byType(ExampleFuriganaText));
+      final positions = {
+        for (final text in ['新', '言葉', '毎日', '勉強'])
+          text: tester.getRect(find.text(text)),
+      };
+      await tester.pumpWidget(
+        example(
+          marked,
+          width: width,
+          hideReadings: true,
+          maintainReadingLayout: true,
+        ),
+      );
+      expect(tester.getSize(find.byType(ExampleFuriganaText)), sentenceSize);
+      for (final entry in positions.entries) {
+        expect(tester.getRect(find.text(entry.key)), entry.value);
+      }
+      expect(find.text('あたら', findRichText: true), findsNothing);
+      expect(find.text('べんきょう', findRichText: true), findsNothing);
+    }
+  });
 
   testWidgets('only kanji receive readings above the written form', (
     tester,

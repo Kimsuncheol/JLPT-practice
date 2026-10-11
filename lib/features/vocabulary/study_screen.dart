@@ -774,20 +774,12 @@ class _StudyCard extends StatelessWidget {
     final titleLarge = Theme.of(context).textTheme.titleLarge;
     return _speechTarget(
       onTap: onSpeakWord,
-      child: showFurigana && quiz == null
-          ? Text(
-              breakLongSlashSeparatedLabel(vocabulary.reading),
-              textAlign: TextAlign.center,
-              style: titleLarge?.copyWith(
-                color: Theme.of(context).colorScheme.primary,
-              ),
-            )
-          : coverTapeFor(
-              characters: vocabulary.reading.length,
-              fontSize: titleLarge?.fontSize ?? 22,
-              maxWidth: AppSizes.size220,
-              glyphWidth: 0.9,
-            ),
+      child: _coveredReadingText(
+        breakLongSlashSeparatedLabel(vocabulary.reading),
+        style: titleLarge?.copyWith(
+          color: Theme.of(context).colorScheme.primary,
+        ),
+      ),
     );
   }
 
@@ -798,18 +790,27 @@ class _StudyCard extends StatelessWidget {
     );
     return _speechTarget(
       onTap: onSpeakWord,
-      child: showFurigana && quiz == null
-          ? Text(
-              breakLongSlashSeparatedLabel(vocabulary.romaji),
-              textAlign: TextAlign.center,
-              style: style,
-            )
-          : coverTapeFor(
-              characters: vocabulary.romaji.length,
-              fontSize: style?.fontSize ?? 16,
-              maxWidth: AppSizes.size180,
-              glyphWidth: 0.6,
-            ),
+      child: _coveredReadingText(
+        breakLongSlashSeparatedLabel(vocabulary.romaji),
+        style: style,
+      ),
+    );
+  }
+
+  Widget _coveredReadingText(String text, {required TextStyle? style}) {
+    final hidden = !showFurigana || quiz != null;
+    return Stack(
+      children: [
+        Text.rich(
+          TextSpan(text: text, semanticsLabel: hidden ? '' : null),
+          textAlign: TextAlign.center,
+          style: hidden
+              ? (style ?? const TextStyle()).copyWith(color: Colors.transparent)
+              : style,
+        ),
+        if (hidden)
+          const Positioned.fill(child: CoverTape(width: 0, height: 0)),
+      ],
     );
   }
 
@@ -829,23 +830,30 @@ class _StudyCard extends StatelessWidget {
           ),
           child: FittedBox(
             fit: BoxFit.scaleDown,
-            child: hideWord
-                ? coverTapeFor(
-                    characters: vocabulary.word.length,
-                    fontSize: AppSizes.font56 * 1.15,
-                    tilt: -0.02,
-                  )
-                : Text(
-                    displayWord,
-                    maxLines: displayWord.contains('\n') ? null : 1,
-                    softWrap: false,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: AppSizes.font56,
-                      height: AppSizes.lineHeight1_15,
-                      fontWeight: AppFontWeights.extraBold,
-                    ),
+            child: Stack(
+              key: const ValueKey('study-word-area'),
+              children: [
+                Text.rich(
+                  TextSpan(
+                    text: displayWord,
+                    semanticsLabel: hideWord ? '' : null,
                   ),
+                  maxLines: displayWord.contains('\n') ? null : 1,
+                  softWrap: false,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: hideWord ? Colors.transparent : null,
+                    fontSize: AppSizes.font56,
+                    height: AppSizes.lineHeight1_15,
+                    fontWeight: AppFontWeights.extraBold,
+                  ),
+                ),
+                if (hideWord)
+                  const Positioned.fill(
+                    child: CoverTape(width: 0, height: 0, tilt: -0.02),
+                  ),
+              ],
+            ),
           ),
         ),
       ),
@@ -926,6 +934,7 @@ class _StudyCard extends StatelessWidget {
                       ? wordMaskTargets(vocabulary.word)
                       : const [],
                   hideReadings: !showFurigana,
+                  maintainReadingLayout: true,
                   alignment: WrapAlignment.start,
                 ),
               ),
