@@ -82,6 +82,33 @@ void main() {
     }
   });
 
+  test('speech falls back to written text only without a reading', () {
+    const example = VocabularyExample(
+      sentence: 'こんにちは。',
+      translations: {},
+      quizSentence: '',
+      answer: '',
+    );
+    expect(example.speechText, 'こんにちは。');
+    for (final variant in [
+      (reading: 'なま', furigana: 'せい', expected: 'なま'),
+      (reading: '', furigana: 'せい', expected: 'せい'),
+      (reading: '', furigana: '', expected: '生'),
+    ]) {
+      final word = Vocabulary.fromJson({
+        'id': 'test',
+        'word': '生',
+        'reading': variant.reading,
+        'furigana': variant.furigana,
+        'meanings': <String, dynamic>{},
+        'partOfSpeech': 'noun',
+        'jlptLevel': 'N5',
+        'example': {'sentence': '', 'translations': <String, String>{}},
+      });
+      expect(word.speechText, variant.expected);
+    }
+  });
+
   test('only speaker-tagged examples are classified as role-play', () {
     final rolePlayWords = catalog
         .map(Vocabulary.fromCatalogJson)
@@ -107,6 +134,7 @@ void main() {
     });
 
     expect(example.sentenceReading, 'りんごをひとつください。');
+    expect(example.speechText, 'りんごをひとつください。');
     expect(example.sentenceReading, isNot(contains('(')));
     expect(example.sentenceReading, isNot(contains('（')));
   });

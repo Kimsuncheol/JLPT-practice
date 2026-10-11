@@ -141,7 +141,11 @@ class ExampleTile extends StatelessWidget {
                 key: ValueKey('sentence-${example.word}'),
                 borderRadius: BorderRadius.circular(AppSizes.radius8),
                 splashFactory: NoSplash.splashFactory,
-                onTap: () => onSpeakSentence(example.sentence),
+                onTap: () => onSpeakSentence(
+                  example.sentenceReading.trim().isNotEmpty
+                      ? example.sentenceReading
+                      : example.sentence,
+                ),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: AppSizes.size2),
                   child: ExampleFuriganaText(

@@ -177,9 +177,9 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
                       hideMeaning: meaningsHidden,
                       maskMeaningInTranslation: meaningsHidden,
                       onSpeakWord: () =>
-                          _speakIfAudible(word.reading, word: word),
+                          _speakIfAudible(word.speechText, word: word),
                       onSpeakExample: () =>
-                          _speakIfAudible(word.example.sentence),
+                          _speakIfAudible(word.example.speechText),
                     ),
                   );
                 },
@@ -569,11 +569,11 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
   }
 
   void _speakWord(Vocabulary word) {
-    final readings = splitReadings(word.reading);
+    final readings = splitReadings(word.speechText);
     if (readings.length > 1) {
       _speakReadings(readings);
     } else {
-      _speak(word.word);
+      _speak(word.speechText);
     }
   }
 

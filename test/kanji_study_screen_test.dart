@@ -568,7 +568,7 @@ void main() {
     expect(find.text('2 / 2'), findsOneWidget);
   });
 
-  testWidgets('tapping an example sentence speaks that sentence', (
+  testWidgets('tapping an example sentence uses its furigana when available', (
     tester,
   ) async {
     final speech = await _pumpStudy(tester);
@@ -582,7 +582,7 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    expect(speech.spoken, ['りんごを一つください。', '一部が遅れた。']);
+    expect(speech.spoken, ['りんごをひとつください。', 'いちぶがおくれた。']);
   });
 
   testWidgets('the card fills the screen width with no border or corners', (

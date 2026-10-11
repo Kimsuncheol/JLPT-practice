@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
+import 'package:jlpt_practice/core/services/tts_service.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/core/utils/study_batches.dart';
 import 'package:jlpt_practice/features/vocabulary/study_finish/studied_words_section.dart';
@@ -70,7 +71,17 @@ class StudyFinishScreen extends ConsumerWidget {
                 flex: 5,
                 child: StudiedWordsSection(
                   words: [for (final word in todaysWords) word.word],
-                  onWordTap: (word) => ref.read(ttsServiceProvider).speak(word),
+                  onWordTap: (word) async {
+                    final vocabulary = todaysWords.firstWhere(
+                      (entry) => entry.word == word,
+                    );
+                    final service = ref.read(ttsServiceProvider);
+                    for (final reading in splitReadings(
+                      vocabulary.speechText,
+                    )) {
+                      await service.speak(reading);
+                    }
+                  },
                 ),
               ),
               const SizedBox(height: AppSizes.space16),

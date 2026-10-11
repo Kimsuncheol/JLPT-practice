@@ -3,10 +3,11 @@ import 'dart:async';
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter/widgets.dart';
 import 'package:jlpt_practice/data/models/study_preferences.dart';
+import 'package:jlpt_practice/data/models/kanji.dart' show parseFurigana;
 import 'package:volume_controller/volume_controller.dart';
 
 final _furiganaAfterKanji = RegExp(
-  r'([\u3400-\u4DBF\u4E00-\u9FFF々〆ヵヶ])[\u0020\u3000]*(?:（[ぁ-ゖァ-ヺー・]+）|\([ぁ-ゖァ-ヺー・]+\))',
+  r'[\u3400-\u4DBF\u4E00-\u9FFF々〆ヵヶ]+[\u0020\u3000]*(?:（([ぁ-ゖァ-ヺー・]+)）|\(([ぁ-ゖァ-ヺー・]+)\))',
 );
 
 final _inlineDialogueSpeaker = RegExp(
@@ -14,8 +15,13 @@ final _inlineDialogueSpeaker = RegExp(
   multiLine: true,
 );
 
-String prepareJapaneseTextForSpeech(String text) => text
-    .replaceAllMapped(_furiganaAfterKanji, (match) => match.group(1)!)
+String prepareJapaneseTextForSpeech(String text) => parseFurigana(text)
+    .map((segment) => segment.ruby ?? segment.text)
+    .join()
+    .replaceAllMapped(
+      _furiganaAfterKanji,
+      (match) => match.group(1) ?? match.group(2)!,
+    )
     .replaceAllMapped(_inlineDialogueSpeaker, (match) => match.group(1)!);
 
 List<String> splitReadings(String reading) => reading

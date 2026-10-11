@@ -260,7 +260,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('単語6'), findsOneWidget);
-    expect(speech.events, ['speak:単語6']);
+    expect(speech.events, ['speak:たんご']);
   });
 
   testWidgets('a new day stays silent while automatic pronunciation is off', (
@@ -862,7 +862,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('単語2'), findsOneWidget);
-    expect(speech.events, ['speak:単語1', 'speak:たんご', 'stop', 'speak:単語2']);
+    expect(speech.events, ['speak:たんご', 'speak:たんご', 'stop', 'speak:たんご']);
   });
 
   for (final theme in {

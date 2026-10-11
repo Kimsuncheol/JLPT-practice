@@ -46,6 +46,11 @@ class VocabularyExample {
       : parseFurigana(
           sentenceFurigana,
         ).map((segment) => segment.ruby ?? segment.text).join();
+
+  /// Uses the supplied pronunciation even when readings are hidden in the UI.
+  String get speechText =>
+      sentenceReading.trim().isNotEmpty ? sentenceReading : sentence;
+
   final Map<String, String> translations;
   final String quizSentence;
   final String answer;
@@ -193,6 +198,12 @@ class Vocabulary {
   final VocabularyExample example;
   final int rank;
   final bool isCommon;
+
+  String get speechText => reading.trim().isNotEmpty
+      ? reading
+      : furigana.trim().isNotEmpty
+      ? furigana
+      : word;
 
   bool get hasExample => example.sentence.isNotEmpty;
 
