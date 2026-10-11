@@ -717,7 +717,7 @@ class _StudyCard extends StatelessWidget {
       builder: (context, constraints) => Column(
         children: [
           // Anchor the heading to the viewport, independently of answers,
-          // wrapped option rows, feedback, and scrolling in the example.
+          // wrapped option rows and scrolling in the example.
           SizedBox(height: constraints.maxHeight * 0.22),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: AppSizes.size24),
@@ -738,21 +738,7 @@ class _StudyCard extends StatelessWidget {
                           ),
                           child: _buildExample(context),
                         ),
-                        Expanded(
-                          child: Center(
-                            child: quizSelection == null
-                                ? const SizedBox.shrink()
-                                : Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: AppSizes.space20,
-                                    ),
-                                    child: ShortQuizFeedback(
-                                      quiz: quiz!,
-                                      selection: quizSelection!,
-                                    ),
-                                  ),
-                          ),
-                        ),
+                        const Spacer(),
                       ],
                     ),
                   ),

@@ -371,7 +371,7 @@ void main() {
         .answer;
     await tester.tap(find.widgetWithText(ActionChip, answer));
     await tester.pumpAndSettle();
-    expect(find.text('Correct'), findsOneWidget);
+    expect(find.text('Correct'), findsNothing);
     await tester.tap(trigger);
     await tester.pumpAndSettle();
     expect(find.text('Correct'), findsNothing);
@@ -455,7 +455,6 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Hide\nword'), findsOneWidget);
     expect(find.text('Short\nquiz'), findsOneWidget);
-    final controls = find.byKey(const ValueKey('study-hide-pages'));
     await tester.tap(find.text('Short\nquiz'));
     await tester.pumpAndSettle();
     expect(find.byType(ShortQuizGame), findsOneWidget);
@@ -498,39 +497,17 @@ void main() {
     await tester.pump();
     expect(tester.getTopLeft(find.text('word')), meaningPosition);
     await tester.pumpAndSettle();
-    expect(find.text('Correct'), findsOneWidget);
+    expect(find.text('Correct'), findsNothing);
     expect(tester.getTopLeft(find.text('word')), meaningPosition);
     expect(find.text('Try again'), findsNothing);
-    final feedback = find.byKey(const ValueKey('short-quiz-feedback'));
+    expect(find.byType(ShortQuizFeedback), findsNothing);
     expect(
-      tester.getCenter(feedback).dy,
-      closeTo(
-        (tester.getRect(find.byType(ShortQuizGame)).bottom +
-                tester.getRect(controls).top) /
-            2,
-        0.01,
-      ),
-    );
-    expect(
-      tester.getCenter(feedback).dx,
-      closeTo(tester.getCenter(find.byType(Scaffold)).dx, 0.01),
-    );
-    final translationFinder = find.byWidgetPredicate(
-      (widget) =>
-          widget is Text &&
-          widget.textSpan?.toPlainText() == 'I use the word every day.',
-    );
-    expect(
-      tester.getRect(feedback).top,
-      greaterThan(tester.getRect(translationFinder).bottom),
-    );
-    expect(
-      tester.getRect(feedback).bottom,
-      lessThan(tester.getRect(controls).top),
+      find.byKey(const ValueKey('short-quiz-feedback-image')),
+      findsNothing,
     );
 
     await tester.pump(const Duration(milliseconds: 500));
-    expect(find.text('Correct'), findsOneWidget);
+    expect(find.text('Correct'), findsNothing);
     await tester.pump(const Duration(seconds: 1));
     await tester.pumpAndSettle();
     expect(find.byType(ShortQuizGame), findsNothing);
