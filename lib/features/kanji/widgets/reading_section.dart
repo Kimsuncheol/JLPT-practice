@@ -56,6 +56,7 @@ class ReadingSection extends StatelessWidget {
               ReadingChip(
                 reading: reading,
                 hidden: hideReadings,
+                horizontalPadding: 0,
                 onTap: () => onSpeak(reading),
               ),
           ],

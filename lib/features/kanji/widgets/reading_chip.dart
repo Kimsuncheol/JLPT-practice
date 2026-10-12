@@ -64,6 +64,7 @@ class ReadingChip extends StatelessWidget {
     required this.onTap,
     this.color,
     this.fontSize,
+    this.horizontalPadding = AppSizes.size14,
     super.key,
   });
 
@@ -76,6 +77,7 @@ class ReadingChip extends StatelessWidget {
 
   /// The text size; the theme's title size when null.
   final double? fontSize;
+  final double horizontalPadding;
 
   @override
   Widget build(BuildContext context) {
@@ -95,8 +97,8 @@ class ReadingChip extends StatelessWidget {
           splashFactory: NoSplash.splashFactory,
           onTap: onTap,
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSizes.size14,
+            padding: EdgeInsets.symmetric(
+              horizontal: horizontalPadding,
               vertical: AppSizes.size8,
             ),
             child: CoveredText(text: reading, hidden: hidden, style: style),
