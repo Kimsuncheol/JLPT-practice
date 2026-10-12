@@ -9,7 +9,6 @@ import 'package:jlpt_practice/core/services/tts_service.dart';
 import 'package:jlpt_practice/core/services/volume_service.dart';
 import 'package:jlpt_practice/shared/volume_warning_toast.dart';
 import 'package:jlpt_practice/data/models/grammar_point.dart';
-import 'package:jlpt_practice/data/models/kanji.dart';
 import 'package:jlpt_practice/features/vocabulary/example_furigana_text.dart';
 import 'package:jlpt_practice/data/models/grammar_study_session.dart';
 import 'package:jlpt_practice/features/grammar/grammar_providers.dart';
@@ -285,18 +284,25 @@ class _ExampleCard extends StatelessWidget {
             splashFactory: NoSplash.splashFactory,
             overlayColor: const WidgetStatePropertyAll(Colors.transparent),
             onTap: onSpeak,
-            child: ExampleFuriganaText(
-              key: ValueKey('grammar-example-$number'),
-              segments: [
-                FuriganaSegment('$number. '),
-                ...example.sentenceSegments,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                Text('$number.', style: Theme.of(context).textTheme.titleLarge),
+                const SizedBox(width: AppSizes.space8),
+                Expanded(
+                  child: ExampleFuriganaText(
+                    key: ValueKey('grammar-example-$number'),
+                    segments: example.sentenceSegments,
+                    style:
+                        Theme.of(context).textTheme.titleLarge ??
+                        const TextStyle(fontSize: 22),
+                    wordTargets: const [],
+                    hideReadings: false,
+                    alignment: WrapAlignment.start,
+                  ),
+                ),
               ],
-              style:
-                  Theme.of(context).textTheme.titleLarge ??
-                  const TextStyle(fontSize: 22),
-              wordTargets: const [],
-              hideReadings: false,
-              alignment: WrapAlignment.start,
             ),
           ),
         ),
