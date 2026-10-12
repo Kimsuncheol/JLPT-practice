@@ -133,16 +133,18 @@ class _ShortQuizGameState extends State<ShortQuizGame> {
     TextStyle? style,
   }) {
     final reading = widget.quiz.optionReadings[option] ?? '';
+    final sentenceWeight = Theme.of(context).textTheme.titleLarge?.fontWeight;
     final readingStyle = TextStyle(
       fontSize: 11,
       height: 1.2,
+      fontWeight: sentenceWeight,
       color: Theme.of(context).colorScheme.primary,
     );
     final word = Text(
       option,
       key: wordKey,
       textAlign: TextAlign.center,
-      style: style,
+      style: (style ?? const TextStyle()).copyWith(fontWeight: sentenceWeight),
     );
     if (reading.isEmpty) {
       final readingLine = TextPainter(
