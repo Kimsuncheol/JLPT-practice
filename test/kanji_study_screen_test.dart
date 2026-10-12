@@ -13,6 +13,8 @@ import 'package:jlpt_practice/data/repositories/kanji_repository.dart';
 import 'package:jlpt_practice/features/kanji/kanji_finish_screen.dart';
 import 'package:jlpt_practice/features/kanji/kanji_study_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_tape.dart';
+import 'package:jlpt_practice/features/vocabulary/covered_text.dart';
+import 'package:jlpt_practice/features/vocabulary/example_furigana_text.dart';
 import 'package:jlpt_practice/features/vocabulary/day_selection_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -20,6 +22,60 @@ import 'support/kanji_test_support.dart';
 
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
+
+  for (final size in [const Size(360, 640), const Size(390, 844)]) {
+    testWidgets('all kanji hide controls preserve layout at $size', (
+      tester,
+    ) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = size;
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.view.resetPhysicalSize);
+      await _pumpStudy(tester);
+      List<Rect> frontBounds() => [
+        for (final element in _inFront(find.byType(CoveredText)).evaluate())
+          tester.getRect(find.byWidget(element.widget)),
+      ];
+      final front = frontBounds();
+      expect(front, isNotEmpty);
+      for (final id in ['kanji', 'kun', 'on']) {
+        await tester.tap(find.byKey(ValueKey('hide-front-$id')));
+        await tester.pumpAndSettle();
+        expect(frontBounds(), front, reason: id);
+      }
+      await tester.drag(
+        find.byKey(const ValueKey('hide-front-kun')),
+        const Offset(-600, 0),
+      );
+      await tester.pumpAndSettle();
+      for (final id in ['hun', 'eum']) {
+        await tester.tap(find.byKey(ValueKey('hide-front-$id')));
+        await tester.pumpAndSettle();
+        expect(frontBounds(), front, reason: id);
+      }
+      await _flip(tester);
+      List<Rect> backBounds() => [
+        for (final element in _inBack(
+          find.byWidgetPredicate(
+            (widget) => widget is CoveredText || widget is ExampleFuriganaText,
+          ),
+        ).evaluate())
+          tester.getRect(find.byWidget(element.widget)),
+      ];
+      final back = backBounds();
+      expect(back, isNotEmpty);
+      for (final id in ['kun', 'on', 'furigana', 'meanings']) {
+        await tester.tap(find.byKey(ValueKey('hide-back-$id')));
+        await tester.pumpAndSettle();
+        expect(backBounds(), back, reason: id);
+      }
+      for (final id in ['kun', 'on', 'furigana', 'meanings']) {
+        await tester.tap(find.byKey(ValueKey('hide-back-$id')));
+        await tester.pumpAndSettle();
+        expect(backBounds(), back, reason: 'restore $id');
+      }
+    });
+  }
 
   test('speech text drops dictionary markers for okurigana and affixes', () {
     expect(kanjiReadingForSpeech('ひと.つ'), 'ひとつ');

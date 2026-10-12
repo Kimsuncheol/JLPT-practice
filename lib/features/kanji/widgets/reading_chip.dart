@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:jlpt_practice/features/vocabulary/cover_tape.dart';
+import 'package:jlpt_practice/features/vocabulary/covered_text.dart';
 import 'package:jlpt_practice/core/constants/app_sizes.dart';
 import 'package:jlpt_practice/core/constants/app_spacing.dart';
 
@@ -99,14 +99,7 @@ class ReadingChip extends StatelessWidget {
               horizontal: AppSizes.size14,
               vertical: AppSizes.size8,
             ),
-            child: hidden
-                ? coverTapeFor(
-                    characters: reading.length,
-                    fontSize: style?.fontSize ?? 22,
-                    maxWidth: AppSizes.size120,
-                    glyphWidth: 0.9,
-                  )
-                : Text(reading, style: style),
+            child: CoveredText(text: reading, hidden: hidden, style: style),
           ),
         ),
       ),

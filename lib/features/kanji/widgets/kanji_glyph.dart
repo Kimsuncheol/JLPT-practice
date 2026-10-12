@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:jlpt_practice/features/vocabulary/cover_tape.dart';
+import 'package:jlpt_practice/features/vocabulary/covered_text.dart';
 import 'package:jlpt_practice/core/constants/app_font_weights.dart';
 import 'package:jlpt_practice/core/constants/app_sizes.dart';
 
@@ -18,17 +18,10 @@ class KanjiGlyph extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (hidden) {
-      return coverTapeFor(
-        characters: 1,
-        fontSize: fontSize,
-        maxWidth: fontSize * 1.3,
-        glyphWidth: 0.9,
-        tilt: -0.02,
-      );
-    }
-    return Text(
-      character,
+    return CoveredText(
+      text: character,
+      hidden: hidden,
+      tilt: -0.02,
       style: TextStyle(
         fontSize: fontSize,
         height: AppSizes.lineHeight1_1,
