@@ -68,14 +68,41 @@ void main() {
 
     expect(find.text(_n5.explanation), findsOneWidget);
     expect(find.text(_n5.formation), findsOneWidget);
-    for (final example in _n5.examples) {
+    for (final (index, example) in _n5.examples.indexed) {
+      final sentence = find.byKey(ValueKey('grammar-example-${index + 1}'));
       await tester.scrollUntilVisible(
-        find.textContaining(example.japanese),
+        sentence,
         200,
         scrollable: find.byType(Scrollable).last,
       );
-      expect(find.textContaining(example.japanese), findsOneWidget);
-      expect(find.text(example.reading), findsOneWidget);
+      expect(sentence, findsOneWidget);
+      expect(find.text(example.reading), findsNothing);
+      expect(
+        tester
+            .widget<Container>(
+              find.byKey(ValueKey('grammar-example-container-${index + 1}')),
+            )
+            .decoration,
+        isNull,
+      );
+      for (final segment in example.sentenceSegments.where(
+        (segment) => segment.ruby != null,
+      )) {
+        final ruby = find.descendant(
+          of: sentence,
+          matching: find.text(segment.ruby!, findRichText: true),
+        );
+        final base = find.descendant(
+          of: sentence,
+          matching: find.text(segment.text),
+        );
+        expect(ruby, findsOneWidget);
+        expect(base, findsOneWidget);
+        expect(
+          tester.getBottomLeft(ruby).dy,
+          lessThanOrEqualTo(tester.getTopLeft(base).dy),
+        );
+      }
       expect(find.text(example.english), findsOneWidget);
     }
     final actions = find.byKey(const ValueKey('grammar_detail_actions'));

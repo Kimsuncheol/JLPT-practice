@@ -1,3 +1,6 @@
+import 'package:jlpt_practice/core/utils/furigana_alignment.dart';
+import 'package:jlpt_practice/data/models/kanji.dart';
+
 class GrammarExample {
   const GrammarExample({
     required this.japanese,
@@ -17,6 +20,9 @@ class GrammarExample {
   final String reading;
   final String english;
   final String korean;
+
+  List<FuriganaSegment> get sentenceSegments =>
+      alignSentenceFurigana(japanese, reading);
 
   String translation(String language) =>
       language == 'ko' && korean.isNotEmpty ? korean : english;
