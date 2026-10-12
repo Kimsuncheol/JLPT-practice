@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:jlpt_practice/core/constants/app_sizes.dart';
 import 'package:jlpt_practice/core/constants/app_spacing.dart';
-import 'package:jlpt_practice/features/vocabulary/cover_tape.dart';
+import 'package:jlpt_practice/features/vocabulary/covered_text.dart';
 
 /// The Korean hun (meaning) or eum (sound) of a kanji, shown with the kun or
 /// on readings it belongs with. Covered by tape while [hidden].
@@ -20,14 +19,7 @@ class HunEumLine extends StatelessWidget {
       runSpacing: AppSpacing.run8,
       children: [
         for (final value in values)
-          hidden
-              ? coverTapeFor(
-                  characters: value.length,
-                  fontSize: style?.fontSize ?? 22,
-                  maxWidth: AppSizes.size120,
-                  glyphWidth: 0.9,
-                )
-              : Text(value, style: style),
+          CoveredText(text: value, hidden: hidden, style: style),
       ],
     );
   }

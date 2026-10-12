@@ -3,19 +3,26 @@ import 'package:jlpt_practice/core/services/tts_service.dart';
 
 void main() {
   group('prepareJapaneseTextForSpeech', () {
-    test('removes hiragana furigana attached to kanji', () {
-      expect(prepareJapaneseTextForSpeech('今日（きょう）は何（なに）をしますか？'), '今日は何をしますか？');
+    test('uses hiragana furigana attached to kanji', () {
+      expect(
+        prepareJapaneseTextForSpeech('今日（きょう）は何（なに）をしますか？'),
+        'きょうはなにをしますか？',
+      );
     });
 
-    test('removes ASCII and spaced furigana forms', () {
+    test('uses ASCII and spaced furigana forms', () {
       expect(
         prepareJapaneseTextForSpeech('日本語 (にほんご)を勉強（べんきょう）します。'),
-        '日本語を勉強します。',
+        'にほんごをべんきょうします。',
       );
     });
 
     test('supports readings attached to a kanji inside a word', () {
-      expect(prepareJapaneseTextForSpeech('食（た）べる'), '食べる');
+      expect(prepareJapaneseTextForSpeech('食（た）べる'), 'たべる');
+    });
+
+    test('uses brace markup readings', () {
+      expect(prepareJapaneseTextForSpeech('{今日|きょう}は{一|ひと}つ。'), 'きょうはひとつ。');
     });
 
     test('preserves explanatory and standalone parentheses', () {

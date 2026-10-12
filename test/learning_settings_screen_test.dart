@@ -76,10 +76,12 @@ void main() {
     expect(find.byType(LearningLanguageScreen), findsOneWidget);
   });
 
-  testWidgets('furigana and automatic pronunciation live here', (tester) async {
+  testWidgets('automatic pronunciation preserves reading visibility', (
+    tester,
+  ) async {
     final container = await pump(tester, const LearningSettingsScreen());
 
-    expect(find.text('Show furigana'), findsOneWidget);
+    expect(find.text('Show furigana'), findsNothing);
     expect(find.text('Automatic pronunciation'), findsOneWidget);
 
     await tester.tap(find.text('Automatic pronunciation'));
@@ -88,11 +90,9 @@ void main() {
       container.read(appControllerProvider).requireValue.autoPlayAudio,
       isTrue,
     );
-    await tester.tap(find.text('Show furigana'));
-    await tester.pumpAndSettle();
     expect(
       container.read(appControllerProvider).requireValue.showFurigana,
-      isFalse,
+      isTrue,
     );
   });
 

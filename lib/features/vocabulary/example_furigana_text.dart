@@ -18,12 +18,16 @@ class ExampleFuriganaText extends StatelessWidget {
     this.replacements = const {},
     this.replacementLabels = const {},
     this.hideCoveredReadings = false,
+    this.maintainReadingLayout = false,
     super.key,
   });
 
   final Map<String, Widget> replacements;
   final Map<String, String> replacementLabels;
   final bool hideCoveredReadings;
+
+  /// Reserves ruby space while hiding it, so study controls do not move text.
+  final bool maintainReadingLayout;
   final List<FuriganaSegment> segments;
   final TextStyle style;
   final List<String> wordTargets;
@@ -93,20 +97,19 @@ class ExampleFuriganaText extends StatelessWidget {
             !hideReadings &&
             segment.ruby != null &&
             !(hideCoveredReadings && masks.any((mask) => mask.covered));
+        final reserveReading =
+            showReading || (maintainReadingLayout && segment.ruby != null);
         final unit = Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Hidden ruby must not participate in layout. Keeping an invisible
-            // reading here makes this column as wide as the reading (for
-            // example, `新` becomes as wide as `あたら`), so the base
-            // sentence retains the expanded furigana spacing after readings
-            // are hidden.
-            if (showReading)
+            // Study cards retain ruby dimensions when toggling visibility;
+            // other views can collapse hidden ruby for a compact sentence.
+            if (reserveReading)
               SizedBox(
                 height: AppSizes.size16,
                 child: MaskedSegmentsText(
                   key: ValueKey('example-ruby-$start'),
-                  segments: [MaskSegment(segment.ruby!, covered: false)],
+                  segments: [MaskSegment(segment.ruby!, covered: !showReading)],
                   style: rubyStyle,
                   glyphWidth: 1,
                 ),
@@ -134,7 +137,7 @@ class ExampleFuriganaText extends StatelessWidget {
         } else {
           lines.last.add(unit);
           readingsByLine.last.add(
-            showReading && (segment.ruby?.isNotEmpty ?? false),
+            reserveReading && (segment.ruby?.isNotEmpty ?? false),
           );
         }
       }

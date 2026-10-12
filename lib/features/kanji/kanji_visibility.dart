@@ -15,7 +15,7 @@ class KanjiVisibility {
   final bool hideKunYomi;
   final bool hideOnYomi;
 
-  /// The furigana of the examples on the back; the readings stay as they are.
+  /// Word and sentence furigana on the back; kun/on reading chips stay as they are.
   final bool hideFurigana;
   final bool hideHun;
   final bool hideEum;

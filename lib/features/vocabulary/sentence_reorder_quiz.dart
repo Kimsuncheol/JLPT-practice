@@ -211,7 +211,7 @@ Future<void> playQuizSentenceAudio(
   TtsService service,
 ) async {
   try {
-    await service.speak(quiz.entry.example.sentence);
+    await service.speak(quiz.entry.example.speechText);
   } catch (error) {
     debugPrint('Sentence reorder audio failed: $error');
   }

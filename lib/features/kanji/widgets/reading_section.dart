@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jlpt_practice/data/models/kanji.dart';
 import 'package:jlpt_practice/features/kanji/widgets/reading_chip.dart';
-import 'package:jlpt_practice/features/vocabulary/cover_tape.dart';
+import 'package:jlpt_practice/features/vocabulary/covered_text.dart';
 import 'package:jlpt_practice/features/vocabulary/example_furigana_text.dart';
 import 'package:jlpt_practice/core/constants/app_sizes.dart';
 import 'package:jlpt_practice/core/constants/app_font_weights.dart';
@@ -56,6 +56,7 @@ class ReadingSection extends StatelessWidget {
               ReadingChip(
                 reading: reading,
                 hidden: hideReadings,
+                horizontalPadding: 0,
                 onTap: () => onSpeak(reading),
               ),
           ],
@@ -89,7 +90,7 @@ class ExampleTile extends StatelessWidget {
   final String language;
   final bool hideReadings;
 
-  /// Covers the furigana of the sentence only.
+  /// Covers the readings of both the example word and sentence.
   final bool hideFurigana;
   final bool hideMeanings;
   final ValueChanged<String> onSpeakSentence;
@@ -106,21 +107,15 @@ class ExampleTile extends StatelessWidget {
         children: [
           // The reading is stacked above the word, with no brackets around it.
           if (example.reading.isNotEmpty)
-            hideReadings
-                ? coverTapeFor(
-                    characters: example.reading.length,
-                    fontSize: AppSizes.font12,
-                    maxWidth: AppSizes.size110,
-                    glyphWidth: 0.9,
-                  )
-                : Text(
-                    example.reading,
-                    style: TextStyle(
-                      fontSize: AppSizes.font12,
-                      height: AppSizes.lineHeight1_2,
-                      color: theme.colorScheme.primary,
-                    ),
-                  ),
+            CoveredText(
+              text: example.reading,
+              hidden: hideReadings || hideFurigana,
+              style: TextStyle(
+                fontSize: AppSizes.font12,
+                height: AppSizes.lineHeight1_2,
+                color: theme.colorScheme.primary,
+              ),
+            ),
           Text(
             example.word,
             style: theme.textTheme.titleLarge?.copyWith(
@@ -131,7 +126,6 @@ class ExampleTile extends StatelessWidget {
           _maybeCovered(
             example.meaning(language),
             style: theme.textTheme.bodyLarge,
-            fontSize: AppSizes.font16,
           ),
           if (example.sentence.isNotEmpty) ...[
             const SizedBox(height: AppSizes.space6),
@@ -141,7 +135,11 @@ class ExampleTile extends StatelessWidget {
                 key: ValueKey('sentence-${example.word}'),
                 borderRadius: BorderRadius.circular(AppSizes.radius8),
                 splashFactory: NoSplash.splashFactory,
-                onTap: () => onSpeakSentence(example.sentence),
+                onTap: () => onSpeakSentence(
+                  example.sentenceReading.trim().isNotEmpty
+                      ? example.sentenceReading
+                      : example.sentence,
+                ),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: AppSizes.size2),
                   child: ExampleFuriganaText(
@@ -151,6 +149,7 @@ class ExampleTile extends StatelessWidget {
                         const TextStyle(fontSize: AppSizes.font18),
                     wordTargets: const [],
                     hideReadings: hideFurigana,
+                    maintainReadingLayout: true,
                     runSpacingWithFurigana: AppSizes.space6,
                     alignment: WrapAlignment.start,
                   ),
@@ -158,11 +157,7 @@ class ExampleTile extends StatelessWidget {
               ),
             ),
             if (translation.isNotEmpty)
-              _maybeCovered(
-                translation,
-                style: muted,
-                fontSize: AppSizes.font14,
-              ),
+              _maybeCovered(translation, style: muted),
           ],
         ],
       ),
@@ -170,22 +165,13 @@ class ExampleTile extends StatelessWidget {
   }
 
   /// [text] as-is, or tape the width of the text while meanings are hidden.
-  Widget _maybeCovered(
-    String text, {
-    required TextStyle? style,
-    required double fontSize,
-  }) {
+  Widget _maybeCovered(String text, {required TextStyle? style}) {
     if (text.isEmpty) return const SizedBox.shrink();
-    if (!hideMeanings) return Text(text, style: style);
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: AppSizes.size2),
-      child: coverTapeFor(
-        characters: text.length,
-        fontSize: fontSize,
-        maxWidth: AppSizes.size220,
-        glyphWidth: 0.7,
-        tilt: 0.015,
-      ),
+    return CoveredText(
+      text: text,
+      hidden: hideMeanings,
+      style: style,
+      tilt: 0.015,
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jlpt_practice/core/constants/app_sizes.dart';
 import 'package:jlpt_practice/core/constants/app_spacing.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_masking.dart';
@@ -132,16 +133,18 @@ class _ShortQuizGameState extends State<ShortQuizGame> {
     TextStyle? style,
   }) {
     final reading = widget.quiz.optionReadings[option] ?? '';
+    final sentenceWeight = Theme.of(context).textTheme.titleLarge?.fontWeight;
     final readingStyle = TextStyle(
       fontSize: 11,
       height: 1.2,
+      fontWeight: sentenceWeight,
       color: Theme.of(context).colorScheme.primary,
     );
     final word = Text(
       option,
       key: wordKey,
       textAlign: TextAlign.center,
-      style: style,
+      style: (style ?? const TextStyle()).copyWith(fontWeight: sentenceWeight),
     );
     if (reading.isEmpty) {
       final readingLine = TextPainter(
@@ -177,31 +180,40 @@ class _ShortQuizGameState extends State<ShortQuizGame> {
     final correct = _selected != null && quiz.grade(_selected!);
     final blank = Container(
       key: _blankKey,
-      constraints: const BoxConstraints(minWidth: 80, minHeight: 44),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      constraints: const BoxConstraints(minWidth: 96, minHeight: 44),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: _selected == null
-            ? colors.surfaceContainerHighest
-            : correct
-            ? colors.primaryContainer
-            : colors.errorContainer,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: _selected == null
-              ? colors.outline
-              : correct
-              ? colors.primary
-              : colors.error,
+        border: Border(
+          bottom: BorderSide(
+            width: 1.5,
+            color: _selected == null
+                ? colors.outline
+                : correct
+                ? colors.primary
+                : colors.error,
+          ),
         ),
       ),
       child: Opacity(
         opacity: _moving ? 0 : 1,
-        child: _optionLabel(
-          context,
-          _selected ?? '',
-          wordKey: const ValueKey('short-quiz-blank'),
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
+        child: _selected == null
+            ? _optionLabel(
+                context,
+                '',
+                wordKey: const ValueKey('short-quiz-blank'),
+                style: Theme.of(context).textTheme.titleLarge,
+              )
+            : Chip(
+                key: const ValueKey('short-quiz-selected-chip'),
+                label: _optionLabel(
+                  context,
+                  _selected!,
+                  wordKey: const ValueKey('short-quiz-blank'),
+                ),
+                backgroundColor: correct
+                    ? colors.primaryContainer
+                    : colors.errorContainer,
+              ),
       ),
     );
     return Column(
@@ -264,6 +276,7 @@ class ShortQuizFeedback extends StatelessWidget {
   Widget build(BuildContext context) {
     final correct = quiz.grade(selection);
     final colors = Theme.of(context).colorScheme;
+    final accent = correct ? colors.primary : colors.error;
     return Semantics(
       liveRegion: true,
       child: Row(
@@ -271,17 +284,27 @@ class ShortQuizFeedback extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            correct ? Icons.check_circle_rounded : Icons.cancel_rounded,
-            color: correct ? colors.primary : colors.error,
+          Image.asset(
+            correct
+                ? 'assets/images/short_quiz/correct-reference.png'
+                : 'assets/images/short_quiz/incorrect-reference.png',
+            key: const ValueKey('short-quiz-feedback-image'),
+            width: AppSizes.font24,
+            height: AppSizes.font24,
+            excludeFromSemantics: true,
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSizes.space12),
           Flexible(
             child: Text(
               correct
                   ? context.strings('correct')
                   : '${context.strings('incorrect')} · ${context.strings('answer')}: ${quiz.answer}',
               textAlign: TextAlign.center,
+              style: TextStyle(
+                color: accent,
+                fontSize: AppSizes.font24,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
         ],

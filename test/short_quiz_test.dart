@@ -149,12 +149,34 @@ void main() {
     expect(hoverColor, isNotNull);
     await tester.tap(wrong);
     await tester.pump();
+    expect(find.byIcon(Icons.cancel_rounded), findsNothing);
     expect(find.text('Not quite · Answer: 食べます'), findsOneWidget);
+    final incorrectImage = tester.widget<Image>(
+      find.byKey(const ValueKey('short-quiz-feedback-image')),
+    );
+    expect(
+      (incorrectImage.image as AssetImage).assetName,
+      'assets/images/short_quiz/incorrect-reference.png',
+    );
+    expect(incorrectImage.width, 24);
+    expect(incorrectImage.height, 24);
     expect(find.widgetWithText(ActionChip, '飲みます'), findsNothing);
     await tester.pumpAndSettle();
     expect(
       tester.widget<Text>(find.byKey(const ValueKey('short-quiz-blank'))).data,
       '飲みます',
+    );
+    expect(find.widgetWithText(Chip, '飲みます'), findsOneWidget);
+    expect(
+      tester
+          .widget<Opacity>(
+            find.ancestor(
+              of: find.byKey(const ValueKey('short-quiz-selected-chip')),
+              matching: find.byType(Opacity),
+            ),
+          )
+          .opacity,
+      1,
     );
     expect(tester.takeException(), isNull);
     expect(find.text('Try again'), findsNothing);
@@ -162,12 +184,21 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.widgetWithText(ActionChip, '食べます'));
     await tester.pump();
+    expect(find.byIcon(Icons.check_circle_rounded), findsNothing);
     expect(find.text('Correct'), findsOneWidget);
+    final correctImage = tester.widget<Image>(
+      find.byKey(const ValueKey('short-quiz-feedback-image')),
+    );
+    expect(
+      (correctImage.image as AssetImage).assetName,
+      'assets/images/short_quiz/correct-reference.png',
+    );
     await tester.pumpAndSettle();
     expect(
       tester.widget<Text>(find.byKey(const ValueKey('short-quiz-blank'))).data,
       '食べます',
     );
+    expect(find.widgetWithText(Chip, '食べます'), findsOneWidget);
     expect(find.text('たべます'), findsOneWidget);
     expect(tester.takeException(), isNull);
     await mouse.removePointer();

@@ -13,6 +13,8 @@ import 'package:jlpt_practice/data/repositories/kanji_repository.dart';
 import 'package:jlpt_practice/features/kanji/kanji_finish_screen.dart';
 import 'package:jlpt_practice/features/kanji/kanji_study_screen.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_tape.dart';
+import 'package:jlpt_practice/features/vocabulary/covered_text.dart';
+import 'package:jlpt_practice/features/vocabulary/example_furigana_text.dart';
 import 'package:jlpt_practice/features/vocabulary/day_selection_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -20,6 +22,60 @@ import 'support/kanji_test_support.dart';
 
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
+
+  for (final size in [const Size(360, 640), const Size(390, 844)]) {
+    testWidgets('all kanji hide controls preserve layout at $size', (
+      tester,
+    ) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = size;
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.view.resetPhysicalSize);
+      await _pumpStudy(tester);
+      List<Rect> frontBounds() => [
+        for (final element in _inFront(find.byType(CoveredText)).evaluate())
+          tester.getRect(find.byWidget(element.widget)),
+      ];
+      final front = frontBounds();
+      expect(front, isNotEmpty);
+      for (final id in ['kanji', 'kun', 'on']) {
+        await tester.tap(find.byKey(ValueKey('hide-front-$id')));
+        await tester.pumpAndSettle();
+        expect(frontBounds(), front, reason: id);
+      }
+      await tester.drag(
+        find.byKey(const ValueKey('hide-front-kun')),
+        const Offset(-600, 0),
+      );
+      await tester.pumpAndSettle();
+      for (final id in ['hun', 'eum']) {
+        await tester.tap(find.byKey(ValueKey('hide-front-$id')));
+        await tester.pumpAndSettle();
+        expect(frontBounds(), front, reason: id);
+      }
+      await _flip(tester);
+      List<Rect> backBounds() => [
+        for (final element in _inBack(
+          find.byWidgetPredicate(
+            (widget) => widget is CoveredText || widget is ExampleFuriganaText,
+          ),
+        ).evaluate())
+          tester.getRect(find.byWidget(element.widget)),
+      ];
+      final back = backBounds();
+      expect(back, isNotEmpty);
+      for (final id in ['kun', 'on', 'furigana', 'meanings']) {
+        await tester.tap(find.byKey(ValueKey('hide-back-$id')));
+        await tester.pumpAndSettle();
+        expect(backBounds(), back, reason: id);
+      }
+      for (final id in ['kun', 'on', 'furigana', 'meanings']) {
+        await tester.tap(find.byKey(ValueKey('hide-back-$id')));
+        await tester.pumpAndSettle();
+        expect(backBounds(), back, reason: 'restore $id');
+      }
+    });
+  }
 
   test('speech text drops dictionary markers for okurigana and affixes', () {
     expect(kanjiReadingForSpeech('ひと.つ'), 'ひとつ');
@@ -568,7 +624,7 @@ void main() {
     expect(find.text('2 / 2'), findsOneWidget);
   });
 
-  testWidgets('tapping an example sentence speaks that sentence', (
+  testWidgets('tapping an example sentence uses its furigana when available', (
     tester,
   ) async {
     final speech = await _pumpStudy(tester);
@@ -582,7 +638,7 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    expect(speech.spoken, ['りんごを一つください。', '一部が遅れた。']);
+    expect(speech.spoken, ['りんごをひとつください。', 'いちぶがおくれた。']);
   });
 
   testWidgets('the card fills the screen width with no border or corners', (
@@ -693,7 +749,7 @@ void main() {
     }
   });
 
-  testWidgets('hide reading covers sentence furigana only', (tester) async {
+  testWidgets('hide reading covers word and sentence furigana', (tester) async {
     await _pumpStudy(tester);
     await _flip(tester);
     Finder ruby(String word, String text) => find.descendant(
@@ -707,12 +763,29 @@ void main() {
     await tester.pumpAndSettle();
     expect(ruby('一つ', 'ひと'), findsNothing);
     expect(ruby('一部', 'いちぶ'), findsNothing);
-    // Readings and example word readings are not touched.
+    // Kun/on reading chips stay visible, while example word readings are covered.
     expect(_inBack(find.text('ひと.つ')), findsOneWidget);
-    expect(_inBack(find.text('ひとつ')), findsOneWidget);
+    expect(_inBack(find.text('いつ')), findsOneWidget);
+    expect(_inBack(find.text('ひとつ')), findsNothing);
+    expect(_inBack(find.text('いちぶ')), findsNothing);
+    expect(_inBack(find.text('一つ')), findsOneWidget);
+    expect(_inBack(find.text('一部')), findsWidgets);
 
     await tester.tap(find.byKey(const ValueKey('hide-back-furigana')));
     await tester.pumpAndSettle();
+    expect(ruby('一つ', 'ひと'), findsOneWidget);
+    expect(ruby('一部', 'いちぶ'), findsOneWidget);
+    expect(_inBack(find.text('ひとつ')), findsOneWidget);
+    expect(_inBack(find.text('いちぶ')), findsNWidgets(2));
+
+    await tester.tap(find.byKey(const ValueKey('hide-back-kun')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('hide-back-furigana')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('hide-back-furigana')));
+    await tester.pumpAndSettle();
+    // Showing furigana preserves the separately hidden kun readings.
+    expect(_inBack(find.text('ひとつ')), findsNothing);
     expect(ruby('一つ', 'ひと'), findsOneWidget);
   });
 

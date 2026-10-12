@@ -3,9 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/core/services/meaning_mask_service.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_masking.dart';
-import 'package:jlpt_practice/features/vocabulary/cover_tape.dart';
 
-/// Renders matched runs with tape, or visible text when highlighting.
+/// Hides matched runs without changing text layout, or highlights them.
 class MaskedSegmentsText extends StatelessWidget {
   const MaskedSegmentsText({
     required this.segments,
@@ -26,7 +25,6 @@ class MaskedSegmentsText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fontSize = style?.fontSize ?? 14;
     return Text.rich(
       TextSpan(
         style: style,
@@ -35,12 +33,12 @@ class MaskedSegmentsText extends StatelessWidget {
             if (segment.covered && highlightStyle != null)
               TextSpan(text: segment.text, style: highlightStyle)
             else if (segment.covered)
-              WidgetSpan(
-                alignment: PlaceholderAlignment.middle,
-                child: coverTapeFor(
-                  characters: segment.text.length,
-                  fontSize: fontSize,
-                  glyphWidth: glyphWidth,
+              TextSpan(
+                text: segment.text,
+                semanticsLabel: '',
+                style: TextStyle(
+                  foreground: Paint()..color = Colors.transparent,
+                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                 ),
               )
             else
@@ -132,9 +130,7 @@ class _MaskedTranslationState extends ConsumerState<MaskedTranslation> {
     return FutureBuilder<List<MaskSpan>>(
       future: _spans,
       builder: (context, snapshot) => MaskedSegmentsText(
-        segments:
-            snapshot.hasData &&
-                (widget.highlightStyle == null || snapshot.data!.isNotEmpty)
+        segments: snapshot.hasData && snapshot.data!.isNotEmpty
             ? maskSegmentsFromSpans(widget.translation, [
                 for (final span in snapshot.data!)
                   (start: span.start, end: span.end),

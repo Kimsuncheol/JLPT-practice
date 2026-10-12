@@ -48,12 +48,6 @@ class LearningSettingsScreen extends ConsumerWidget {
               _Group(
                 children: [
                   SwitchListTile(
-                    secondary: const Icon(Icons.subtitles_rounded),
-                    title: Text(strings('showFurigana')),
-                    value: state.showFurigana,
-                    onChanged: controller.setShowFurigana,
-                  ),
-                  SwitchListTile(
                     secondary: const Icon(Icons.volume_up_rounded),
                     title: Text(strings('autoAudio')),
                     value: state.autoPlayAudio,

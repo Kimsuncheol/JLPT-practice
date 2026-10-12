@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:jlpt_practice/features/vocabulary/cover_tape.dart';
+import 'package:jlpt_practice/features/vocabulary/covered_text.dart';
 import 'package:jlpt_practice/core/constants/app_sizes.dart';
 import 'package:jlpt_practice/core/constants/app_spacing.dart';
 
@@ -64,6 +64,7 @@ class ReadingChip extends StatelessWidget {
     required this.onTap,
     this.color,
     this.fontSize,
+    this.horizontalPadding = AppSizes.size14,
     super.key,
   });
 
@@ -76,6 +77,7 @@ class ReadingChip extends StatelessWidget {
 
   /// The text size; the theme's title size when null.
   final double? fontSize;
+  final double horizontalPadding;
 
   @override
   Widget build(BuildContext context) {
@@ -95,18 +97,11 @@ class ReadingChip extends StatelessWidget {
           splashFactory: NoSplash.splashFactory,
           onTap: onTap,
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSizes.size14,
+            padding: EdgeInsets.symmetric(
+              horizontal: horizontalPadding,
               vertical: AppSizes.size8,
             ),
-            child: hidden
-                ? coverTapeFor(
-                    characters: reading.length,
-                    fontSize: style?.fontSize ?? 22,
-                    maxWidth: AppSizes.size120,
-                    glyphWidth: 0.9,
-                  )
-                : Text(reading, style: style),
+            child: CoveredText(text: reading, hidden: hidden, style: style),
           ),
         ),
       ),
