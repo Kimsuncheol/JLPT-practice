@@ -9,9 +9,9 @@ import 'package:jlpt_practice/core/services/tts_service.dart';
 import 'package:jlpt_practice/core/services/volume_service.dart';
 import 'package:jlpt_practice/shared/volume_warning_toast.dart';
 import 'package:jlpt_practice/data/models/grammar_point.dart';
+import 'package:jlpt_practice/features/vocabulary/example_furigana_text.dart';
 import 'package:jlpt_practice/data/models/grammar_study_session.dart';
 import 'package:jlpt_practice/features/grammar/grammar_providers.dart';
-import 'package:jlpt_practice/features/grammar/grammar_qa_chat_screen.dart';
 import 'package:jlpt_practice/features/grammar/grammar_study_session_provider.dart';
 import 'package:jlpt_practice/core/constants/app_sizes.dart';
 
@@ -197,9 +197,7 @@ class _GrammarDetailsState extends ConsumerState<_GrammarDetails> {
               children: [
                 FilledButton.icon(
                   key: const ValueKey('grammar_detail_practice_with_ai'),
-                  onPressed: () => context.push(
-                    '/grammar/tutor/${Uri.encodeComponent(grammar.id)}',
-                  ),
+                  onPressed: null,
                   style: FilledButton.styleFrom(
                     minimumSize: const Size.fromHeight(52),
                   ),
@@ -209,11 +207,7 @@ class _GrammarDetailsState extends ConsumerState<_GrammarDetails> {
                 const SizedBox(height: AppSizes.space10),
                 FilledButton.tonalIcon(
                   key: const ValueKey('grammar_detail_tutor'),
-                  onPressed: () => showGrammarQaChatScreen(
-                    context,
-                    grammar: grammar,
-                    languageCode: language,
-                  ),
+                  onPressed: null,
                   style: FilledButton.styleFrom(
                     minimumSize: const Size.fromHeight(52),
                   ),
@@ -269,13 +263,10 @@ class _ExampleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
+    key: ValueKey('grammar-example-container-$number'),
     width: double.infinity,
     margin: const EdgeInsets.only(bottom: AppSizes.size12),
     padding: const EdgeInsets.all(AppSizes.size18),
-    decoration: BoxDecoration(
-      color: Theme.of(context).colorScheme.primaryContainer,
-      borderRadius: BorderRadius.circular(AppSizes.radius20),
-    ),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -286,16 +277,27 @@ class _ExampleCard extends StatelessWidget {
             splashFactory: NoSplash.splashFactory,
             overlayColor: const WidgetStatePropertyAll(Colors.transparent),
             onTap: onSpeak,
-            child: Text(
-              '$number. ${example.japanese}',
-              style: Theme.of(context).textTheme.titleMedium,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                Text('$number.', style: Theme.of(context).textTheme.titleLarge),
+                const SizedBox(width: AppSizes.space8),
+                Expanded(
+                  child: ExampleFuriganaText(
+                    key: ValueKey('grammar-example-$number'),
+                    segments: example.sentenceSegments,
+                    style:
+                        Theme.of(context).textTheme.titleLarge ??
+                        const TextStyle(fontSize: 22),
+                    wordTargets: const [],
+                    hideReadings: false,
+                    alignment: WrapAlignment.start,
+                  ),
+                ),
+              ],
             ),
           ),
-        ),
-        const SizedBox(height: AppSizes.space5),
-        Text(
-          example.reading,
-          style: TextStyle(color: Theme.of(context).colorScheme.primary),
         ),
         const SizedBox(height: AppSizes.space7),
         Text(

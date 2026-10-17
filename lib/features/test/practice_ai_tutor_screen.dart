@@ -49,6 +49,8 @@ class PracticeAiTutorScreen extends ConsumerStatefulWidget {
 }
 
 class _PracticeAiTutorScreenState extends ConsumerState<PracticeAiTutorScreen> {
+  // Retain the online tutor UI for future use without issuing AI requests.
+  static final bool _aiEnabled = false;
   static const _maxQuestions = 10;
   static const _user = ChatUser(id: 'user', firstName: 'You');
   static const _assistant = ChatUser(id: 'ai', firstName: 'AI');
@@ -60,7 +62,7 @@ class _PracticeAiTutorScreenState extends ConsumerState<PracticeAiTutorScreen> {
   final _streamedFeedback = ValueNotifier<PracticeTutorFeedback?>(null);
   bool _feedbackMessageAdded = false;
   Object? _error;
-  bool _loading = true;
+  bool _loading = false;
   bool _sending = false;
   bool _waiting = false;
   bool _feedbackSent = false;
@@ -80,6 +82,7 @@ class _PracticeAiTutorScreenState extends ConsumerState<PracticeAiTutorScreen> {
   }
 
   Future<void> _load() async {
+    if (!_aiEnabled) return;
     setState(() {
       _loading = true;
       _error = null;
@@ -120,6 +123,7 @@ class _PracticeAiTutorScreenState extends ConsumerState<PracticeAiTutorScreen> {
   }
 
   Future<void> _sendQuestion(String questionText) async {
+    if (!_aiEnabled) return;
     final question = questionText.trim();
     if (question.isEmpty ||
         question.length > 500 ||
@@ -260,17 +264,17 @@ class _PracticeAiTutorScreenState extends ConsumerState<PracticeAiTutorScreen> {
                 centered: false,
                 chips: _questionChips(context),
               ),
-            if (_feedback != null)
-              ChatUiStyle.composer(
-                context: context,
-                controller: _input,
-                hint: context.strings('typeYourQuestion'),
-                sendTooltip: context.strings('sendMessage'),
-                enabled: !_sending && _questionCount < _maxQuestions,
-                maxLength: 500,
-                onSend: _sendInput,
-                sendKey: const ValueKey('practice_ai_chat_send'),
-              ),
+            ChatUiStyle.composer(
+              context: context,
+              controller: _input,
+              hint: context.strings('typeYourQuestion'),
+              sendTooltip: context.strings('sendMessage'),
+              enabled:
+                  _aiEnabled && !_sending && _questionCount < _maxQuestions,
+              maxLength: 500,
+              onSend: _sendInput,
+              sendKey: const ValueKey('practice_ai_chat_send'),
+            ),
             Padding(
               padding: const EdgeInsets.fromLTRB(
                 AppSizes.size16,
@@ -316,7 +320,7 @@ class _PracticeAiTutorScreenState extends ConsumerState<PracticeAiTutorScreen> {
               ),
               const SizedBox(height: AppSizes.space14),
               OutlinedButton(
-                onPressed: _load,
+                onPressed: _aiEnabled ? _load : null,
                 child: Text(context.strings('tryAgain')),
               ),
             ],
@@ -424,7 +428,11 @@ class _PracticeAiTutorScreenState extends ConsumerState<PracticeAiTutorScreen> {
 
   Widget _questionChip(String label) => ChatUiStyle.suggestion(
     label,
-    _feedback == null || _loading || _sending || _questionCount >= _maxQuestions
+    !_aiEnabled ||
+            _feedback == null ||
+            _loading ||
+            _sending ||
+            _questionCount >= _maxQuestions
         ? null
         : () => _sendQuestion(label),
   );

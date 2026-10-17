@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:jlpt_practice/data/models/grammar_point.dart';
+import 'package:jlpt_practice/core/utils/furigana_alignment.dart';
 
 void main() {
   late List<Map<String, dynamic>> catalog;
@@ -21,6 +23,44 @@ void main() {
     expect(_count(catalog, 'N4'), 124);
     expect(_count(catalog, 'N5'), 136);
   });
+
+  test('every grammar example aligns readings and preserves its sentence', () {
+    for (final point in catalog) {
+      for (final raw in point['examples'] as List<dynamic>) {
+        final example = GrammarExample.fromJson(raw as Map<String, dynamic>);
+        final segments = example.sentenceSegments;
+        expect(
+          segments.map((segment) => segment.text).join(),
+          example.japanese,
+        );
+        for (final segment in segments) {
+          if (_containsKanji(segment.text)) {
+            expect(segment.ruby, isNotNull, reason: example.japanese);
+            expect(segment.ruby, isNotEmpty, reason: example.japanese);
+          }
+        }
+      }
+    }
+  });
+
+  test(
+    'furigana alignment handles katakana, okurigana and mismatched readings',
+    () {
+      final segments = alignSentenceFurigana(
+        '一ヶ月後、フランス語を話します。',
+        'いちかげつご、フランスごをはなします。',
+      );
+      expect(
+        segments
+            .where((segment) => segment.ruby != null)
+            .map((segment) => segment.ruby),
+        ['いちかげつご', 'ご', 'はな'],
+      );
+      final fallback = alignSentenceFurigana('学校へ行く。', 'invalid');
+      expect(fallback.single.text, '学校へ行く。');
+      expect(fallback.single.ruby, isNull);
+    },
+  );
 
   test('grammar ranks are contiguous within every level', () {
     for (final level in ['N1', 'N2', 'N3', 'N4', 'N5']) {

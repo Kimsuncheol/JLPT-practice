@@ -335,6 +335,30 @@ class _RenderFuriganaWrap extends RenderBox
   @override
   void performLayout() => size = _layout(constraints, dry: false);
 
+  // Numbered examples align with the written sentence, below any ruby in
+  // its first row. A later row's ruby must not offset the number.
+  @override
+  double? computeDistanceToActualBaseline(TextBaseline baseline) {
+    final child = firstChild;
+    if (child == null) return null;
+    final distance = _writtenBaseline(child, baseline);
+    if (distance == null) return null;
+    return (child.parentData! as WrapParentData).offset.dy + distance;
+  }
+
+  double? _writtenBaseline(RenderBox box, TextBaseline baseline) {
+    if (box is RenderFlex) {
+      final child = box.direction == Axis.vertical
+          ? box.lastChild
+          : box.firstChild;
+      if (child == null) return null;
+      final distance = _writtenBaseline(child, baseline);
+      if (distance == null) return null;
+      return (child.parentData! as FlexParentData).offset.dy + distance;
+    }
+    return box.getDistanceToActualBaseline(baseline);
+  }
+
   @override
   void paint(PaintingContext context, Offset offset) =>
       defaultPaint(context, offset);

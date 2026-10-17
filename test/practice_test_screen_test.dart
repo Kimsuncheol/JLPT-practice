@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -11,6 +9,7 @@ import 'package:jlpt_practice/data/models/mock_test_problem.dart';
 import 'package:jlpt_practice/features/test/mock_test_providers.dart';
 import 'package:jlpt_practice/features/test/mock_test_result_screen.dart';
 import 'package:jlpt_practice/features/test/practice_ai_tutor_service.dart';
+import 'package:jlpt_practice/features/test/practice_ai_tutor_screen.dart';
 import 'package:jlpt_practice/features/test/practice_test_screen.dart';
 
 void main() {
@@ -113,138 +112,88 @@ void main() {
     );
   }
 
-  testWidgets('AI Tutor preserves the stored explanation and opens guidance', (
-    tester,
-  ) async {
-    final tutor = _FakePracticeAiTutorEvaluator();
-    final container = ProviderContainer(
-      overrides: [
-        appControllerProvider.overrideWith(_FakeAppController.new),
-        generatedPracticeSetProvider((
-          level: 'N5',
-          practiceNumber: 1,
-        )).overrideWith(
-          (ref) async => GeneratedPracticeSet(
-            items: [_problems[2]],
-            vocabularyQuestions: const [],
-          ),
-        ),
-        practiceAiTutorProvider.overrideWith((ref) async => tutor),
-      ],
-    );
-    addTearDown(container.dispose);
-    await container.read(appControllerProvider.future);
-
-    await tester.pumpWidget(
-      UncontrolledProviderScope(
-        container: container,
-        child: const MaterialApp(
-          home: PracticeTestScreen(
+  testWidgets(
+    'AI Tutor trigger is inactive and preserves the stored explanation',
+    (tester) async {
+      var aiRequests = 0;
+      final container = ProviderContainer(
+        overrides: [
+          appControllerProvider.overrideWith(_FakeAppController.new),
+          generatedPracticeSetProvider((
             level: 'N5',
-            section: ProblemSection.reading,
             practiceNumber: 1,
+          )).overrideWith(
+            (ref) async => GeneratedPracticeSet(
+              items: [_problems[2]],
+              vocabularyQuestions: const [],
+            ),
+          ),
+          practiceAiTutorProvider.overrideWith((ref) async {
+            aiRequests++;
+            throw StateError('AI must remain inactive');
+          }),
+        ],
+      );
+      addTearDown(container.dispose);
+      await container.read(appControllerProvider.future);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const MaterialApp(
+            home: PracticeTestScreen(
+              level: 'N5',
+              section: ProblemSection.reading,
+              practiceNumber: 1,
+            ),
           ),
         ),
-      ),
-    );
-    await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const ValueKey('practice_test_choice_0')));
-    await tester.pumpAndSettle();
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('practice_test_choice_0')));
+      await tester.pumpAndSettle();
 
-    expect(find.text('The passage says 7 o\'clock.'), findsOneWidget);
-    expect(find.byKey(const ValueKey('practice_continue')), findsOneWidget);
+      expect(find.text('The passage says 7 o\'clock.'), findsOneWidget);
+      expect(find.byKey(const ValueKey('practice_continue')), findsOneWidget);
 
-    await tester.tap(find.byKey(const ValueKey('practice_ask_ai_tutor')));
-    await tester.pumpAndSettle();
+      final button = find.byKey(const ValueKey('practice_ask_ai_tutor'));
+      expect(tester.widget<FilledButton>(button).onPressed, isNull);
+      expect(aiRequests, 0);
 
-    expect(find.text('Practice Tutor'), findsOneWidget);
-    expect(find.text('The passage explicitly gives the time.'), findsOneWidget);
-    expect(find.text('“7じ”'), findsOneWidget);
-    expect(find.byKey(const ValueKey('practice_ai_continue')), findsOneWidget);
-    expect(find.byType(BottomSheet), findsNothing);
-    expect(find.byIcon(Icons.close_rounded), findsOneWidget);
-    expect(find.byType(ActionChip), findsNWidgets(3));
-
-    const question = 'Can you explain that more simply?';
-    await tester.enterText(find.byType(TextField).last, question);
-    await tester.tap(find.byKey(const ValueKey('practice_ai_chat_send')));
-    await tester.pumpAndSettle();
-
-    expect(find.text(question), findsOneWidget);
-    expect(find.text('Here is a simpler chat reply.'), findsOneWidget);
-    expect(tutor.histories.single, isEmpty);
-    expect(find.byType(ActionChip), findsNWidgets(3));
-
-    const secondQuestion = 'What should I notice first?';
-    final pendingReply = Completer<String>();
-    tutor.nextReply = pendingReply;
-    await tester.enterText(find.byType(TextField).last, secondQuestion);
-    await tester.tap(find.byKey(const ValueKey('practice_ai_chat_send')));
-    await tester.pump();
-    expect(find.byType(ActionChip), findsNWidgets(3));
-    expect(
-      tester
-          .widgetList<ActionChip>(find.byType(ActionChip))
-          .every((chip) => chip.onPressed == null),
-      isTrue,
-    );
-    pendingReply.complete('Here is a simpler chat reply.');
-    await tester.pumpAndSettle();
-    expect(find.byType(ActionChip), findsNWidgets(3));
-
-    expect(tutor.histories, hasLength(2));
-    expect(tutor.histories.last, hasLength(2));
-    expect(tutor.histories.last.first.text, question);
-    expect(tutor.histories.last.last.text, 'Here is a simpler chat reply.');
-
-    await tester.tap(find.byKey(const ValueKey('practice_ai_close')));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const ValueKey('practice_ask_ai_tutor')));
-    await tester.pumpAndSettle();
-
-    expect(find.text(question), findsNothing);
-    expect(find.text(secondQuestion), findsNothing);
-    expect(find.byType(TextField), findsOneWidget);
-    expect(
-      find.text('This conversation is deleted when you close it.'),
-      findsOneWidget,
-    );
-  });
-}
-
-class _FakePracticeAiTutorEvaluator implements PracticeAiTutorEvaluator {
-  final List<List<PracticeTutorMessage>> histories = [];
-  Completer<String>? nextReply;
-
-  @override
-  Future<PracticeTutorFeedback> explain({
-    required MockTestProblem problem,
-    required String selectedAnswer,
-    required String explanationLanguage,
-    PracticeTutorFocus focus = PracticeTutorFocus.overview,
-    void Function(PracticeTutorFeedback partial)? onPartial,
-  }) async => const PracticeTutorFeedback(
-    summary: 'The passage explicitly gives the time.',
-    whyCorrect: 'The person wakes at 7.',
-    whySelectedIsWrong: 'The selected time is not in the passage.',
-    keyEvidence: ['7じ'],
-    learningPoints: ['Look for time expressions.'],
+      // Direct entry must also keep all AI actions inactive.
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp(
+            home: PracticeAiTutorScreen(
+              problem: _problems[2],
+              selectedAnswer: _problems[2].choices.first,
+              explanationLanguage: 'English',
+              onContinue: () {},
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Practice Tutor'), findsOneWidget);
+      expect(tester.widget<TextField>(find.byType(TextField)).enabled, isFalse);
+      expect(
+        tester
+            .widget<IconButton>(
+              find.byKey(const ValueKey('practice_ai_chat_send')),
+            )
+            .onPressed,
+        isNull,
+      );
+      expect(
+        tester
+            .widgetList<ActionChip>(find.byType(ActionChip))
+            .every((chip) => chip.onPressed == null),
+        isTrue,
+      );
+      expect(aiRequests, 0);
+    },
   );
-
-  @override
-  Future<String> ask({
-    required MockTestProblem problem,
-    required String selectedAnswer,
-    required String explanationLanguage,
-    required List<PracticeTutorMessage> history,
-    required String question,
-    void Function(String text)? onPartial,
-  }) async {
-    histories.add(List<PracticeTutorMessage>.of(history));
-    final pending = nextReply;
-    nextReply = null;
-    return pending == null ? 'Here is a simpler chat reply.' : pending.future;
-  }
 }
 
 class _FakeAppController extends AppController {

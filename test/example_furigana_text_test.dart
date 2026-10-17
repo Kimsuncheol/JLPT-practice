@@ -5,6 +5,48 @@ import 'package:jlpt_practice/features/vocabulary/cover_tape.dart';
 import 'package:jlpt_practice/features/vocabulary/example_furigana_text.dart';
 
 void main() {
+  testWidgets('example numbers align with the first written row', (
+    tester,
+  ) async {
+    for (final marked in [
+      r'$1BOXとか$5BOXとか、{異|こと}なる{価格|かかく}のランチBOXがあります。',
+      '{新|あたら}しい{言葉|ことば}を{勉強|べんきょう}します。',
+    ]) {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SizedBox(
+              width: 180,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
+                children: [
+                  const Text('4.', style: TextStyle(fontSize: 22)),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: ExampleFuriganaText(
+                      segments: parseFurigana(marked),
+                      style: const TextStyle(fontSize: 22),
+                      wordTargets: const [],
+                      hideReadings: false,
+                      alignment: WrapAlignment.start,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+      final firstText = marked.startsWith(r'$') ? r'$' : '新';
+      expect(
+        tester.getTopLeft(find.text('4.')).dy,
+        closeTo(tester.getTopLeft(find.text(firstText).first).dy, 0.01),
+      );
+      expect(tester.takeException(), isNull);
+    }
+  });
+
   Widget example(
     String marked, {
     double width = 300,

@@ -62,10 +62,6 @@ dependencies:
   connectivity_plus: ^7.3.1
   google_sign_in: ^7.2.0
   wakelock_plus: ^1.7.0
-  crypto: ^3.0.7
-  http: ^1.6.0
-  flutter_gemma: ^1.9.0
-  flutter_gemma_litertlm: ^1.8.0
   flutter_gen_ai_chat_ui: ^2.19.1
   flutter_markdown_plus: ^1.0.12
   google_fonts: ^8.2.1
@@ -96,7 +92,6 @@ flutter:
     - assets/images/short_quiz/
     - assets/data/
     - assets/fonts/
-    - assets/offline_ai/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

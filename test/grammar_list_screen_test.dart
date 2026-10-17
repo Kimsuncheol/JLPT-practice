@@ -63,19 +63,57 @@ void main() {
 
     expect(find.byType(ExpansionTile), findsOneWidget);
     expect(find.textContaining('Part 1'), findsOneWidget);
+    expect(
+      tester
+          .widget<IconButton>(
+            find.byWidgetPredicate(
+              (widget) =>
+                  widget is IconButton && widget.tooltip == 'Practise with AI',
+            ),
+          )
+          .onPressed,
+      isNull,
+    );
     await tester.tap(find.text(_n5.title));
     await tester.pumpAndSettle();
 
     expect(find.text(_n5.explanation), findsOneWidget);
     expect(find.text(_n5.formation), findsOneWidget);
-    for (final example in _n5.examples) {
+    for (final (index, example) in _n5.examples.indexed) {
+      final sentence = find.byKey(ValueKey('grammar-example-${index + 1}'));
       await tester.scrollUntilVisible(
-        find.textContaining(example.japanese),
+        sentence,
         200,
         scrollable: find.byType(Scrollable).last,
       );
-      expect(find.textContaining(example.japanese), findsOneWidget);
-      expect(find.text(example.reading), findsOneWidget);
+      expect(sentence, findsOneWidget);
+      expect(find.text(example.reading), findsNothing);
+      expect(
+        tester
+            .widget<Container>(
+              find.byKey(ValueKey('grammar-example-container-${index + 1}')),
+            )
+            .decoration,
+        isNull,
+      );
+      for (final segment in example.sentenceSegments.where(
+        (segment) => segment.ruby != null,
+      )) {
+        final ruby = find.descendant(
+          of: sentence,
+          matching: find.text(segment.ruby!, findRichText: true),
+        );
+        final base = find.descendant(
+          of: sentence,
+          matching: find.text(segment.text),
+        );
+        expect(ruby, findsOneWidget);
+        expect(base, findsOneWidget);
+        expect(
+          tester.getBottomLeft(ruby).dy,
+          lessThanOrEqualTo(tester.getTopLeft(base).dy),
+        );
+      }
       expect(find.text(example.english), findsOneWidget);
     }
     final actions = find.byKey(const ValueKey('grammar_detail_actions'));
@@ -100,14 +138,8 @@ void main() {
       tester.getBottomLeft(actions).dy,
       closeTo(tester.getSize(find.byType(Scaffold).last).height, 1),
     );
-    await tester.tap(practiceButton);
-    await tester.pumpAndSettle();
-    expect(find.text('Practice N5_1'), findsOneWidget);
-    router.pop();
-    await tester.pumpAndSettle();
-    await tester.tap(tutorButton);
-    await tester.pumpAndSettle();
-    expect(find.text('Grammar Tutor'), findsOneWidget);
+    expect(tester.widget<FilledButton>(practiceButton).onPressed, isNull);
+    expect(tester.widget<FilledButton>(tutorButton).onPressed, isNull);
     expect(tester.takeException(), isNull);
   });
 
