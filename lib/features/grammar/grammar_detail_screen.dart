@@ -12,7 +12,10 @@ import 'package:jlpt_practice/data/models/grammar_point.dart';
 import 'package:jlpt_practice/features/vocabulary/example_furigana_text.dart';
 import 'package:jlpt_practice/data/models/grammar_study_session.dart';
 import 'package:jlpt_practice/features/grammar/grammar_providers.dart';
+import 'package:jlpt_practice/features/grammar/grammar_qa_chat_screen.dart';
 import 'package:jlpt_practice/features/grammar/grammar_study_session_provider.dart';
+import 'package:jlpt_practice/core/constants/app_colors.dart';
+import 'package:jlpt_practice/core/constants/app_font_weights.dart';
 import 'package:jlpt_practice/core/constants/app_sizes.dart';
 
 class GrammarDetailScreen extends ConsumerWidget {
@@ -106,6 +109,15 @@ class _GrammarDetailsState extends ConsumerState<_GrammarDetails> {
         ?.meaningLanguage;
     final language =
         meaningLanguage ?? Localizations.localeOf(context).languageCode;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+    final menuBackgroundColor = isDark
+        ? colorScheme.surfaceContainerHigh
+        : colorScheme.surface;
+    final menuBorderColor = colorScheme.outlineVariant.withValues(
+      alpha: isDark ? 0.6 : 0.8,
+    );
     return Scaffold(
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
@@ -169,54 +181,75 @@ class _GrammarDetailsState extends ConsumerState<_GrammarDetails> {
           ),
         ],
       ),
-      bottomNavigationBar: Container(
-        key: const ValueKey('grammar_detail_actions'),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          border: Border(
-            top: BorderSide(
-              color: Theme.of(
-                context,
-              ).colorScheme.outlineVariant.withValues(alpha: 0.5),
-              width: AppSizes.size0_5,
+      floatingActionButton: MenuAnchor(
+        key: const ValueKey('grammar_detail_ai_menu'),
+        alignmentOffset: const Offset(0, -AppSizes.size8),
+        style: MenuStyle(
+          backgroundColor: WidgetStatePropertyAll(menuBackgroundColor),
+          surfaceTintColor: const WidgetStatePropertyAll(Colors.transparent),
+          shadowColor: const WidgetStatePropertyAll(AppPalette.shadow20),
+          elevation: const WidgetStatePropertyAll(AppSizes.size6),
+          padding: const WidgetStatePropertyAll(
+            EdgeInsets.symmetric(vertical: AppSizes.size8),
+          ),
+          shape: WidgetStatePropertyAll(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppSizes.radius18),
+              side: BorderSide(color: menuBorderColor),
             ),
           ),
         ),
-        child: SafeArea(
-          top: false,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSizes.size16,
-              AppSizes.size12,
-              AppSizes.size16,
-              AppSizes.size12,
+        menuChildren: [
+          MenuItemButton(
+            key: const ValueKey('grammar_detail_practice_with_ai'),
+            leadingIcon: Icon(
+              Icons.auto_awesome_rounded,
+              color: colorScheme.primary,
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                FilledButton.icon(
-                  key: const ValueKey('grammar_detail_practice_with_ai'),
-                  onPressed: null,
-                  style: FilledButton.styleFrom(
-                    minimumSize: const Size.fromHeight(52),
-                  ),
-                  icon: const Icon(Icons.auto_awesome_rounded),
-                  label: Text(context.strings('practiceWithAi')),
-                ),
-                const SizedBox(height: AppSizes.space10),
-                FilledButton.tonalIcon(
-                  key: const ValueKey('grammar_detail_tutor'),
-                  onPressed: null,
-                  style: FilledButton.styleFrom(
-                    minimumSize: const Size.fromHeight(52),
-                  ),
-                  icon: const Icon(Icons.question_answer_rounded),
-                  label: Text(context.strings('grammarChatTitle')),
-                ),
-              ],
+            onPressed: () => context.push(
+              '/grammar/tutor/${Uri.encodeComponent(grammar.id)}',
+            ),
+            child: Text(
+              context.strings('practiceWithAi'),
+              style: TextStyle(
+                color: colorScheme.onSurface,
+                fontWeight: AppFontWeights.semiBold,
+              ),
             ),
           ),
+          MenuItemButton(
+            key: const ValueKey('grammar_detail_tutor'),
+            leadingIcon: Icon(
+              Icons.question_answer_rounded,
+              color: colorScheme.primary,
+            ),
+            onPressed: () => showGrammarQaChatScreen(
+              context,
+              grammar: grammar,
+              languageCode: language,
+            ),
+            child: Text(
+              context.strings('grammarChatTitle'),
+              style: TextStyle(
+                color: colorScheme.onSurface,
+                fontWeight: AppFontWeights.semiBold,
+              ),
+            ),
+          ),
+        ],
+        builder: (context, controller, child) => FloatingActionButton(
+          key: const ValueKey('grammar_detail_ai_trigger'),
+          shape: const CircleBorder(),
+          backgroundColor: colorScheme.primary,
+          foregroundColor: colorScheme.onPrimary,
+          onPressed: () {
+            if (controller.isOpen) {
+              controller.close();
+            } else {
+              controller.open();
+            }
+          },
+          child: const Icon(Icons.auto_awesome_rounded),
         ),
       ),
     );

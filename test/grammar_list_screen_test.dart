@@ -117,30 +117,76 @@ void main() {
       expect(find.text(example.english), findsOneWidget);
     }
     final actions = find.byKey(const ValueKey('grammar_detail_actions'));
+    final trigger = find.byKey(const ValueKey('grammar_detail_ai_trigger'));
     final practiceButton = find.byKey(
       const ValueKey('grammar_detail_practice_with_ai'),
     );
     final tutorButton = find.byKey(const ValueKey('grammar_detail_tutor'));
-    expect(actions, findsOneWidget);
-    expect(find.byType(FloatingActionButton), findsNothing);
+    expect(actions, findsNothing);
+    expect(trigger, findsOneWidget);
+    expect(find.byType(FloatingActionButton), findsOneWidget);
     expect(
-      find.descendant(of: actions, matching: practiceButton),
-      findsOneWidget,
+      tester.widget<FloatingActionButton>(trigger).shape,
+      const CircleBorder(),
     );
-    expect(find.descendant(of: actions, matching: tutorButton), findsOneWidget);
+    expect(practiceButton, findsNothing);
+    expect(tutorButton, findsNothing);
+
+    await tester.tap(trigger);
+    await tester.pumpAndSettle();
+
+    expect(practiceButton, findsOneWidget);
+    expect(tutorButton, findsOneWidget);
     expect(find.text('Practise with AI'), findsOneWidget);
     expect(find.text('Grammar Tutor'), findsOneWidget);
     expect(
       tester.getTopLeft(practiceButton).dy,
       lessThan(tester.getTopLeft(tutorButton).dy),
     );
-    expect(
-      tester.getBottomLeft(actions).dy,
-      closeTo(tester.getSize(find.byType(Scaffold).last).height, 1),
-    );
-    expect(tester.widget<FilledButton>(practiceButton).onPressed, isNull);
-    expect(tester.widget<FilledButton>(tutorButton).onPressed, isNull);
+
+    await tester.tap(tutorButton);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('grammar_chat_close')), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('grammar_chat_close')));
+    await tester.pumpAndSettle();
+
+    await tester.tap(trigger);
+    await tester.pumpAndSettle();
+    await tester.tap(practiceButton);
+    await tester.pumpAndSettle();
+    expect(find.text('Practice N5_1'), findsOneWidget);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('AI menu bar adapts to light and dark appearance modes', (
+    tester,
+  ) async {
+    for (final brightness in Brightness.values) {
+      final theme = brightness == Brightness.light
+          ? ThemeData.light(useMaterial3: true)
+          : ThemeData.dark(useMaterial3: true);
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            grammarCatalogProvider.overrideWith((ref) async => _grammar),
+          ],
+          child: MaterialApp(
+            theme: theme,
+            home: const GrammarDetailScreen(grammarId: 'N5_1'),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final menuAnchor = tester.widget<MenuAnchor>(
+        find.byKey(const ValueKey('grammar_detail_ai_menu')),
+      );
+      final resolvedBg = menuAnchor.style?.backgroundColor?.resolve(const {});
+      final expectedBg = brightness == Brightness.dark
+          ? theme.colorScheme.surfaceContainerHigh
+          : theme.colorScheme.surface;
+      expect(resolvedBg, expectedBg);
+    }
   });
 
   testWidgets('Korean locale displays Korean grammar detail', (tester) async {
@@ -166,15 +212,14 @@ void main() {
     expect(find.text(_n5.summaryKo), findsOneWidget);
     expect(find.text(_n5.explanationKo), findsOneWidget);
     expect(find.text(_n5.formationKo), findsOneWidget);
-    final actions = find.byKey(const ValueKey('grammar_detail_actions'));
-    expect(
-      find.descendant(of: actions, matching: find.text('AI로 연습하기')),
-      findsOneWidget,
-    );
-    expect(
-      find.descendant(of: actions, matching: find.text('문법 튜터')),
-      findsOneWidget,
-    );
+    expect(find.text('AI로 연습하기'), findsNothing);
+    expect(find.text('문법 튜터'), findsNothing);
+
+    await tester.tap(find.byKey(const ValueKey('grammar_detail_ai_trigger')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('AI로 연습하기'), findsOneWidget);
+    expect(find.text('문법 튜터'), findsOneWidget);
     for (final example in _n5.examples) {
       await tester.scrollUntilVisible(
         find.text(example.korean),
