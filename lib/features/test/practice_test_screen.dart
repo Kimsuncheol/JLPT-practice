@@ -11,7 +11,6 @@ import 'package:jlpt_practice/data/models/mock_test.dart';
 import 'package:jlpt_practice/data/models/mock_test_problem.dart';
 import 'package:jlpt_practice/data/models/quiz.dart';
 import 'package:jlpt_practice/features/test/mock_test_providers.dart';
-import 'package:jlpt_practice/features/test/practice_ai_tutor_screen.dart';
 import 'package:jlpt_practice/features/test/practice_test_generator.dart';
 import 'package:jlpt_practice/shared/volume_warning_toast.dart';
 import 'package:jlpt_practice/core/constants/app_sizes.dart';
@@ -317,17 +316,7 @@ class _PracticeTestScreenState extends ConsumerState<PracticeTestScreen> {
                                 const SizedBox(height: AppSizes.space12),
                                 FilledButton.tonalIcon(
                                   key: const ValueKey('practice_ask_ai_tutor'),
-                                  onPressed: () => showPracticeAiTutorScreen(
-                                    context: context,
-                                    problem: item,
-                                    selectedAnswer: _selected!,
-                                    explanationLanguage:
-                                        state.meaningLanguage == 'ko'
-                                        ? 'Korean'
-                                        : 'English',
-                                    onContinue: () =>
-                                        unawaited(_advance(items)),
-                                  ),
+                                  onPressed: null,
                                   icon: const Icon(Icons.auto_awesome_rounded),
                                   label: Text(context.strings('askAiTutor')),
                                 ),

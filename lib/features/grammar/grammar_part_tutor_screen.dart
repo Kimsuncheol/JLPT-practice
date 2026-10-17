@@ -261,12 +261,11 @@ class _GrammarPartTutorScreenState extends ConsumerState<GrammarPartTutorScreen>
           title: context.strings('reviewNext'),
           icon: Icons.refresh_rounded,
           items: weak,
-          onTap: (item) => context.push('/grammar/tutor/${item.id}'),
         ),
         const SizedBox(height: AppSizes.space22),
         if (weak.isNotEmpty)
           FilledButton(
-            onPressed: () => context.push('/grammar/tutor/${weak.first.id}'),
+            onPressed: null,
             child: Text(context.strings('practiceWeakPoints')),
           ),
         TextButton(
@@ -283,13 +282,11 @@ class _ResultGroup extends StatelessWidget {
     required this.title,
     required this.icon,
     required this.items,
-    this.onTap,
   });
 
   final String title;
   final IconData icon;
   final List<GrammarPoint> items;
-  final ValueChanged<GrammarPoint>? onTap;
 
   @override
   Widget build(BuildContext context) => Container(
@@ -315,8 +312,6 @@ class _ResultGroup extends StatelessWidget {
             dense: true,
             contentPadding: EdgeInsets.zero,
             title: Text('#${item.rank}  ${item.title}'),
-            trailing: onTap == null ? null : const Icon(Icons.chevron_right),
-            onTap: onTap == null ? null : () => onTap!(item),
           ),
       ],
     ),

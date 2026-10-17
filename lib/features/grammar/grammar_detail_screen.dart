@@ -12,7 +12,6 @@ import 'package:jlpt_practice/data/models/grammar_point.dart';
 import 'package:jlpt_practice/features/vocabulary/example_furigana_text.dart';
 import 'package:jlpt_practice/data/models/grammar_study_session.dart';
 import 'package:jlpt_practice/features/grammar/grammar_providers.dart';
-import 'package:jlpt_practice/features/grammar/grammar_qa_chat_screen.dart';
 import 'package:jlpt_practice/features/grammar/grammar_study_session_provider.dart';
 import 'package:jlpt_practice/core/constants/app_sizes.dart';
 
@@ -198,9 +197,7 @@ class _GrammarDetailsState extends ConsumerState<_GrammarDetails> {
               children: [
                 FilledButton.icon(
                   key: const ValueKey('grammar_detail_practice_with_ai'),
-                  onPressed: () => context.push(
-                    '/grammar/tutor/${Uri.encodeComponent(grammar.id)}',
-                  ),
+                  onPressed: null,
                   style: FilledButton.styleFrom(
                     minimumSize: const Size.fromHeight(52),
                   ),
@@ -210,11 +207,7 @@ class _GrammarDetailsState extends ConsumerState<_GrammarDetails> {
                 const SizedBox(height: AppSizes.space10),
                 FilledButton.tonalIcon(
                   key: const ValueKey('grammar_detail_tutor'),
-                  onPressed: () => showGrammarQaChatScreen(
-                    context,
-                    grammar: grammar,
-                    languageCode: language,
-                  ),
+                  onPressed: null,
                   style: FilledButton.styleFrom(
                     minimumSize: const Size.fromHeight(52),
                   ),

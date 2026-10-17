@@ -63,6 +63,17 @@ void main() {
 
     expect(find.byType(ExpansionTile), findsOneWidget);
     expect(find.textContaining('Part 1'), findsOneWidget);
+    expect(
+      tester
+          .widget<IconButton>(
+            find.byWidgetPredicate(
+              (widget) =>
+                  widget is IconButton && widget.tooltip == 'Practise with AI',
+            ),
+          )
+          .onPressed,
+      isNull,
+    );
     await tester.tap(find.text(_n5.title));
     await tester.pumpAndSettle();
 
@@ -127,14 +138,8 @@ void main() {
       tester.getBottomLeft(actions).dy,
       closeTo(tester.getSize(find.byType(Scaffold).last).height, 1),
     );
-    await tester.tap(practiceButton);
-    await tester.pumpAndSettle();
-    expect(find.text('Practice N5_1'), findsOneWidget);
-    router.pop();
-    await tester.pumpAndSettle();
-    await tester.tap(tutorButton);
-    await tester.pumpAndSettle();
-    expect(find.text('Grammar Tutor'), findsOneWidget);
+    expect(tester.widget<FilledButton>(practiceButton).onPressed, isNull);
+    expect(tester.widget<FilledButton>(tutorButton).onPressed, isNull);
     expect(tester.takeException(), isNull);
   });
 

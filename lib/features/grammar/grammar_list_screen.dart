@@ -160,7 +160,7 @@ class _GrammarCard extends StatelessWidget {
                 _MasteryIcon(progress: progress),
                 IconButton(
                   tooltip: context.strings('practiceWithAi'),
-                  onPressed: () => context.push('/grammar/tutor/${grammar.id}'),
+                  onPressed: null,
                   icon: const Icon(Icons.auto_awesome_outlined),
                 ),
               ],
@@ -250,7 +250,9 @@ class _PartList extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: FilledButton.tonalIcon(
-                  onPressed: () => context.push('/grammar/part/$level/$number'),
+                  onPressed: practised == 0
+                      ? () => context.push('/grammar/part/$level/$number')
+                      : null,
                   icon: const Icon(Icons.auto_awesome),
                   label: Text(
                     practised == 0
