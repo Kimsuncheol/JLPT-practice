@@ -35,11 +35,10 @@ class GrammarQaChatScreen extends StatelessWidget {
     title: context.strings('grammarChatTitle'),
     icon: Icons.question_answer_rounded,
     hint: context.strings('askAboutThisGrammarHint'),
-    suggestionKeys: const [
-      'askSuggestionWhenToUse',
-      'askSuggestionMoreExamples',
-      'askSuggestionDifference',
-    ],
+    initialMessage:
+        'Explain this grammar point clearly: its meaning, formation, and when to use it. '
+        'Give two Japanese example sentences with translations in the selected explanation language.',
+    suggestionKeys: const [],
     closeKey: const ValueKey('grammar_chat_close'),
   );
 }
