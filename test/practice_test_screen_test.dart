@@ -8,8 +8,10 @@ import 'package:jlpt_practice/data/models/mock_test.dart';
 import 'package:jlpt_practice/data/models/mock_test_problem.dart';
 import 'package:jlpt_practice/features/test/mock_test_providers.dart';
 import 'package:jlpt_practice/features/test/mock_test_result_screen.dart';
-import 'package:jlpt_practice/features/test/practice_ai_tutor_service.dart';
-import 'package:jlpt_practice/features/test/practice_ai_tutor_screen.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
+import 'package:jlpt_practice/core/api/jlpt_api_client.dart';
 import 'package:jlpt_practice/features/test/practice_test_screen.dart';
 
 void main() {
@@ -112,88 +114,84 @@ void main() {
     );
   }
 
-  testWidgets(
-    'AI Tutor trigger is inactive and preserves the stored explanation',
-    (tester) async {
-      var aiRequests = 0;
-      final container = ProviderContainer(
-        overrides: [
-          appControllerProvider.overrideWith(_FakeAppController.new),
-          generatedPracticeSetProvider((
+  testWidgets('AI Tutor explains the selected answer through the API', (
+    tester,
+  ) async {
+    var aiRequests = 0;
+    final container = ProviderContainer(
+      overrides: [
+        appControllerProvider.overrideWith(_FakeAppController.new),
+        generatedPracticeSetProvider((
+          level: 'N5',
+          practiceNumber: 1,
+        )).overrideWith(
+          (ref) async => GeneratedPracticeSet(
+            items: [_problems[2]],
+            vocabularyQuestions: const [],
+          ),
+        ),
+        jlptApiClientProvider.overrideWithValue(
+          JlptApiClient(
+            baseUrl: 'https://example.test',
+            client: MockClient((request) async {
+              aiRequests++;
+              expect(request.url.path, '/api/tutor');
+              final data = jsonDecode(request.body) as Map;
+              expect(
+                data['question']['selected_answer'],
+                _problems[2].choices.first,
+              );
+              return http.Response(
+                '{"reply":"The passage explicitly gives the time.","follow_up_questions":["Why does this fit?"]}',
+                200,
+              );
+            }),
+          ),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container.read(appControllerProvider.future);
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const MaterialApp(
+          home: PracticeTestScreen(
             level: 'N5',
+            section: ProblemSection.reading,
             practiceNumber: 1,
-          )).overrideWith(
-            (ref) async => GeneratedPracticeSet(
-              items: [_problems[2]],
-              vocabularyQuestions: const [],
-            ),
-          ),
-          practiceAiTutorProvider.overrideWith((ref) async {
-            aiRequests++;
-            throw StateError('AI must remain inactive');
-          }),
-        ],
-      );
-      addTearDown(container.dispose);
-      await container.read(appControllerProvider.future);
-
-      await tester.pumpWidget(
-        UncontrolledProviderScope(
-          container: container,
-          child: const MaterialApp(
-            home: PracticeTestScreen(
-              level: 'N5',
-              section: ProblemSection.reading,
-              practiceNumber: 1,
-            ),
           ),
         ),
-      );
-      await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const ValueKey('practice_test_choice_0')));
-      await tester.pumpAndSettle();
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('practice_test_choice_0')));
+    await tester.pumpAndSettle();
 
-      expect(find.text('The passage says 7 o\'clock.'), findsOneWidget);
-      expect(find.byKey(const ValueKey('practice_continue')), findsOneWidget);
+    expect(find.text('The passage says 7 o\'clock.'), findsOneWidget);
+    expect(find.byKey(const ValueKey('practice_continue')), findsOneWidget);
 
-      final button = find.byKey(const ValueKey('practice_ask_ai_tutor'));
-      expect(tester.widget<FilledButton>(button).onPressed, isNull);
-      expect(aiRequests, 0);
-
-      // Direct entry must also keep all AI actions inactive.
-      await tester.pumpWidget(
-        UncontrolledProviderScope(
-          container: container,
-          child: MaterialApp(
-            home: PracticeAiTutorScreen(
-              problem: _problems[2],
-              selectedAnswer: _problems[2].choices.first,
-              explanationLanguage: 'English',
-              onContinue: () {},
-            ),
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
-      expect(find.text('Practice Tutor'), findsOneWidget);
-      expect(tester.widget<TextField>(find.byType(TextField)).enabled, isFalse);
-      expect(
-        tester
-            .widget<IconButton>(
-              find.byKey(const ValueKey('practice_ai_chat_send')),
-            )
-            .onPressed,
-        isNull,
-      );
-      expect(
-        tester
-            .widgetList<ActionChip>(find.byType(ActionChip))
-            .every((chip) => chip.onPressed == null),
-        isTrue,
-      );
-      expect(aiRequests, 0);
-    },
-  );
+    final button = find.byKey(const ValueKey('practice_ask_ai_tutor'));
+    expect(tester.widget<FilledButton>(button).onPressed, isNotNull);
+    expect(aiRequests, 0);
+    await tester.tap(button);
+    await tester.pumpAndSettle();
+    expect(find.text('Practice Tutor'), findsOneWidget);
+    expect(
+      find.text('The passage explicitly gives the time.', findRichText: true),
+      findsOneWidget,
+    );
+    expect(tester.widget<TextField>(find.byType(TextField)).enabled, isTrue);
+    expect(aiRequests, 1);
+    await tester.enterText(find.byType(TextField), 'Why?');
+    await tester.tap(find.byKey(const ValueKey('practice_ai_chat_send')));
+    await tester.pumpAndSettle();
+    expect(aiRequests, 2);
+    await tester.tap(find.byKey(const ValueKey('practice_ai_close')));
+    await tester.pumpAndSettle();
+    expect(find.text('The passage says 7 o\'clock.'), findsOneWidget);
+  });
 }
 
 class _FakeAppController extends AppController {

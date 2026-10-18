@@ -41,9 +41,9 @@
   <td>Core app functionality — saving your learning progress locally and in Firestore under your Firebase account.</td>
 </tr>
 <tr>
-  <td>AI grammar-practice submissions</td>
-  <td>Japanese sentences you submit for grammar feedback, plus the selected grammar point.</td>
-  <td>Sent to Google's Gemini API to evaluate that practice sentence. Used only when you request AI feedback.</td>
+  <td>AI tutoring and extra practice</td>
+  <td>Your tutor messages, selected lesson or practice question, selected answer, and up to six recent messages. Extra-practice requests include the JLPT level, category, and explanation language.</td>
+  <td>Sent to the JLPT API hosted on Render and its configured Ollama model provider when you open an AI tutor or request AI practice. Chat and generated practice sessions remain in app memory and are discarded when you leave the screen; they are not saved with your study progress.</td>
 </tr>
 <tr>
   <td>Advertising identifier</td>
@@ -64,7 +64,7 @@
 <ul>
   <li><strong>Google Firebase</strong> (Authentication, Firestore database, Crashlytics, Remote Config, App Check) — <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google Privacy Policy</a></li>
   <li><strong>Google Mobile Ads (AdMob)</strong> — used to display ads. See <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener">how Google uses information from apps that use its services</a>.</li>
-  <li><strong>Google Gemini API</strong> — evaluates sentences submitted through grammar practice. Those sentences are processed by this service.</li>
+  <li><strong>JLPT tutor API (Render) and its configured Ollama model provider</strong> — process AI tutoring and practice-generation requests. The app does not include your Firebase account ID in these requests. The backend is configured without application-level conversation persistence or content logging; hosting and model providers process requests under their own policies.</li>
 </ul>
 
 <h2>Data Sharing</h2>

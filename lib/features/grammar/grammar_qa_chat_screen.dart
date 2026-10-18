@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/data/models/grammar_point.dart';
-import 'package:jlpt_practice/shared/inactive_ai_chat.dart';
+import 'package:jlpt_practice/shared/api_tutor_chat.dart';
+import 'package:jlpt_practice/core/api/jlpt_tutor_service.dart';
 
 Future<void> showGrammarQaChatScreen(
   BuildContext context, {
@@ -27,7 +28,10 @@ class GrammarQaChatScreen extends StatelessWidget {
   final String languageCode;
 
   @override
-  Widget build(BuildContext context) => InactiveAiChat(
+  Widget build(BuildContext context) => ApiTutorChat(
+    level: grammar.level,
+    language: languageCode,
+    contextData: grammarTutorContext(grammar, languageCode),
     title: context.strings('grammarChatTitle'),
     icon: Icons.question_answer_rounded,
     hint: context.strings('askAboutThisGrammarHint'),

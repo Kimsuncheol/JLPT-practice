@@ -72,7 +72,7 @@ void main() {
             ),
           )
           .onPressed,
-      isNull,
+      isNotNull,
     );
     await tester.tap(find.text(_n5.title));
     await tester.pumpAndSettle();

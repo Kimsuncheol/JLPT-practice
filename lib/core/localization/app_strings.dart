@@ -246,7 +246,7 @@ class AppStrings {
     'anonymousBody':
         'Sign in to restore your study history after reinstalling or changing devices.',
     'privacyBody':
-        'Only study settings and anonymous usage identifiers are used. Ad consent choices become available when ads are enabled.',
+        'Study settings and progress are stored for learning. AI features send your messages and lesson or question context to the JLPT tutor service and its model provider. Chats are cleared when closed. Ad consent choices are available when ads are enabled.',
     'attributionBody':
         'Ranked vocabulary and grammar are imported from the MIT-licensed tristcoil/hanabira.org dataset. Vocabulary examples include generated content.',
     'offlineMode': 'Works offline',
@@ -302,6 +302,29 @@ class AppStrings {
     'aiTutor': 'AI Tutor',
     'practiceChatTitle': 'Practice Tutor',
     'aiGeneratedNotice': 'AI-generated guidance may contain mistakes.',
+    'aiServiceUnavailable':
+        'The AI service is unavailable. Please try again later. Your lessons are still available.',
+    'aiServiceBusy':
+        'The AI service is busy. Please wait a moment and try again.',
+    'aiServiceTimeout':
+        'The AI service took too long to respond. Please try again.',
+    'aiRequestInvalid':
+        'This request could not be sent. Try a shorter question.',
+    'aiResponseInvalid':
+        'The AI service returned an incomplete response. Please try again.',
+    'aiExtraPractice': 'AI extra practice',
+    'aiExtraPracticeDescription':
+        'Create extra vocabulary, grammar, and reading questions',
+    'aiFocusedPractice': 'Practise this grammar point',
+    'aiFocusedEnglishNotice':
+        'This focused question includes an English explanation. The tutor can explain it in your selected language.',
+    'aiGeneratePractice': 'Generate practice',
+    'aiGenerating': 'Creating your practice questions…',
+    'aiLoadingFollowUps': 'Preparing follow-up questions…',
+    'scrollToBottom': 'Scroll to bottom',
+    'aiPracticeNotice':
+        'Unofficial AI-generated practice. Difficulty is approximate, answers may contain mistakes, and results do not predict a JLPT score. This session is not saved.',
+
     'whyCorrect': 'Why this answer is correct',
     'whyWrong': 'Why your answer was incorrect',
     'keyEvidence': 'Key evidence',
@@ -582,7 +605,8 @@ class AppStrings {
     'profile': '프로필',
     'authMethod': '로그인 방법',
     'anonymousBody': '로그인하면 앱 재설치 또는 기기 변경 후에도 학습 기록을 복원할 수 있습니다.',
-    'privacyBody': '학습 설정과 익명 사용 식별자만 사용합니다. 광고를 활성화하면 광고 동의 선택 항목이 제공됩니다.',
+    'privacyBody':
+        '학습 설정과 진도를 저장합니다. AI 기능을 사용하면 메시지와 문법 또는 문제 정보가 JLPT 튜터 서비스와 모델 제공업체로 전송됩니다. 대화는 창을 닫으면 삭제됩니다. 광고를 활성화하면 광고 동의 선택 항목이 제공됩니다.',
     'attributionBody':
         '급수별 단어와 문법은 MIT 라이선스의 tristcoil/hanabira.org 데이터셋에서 가져왔으며, 단어 예문에는 생성된 콘텐츠가 포함됩니다.',
     'offlineMode': '오프라인 사용 가능',
@@ -633,6 +657,24 @@ class AppStrings {
     'aiTutor': 'AI 튜터',
     'practiceChatTitle': '연습 문제 튜터',
     'aiGeneratedNotice': 'AI가 생성한 안내에는 오류가 있을 수 있습니다.',
+    'aiServiceUnavailable':
+        '현재 AI 서비스에 연결할 수 없습니다. 잠시 후 다시 시도해 주세요. 일반 학습은 계속 이용할 수 있습니다.',
+    'aiServiceBusy': 'AI 서비스가 혼잡합니다. 잠시 후 다시 시도해 주세요.',
+    'aiServiceTimeout': 'AI 응답 시간이 초과되었습니다. 다시 시도해 주세요.',
+    'aiRequestInvalid': '요청을 보낼 수 없습니다. 질문을 더 짧게 작성해 주세요.',
+    'aiResponseInvalid': 'AI 서비스의 응답이 완전하지 않습니다. 다시 시도해 주세요.',
+    'aiExtraPractice': 'AI 추가 연습',
+    'aiExtraPracticeDescription': '어휘, 문법, 독해 추가 문제 만들기',
+    'aiFocusedPractice': '이 문법으로 문제 풀기',
+    'aiFocusedEnglishNotice':
+        '이 맞춤 문제의 기본 해설은 영어입니다. 튜터에게 선택한 언어로 설명을 요청할 수 있어요.',
+    'aiGeneratePractice': '연습 문제 만들기',
+    'aiGenerating': '연습 문제를 만들고 있어요…',
+    'aiLoadingFollowUps': '후속 질문을 만들고 있어요…',
+    'scrollToBottom': '맨 아래로 이동',
+    'aiPracticeNotice':
+        'AI가 생성한 비공식 연습 문제입니다. 난이도는 추정치이며 정답에 오류가 있을 수 있습니다. 결과는 실제 JLPT 점수를 예측하지 않으며 이 연습 기록은 저장되지 않습니다.',
+
     'whyCorrect': '이 답이 정답인 이유',
     'whyWrong': '선택한 답이 틀린 이유',
     'keyEvidence': '핵심 근거',
