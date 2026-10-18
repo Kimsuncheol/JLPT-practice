@@ -362,11 +362,7 @@ class _ApiTutorChatState extends ConsumerState<ApiTutorChat> {
                       ),
                     ),
                   ),
-                  if (widget.initialMessage == null &&
-                      widget.suggestionKeys.isNotEmpty &&
-                      _history.isEmpty &&
-                      !_busy &&
-                      _error == null)
+                  if (_history.isEmpty && !_busy && _error == null)
                     ChatUiStyle.suggestions(
                       context: context,
                       centered: true,
