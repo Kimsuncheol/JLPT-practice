@@ -20,6 +20,8 @@ class ApiTutorChat extends ConsumerStatefulWidget {
     this.contextBuilder,
     this.practiceItem = false,
     this.initialMessage,
+    this.initialReplyLoader,
+    this.showInitialMessage = false,
     this.sendKey,
     this.onContinue,
     this.onPractice,
@@ -35,6 +37,10 @@ class ApiTutorChat extends ConsumerStatefulWidget {
   final Map<String, dynamic> Function()? contextBuilder;
   final bool practiceItem;
   final String? initialMessage;
+
+  /// Optional structured first turn; subsequent turns use the tutor endpoint.
+  final Future<TutorReply> Function(JlptApiClient client)? initialReplyLoader;
+  final bool showInitialMessage;
   final VoidCallback? onContinue, onPractice;
 
   @override
@@ -60,7 +66,9 @@ class _ApiTutorChatState extends ConsumerState<ApiTutorChat> {
   void initState() {
     super.initState();
     if (widget.initialMessage case final message?) {
-      Future<void>.microtask(() => _send(message, showUser: false));
+      Future<void>.microtask(
+        () => _send(message, showUser: widget.showInitialMessage),
+      );
     }
   }
 
@@ -110,14 +118,17 @@ class _ApiTutorChatState extends ConsumerState<ApiTutorChat> {
     try {
       final service = JlptTutorService(ref.read(jlptApiClientProvider));
       final contextData = widget.contextBuilder?.call() ?? widget.contextData;
-      final reply = await service.fetchReply(
-        practiceItem: widget.practiceItem,
-        level: widget.level,
-        language: widget.language,
-        context: contextData,
-        message: message,
-        history: List.of(_history),
-      );
+      final initialLoader = widget.initialReplyLoader;
+      final reply = _history.isEmpty && initialLoader != null
+          ? await initialLoader(service.client)
+          : await service.fetchReply(
+              practiceItem: widget.practiceItem,
+              level: widget.level,
+              language: widget.language,
+              context: contextData,
+              message: message,
+              history: List.of(_history),
+            );
       if (!mounted) return;
       final answer = ChatMessage(
         text: reply.text,
@@ -383,6 +394,7 @@ class _ApiTutorChatState extends ConsumerState<ApiTutorChat> {
                           : () => _send(
                               _failedMessage!,
                               showUser:
+                                  widget.showInitialMessage ||
                                   _history.isNotEmpty ||
                                   widget.initialMessage != _failedMessage,
                             ),
@@ -403,7 +415,9 @@ class _ApiTutorChatState extends ConsumerState<ApiTutorChat> {
               controller: _input,
               hint: widget.hint,
               sendTooltip: context.strings('sendMessage'),
-              enabled: !_busy,
+              enabled:
+                  !_busy &&
+                  (widget.initialReplyLoader == null || _history.isNotEmpty),
               maxLength: 500,
               onSend: () => _send(_input.text),
               sendKey: widget.sendKey,

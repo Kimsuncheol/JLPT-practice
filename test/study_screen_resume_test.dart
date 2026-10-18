@@ -1,3 +1,5 @@
+import 'package:jlpt_practice/core/api/jlpt_api_client.dart';
+import 'package:jlpt_practice/features/vocabulary/word_explanation_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -24,6 +26,55 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
+
+  testWidgets(
+    'word explanation opens with current study word and preserves position',
+    (tester) async {
+      final container = ProviderContainer(
+        overrides: [
+          appControllerProvider.overrideWith(
+            () => _ResumeAppController('word_2', 2),
+          ),
+          jlptApiClientProvider.overrideWith((ref) {
+            final client = JlptApiClient(baseUrl: '');
+            ref.onDispose(client.close);
+            return client;
+          }),
+        ],
+      );
+      addTearDown(container.dispose);
+      await container.read(appControllerProvider.future);
+      final router = _createRouter();
+      addTearDown(router.dispose);
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp.router(
+            theme: AppTheme.light(),
+            routerConfig: router,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      router.push('/study/day/1?startOver=true');
+      await tester.pumpAndSettle();
+      final pages = find.byKey(const ValueKey('study-word-pages'));
+      await tester.drag(pages, Offset(-tester.getSize(pages).width, 0));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('study_word_explanation')));
+      await tester.pumpAndSettle();
+      final screen = tester.widget<WordExplanationScreen>(
+        find.byType(WordExplanationScreen),
+      );
+      final state = container.read(appControllerProvider).requireValue;
+      expect(screen.word, state.selectedVocabulary[1].word);
+      expect(find.text('Word explanation'), findsOneWidget);
+      await tester.tap(find.byKey(const ValueKey('word_chat_close')));
+      await tester.pumpAndSettle();
+      expect(find.text('2 / 5'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
 
   test('long slash-separated labels break after the slash', () {
     expect(breakLongSlashSeparatedLabel('ラジカセ / ラジオカセット'), 'ラジカセ /\nラジオカセット');

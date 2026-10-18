@@ -44,6 +44,24 @@ AI screens use `https://jlpt-practice-langchain-muj9.onrender.com` by default.
 No Gemini/Firebase AI credentials or on-device models are required. Ordinary
 lessons and ranked practice tests continue to work offline.
 
+- Vocabulary → open a study day → tap the sparkle icon in the top bar →
+  **Word explanation** opens a `flutter_gen_ai_chat_ui` chat and immediately
+  calls `POST /api/words/explain` for the current word and example sentence,
+  without displaying an initial user question bubble,
+  with the word's JLPT level and selected meaning language
+  (English/Korean/Japanese; other languages fall back to English).
+  The request supports a word of 1–100 characters and optional context up to 500.
+  The full explanation appears as a Markdown AI message, including readings,
+  meanings/POS, collocations, grammar, original AI examples, nuances, register,
+  synonyms, usage contrasts, and separately labeled server-curated past-exam
+  references when available. References reflect backend collection metadata;
+  the app does not independently verify them. Exactly three follow-up questions
+  arrive with the explanation in one call and appear in its message footer.
+  Tap a question or type in the composer to continue through `/api/tutor/chat`
+  in the same conversation with bounded word context and recent history.
+  Errors keep the conversation and allow manual retry. Explanations and chats
+  stay in memory and are discarded when the screen closes. This requires a
+  backend deployment that includes `/api/words/explain`.
 - Grammar → AI menu → **Grammar Tutor** uses `POST /api/tutor/chat` with
   lesson context. **Practise with AI** opens a guided conversation; its quiz
   icon creates a question focused on that grammar point using

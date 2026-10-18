@@ -18,6 +18,8 @@ import 'package:jlpt_practice/features/vocabulary/cover_masking.dart';
 import 'package:jlpt_practice/features/vocabulary/cover_tape.dart';
 import 'package:jlpt_practice/features/vocabulary/example_furigana_text.dart';
 import 'package:jlpt_practice/features/vocabulary/short_quiz.dart';
+import 'package:jlpt_practice/features/vocabulary/word_explanation_screen.dart';
+import 'package:jlpt_practice/shared/eye_comfort_overlay.dart';
 import 'package:jlpt_practice/features/vocabulary/short_quiz_game.dart';
 import 'package:jlpt_practice/features/vocabulary/masked_translation.dart';
 import 'package:jlpt_practice/core/constants/app_sizes.dart';
@@ -128,6 +130,29 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
           centerTitle: false,
           titleSpacing: AppSizes.size0,
           actions: [
+            IconButton(
+              key: const ValueKey('study_word_explanation'),
+              tooltip: context.strings('wordExplanation'),
+              icon: const Icon(Icons.auto_awesome_outlined),
+              onPressed: () async {
+                _readingsRequest++;
+                if (_ttsService != null) await _ttsService!.stop();
+                if (!context.mounted) return;
+                final word = words[_index];
+                await Navigator.of(context).push<void>(
+                  MaterialPageRoute(
+                    builder: (_) => EyeComfortOverlay(
+                      child: WordExplanationScreen(
+                        word: word.word,
+                        contextSentence: word.example.sentence,
+                        level: word.jlptLevel,
+                        language: state.meaningLanguage,
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
             IconButton(
               onPressed: () => context.push('/settings/learning'),
               icon: const Icon(Icons.settings_rounded),
