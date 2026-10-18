@@ -1,3 +1,4 @@
+import 'package:jlpt_practice/features/test/practice_ai_tutor_screen.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -316,7 +317,17 @@ class _PracticeTestScreenState extends ConsumerState<PracticeTestScreen> {
                                 const SizedBox(height: AppSizes.space12),
                                 FilledButton.tonalIcon(
                                   key: const ValueKey('practice_ask_ai_tutor'),
-                                  onPressed: null,
+                                  onPressed: () => showPracticeAiTutorScreen(
+                                    context: context,
+                                    problem: item,
+                                    selectedAnswer: _selected!,
+                                    explanationLanguage:
+                                        state.meaningLanguage == 'ko'
+                                        ? 'Korean'
+                                        : 'English',
+                                    onContinue: () =>
+                                        unawaited(_advance(items)),
+                                  ),
                                   icon: const Icon(Icons.auto_awesome_rounded),
                                   label: Text(context.strings('askAiTutor')),
                                 ),

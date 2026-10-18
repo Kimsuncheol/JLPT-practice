@@ -1,3 +1,7 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
+import 'package:jlpt_practice/core/api/jlpt_api_client.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen_ai_chat_ui/flutter_gen_ai_chat_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,48 +14,55 @@ import 'package:jlpt_practice/features/grammar/grammar_tutor_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
-  testWidgets('rank tutor retains its chat with inactive controls', (
+  testWidgets('rank tutor loads intro from API and sends grammar follow-up', (
     tester,
   ) async {
     SharedPreferences.setMockInitialValues({});
+    final requests = <Map<String, dynamic>>[];
+    final client = JlptApiClient(
+      baseUrl: 'https://example.test',
+      client: MockClient((request) async {
+        expect(request.url.path, '/api/tutor/chat');
+        requests.add(jsonDecode(request.body) as Map<String, dynamic>);
+        return http.Response(
+          jsonEncode({
+            'follow_up_questions': ['What is another example?'],
+            'reply': requests.length == 1
+                ? 'Grammar introduction'
+                : 'Sentence feedback',
+          }),
+          200,
+        );
+      }),
+    );
+    addTearDown(client.close);
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [grammarCatalogProvider.overrideWith((_) async => _items)],
+        overrides: [
+          grammarCatalogProvider.overrideWith((_) async => _items),
+          jlptApiClientProvider.overrideWithValue(client),
+        ],
         child: const MaterialApp(home: GrammarTutorScreen(grammarId: 'N5_1')),
       ),
     );
     await tester.pumpAndSettle();
     expect(find.text('Practise with AI'), findsOneWidget);
     expect(find.byType(AiChatWidget), findsOneWidget);
-    expect(tester.widget<TextField>(find.byType(TextField)).enabled, isFalse);
+    expect(requests, hasLength(1));
     expect(
-      tester
-          .widget<IconButton>(
-            find.byKey(const ValueKey('grammar_practice_send')),
-          )
-          .onPressed,
-      isNull,
+      (requests.single['question'] as Map)['passage'],
+      contains(_target.explanation),
     );
-    expect(find.byType(ActionChip), findsNWidgets(3));
-    expect(
-      tester
-          .widgetList<ActionChip>(find.byType(ActionChip))
-          .every((chip) => chip.onPressed == null),
-      isTrue,
-    );
-    expect(find.byKey(const ValueKey('chat_ai_loading_bubble')), findsNothing);
-    expect((await LocalStore.create()).loadGrammarStudySessions(), isEmpty);
-    tester
-        .widget<AiChatWidget>(find.byType(AiChatWidget))
-        .onSendMessage(
-          ChatMessage(
-            text: 'test',
-            user: const ChatUser(id: 'user'),
-            createdAt: DateTime.now(),
-          ),
-        );
+    expect(tester.widget<TextField>(find.byType(TextField)).enabled, isTrue);
+    await tester.enterText(find.byType(TextField), '寿司が一番好きです。');
+    await tester.tap(find.byKey(const ValueKey('grammar_practice_send')));
     await tester.pumpAndSettle();
-    expect(find.text('test'), findsNothing);
+    expect(requests, hasLength(2));
+    expect(requests.last['history'], hasLength(2));
+    expect(
+      (await LocalStore.create()).loadGrammarStudySessions()['N5']!.grammarId,
+      'N5_1',
+    );
   });
 
   testWidgets('part checkpoint diagnoses multiple ranks', (tester) async {

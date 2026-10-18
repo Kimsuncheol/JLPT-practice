@@ -38,6 +38,65 @@ covering every published JLPT item type. The original
 `jlpt_test_problems_2021_2025.csv` is preserved and is not loaded by the live
 mock-test flow.
 
+## JLPT tutor API
+
+AI screens use `https://jlpt-practice-langchain-muj9.onrender.com` by default.
+No Gemini/Firebase AI credentials or on-device models are required. Ordinary
+lessons and ranked practice tests continue to work offline.
+
+- Grammar → AI menu → **Grammar Tutor** uses `POST /api/tutor/chat` with
+  lesson context. **Practise with AI** opens a guided conversation; its quiz
+  icon creates a question focused on that grammar point using
+  `POST /api/practice/question`.
+- Answer a practice-test question → **Ask AI Tutor** uses `POST /api/tutor`
+  with the selected question, passage, answer key, selected answer, and stored
+  explanation. Replies are rendered as Markdown, not parsed as structured grades.
+- Test → select a level → **AI extra practice** generates three vocabulary,
+  grammar, or reading questions with `POST /api/practice/generate`. Batch
+  explanations follow the app's meaning language. The focused single-question
+  endpoint currently returns English explanations; its tutor supports Korean.
+- Multiple-choice scoring stays local. AI sessions do not affect ranked test
+  results, XP, or SRS, and questions and conversations are discarded on exit.
+
+AI-generated conversational follow-up questions appear inside the footer of
+each AI reply. If a response includes `follow_up_questions`, the app uses them
+directly. With the current reply-only API, it makes a separate tutor request for
+up to three questions in the selected explanation language. The main reply is
+shown immediately; suggestion failures leave it usable. Suggestion requests are
+not added to conversation history. Sending text or tapping a follow-up returns
+the transcript to the bottom; manually scrolling up releases that anchor.
+
+The API receives up to six recent conversation messages (500 characters each)
+and bounded lesson/question context. Requests use a 130-second timeout for the
+backend's configurable model timeout and cold starts, show localized errors,
+and allow manual retry while preserving typed questions. There is no automatic
+retry that could duplicate model work. `GET /health` is available through
+`JlptApiClient.health()`; it checks server reachability, not model readiness.
+
+Live verification on 2026-10-18 confirmed health, both tutor endpoints, and
+batch generation against the configured deployment. The optional focused
+`/api/practice/question` endpoint returned HTTP 502 on two attempts. Its screen
+handles this with an error and manual retry; that backend endpoint needs repair
+before focused questions can be relied on. Batch extra practice remains available.
+
+Override the address for staging or development:
+
+```sh
+flutter run --dart-define=JLPT_API_BASE_URL=https://your-api.example.com
+```
+
+Release builds require HTTPS. For local development, prefer an HTTPS tunnel;
+Android emulators reach the Mac through `10.0.2.2` and physical devices need a
+reachable LAN address or tunnel. Platform transport policies still apply to
+HTTP debug overrides. The URL is public configuration; keep Ollama credentials
+on the backend. The Flutter client never connects directly to Ollama.
+
+Validate the integration without making live model calls:
+
+```sh
+flutter test test/api test/grammar_tutor_screen_test.dart test/grammar_qa_chat_screen_test.dart test/practice_test_screen_test.dart
+```
+
 ## Configure Firebase
 
 1. Create Android and iOS apps in a Firebase project.

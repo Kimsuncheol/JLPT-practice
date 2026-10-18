@@ -1,3 +1,4 @@
+import 'package:jlpt_practice/features/test/ai_practice_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
@@ -32,6 +33,19 @@ class QuestionTypeScreen extends StatelessWidget {
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: AppSizes.space14),
+            ListTile(
+              key: const ValueKey('ai_extra_practice'),
+              leading: const Icon(Icons.auto_awesome_rounded),
+              title: Text(strings('aiExtraPractice')),
+              subtitle: Text(strings('aiExtraPracticeDescription')),
+              trailing: const Icon(Icons.chevron_right_rounded),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => AiPracticeScreen(level: level),
+                ),
+              ),
+            ),
+            const SizedBox(height: 14),
             _QuestionTypeGroup(
               children: [
                 _QuestionTypeTile(

@@ -265,7 +265,7 @@ class _GrammarPartTutorScreenState extends ConsumerState<GrammarPartTutorScreen>
         const SizedBox(height: AppSizes.space22),
         if (weak.isNotEmpty)
           FilledButton(
-            onPressed: null,
+            onPressed: () => context.push('/grammar/tutor/${weak.first.id}'),
             child: Text(context.strings('practiceWeakPoints')),
           ),
         TextButton(
