@@ -25,6 +25,13 @@ dart run tool/import_hanabira_grammar.dart
 dart run tool/translate_hanabira_grammar_google.dart
 ```
 
+Vocabulary example generation (`tool/generate_jlpt_examples.dart`) requires
+`sentence_furigana`, for example `{旅行|りょこう}から{帰|かえ}った。`.
+The generator rejects missing readings, unannotated kanji, and annotations that
+change the written sentence before saving. Study cards render readings above
+their kanji, respecting **Hide reading**. Older examples with a full kana reading
+also use this layout when the reading aligns with the sentence.
+
 Rebuild the ranked mock-exam bank from the retained legacy reference bank with:
 
 ```sh
@@ -53,15 +60,21 @@ lessons and ranked practice tests continue to work offline.
   The request supports a word of 1–100 characters and optional context up to 500.
   The full explanation appears as a Markdown AI message, including readings,
   meanings/POS, collocations, grammar, original AI examples, nuances, register,
-  synonyms, usage contrasts, and separately labeled server-curated past-exam
-  references when available. References reflect backend collection metadata;
-  the app does not independently verify them. Exactly three follow-up questions
+  synonyms, and usage contrasts. Past-exam examples, approximate difficulty,
+  and study notice sections are omitted, including when older servers return
+  their metadata. Exactly three follow-up questions
   arrive with the explanation in one call and appear in its message footer.
   Tap a question or type in the composer to continue through `/api/tutor/chat`
   in the same conversation with bounded word context and recent history.
   Errors keep the conversation and allow manual retry. Explanations and chats
   stay in memory and are discarded when the screen closes. This requires a
   backend deployment that includes `/api/words/explain`.
+  Generated examples accept `sentence_furigana` using `{kanji|hiragana}` markup;
+  chat renders these readings above the kanji with the same widget as study
+  cards. Older backend responses with a full kana `reading` are aligned when
+  possible. Usage contrasts require `natural_example_furigana` and
+  `unnatural_example_furigana`, rendered above the corresponding kanji as well.
+  Tutor follow-ups can use the same inline markup in reply Markdown.
 - Grammar → AI menu → **Grammar Tutor** uses `POST /api/tutor/chat` with
   lesson context. **Practise with AI** opens a guided conversation; its quiz
   icon creates a question focused on that grammar point using

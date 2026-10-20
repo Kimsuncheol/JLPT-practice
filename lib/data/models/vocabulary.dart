@@ -1,3 +1,4 @@
+import 'package:jlpt_practice/core/utils/furigana_alignment.dart';
 import 'package:jlpt_practice/data/models/kanji.dart'
     show FuriganaSegment, parseFurigana;
 
@@ -34,6 +35,9 @@ class VocabularyExample {
   final String sentenceFurigana;
 
   List<FuriganaSegment> get sentenceSegments {
+    if (sentenceFurigana.isEmpty) {
+      return alignSentenceFurigana(sentence, reading);
+    }
     final segments = parseFurigana(sentenceFurigana);
     return segments.map((segment) => segment.text).join() == sentence
         ? segments

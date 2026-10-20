@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen_ai_chat_ui/flutter_gen_ai_chat_ui.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gpt_markdown/gpt_markdown.dart';
+import 'package:jlpt_practice/data/models/kanji.dart';
+import 'package:jlpt_practice/features/vocabulary/example_furigana_text.dart';
 import 'package:jlpt_practice/core/constants/app_sizes.dart';
 import 'package:jlpt_practice/core/constants/app_font_weights.dart';
 import 'package:jlpt_practice/core/constants/app_spacing.dart';
@@ -111,6 +113,20 @@ class ChatUiStyle {
         child: GptMarkdown(
           data,
           style: body,
+          inlinePatterns: [
+            InlinePattern(
+              pattern: RegExp(r'\{([㐀-䶿一-鿿々〆]+)\|([ぁ-ゖー]+)\}'),
+              builder: (context, match, style) => WidgetSpan(
+                alignment: PlaceholderAlignment.bottom,
+                child: ExampleFuriganaText(
+                  segments: [FuriganaSegment(match.group(1)!, match.group(2)!)],
+                  style: style,
+                  wordTargets: const [],
+                  hideReadings: false,
+                ),
+              ),
+            ),
+          ],
           styleSheet: styleSheet,
           // Links are intentionally inert until chat has an external-link flow.
         ),

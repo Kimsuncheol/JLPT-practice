@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'example_furigana_format.dart';
+
 const _catalogPath = 'assets/data/jlpt_catalog.json';
 const _enrichedPath = 'assets/data/vocabulary.json';
 const _endpoint = 'https://api.openai.com/v1/responses';
@@ -175,10 +177,11 @@ Map<String, Map<String, dynamic>> _validateBatch(
     if (answer.isEmpty || !sentence.contains(answer)) {
       throw FormatException('$key answer is not present in its sentence');
     }
-    final reading = item['reading'] as String;
+    if (!hasValidExampleFurigana(item)) {
+      throw FormatException('$key has invalid or incomplete sentence furigana');
+    }
     final translations = item['translations'] as Map<String, dynamic>;
     if (sentence.isEmpty ||
-        reading.isEmpty ||
         (translations['en'] as String).isEmpty ||
         (translations['ko'] as String).isEmpty) {
       throw FormatException('$key contains an empty example field');
@@ -200,10 +203,11 @@ bool _hasCompleteExample(Map<String, dynamic> entry) {
   final translations = example['translations'];
   return [
         'sentence',
-        'reading',
+        'sentence_furigana',
         'quizSentence',
         'answer',
       ].every((key) => (example[key] as String? ?? '').isNotEmpty) &&
+      hasValidExampleFurigana(example) &&
       translations is Map<String, dynamic> &&
       (translations['en'] as String? ?? '').isNotEmpty &&
       (translations['ko'] as String? ?? '').isNotEmpty;
@@ -260,9 +264,13 @@ You are a meticulous native Japanese language educator creating JLPT study data.
 For every input item, return exactly one natural, self-contained Japanese example
 sentence that demonstrates the supplied word in the supplied English sense.
 Match sentence complexity roughly to the JLPT level. The answer may be a natural
-inflected form of the target word. Include a kana reading of the full sentence,
-an accurate natural English translation, and an accurate natural Korean
-translation. Create quizSentence by replacing the first exact occurrence of
+inflected form of the target word. Include sentence_furigana with every kanji run
+annotated as {kanji|hiragana reading}. Only annotate kanji; preserve all kana,
+okurigana, punctuation, whitespace and speaker labels exactly as in sentence.
+For example: 旅行から帰った。 -> {旅行|りょこう}から{帰|かえ}った。
+Removing annotations must reproduce sentence exactly. If there is no kanji,
+sentence_furigana must equal sentence. Include accurate natural English and
+Korean translations. Create quizSentence by replacing the first exact occurrence of
 answer in sentence with ＿＿＿; change nothing else. Never omit, merge, reorder,
 or invent an item, and copy each key exactly. Avoid offensive, sexual, violent,
 political, or personally identifying content.
@@ -280,7 +288,7 @@ const _schema = {
         'properties': {
           'key': {'type': 'string'},
           'sentence': {'type': 'string'},
-          'reading': {'type': 'string'},
+          'sentence_furigana': {'type': 'string'},
           'translations': {
             'type': 'object',
             'additionalProperties': false,
@@ -296,7 +304,7 @@ const _schema = {
         'required': [
           'key',
           'sentence',
-          'reading',
+          'sentence_furigana',
           'translations',
           'quizSentence',
           'answer',

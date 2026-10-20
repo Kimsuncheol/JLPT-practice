@@ -1,4 +1,6 @@
 import 'package:jlpt_practice/core/api/jlpt_api_client.dart';
+import 'package:jlpt_practice/core/utils/furigana_alignment.dart';
+import 'package:jlpt_practice/data/models/kanji.dart';
 
 class WordExplanationSection {
   const WordExplanationSection(this.titleKey, this.text);
@@ -95,8 +97,7 @@ class JlptWordService {
           section(
             'wordOriginalExamples',
             [
-              _text(example['japanese']),
-              _text(example['reading']),
+              _exampleSentence(example),
               _text(example['translation']),
               _text(example['usage_note']),
             ].join('\n'),
@@ -118,38 +119,10 @@ class JlptWordService {
       for (final contrast in _optionalObjects(data['natural_vs_unnatural'])) {
         section(
           'wordUsageContrast',
-          '✓ ${_text(contrast['natural_example'])}\n'
-              '✗ ${_text(contrast['unnatural_example'])}\n${_text(contrast['explanation'])}',
+          '✓ ${_exampleSentence(contrast, japaneseKey: 'natural_example', furiganaKey: 'natural_example_furigana', readingKey: null)}\n'
+              '✗ ${_exampleSentence(contrast, japaneseKey: 'unnatural_example', furiganaKey: 'unnatural_example_furigana', readingKey: null)}\n${_text(contrast['explanation'])}',
         );
       }
-      // Keep server-provided exam references in a separate section from AI examples.
-      final sources = _optionalObjects(data['verified_past_exam_examples']);
-      if (sources.isEmpty) {
-        sections.add(const WordExplanationSection('wordPastExamExamples', ''));
-      }
-      for (final source in sources) {
-        if (source['source_type'] != 'past_exam' ||
-            source['verified_from_curated_collection'] != true ||
-            source['ai_generated'] != false) {
-          throw const FormatException();
-        }
-        section(
-          'wordPastExamExamples',
-          [
-            _text(source['japanese']),
-            if (source['reading'] != null) _text(source['reading']),
-            _text(source['source_title']),
-            _text(source['source_reference']),
-            if (source['exam_year'] != null) source['exam_year'].toString(),
-            if (source['exam_level'] != null) _text(source['exam_level']),
-            if (source['question_or_page_ref'] != null)
-              _text(source['question_or_page_ref']),
-            if (source['source_url'] != null) _text(source['source_url']),
-          ].join('\n'),
-        );
-      }
-      section('wordDifficulty', data['approximate_difficulty_label']);
-      section('wordNotice', data['notice']);
       return WordExplanation(
         word: word,
         reading: reading,
@@ -199,4 +172,38 @@ List<Map<String, dynamic>> _optionalObjects(Object? value) =>
 
 extension on String {
   String? get nullIfEmpty => isEmpty ? null : this;
+}
+
+/// Preserve server annotations; older deployments provide a full kana reading.
+String _exampleSentence(
+  Map<String, dynamic> example, {
+  String japaneseKey = 'japanese',
+  String furiganaKey = 'sentence_furigana',
+  String? readingKey = 'reading',
+}) {
+  final japanese = _text(example[japaneseKey]);
+  final marked = example[furiganaKey];
+  if (marked != null) {
+    final annotation = _text(marked);
+    final segments = parseFurigana(annotation);
+    if (segments.map((s) => s.text).join() != japanese ||
+        segments.any(
+          (s) => s.ruby == null
+              ? RegExp(r'[㐀-䶿一-鿿々〆{}|]').hasMatch(s.text)
+              : !RegExp(r'^[㐀-䶿一-鿿々〆]+$').hasMatch(s.text) ||
+                    !RegExp(r'^[ぁ-ゖー]+$').hasMatch(s.ruby!),
+        )) {
+      throw const FormatException();
+    }
+    return annotation;
+  }
+  if (readingKey == null) return japanese;
+  final reading = _text(example[readingKey]);
+  final segments = alignSentenceFurigana(japanese, reading);
+  if (!segments.any((s) => s.ruby != null)) {
+    return '$japanese\n$reading';
+  }
+  return segments
+      .map((s) => s.ruby == null ? s.text : '{${s.text}|${s.ruby}}')
+      .join();
 }

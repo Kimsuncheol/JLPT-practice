@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:jlpt_practice/core/api/jlpt_api_client.dart';
 import 'package:jlpt_practice/features/vocabulary/word_explanation_screen.dart';
+import 'package:jlpt_practice/features/vocabulary/example_furigana_text.dart';
 import 'jlpt_word_service_test.dart' show wordResponse;
 
 Widget app(JlptApiClient client) => ProviderScope(
@@ -114,6 +115,116 @@ void main() {
     },
   );
 
+  for (final legacy in [false, true]) {
+    testWidgets('chat renders example furigana above kanji (legacy: $legacy)', (
+      tester,
+    ) async {
+      final data = wordResponse();
+      if (!legacy) {
+        data['meanings'][0]['examples'][0]['sentence_furigana'] =
+            '{旅行|りょこう}の{準備|じゅんび}をする。';
+      }
+      final client = JlptApiClient(
+        baseUrl: 'https://example.test',
+        client: MockClient((_) async => _jsonResponse(jsonEncode(data), 200)),
+      );
+      addTearDown(client.close);
+      await tester.pumpWidget(app(client));
+      await tester.pumpAndSettle();
+      expect(find.byType(ExampleFuriganaText), findsNWidgets(2));
+      for (final pair in [('旅行', 'りょこう'), ('準備', 'じゅんび')]) {
+        final unit = find.byWidgetPredicate(
+          (widget) =>
+              widget is ExampleFuriganaText &&
+              widget.segments.single.text == pair.$1,
+        );
+        final ruby = find.descendant(
+          of: unit,
+          matching: find.text(pair.$2, findRichText: true),
+        );
+        final kanji = find.descendant(of: unit, matching: find.text(pair.$1));
+        expect(ruby, findsOneWidget);
+        expect(kanji, findsOneWidget);
+        expect(
+          tester.getBottomLeft(ruby).dy,
+          lessThanOrEqualTo(tester.getTopLeft(kanji).dy),
+        );
+      }
+      expect(find.text('りょこうのじゅんびをする。', findRichText: true), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  testWidgets('usage comparisons have ruby and omit metadata sections', (
+    tester,
+  ) async {
+    final data = wordResponse();
+    data['natural_vs_unnatural'] = [
+      {
+        'natural_example': '旅行の土産として、地元の和菓子を買った。',
+        'natural_example_furigana':
+            '{旅行|りょこう}の{土産|みやげ}として、{地元|じもと}の{和菓子|わがし}を{買|か}った。',
+        'unnatural_example': '旅行の土産として、地元の和菓子を持ってきた。',
+        'unnatural_example_furigana':
+            '{旅行|りょこう}の{土産|みやげ}として、{地元|じもと}の{和菓子|わがし}を{持|も}ってきた。',
+        'explanation': '買った emphasizes purchasing the gift.',
+      },
+    ];
+    data['approximate_difficulty_label'] = 'Approximate difficulty';
+    data['notice'] = 'Study notice';
+    data['verified_past_exam_examples'] = [
+      {'japanese': 'Old exam text'},
+    ];
+    final client = JlptApiClient(
+      baseUrl: 'https://example.test',
+      client: MockClient((_) async => _jsonResponse(jsonEncode(data), 200)),
+    );
+    addTearDown(client.close);
+    await tester.pumpWidget(app(client));
+    await tester.pumpAndSettle();
+    final messages = tester
+        .widget<AiChatWidget>(find.byType(AiChatWidget))
+        .controller
+        .messages;
+    final text = messages.single.text;
+    expect(
+      text,
+      contains('✓ {旅行|りょこう}の{土産|みやげ}として、{地元|じもと}の{和菓子|わがし}を{買|か}った。'),
+    );
+    expect(
+      text,
+      contains('✗ {旅行|りょこう}の{土産|みやげ}として、{地元|じもと}の{和菓子|わがし}を{持|も}ってきた。'),
+    );
+    for (final excluded in [
+      'Past-exam',
+      'Approximate difficulty',
+      'Study notice',
+      'Old exam text',
+    ]) {
+      expect(text, isNot(contains(excluded)));
+    }
+    final units = find.byType(ExampleFuriganaText);
+    expect(units, findsNWidgets(12));
+    for (final element in units.evaluate()) {
+      final widget = element.widget as ExampleFuriganaText;
+      final unit = find.byWidget(widget);
+      final segment = widget.segments.single;
+      final ruby = find.descendant(
+        of: unit,
+        matching: find.text(segment.ruby!, findRichText: true),
+      );
+      final kanji = find.descendant(
+        of: unit,
+        matching: find.text(segment.text),
+      );
+      expect(
+        tester.getBottomLeft(ruby).dy,
+        lessThanOrEqualTo(tester.getTopLeft(kanji).dy),
+      );
+    }
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets(
     'failed explanation retries without duplicate messages or a tutor request',
     (tester) async {
@@ -132,7 +243,10 @@ void main() {
       await tester.pumpAndSettle();
       expect(requests, hasLength(1));
       expect(
-        tester.widget<AiChatWidget>(find.byType(AiChatWidget)).controller.messages,
+        tester
+            .widget<AiChatWidget>(find.byType(AiChatWidget))
+            .controller
+            .messages,
         isEmpty,
       );
       expect(tester.widget<TextField>(find.byType(TextField)).enabled, isFalse);
@@ -192,7 +306,10 @@ void main() {
       findsOneWidget,
     );
     expect(
-      tester.widget<AiChatWidget>(find.byType(AiChatWidget)).controller.messages,
+      tester
+          .widget<AiChatWidget>(find.byType(AiChatWidget))
+          .controller
+          .messages,
       isEmpty,
     );
     await tester.tap(find.byKey(const ValueKey('word_chat_close')));

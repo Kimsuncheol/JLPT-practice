@@ -61,16 +61,44 @@ void main() {
         contains('Prepare for a trip.'),
       );
       expect(
-        result.sections
-            .where((s) => s.titleKey == 'wordPastExamExamples')
-            .single
-            .text,
+        result.sections.where((s) => s.titleKey == 'wordPastExamExamples'),
         isEmpty,
       );
       expect(result.tutorContext['question_text'], contains('準備'));
       expect(result.tutorContext['passage'], contains('Preparation'));
     },
   );
+
+  test('server furigana is preserved and malformed annotations fail', () async {
+    for (final marked in [
+      '{旅行|りょこう}の{準備|じゅんび}をする。',
+      '旅行の{準備|じゅんび}をする。',
+      '{旅行|りょこう}の{準備|じゅんび}をした。',
+    ]) {
+      final data = wordResponse();
+      data['meanings'][0]['examples'][0]['sentence_furigana'] = marked;
+      final client = JlptApiClient(
+        baseUrl: 'https://example.test',
+        client: MockClient((_) async => _jsonResponse(jsonEncode(data), 200)),
+      );
+      addTearDown(client.close);
+      final result = JlptWordService(
+        client,
+      ).explain(word: '準備', context: '', level: 'N4', language: 'en');
+      if (marked.startsWith('{旅行') && marked.endsWith('をする。')) {
+        final explanation = await result;
+        expect(
+          explanation.sections
+              .where((s) => s.titleKey == 'wordOriginalExamples')
+              .single
+              .text,
+          startsWith(marked),
+        );
+      } else {
+        await expectLater(result, throwsA(isA<JlptApiException>()));
+      }
+    }
+  });
 
   for (final invalid in [
     null,
@@ -111,7 +139,7 @@ void main() {
   }
 
   test(
-    'optional citation reading is accepted and provenance stays separate',
+    'legacy metadata does not create excluded explanation sections',
     () async {
       final client = JlptApiClient(
         baseUrl: 'https://example.test',
@@ -119,6 +147,8 @@ void main() {
           (_) async => _jsonResponse(
             jsonEncode({
               ...wordResponse(),
+              'approximate_difficulty_label': 'Approximate JLPT difficulty',
+              'notice': 'Study notice',
               'verified_past_exam_examples': [
                 {
                   'japanese': '準備してください。',
@@ -140,11 +170,14 @@ void main() {
         client,
       ).explain(word: '準備', context: '', level: 'N4', language: 'en');
       expect(
-        result.sections
-            .where((s) => s.titleKey == 'wordPastExamExamples')
-            .single
-            .text,
-        contains('Archive page 5'),
+        result.sections.where(
+          (s) => const [
+            'wordPastExamExamples',
+            'wordDifficulty',
+            'wordNotice',
+          ].contains(s.titleKey),
+        ),
+        isEmpty,
       );
     },
   );
