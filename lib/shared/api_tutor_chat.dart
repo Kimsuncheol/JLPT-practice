@@ -19,6 +19,7 @@ class ApiTutorChat extends ConsumerStatefulWidget {
     this.contextData = const {},
     this.contextBuilder,
     this.practiceItem = false,
+    this.structuredExamples = false,
     this.initialMessage,
     this.initialReplyLoader,
     this.showInitialMessage = false,
@@ -36,6 +37,7 @@ class ApiTutorChat extends ConsumerStatefulWidget {
   final Map<String, dynamic> contextData;
   final Map<String, dynamic> Function()? contextBuilder;
   final bool practiceItem;
+  final bool structuredExamples;
   final String? initialMessage;
 
   /// Optional structured first turn; subsequent turns use the tutor endpoint.
@@ -123,6 +125,7 @@ class _ApiTutorChatState extends ConsumerState<ApiTutorChat> {
           ? await initialLoader(service.client)
           : await service.fetchReply(
               practiceItem: widget.practiceItem,
+              structuredExamples: widget.structuredExamples,
               level: widget.level,
               language: widget.language,
               context: contextData,

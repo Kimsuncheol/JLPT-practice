@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:jlpt_practice/core/api/tutor_example.dart';
 import 'package:jlpt_practice/core/api/jlpt_api_client.dart';
 import 'package:jlpt_practice/data/models/grammar_point.dart';
 import 'package:jlpt_practice/data/models/mock_test_problem.dart';
@@ -38,6 +39,7 @@ class JlptTutorService {
     required Map<String, dynamic> context,
     required String message,
     required List<TutorTurn> history,
+    bool structuredExamples = false,
   }) async {
     final text = message.trim();
     if (text.isEmpty || text.runes.length > 500) {
@@ -48,6 +50,7 @@ class JlptTutorService {
         .toList();
     final payload = <String, dynamic>{
       'level': level,
+      if (structuredExamples) 'structured_examples': true,
       'explanation_language': explanationLanguage(language),
       'question': context,
       'message': text,
@@ -75,7 +78,11 @@ class JlptTutorService {
       throw const JlptApiException('aiResponseInvalid');
     }
     return TutorReply(
-      text: reply.trim(),
+      text: _renderExamples(
+        reply.trim(),
+        response['examples'],
+        required: structuredExamples,
+      ),
       followUpQuestions: _followUpQuestions(response['follow_up_questions']),
     );
   }
@@ -136,7 +143,12 @@ Map<String, dynamic> grammarTutorContext(
 ) {
   final examples = grammar.examples
       .take(2)
-      .map((e) => '${e.japanese} ${e.translation(language)}')
+      .map((e) {
+        final marked = e.sentenceSegments
+            .map((s) => s.ruby == null ? s.text : '{${s.text}|${s.ruby}}')
+            .join();
+        return '$marked ${e.translation(language)}';
+      })
       .join('\n');
   return {
     'id': boundedText(grammar.id, 80),
@@ -195,4 +207,32 @@ Map<String, dynamic> practiceTutorContext(
                   : '',
           ],
   };
+}
+
+String _renderExamples(String reply, Object? raw, {required bool required}) {
+  try {
+    if (raw == null && !required) return reply;
+    if (raw is! List || raw.length > 4 || (required && raw.isEmpty)) {
+      throw const FormatException();
+    }
+    final examples = raw.map((value) {
+      if (value is! Map<String, dynamic>) throw const FormatException();
+      return TutorExample.fromJson(value);
+    }).toList();
+    final marker = RegExp(r'\[\[example:([^\]]*)\]\]');
+    final matches = marker.allMatches(reply).toList();
+    final expected = {for (var i = 1; i <= examples.length; i++) '$i'};
+    if (matches.length != examples.length ||
+        matches.map((m) => m.group(1)).toSet().length != examples.length ||
+        matches.any((m) => !expected.contains(m.group(1))) ||
+        reply.replaceAll(marker, '').contains('[[example:')) {
+      throw const FormatException();
+    }
+    return reply.replaceAllMapped(
+      marker,
+      (m) => examples[int.parse(m.group(1)!) - 1].markdownBlock,
+    );
+  } on FormatException {
+    throw const JlptApiException('aiResponseInvalid');
+  }
 }

@@ -79,7 +79,15 @@ lessons and ranked practice tests continue to work offline.
   with the selected lesson context on opening. A hidden initial request asks for
   a detailed explanation of meaning, formation, usage, nuance, common mistakes,
   comparisons, and two examples with furigana and translations. Three generated
-  follow-up questions arrive with the reply. The initial suggestion-chip
+  follow-up questions arrive with the reply. Grammar Tutor requests
+  `structured_examples: true`: the service returns validated `examples` with
+  written Japanese, complete `sentence_furigana`, and a separate translation.
+  Placement markers in the explanation become whole-sentence furigana widgets,
+  matching the grammar study screen, with translations below. This applies to
+  initial and later replies. Incomplete readings or missing examples show the
+  normal retryable response error instead of partially annotated text. Older
+  servers must be deployed with this contract before using the updated app.
+  Lesson context also includes annotated examples. The initial suggestion-chip
   container is omitted. **Practise with AI** opens a guided conversation; its quiz
   icon creates a question focused on that grammar point using
   `POST /api/practice/question`.

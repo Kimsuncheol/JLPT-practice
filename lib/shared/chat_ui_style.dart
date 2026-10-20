@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:jlpt_practice/core/api/tutor_example.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen_ai_chat_ui/flutter_gen_ai_chat_ui.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -113,6 +115,44 @@ class ChatUiStyle {
         child: GptMarkdown(
           data,
           style: body,
+          codeBuilder: (context, name, code, closed) {
+            if (name == 'jlpt-example' && closed) {
+              try {
+                final example = TutorExample.fromJson(
+                  jsonDecode(code) as Map<String, dynamic>,
+                );
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ExampleFuriganaText(
+                        segments: example.segments,
+                        style: body,
+                        wordTargets: const [],
+                        hideReadings: false,
+                        alignment: WrapAlignment.start,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        example.translation,
+                        style: body.copyWith(color: colors.onSurfaceVariant),
+                      ),
+                    ],
+                  ),
+                );
+              } on FormatException {
+                return Text(code, style: body);
+              } on TypeError {
+                return Text(code, style: body);
+              }
+            }
+            return GptMarkdown(
+              '```$name\n$code\n```',
+              style: body,
+              styleSheet: styleSheet,
+            );
+          },
           inlinePatterns: [
             InlinePattern(
               pattern: RegExp(r'\{([㐀-䶿一-鿿々〆]+)\|([ぁ-ゖー]+)\}'),
