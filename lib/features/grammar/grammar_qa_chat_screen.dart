@@ -35,11 +35,15 @@ class GrammarQaChatScreen extends StatelessWidget {
     title: context.strings('grammarChatTitle'),
     icon: Icons.question_answer_rounded,
     hint: context.strings('askAboutThisGrammarHint'),
-    suggestionKeys: const [
-      'askSuggestionWhenToUse',
-      'askSuggestionMoreExamples',
-      'askSuggestionDifference',
-    ],
+    suggestionKeys: const [],
+    initialMessage:
+        'Explain the selected grammar point in detail: meaning, formation and '
+        'conjugation, when to use it, register and nuances, common mistakes, '
+        'and differences from similar grammar. Include two natural Japanese '
+        'example sentences with furigana above kanji and translations. '
+        'Return exactly three relevant follow-up questions together with the '
+        'explanation in this response.',
+    showInitialMessage: false,
     closeKey: const ValueKey('grammar_chat_close'),
   );
 }

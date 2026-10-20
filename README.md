@@ -75,8 +75,12 @@ lessons and ranked practice tests continue to work offline.
   possible. Usage contrasts require `natural_example_furigana` and
   `unnatural_example_furigana`, rendered above the corresponding kanji as well.
   Tutor follow-ups can use the same inline markup in reply Markdown.
-- Grammar → AI menu → **Grammar Tutor** uses `POST /api/tutor/chat` with
-  lesson context. **Practise with AI** opens a guided conversation; its quiz
+- Grammar → AI menu → **Grammar Tutor** automatically calls `POST /api/tutor/chat`
+  with the selected lesson context on opening. A hidden initial request asks for
+  a detailed explanation of meaning, formation, usage, nuance, common mistakes,
+  comparisons, and two examples with furigana and translations. Three generated
+  follow-up questions arrive with the reply. The initial suggestion-chip
+  container is omitted. **Practise with AI** opens a guided conversation; its quiz
   icon creates a question focused on that grammar point using
   `POST /api/practice/question`.
 - Answer a practice-test question → **Ask AI Tutor** uses `POST /api/tutor`
