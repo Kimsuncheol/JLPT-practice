@@ -28,7 +28,7 @@ void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
   testWidgets(
-    'word explanation opens with current study word and preserves position',
+    'app bar menu trigger opens menu with AI and learning settings triggers',
     (tester) async {
       final container = ProviderContainer(
         overrides: [
@@ -58,10 +58,61 @@ void main() {
       await tester.pumpAndSettle();
       router.push('/study/day/1?startOver=true');
       await tester.pumpAndSettle();
+
+      final appBar = find.byType(AppBar);
+      final menuTrigger = find.byKey(const ValueKey('study_menu_trigger'));
+      final aiItem = find.byKey(const ValueKey('study_word_explanation'));
+      final settingsItem = find.byKey(
+        const ValueKey('study_learning_settings'),
+      );
+
+      expect(
+        find.descendant(of: appBar, matching: menuTrigger),
+        findsOneWidget,
+      );
+      expect(
+        tester.getCenter(menuTrigger).dx,
+        greaterThan(tester.getCenter(appBar).dx),
+      );
+      expect(aiItem, findsNothing);
+      expect(settingsItem, findsNothing);
+
       final pages = find.byKey(const ValueKey('study-word-pages'));
       await tester.drag(pages, Offset(-tester.getSize(pages).width, 0));
       await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const ValueKey('study_word_explanation')));
+
+      await tester.tap(menuTrigger);
+      await tester.pumpAndSettle();
+
+      expect(aiItem, findsOneWidget);
+      expect(settingsItem, findsOneWidget);
+      expect(
+        find.descendant(of: aiItem, matching: find.text('Word explanation')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: aiItem,
+          matching: find.byIcon(Icons.auto_awesome_outlined),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: settingsItem,
+          matching: find.text('Learning settings'),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: settingsItem,
+          matching: find.byIcon(Icons.settings_rounded),
+        ),
+        findsOneWidget,
+      );
+
+      await tester.tap(aiItem);
       await tester.pumpAndSettle();
       final screen = tester.widget<WordExplanationScreen>(
         find.byType(WordExplanationScreen),
@@ -72,6 +123,12 @@ void main() {
       await tester.tap(find.byKey(const ValueKey('word_chat_close')));
       await tester.pumpAndSettle();
       expect(find.text('2 / 5'), findsOneWidget);
+
+      await tester.tap(menuTrigger);
+      await tester.pumpAndSettle();
+      await tester.tap(settingsItem);
+      await tester.pumpAndSettle();
+      expect(find.text('Learning settings screen'), findsOneWidget);
       expect(tester.takeException(), isNull);
     },
   );
@@ -1600,6 +1657,10 @@ GoRouter _createRouter({String initialLocation = '/'}) => GoRouter(
       builder: (_, _) => const Scaffold(body: Text('Day selection')),
     ),
     GoRoute(path: '/settings/levels', builder: (_, _) => const LevelsScreen()),
+    GoRoute(
+      path: '/settings/learning',
+      builder: (_, _) => const Scaffold(body: Text('Learning settings screen')),
+    ),
     GoRoute(
       path: '/quiz',
       builder: (_, _) => const Scaffold(body: Text('Level quiz')),

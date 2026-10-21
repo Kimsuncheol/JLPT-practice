@@ -112,6 +112,15 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
       );
     }
     _initializePage(words, state);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+    final menuBackgroundColor = isDark
+        ? colorScheme.surfaceContainerHigh
+        : colorScheme.surface;
+    final menuBorderColor = colorScheme.outlineVariant.withValues(
+      alpha: isDark ? 0.6 : 0.8,
+    );
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, _) {
@@ -125,37 +134,90 @@ class _StudyScreenState extends ConsumerState<StudyScreen>
           ),
           title: Text(
             '${context.strings('day')} ${widget.day}',
-            style: Theme.of(context).textTheme.titleMedium,
+            style: theme.textTheme.titleMedium,
           ),
           centerTitle: false,
           titleSpacing: AppSizes.size0,
           actions: [
-            IconButton(
-              key: const ValueKey('study_word_explanation'),
-              tooltip: context.strings('wordExplanation'),
-              icon: const Icon(Icons.auto_awesome_outlined),
-              onPressed: () async {
-                _readingsRequest++;
-                if (_ttsService != null) await _ttsService!.stop();
-                if (!context.mounted) return;
-                final word = words[_index];
-                await Navigator.of(context).push<void>(
-                  MaterialPageRoute(
-                    builder: (_) => EyeComfortOverlay(
-                      child: WordExplanationScreen(
-                        word: word.word,
-                        contextSentence: word.example.sentence,
-                        level: word.jlptLevel,
-                        language: state.meaningLanguage,
+            MenuAnchor(
+              key: const ValueKey('study_menu'),
+              style: MenuStyle(
+                backgroundColor: WidgetStatePropertyAll(menuBackgroundColor),
+                surfaceTintColor: const WidgetStatePropertyAll(
+                  Colors.transparent,
+                ),
+                shadowColor: const WidgetStatePropertyAll(AppPalette.shadow20),
+                elevation: const WidgetStatePropertyAll(AppSizes.size6),
+                padding: const WidgetStatePropertyAll(
+                  EdgeInsets.symmetric(vertical: AppSizes.size8),
+                ),
+                shape: WidgetStatePropertyAll(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppSizes.radius18),
+                    side: BorderSide(color: menuBorderColor),
+                  ),
+                ),
+              ),
+              menuChildren: [
+                MenuItemButton(
+                  key: const ValueKey('study_word_explanation'),
+                  leadingIcon: Icon(
+                    Icons.auto_awesome_rounded,
+                    color: colorScheme.primary,
+                  ),
+                  onPressed: () async {
+                    _readingsRequest++;
+                    if (_ttsService != null) await _ttsService!.stop();
+                    if (!context.mounted) return;
+                    final word = words[_index];
+                    await Navigator.of(context).push<void>(
+                      MaterialPageRoute(
+                        builder: (_) => EyeComfortOverlay(
+                          child: WordExplanationScreen(
+                            word: word.word,
+                            contextSentence: word.example.sentence,
+                            level: word.jlptLevel,
+                            language: state.meaningLanguage,
+                          ),
+                        ),
                       ),
+                    );
+                  },
+                  child: Text(
+                    context.strings('wordExplanation'),
+                    style: TextStyle(
+                      color: colorScheme.onSurface,
+                      fontWeight: AppFontWeights.semiBold,
                     ),
                   ),
-                );
-              },
-            ),
-            IconButton(
-              onPressed: () => context.push('/settings/learning'),
-              icon: const Icon(Icons.settings_rounded),
+                ),
+                MenuItemButton(
+                  key: const ValueKey('study_learning_settings'),
+                  leadingIcon: Icon(
+                    Icons.settings_rounded,
+                    color: colorScheme.primary,
+                  ),
+                  onPressed: () => context.push('/settings/learning'),
+                  child: Text(
+                    context.strings('learningSettings'),
+                    style: TextStyle(
+                      color: colorScheme.onSurface,
+                      fontWeight: AppFontWeights.semiBold,
+                    ),
+                  ),
+                ),
+              ],
+              builder: (context, controller, child) => IconButton(
+                key: const ValueKey('study_menu_trigger'),
+                icon: const Icon(Icons.more_vert_rounded),
+                onPressed: () {
+                  if (controller.isOpen) {
+                    controller.close();
+                  } else {
+                    controller.open();
+                  }
+                },
+              ),
             ),
           ],
         ),
