@@ -1,5 +1,10 @@
 # Data attribution
 
+Daily Japanese expressions, Korean meanings, notes, and dialogue examples come
+from Chosun's Japanese lesson section through the configured Japanese scraper
+API. Lesson detail retains the original article URL and transcription uncertainty.
+These source lessons are supplementary content and are not classified by JLPT level.
+
 The ranked JLPT vocabulary and grammar catalogs are imported from
 [tristcoil/hanabira.org](https://github.com/tristcoil/hanabira.org), which is
 distributed under the MIT License.

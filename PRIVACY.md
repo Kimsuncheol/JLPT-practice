@@ -25,3 +25,9 @@ clears its in-memory conversation. Normal study progress remains subject to
 the Firebase synchronization described above. The backend is configured without
 application-level conversation persistence or content logging; hosting and
 model providers process requests under their own policies.
+
+Daily Japanese lessons fetch public lesson content from the configured Japanese
+archive service (hosted on Render by default). Search text is sent to that
+service without a Firebase account identifier. Up to 30 lesson responses are
+cached on the device for offline study. Selecting Ask AI Tutor sends bounded
+expression/example context to the existing tutor service as described above.

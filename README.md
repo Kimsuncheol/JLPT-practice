@@ -45,6 +45,30 @@ covering every published JLPT item type. The original
 `jlpt_test_problems_2021_2025.csv` is preserved and is not loaded by the live
 mock-test flow.
 
+## Daily Japanese lessons
+
+Home shows the newest ready expression from the Japanese lesson archive, with
+its publication date and Korean meaning. It is labelled **Today’s expression**
+only when its publication date matches the device’s current date; otherwise it
+shows **Latest expression**. Tap the expression to open its lesson, or use
+**Browse lessons** to search Japanese/Korean text and browse ten lessons per page.
+Lesson detail separates the main expression from a conversation panel with
+alternating dialogue bubbles. Tap Japanese text to play TTS and tap the same text
+again to stop. It includes Korean notes, furigana where readings align, and **Ask AI Tutor** for
+an expression or example. Tutor explanations follow the selected meaning language.
+
+The read-only source defaults to `https://japanese-scraper.onrender.com` and can
+be overridden using `--dart-define=JAPANESE_LESSON_API_BASE_URL=https://...`.
+It uses `GET /api/articles?status=ready&page=...&q=...` and
+`GET /api/articles/<id>`. Render cold starts allow a 90-second timeout with
+manual retry. Up to 30 responses are saved locally: saved content appears while
+refreshing and remains usable when refresh fails. Browsed list pages also supply
+cached lesson details, including after an app restart. Uncached pages need a
+network connection; TTS availability depends on the configured speech engine.
+Source transcription uncertainty and a selectable original article URL are shown.
+These supplementary lessons have no JLPT classification and do not alter SRS,
+XP, ranked practice, or the bundled vocabulary/grammar catalogs.
+
 ## JLPT tutor API
 
 AI screens use `https://jlpt-practice-langchain-muj9.onrender.com` by default.

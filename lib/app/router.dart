@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:jlpt_practice/features/daily_lessons/daily_lesson_screens.dart';
 import 'package:jlpt_practice/features/offline_ai/offline_ai_screen.dart';
 import 'package:jlpt_practice/features/auth/auth_gate_screen.dart';
 import 'package:jlpt_practice/features/dashboard/home_shell.dart';
@@ -40,6 +41,17 @@ GoRouter createAppRouter({String initialLocation = '/'}) => GoRouter(
     GoRoute(path: '/sign-in', builder: (_, _) => const AuthGateScreen()),
     GoRoute(path: '/onboarding', builder: (_, _) => const OnboardingScreen()),
     GoRoute(path: '/home', builder: (_, _) => const HomeShell()),
+    GoRoute(
+      path: '/daily-lessons',
+      builder: (_, _) =>
+          const EyeComfortOverlay(child: DailyLessonListScreen()),
+    ),
+    GoRoute(
+      path: '/daily-lessons/:id',
+      builder: (_, state) => EyeComfortOverlay(
+        child: DailyLessonDetailScreen(id: state.pathParameters['id']!),
+      ),
+    ),
     GoRoute(
       path: '/settings/appearance',
       builder: (_, _) => const AppearanceScreen(),

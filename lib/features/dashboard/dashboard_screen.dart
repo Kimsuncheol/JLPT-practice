@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jlpt_practice/features/daily_lessons/daily_lesson_screens.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
@@ -146,6 +147,7 @@ class DashboardScreen extends ConsumerWidget {
                       ),
                     ),
                     RecentStudyCard(state: state),
+                    const LatestExpressionCard(),
                     const SizedBox(height: AppSizes.space18),
                     GridView.count(
                       shrinkWrap: true,

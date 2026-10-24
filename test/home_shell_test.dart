@@ -6,6 +6,8 @@ import 'package:jlpt_practice/app/app_controller.dart';
 import 'package:jlpt_practice/app/theme/app_theme.dart';
 import 'package:jlpt_practice/data/models/app_state.dart';
 import 'package:jlpt_practice/features/dashboard/home_shell.dart';
+import 'package:jlpt_practice/core/api/daily_lesson_service.dart';
+import 'package:jlpt_practice/data/models/daily_lesson.dart';
 
 void main() {
   testWidgets('home has four destinations and no review action', (
@@ -20,6 +22,10 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          dailyLessonPageProvider((
+            page: 1,
+            query: '',
+          )).overrideWith((ref) => _emptyLessons()),
           appControllerProvider.overrideWith(() => _FakeAppController()),
         ],
         child: MaterialApp.router(
@@ -47,6 +53,10 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          dailyLessonPageProvider((
+            page: 1,
+            query: '',
+          )).overrideWith((ref) => _emptyLessons()),
           appControllerProvider.overrideWith(() => _FakeAppController()),
         ],
         child: MaterialApp.router(
@@ -80,6 +90,10 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          dailyLessonPageProvider((
+            page: 1,
+            query: '',
+          )).overrideWith((ref) => _emptyLessons()),
           appControllerProvider.overrideWith(() => _FakeAppController()),
         ],
         child: MaterialApp.router(
@@ -96,6 +110,17 @@ void main() {
     expect(find.text('Level selection'), findsOneWidget);
   });
 }
+
+Stream<LessonSnapshot<DailyLessonPage>> _emptyLessons() => Stream.value(
+  LessonSnapshot(
+    DailyLessonPage.fromJson({
+      'articles': [],
+      'page': 1,
+      'pages': 1,
+      'total': 0,
+    }),
+  ),
+);
 
 class _FakeAppController extends AppController {
   @override

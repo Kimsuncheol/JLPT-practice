@@ -6,6 +6,30 @@ class AppStrings {
   final String languageCode;
 
   static const _en = <String, String>{
+    'dailyJapanese': 'Daily Japanese',
+    'dailyLessonExpression': 'Expression',
+    'dailyLessonConversation': 'Conversation',
+    'tapLessonSentence': 'Tap a sentence to listen. Tap again to stop.',
+    'todayExpression': 'Today’s expression',
+    'latestExpression': 'Latest expression',
+    'browseDailyLessons': 'Browse lessons',
+    'searchDailyLessons': 'Search Japanese or Korean',
+    'refreshDailyLessons': 'Refresh lessons',
+    'noDailyLessons': 'No lessons found.',
+    'dailyLessonLanguageNote':
+        'Japanese expressions with Korean meanings and notes.',
+    'dailyLessonSaved': 'Saved copy · checking for updates',
+    'dailyLessonOffline': 'Couldn’t refresh · showing saved lesson content',
+    'dailyLessonUnavailable':
+        'Lessons couldn’t be loaded. The server may take a moment to wake up. Please try again.',
+    'dailyLessonAudioError': 'Audio couldn’t be played. Please try again.',
+    'stopLessonAudio': 'Stop audio',
+    'dailyLessonTutorHint': 'Ask about this expression or example…',
+    'dailyLessonNotes': 'Lesson notes',
+    'dailyLessonSource': 'Original source (select to copy)',
+    'dailyLessonUncertain': 'Uncertain source text',
+    'dailyLessonTranscriptionNotice':
+        'Supplementary study content transcribed with AI. Text and readings may contain errors; check the original source. These lessons are not classified by JLPT level.',
     "wordExplanation": "Word explanation",
     "wordInput": "Japanese word or expression",
     "wordContextInput": "Context sentence (optional)",
@@ -400,6 +424,29 @@ class AppStrings {
   };
 
   static const _ko = <String, String>{
+    'dailyJapanese': '매일 일본어',
+    'dailyLessonExpression': '표현',
+    'dailyLessonConversation': '대화',
+    'tapLessonSentence': '문장을 누르면 들을 수 있어요. 다시 누르면 멈춰요.',
+    'todayExpression': '오늘의 표현',
+    'latestExpression': '최신 표현',
+    'browseDailyLessons': '레슨 둘러보기',
+    'searchDailyLessons': '일본어 또는 한국어 검색',
+    'refreshDailyLessons': '레슨 새로고침',
+    'noDailyLessons': '레슨을 찾을 수 없습니다.',
+    'dailyLessonLanguageNote': '일본어 표현과 한국어 뜻, 해설을 제공합니다.',
+    'dailyLessonSaved': '저장된 내용 · 업데이트 확인 중',
+    'dailyLessonOffline': '새로고침 실패 · 저장된 레슨을 표시합니다',
+    'dailyLessonUnavailable':
+        '레슨을 불러올 수 없습니다. 서버가 시작되는 데 시간이 걸릴 수 있습니다. 다시 시도해 주세요.',
+    'dailyLessonAudioError': '음성을 재생할 수 없습니다. 다시 시도해 주세요.',
+    'stopLessonAudio': '음성 정지',
+    'dailyLessonTutorHint': '이 표현이나 예문에 대해 질문해 보세요…',
+    'dailyLessonNotes': '레슨 노트',
+    'dailyLessonSource': '원문 출처 (선택하여 복사)',
+    'dailyLessonUncertain': '확인이 필요한 원문',
+    'dailyLessonTranscriptionNotice':
+        'AI로 전사한 보충 학습 자료입니다. 텍스트와 읽기에 오류가 있을 수 있으니 원문을 확인해 주세요. JLPT 수준별로 분류되지 않은 레슨입니다.',
     "wordExplanation": "단어 설명",
     "wordInput": "일본어 단어 또는 표현",
     "wordContextInput": "문맥 예문 (선택 사항)",
