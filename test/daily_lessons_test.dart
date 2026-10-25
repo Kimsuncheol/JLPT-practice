@@ -307,6 +307,11 @@ void main() {
         final avatarRect = tester.getRect(avatar);
         final bubbleRect = tester.getRect(bubble);
         expect(avatarRect.top, greaterThan(bubbleRect.bottom));
+        if (turn == 0) {
+          expect(bubbleRect.left, greaterThan(avatarRect.right));
+        } else {
+          expect(bubbleRect.right, lessThan(avatarRect.left));
+        }
         expect(
           avatarRect.center.dx,
           turn == 0

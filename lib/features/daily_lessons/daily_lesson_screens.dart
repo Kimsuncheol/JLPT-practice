@@ -617,23 +617,26 @@ class _DailyLessonDetailScreenState
             ? CrossAxisAlignment.end
             : CrossAxisAlignment.start,
         children: [
-          Material(
-            key: ValueKey('lesson_bubble_$turn'),
-            color: isB ? scheme.secondaryContainer : scheme.surface,
-            shape: RoundedRectangleBorder(
-              side: BorderSide(
-                color: scheme.outlineVariant.withValues(alpha: 0.45),
+          Padding(
+            padding: EdgeInsets.only(left: isB ? 0 : 40, right: isB ? 40 : 0),
+            child: Material(
+              key: ValueKey('lesson_bubble_$turn'),
+              color: isB ? scheme.secondaryContainer : scheme.surface,
+              shape: RoundedRectangleBorder(
+                side: BorderSide(
+                  color: scheme.outlineVariant.withValues(alpha: 0.45),
+                ),
+                borderRadius: BorderRadius.only(
+                  topLeft: const Radius.circular(20),
+                  topRight: const Radius.circular(20),
+                  bottomLeft: Radius.circular(isB ? 20 : 4),
+                  bottomRight: Radius.circular(isB ? 4 : 20),
+                ),
               ),
-              borderRadius: BorderRadius.only(
-                topLeft: const Radius.circular(20),
-                topRight: const Radius.circular(20),
-                bottomLeft: Radius.circular(isB ? 20 : 4),
-                bottomRight: Radius.circular(isB ? 4 : 20),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+                child: _textCard(lesson, expression, text, showReadings),
               ),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
-              child: _textCard(lesson, expression, text, showReadings),
             ),
           ),
           const SizedBox(height: 8),
