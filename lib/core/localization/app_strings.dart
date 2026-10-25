@@ -7,6 +7,7 @@ class AppStrings {
 
   static const _en = <String, String>{
     'dailyJapanese': 'Daily Japanese',
+    'loadingMoreLessons': 'Loading more lessons…',
     'dailyLessonExpression': 'Expression',
     'dailyLessonConversation': 'Conversation',
     'tapLessonSentence': 'Tap a sentence to listen. Tap again to stop.',
@@ -367,6 +368,7 @@ class AppStrings {
     'aiGenerating': 'Creating your practice questions…',
     'aiLoadingFollowUps': 'Preparing follow-up questions…',
     'scrollToBottom': 'Scroll to bottom',
+    'scrollToTop': 'Scroll to top',
     'aiPracticeNotice':
         'Unofficial AI-generated practice. Difficulty is approximate, answers may contain mistakes, and results do not predict a JLPT score. This session is not saved.',
 
@@ -425,6 +427,7 @@ class AppStrings {
 
   static const _ko = <String, String>{
     'dailyJapanese': '매일 일본어',
+    'loadingMoreLessons': '레슨을 더 불러오는 중…',
     'dailyLessonExpression': '표현',
     'dailyLessonConversation': '대화',
     'tapLessonSentence': '문장을 누르면 들을 수 있어요. 다시 누르면 멈춰요.',
@@ -760,6 +763,7 @@ class AppStrings {
     'aiGenerating': '연습 문제를 만들고 있어요…',
     'aiLoadingFollowUps': '후속 질문을 만들고 있어요…',
     'scrollToBottom': '맨 아래로 이동',
+    'scrollToTop': '맨 위로 이동',
     'aiPracticeNotice':
         'AI가 생성한 비공식 연습 문제입니다. 난이도는 추정치이며 정답에 오류가 있을 수 있습니다. 결과는 실제 JLPT 점수를 예측하지 않으며 이 연습 기록은 저장되지 않습니다.',
 

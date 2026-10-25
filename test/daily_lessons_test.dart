@@ -70,6 +70,121 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
+  testWidgets(
+    'scrolling appends ten lessons once, retries failures and stops at the last page',
+    (tester) async {
+      final calls = <int>[];
+      final pending = Completer<http.Response>();
+      var pageTwoAttempts = 0;
+      Map<String, dynamic> response(int page) => {
+        'articles': [
+          for (var i = (page - 1) * 10; i < page * 10; i++)
+            _article(id: 'item-$i'),
+        ],
+        'page': page,
+        'pages': 2,
+        'total': 20,
+      };
+      final service = DailyLessonService(
+        client: MockClient((request) async {
+          final page = int.parse(request.url.queryParameters['page']!);
+          calls.add(page);
+          if (page == 2 && ++pageTwoAttempts == 1) return pending.future;
+          return _json(response(page));
+        }),
+      );
+      addTearDown(service.close);
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [dailyLessonServiceProvider.overrideWithValue(service)],
+          child: const MaterialApp(home: DailyLessonListScreen()),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(calls, [1]);
+      expect(find.byIcon(Icons.chevron_left), findsNothing);
+      final list = find.byKey(const ValueKey('daily_lessons_list'));
+      await tester.drag(list, const Offset(0, -2000));
+      await tester.pump(const Duration(milliseconds: 300));
+      await tester.drag(list, const Offset(0, -400));
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(calls, [1, 2]);
+      pending.complete(http.Response('<h1>Unavailable</h1>', 503));
+      await tester.pumpAndSettle();
+      await tester.drag(list, const Offset(0, -500));
+      await tester.pumpAndSettle();
+      expect(calls, [1, 2]);
+      expect(find.byKey(const ValueKey('daily_lesson_item-9')), findsOneWidget);
+      await tester.tap(find.text('Try again'));
+      await tester.pumpAndSettle();
+      expect(calls, [1, 2, 2]);
+      await tester.drag(list, const Offset(0, -3000));
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const ValueKey('daily_lesson_item-19')),
+        findsOneWidget,
+      );
+      expect(calls, [1, 2, 2]);
+      await tester.tap(
+        find.byKey(const ValueKey('daily_lessons_scroll_to_top')),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('daily_lesson_item-0')), findsOneWidget);
+      expect(calls, [1, 2, 2]);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('a new search ignores an unfinished page from the old query', (
+    tester,
+  ) async {
+    final pending = Completer<http.Response>();
+    final calls = <String>[];
+    final service = DailyLessonService(
+      client: MockClient((request) async {
+        final query = request.url.queryParameters['q']!;
+        final page = int.parse(request.url.queryParameters['page']!);
+        calls.add('$query:$page');
+        if (page == 2) return pending.future;
+        return _json({
+          'articles': [for (var i = 0; i < 10; i++) _article(id: '$query-$i')],
+          'page': 1,
+          'pages': query.isEmpty ? 2 : 1,
+          'total': 10,
+        });
+      }),
+    );
+    addTearDown(service.close);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [dailyLessonServiceProvider.overrideWithValue(service)],
+        child: const MaterialApp(home: DailyLessonListScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.drag(
+      find.byKey(const ValueKey('daily_lessons_list')),
+      const Offset(0, -2000),
+    );
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.enterText(find.byType(TextField), '努力');
+    await tester.testTextInput.receiveAction(TextInputAction.search);
+    await tester.pumpAndSettle();
+    pending.complete(
+      _json({
+        'articles': [_article(id: 'stale')],
+        'page': 2,
+        'pages': 2,
+        'total': 11,
+      }),
+    );
+    await tester.pumpAndSettle();
+    expect(calls, [':1', ':2', '努力:1']);
+    expect(find.byKey(const ValueKey('daily_lesson_努力-0')), findsOneWidget);
+    expect(find.byKey(const ValueKey('daily_lesson_stale')), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
   test(
     'date labels use publication date; optional source fields can be absent',
     () {
@@ -206,7 +321,9 @@ void main() {
         client: MockClient((request) async {
           requests.add(request);
           return _json(
-            request.url.path == '/api/articles' ? _page() : _article(),
+            request.url.path == '/api/articles'
+                ? _page(page: int.parse(request.url.queryParameters['page']!))
+                : _article(),
           );
         }),
       );
@@ -280,7 +397,10 @@ void main() {
       await tester.testTextInput.receiveAction(TextInputAction.search);
       await tester.pumpAndSettle();
       expect(requests.last.url.queryParameters['q'], '努力');
-      await tester.tap(find.byIcon(Icons.chevron_right).last);
+      await tester.drag(
+        find.byKey(const ValueKey('daily_lessons_list')),
+        const Offset(0, -600),
+      );
       await tester.pumpAndSettle();
       expect(requests.last.url.queryParameters['page'], '2');
       await tester.tap(find.text('努力する'));

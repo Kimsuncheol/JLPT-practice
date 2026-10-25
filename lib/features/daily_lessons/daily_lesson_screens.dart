@@ -141,37 +141,174 @@ class DailyLessonListScreen extends ConsumerStatefulWidget {
 
 class _DailyLessonListScreenState extends ConsumerState<DailyLessonListScreen> {
   final _search = TextEditingController();
-  var _page = 1;
+  final _scroll = ScrollController();
+  final _pages = <int, DailyLessonPage>{};
+  StreamSubscription<LessonSnapshot<DailyLessonPage>>? _subscription;
+  var _page = 0;
   var _query = '';
+  var _generation = 0;
+  var _loading = false;
+  var _loadError = false;
+  var _hasMore = true;
+  var _saved = false;
+  var _offline = false;
+  var _returningToTop = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _scroll.addListener(_nearBottom);
+    _loadNext();
+  }
 
   @override
   void dispose() {
+    _generation++;
+    unawaited(_subscription?.cancel());
     _search.dispose();
+    _scroll.dispose();
     super.dispose();
   }
 
-  void _submit() => setState(() {
-    _query = _search.text.trim();
-    _page = 1;
-  });
+  List<DailyLesson> get _lessons {
+    final seen = <String>{};
+    return [
+      for (final page in _pages.values)
+        for (final lesson in page.lessons)
+          if (seen.add(lesson.id)) lesson,
+    ];
+  }
+
+  void _nearBottom() {
+    if (!_returningToTop &&
+        _scroll.hasClients &&
+        _scroll.position.extentAfter < 300 &&
+        !_loadError) {
+      _loadNext();
+    }
+  }
+
+  Future<void> _scrollToTop() async {
+    if (!_scroll.hasClients) return;
+    _returningToTop = true;
+    try {
+      await _scroll.animateTo(
+        0,
+        duration: const Duration(milliseconds: 350),
+        curve: Curves.easeOutCubic,
+      );
+    } finally {
+      _returningToTop = false;
+    }
+  }
+
+  void _reset() {
+    _generation++;
+    unawaited(_subscription?.cancel());
+    setState(() {
+      _query = _search.text.trim();
+      _pages.clear();
+      _page = 0;
+      _loading = false;
+      _loadError = false;
+      _hasMore = true;
+      _saved = false;
+      _offline = false;
+    });
+    _loadNext();
+    if (_scroll.hasClients) _scroll.jumpTo(0);
+  }
+
+  void _loadNext() {
+    if (_loading || !_hasMore) return;
+    final generation = _generation;
+    final nextPage = _page + 1;
+    var received = false;
+    var failed = false;
+    setState(() {
+      _loading = true;
+      _loadError = false;
+    });
+    _subscription = ref
+        .read(dailyLessonServiceProvider)
+        .pages(page: nextPage, query: _query)
+        .listen(
+          (snapshot) {
+            if (!mounted || generation != _generation) return;
+            received = true;
+            setState(() {
+              // Replace saved data with its refreshed page without appending twice.
+              _pages[nextPage] = snapshot.value;
+              _hasMore =
+                  snapshot.value.page < snapshot.value.pages &&
+                  snapshot.value.lessons.isNotEmpty;
+              _saved = snapshot.saved;
+              _offline = snapshot.offline;
+            });
+          },
+          onError: (Object error, StackTrace stack) {
+            if (!mounted || generation != _generation) return;
+            failed = true;
+            setState(() {
+              _loading = false;
+              _loadError = true;
+            });
+          },
+          onDone: () {
+            if (!mounted || generation != _generation || failed) return;
+            setState(() {
+              _loading = false;
+              _loadError = !received;
+              if (received) _page = nextPage;
+            });
+          },
+        );
+  }
+
+  Widget _lessonTile(DailyLesson lesson) => Card(
+    key: ValueKey('daily_lesson_${lesson.id}'),
+    child: ListTile(
+      contentPadding: const EdgeInsets.all(16),
+      title: Text(
+        lesson.expressions.first.japanese,
+        style: const TextStyle(fontWeight: FontWeight.bold),
+      ),
+      subtitle: Padding(
+        padding: const EdgeInsets.only(top: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (lesson.expressions.first.translation.isNotEmpty)
+              Text(
+                lesson.expressions.first.translation,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            Text(lesson.date),
+          ],
+        ),
+      ),
+      trailing: const Icon(Icons.chevron_right),
+      onTap: () =>
+          context.push('/daily-lessons/${Uri.encodeComponent(lesson.id)}'),
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
-    final query = (page: _page, query: _query);
-    final feed = ref.watch(dailyLessonPageProvider(query));
+    final lessons = _lessons;
     return _withoutRipples(
       context,
       Scaffold(
-        appBar: AppBar(
-          title: Text(context.strings('dailyJapanese')),
-          actions: [
-            IconButton(
-              tooltip: context.strings('refreshDailyLessons'),
-              onPressed: () => ref.invalidate(dailyLessonPageProvider(query)),
-              icon: const Icon(Icons.refresh),
-            ),
-          ],
-        ),
+        floatingActionButton: lessons.isEmpty
+            ? null
+            : FloatingActionButton.small(
+                key: const ValueKey('daily_lessons_scroll_to_top'),
+                tooltip: context.strings('scrollToTop'),
+                onPressed: _scrollToTop,
+                child: const Icon(Icons.vertical_align_top_rounded),
+              ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+        appBar: AppBar(title: Text(context.strings('dailyJapanese'))),
         body: SafeArea(
           child: Column(
             children: [
@@ -180,131 +317,97 @@ class _DailyLessonListScreenState extends ConsumerState<DailyLessonListScreen> {
                 child: TextField(
                   controller: _search,
                   textInputAction: TextInputAction.search,
-                  onSubmitted: (_) => _submit(),
+                  onSubmitted: (_) => _reset(),
                   decoration: InputDecoration(
                     labelText: context.strings('searchDailyLessons'),
                     prefixIcon: const Icon(Icons.search),
                     suffixIcon: IconButton(
                       tooltip: context.strings('searchDailyLessons'),
-                      onPressed: _submit,
+                      onPressed: _reset,
                       icon: const Icon(Icons.arrow_forward),
                     ),
                   ),
                 ),
               ),
               Expanded(
-                child: feed.when(
-                  loading: () =>
-                      const Center(child: CircularProgressIndicator()),
-                  error: (_, _) => Center(
-                    child: _LessonError(
-                      onRetry: () =>
-                          ref.invalidate(dailyLessonPageProvider(query)),
-                    ),
-                  ),
-                  data: (snapshot) {
-                    final page = snapshot.value;
-                    return Column(
-                      children: [
-                        _SavedNotice(
-                          saved: snapshot.saved,
-                          offline: snapshot.offline,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Text(
-                            context.strings('dailyLessonLanguageNote'),
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                        ),
-                        Expanded(
-                          child: page.lessons.isEmpty
-                              ? Center(
-                                  child: Text(
-                                    context.strings('noDailyLessons'),
-                                  ),
-                                )
-                              : ListView.builder(
-                                  key: ValueKey(query),
-                                  padding: const EdgeInsets.all(16),
-                                  itemCount: page.lessons.length,
-                                  itemBuilder: (context, index) {
-                                    final lesson = page.lessons[index];
-                                    return Card(
-                                      child: ListTile(
-                                        contentPadding: const EdgeInsets.all(
-                                          16,
-                                        ),
-                                        title: Text(
-                                          lesson.expressions.first.japanese,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        subtitle: Padding(
-                                          padding: const EdgeInsets.only(
-                                            top: 8,
-                                          ),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              if (lesson
-                                                  .expressions
-                                                  .first
-                                                  .translation
-                                                  .isNotEmpty)
-                                                Text(
-                                                  lesson
-                                                      .expressions
-                                                      .first
-                                                      .translation,
-                                                  style: const TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              Text(lesson.date),
-                                            ],
-                                          ),
-                                        ),
-                                        trailing: const Icon(
-                                          Icons.chevron_right,
-                                        ),
-                                        onTap: () => context.push(
-                                          '/daily-lessons/${Uri.encodeComponent(lesson.id)}',
-                                        ),
+                child: _pages.isEmpty
+                    ? Center(
+                        child: _loadError
+                            ? _LessonError(onRetry: _loadNext)
+                            : const CircularProgressIndicator(),
+                      )
+                    : Column(
+                        children: [
+                          _SavedNotice(saved: _saved, offline: _offline),
+                          Expanded(
+                            child: lessons.isEmpty
+                                ? Center(
+                                    child: Text(
+                                      context.strings('noDailyLessons'),
+                                    ),
+                                  )
+                                : NotificationListener<OverscrollNotification>(
+                                    onNotification: (notification) {
+                                      if (notification.overscroll > 0 &&
+                                          !_loadError) {
+                                        _nearBottom();
+                                      }
+                                      return false;
+                                    },
+                                    child: ListView.builder(
+                                      key: const ValueKey('daily_lessons_list'),
+                                      controller: _scroll,
+                                      physics:
+                                          const AlwaysScrollableScrollPhysics(),
+                                      padding: const EdgeInsets.fromLTRB(
+                                        16,
+                                        16,
+                                        16,
+                                        88,
                                       ),
-                                    );
-                                  },
-                                ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              IconButton(
-                                tooltip: context.strings('previousStudy'),
-                                onPressed: page.page > 1
-                                    ? () => setState(() => _page--)
-                                    : null,
-                                icon: const Icon(Icons.chevron_left),
-                              ),
-                              Text('${page.page} / ${page.pages}'),
-                              IconButton(
-                                tooltip: context.strings('next'),
-                                onPressed: page.page < page.pages
-                                    ? () => setState(() => _page++)
-                                    : null,
-                                icon: const Icon(Icons.chevron_right),
-                              ),
-                            ],
+                                      itemCount: lessons.length + 1,
+                                      itemBuilder: (context, index) {
+                                        if (index < lessons.length) {
+                                          return _lessonTile(lessons[index]);
+                                        }
+                                        if (_loadError) {
+                                          return _LessonError(
+                                            onRetry: _loadNext,
+                                          );
+                                        }
+                                        if (_loading) {
+                                          return Padding(
+                                            padding: const EdgeInsets.all(20),
+                                            child: Center(
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  const SizedBox(
+                                                    width: 24,
+                                                    height: 24,
+                                                    child:
+                                                        CircularProgressIndicator(
+                                                          strokeWidth: 2,
+                                                        ),
+                                                  ),
+                                                  const SizedBox(height: 8),
+                                                  Text(
+                                                    context.strings(
+                                                      'loadingMoreLessons',
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                        return const SizedBox(height: 16);
+                                      },
+                                    ),
+                                  ),
                           ),
-                        ),
-                      ],
-                    );
-                  },
-                ),
+                        ],
+                      ),
               ),
             ],
           ),

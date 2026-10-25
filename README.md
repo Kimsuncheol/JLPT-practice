@@ -51,7 +51,9 @@ Home shows the newest ready expression from the Japanese lesson archive, with
 its publication date and Korean meaning. It is labelled **Today’s expression**
 only when its publication date matches the device’s current date; otherwise it
 shows **Latest expression**. Tap the expression to open its lesson, or use
-**Browse lessons** to search Japanese/Korean text and browse ten lessons per page.
+**Browse lessons** to search Japanese/Korean text. Scrolling near the bottom
+loads the next ten lessons into the same list. Search and refresh restart from
+the first page; failed additional loads keep existing lessons and offer retry.
 Lesson detail separates the main expression from a conversation panel with
 alternating dialogue bubbles. Tap Japanese text to play TTS and tap the same text
 again to stop. It includes Korean notes, furigana where readings align, and **Ask AI Tutor** for
