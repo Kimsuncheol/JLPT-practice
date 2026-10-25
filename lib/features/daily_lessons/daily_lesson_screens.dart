@@ -9,7 +9,7 @@ import 'package:jlpt_practice/core/api/daily_lesson_service.dart';
 import 'package:jlpt_practice/core/api/jlpt_api_client.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/core/services/tts_service.dart';
-import 'package:jlpt_practice/core/utils/furigana_alignment.dart';
+import 'package:jlpt_practice/core/utils/daily_lesson_readings.dart';
 import 'package:jlpt_practice/data/models/daily_lesson.dart';
 import 'package:jlpt_practice/features/vocabulary/audible_speech.dart';
 import 'package:jlpt_practice/features/vocabulary/example_furigana_text.dart';
@@ -454,7 +454,8 @@ class _DailyLessonDetailScreenState
       return;
     }
     _tts ??= ref.read(ttsServiceProvider);
-    final speech = text.reading.trim().isEmpty ? text.japanese : text.reading;
+    final reading = dailyLessonReading(text.japanese, text.reading);
+    final speech = reading.isEmpty ? text.japanese : reading;
     setState(() => _playing = text.japanese);
     try {
       await _tts!.speak(speech);
@@ -545,10 +546,7 @@ class _DailyLessonDetailScreenState
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ExampleFuriganaText(
-                    segments: alignSentenceFurigana(
-                      text.japanese,
-                      text.reading,
-                    ),
+                    segments: dailyLessonSegments(text.japanese, text.reading),
                     style: Theme.of(context).textTheme.titleLarge!,
                     wordTargets: const [],
                     hideReadings: !showReadings,
@@ -696,7 +694,7 @@ class _DailyLessonDetailScreenState
     int turn,
   ) {
     final scheme = Theme.of(context).colorScheme;
-    final prefix = RegExp(r'^\s*([ABＡＢ])\s*[:：]\s*');
+    final prefix = dailyLessonSpeakerPrefix;
     final sourceSpeaker = prefix.firstMatch(example.japanese)?.group(1);
     final speaker = switch (sourceSpeaker) {
       'A' || 'Ａ' => 'A',

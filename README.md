@@ -58,6 +58,12 @@ Lesson detail separates the main expression from a conversation panel with
 alternating dialogue bubbles. Tap Japanese text to play TTS and tap the same text
 again to stop. It includes Korean notes, furigana where readings align, and **Ask AI Tutor** for
 an expression or example. Tutor explanations follow the selected meaning language.
+Daily lesson readings remove trailing Korean pronunciation notes before furigana
+alignment. Sentence-specific corrections repair known malformed readings for
+「本人は気付いていないようですね。」 and the 「昨日は久しぶりに旧友と会って…」
+dialogue, including saved responses. A/B labels with spaces or colons are separated
+from the spoken Japanese. Unknown invalid readings use the original Japanese for
+TTS and remain unannotated.
 
 The read-only source defaults to `https://japanese-scraper.onrender.com` and can
 be overridden using `--dart-define=JAPANESE_LESSON_API_BASE_URL=https://...`.
