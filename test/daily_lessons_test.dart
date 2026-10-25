@@ -41,6 +41,7 @@ Map<String, dynamic> _article({
             'reading': 'まいにちべんきょうします。',
             'translation': '매일 공부합니다.',
           },
+          {'japanese': 'そうですね。', 'translation': '그렇네요.'},
         ],
       },
     ],
@@ -292,6 +293,27 @@ void main() {
       );
       expect(expressionSection, findsOneWidget);
       expect(conversationSection, findsOneWidget);
+      for (var turn = 0; turn < 2; turn++) {
+        final avatar = find.byKey(ValueKey('lesson_speaker_$turn'));
+        final bubble = find.byKey(ValueKey('lesson_bubble_$turn'));
+        expect(
+          tester.widget<CircleAvatar>(avatar).child,
+          isA<Text>().having(
+            (text) => text.data,
+            'speaker',
+            turn == 0 ? 'A' : 'B',
+          ),
+        );
+        final avatarRect = tester.getRect(avatar);
+        final bubbleRect = tester.getRect(bubble);
+        expect(avatarRect.top, greaterThan(bubbleRect.bottom));
+        expect(
+          avatarRect.center.dx,
+          turn == 0
+              ? lessThan(bubbleRect.center.dx)
+              : greaterThan(bubbleRect.center.dx),
+        );
+      }
       expect(
         find.descendant(of: expressionSection, matching: conversationSection),
         findsNothing,

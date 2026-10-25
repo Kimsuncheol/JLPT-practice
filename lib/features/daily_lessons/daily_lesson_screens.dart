@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:jlpt_practice/features/kanji/widgets/dashed_divider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jlpt_practice/app/app_controller.dart';
@@ -236,22 +237,34 @@ class _DailyLessonListScreenState extends ConsumerState<DailyLessonListScreen> {
                                         ),
                                         title: Text(
                                           lesson.expressions.first.japanese,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
                                         subtitle: Padding(
                                           padding: const EdgeInsets.only(
                                             top: 8,
                                           ),
-                                          child: Text(
-                                            [
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              if (lesson
+                                                  .expressions
+                                                  .first
+                                                  .translation
+                                                  .isNotEmpty)
+                                                Text(
                                                   lesson
                                                       .expressions
                                                       .first
                                                       .translation,
-                                                  lesson.date,
-                                                  lesson.title,
-                                                ]
-                                                .where((s) => s.isNotEmpty)
-                                                .join('\n'),
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              Text(lesson.date),
+                                            ],
                                           ),
                                         ),
                                         trailing: const Icon(
@@ -470,7 +483,7 @@ class _DailyLessonDetailScreenState
       children: [
         Card(
           key: ValueKey('lesson_expression_$index'),
-          margin: const EdgeInsets.only(top: 24),
+          margin: EdgeInsets.only(top: index == 0 ? 0 : 24),
           color: scheme.primaryContainer,
           child: Padding(
             padding: const EdgeInsets.all(20),
@@ -498,7 +511,10 @@ class _DailyLessonDetailScreenState
                 const SizedBox(height: 8),
                 _textCard(lesson, expression, expression, showReadings),
                 if (expression.explanation.isNotEmpty) ...[
-                  const Divider(height: 24),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    child: DashedDivider(color: Colors.white),
+                  ),
                   Text(
                     expression.explanation,
                     style: theme.textTheme.bodyMedium?.copyWith(height: 1.6),
@@ -555,42 +571,88 @@ class _DailyLessonDetailScreenState
                 ),
                 const SizedBox(height: 20),
                 for (final (turn, example) in expression.examples.indexed)
-                  Padding(
-                    padding: EdgeInsets.only(
-                      left: turn.isOdd ? 20 : 0,
-                      right: turn.isEven ? 20 : 0,
-                      bottom: 14,
-                    ),
-                    child: Material(
-                      color: turn.isEven
-                          ? scheme.surface
-                          : scheme.secondaryContainer,
-                      shape: RoundedRectangleBorder(
-                        side: BorderSide(
-                          color: scheme.outlineVariant.withValues(alpha: 0.45),
-                        ),
-                        borderRadius: BorderRadius.only(
-                          topLeft: const Radius.circular(20),
-                          topRight: const Radius.circular(20),
-                          bottomLeft: Radius.circular(turn.isEven ? 4 : 20),
-                          bottomRight: Radius.circular(turn.isOdd ? 4 : 20),
-                        ),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
-                        child: _textCard(
-                          lesson,
-                          expression,
-                          example,
-                          showReadings,
-                        ),
-                      ),
-                    ),
+                  _conversationTurn(
+                    lesson,
+                    expression,
+                    example,
+                    showReadings,
+                    turn,
                   ),
               ],
             ),
           ),
       ],
+    );
+  }
+
+  Widget _conversationTurn(
+    DailyLesson lesson,
+    LessonExpression expression,
+    LessonText example,
+    bool showReadings,
+    int turn,
+  ) {
+    final scheme = Theme.of(context).colorScheme;
+    final prefix = RegExp(r'^\s*([ABＡＢ])\s*[:：]\s*');
+    final sourceSpeaker = prefix.firstMatch(example.japanese)?.group(1);
+    final speaker = switch (sourceSpeaker) {
+      'A' || 'Ａ' => 'A',
+      'B' || 'Ｂ' => 'B',
+      _ => turn.isEven ? 'A' : 'B',
+    };
+    final isB = speaker == 'B';
+    final text = LessonText(
+      japanese: example.japanese.replaceFirst(prefix, ''),
+      reading: example.reading.replaceFirst(prefix, ''),
+      translation: example.translation.replaceFirst(prefix, ''),
+    );
+    return Padding(
+      padding: EdgeInsets.only(
+        left: isB ? 20 : 0,
+        right: isB ? 0 : 20,
+        bottom: 18,
+      ),
+      child: Column(
+        crossAxisAlignment: isB
+            ? CrossAxisAlignment.end
+            : CrossAxisAlignment.start,
+        children: [
+          Material(
+            key: ValueKey('lesson_bubble_$turn'),
+            color: isB ? scheme.secondaryContainer : scheme.surface,
+            shape: RoundedRectangleBorder(
+              side: BorderSide(
+                color: scheme.outlineVariant.withValues(alpha: 0.45),
+              ),
+              borderRadius: BorderRadius.only(
+                topLeft: const Radius.circular(20),
+                topRight: const Radius.circular(20),
+                bottomLeft: Radius.circular(isB ? 20 : 4),
+                bottomRight: Radius.circular(isB ? 4 : 20),
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+              child: _textCard(lesson, expression, text, showReadings),
+            ),
+          ),
+          const SizedBox(height: 8),
+          CircleAvatar(
+            key: ValueKey('lesson_speaker_$turn'),
+            radius: 16,
+            backgroundColor: isB
+                ? scheme.secondaryContainer
+                : scheme.primaryContainer,
+            foregroundColor: isB
+                ? scheme.onSecondaryContainer
+                : scheme.onPrimaryContainer,
+            child: Text(
+              speaker,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -636,24 +698,6 @@ class _DailyLessonDetailScreenState
               return ListView(
                 padding: const EdgeInsets.all(20),
                 children: [
-                  _SavedNotice(
-                    saved: snapshot.saved,
-                    offline: snapshot.offline,
-                  ),
-                  Text(
-                    lesson.date,
-                    style: Theme.of(context).textTheme.labelLarge,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    lesson.title,
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    context.strings('dailyLessonLanguageNote'),
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
                   for (final (index, expression) in lesson.expressions.indexed)
                     _expressionSection(
                       lesson,
