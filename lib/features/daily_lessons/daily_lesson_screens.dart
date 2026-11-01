@@ -9,6 +9,7 @@ import 'package:jlpt_practice/core/api/daily_lesson_service.dart';
 import 'package:jlpt_practice/core/api/jlpt_api_client.dart';
 import 'package:jlpt_practice/core/localization/app_strings.dart';
 import 'package:jlpt_practice/core/services/tts_service.dart';
+import 'package:jlpt_practice/core/services/daily_lesson_refresh.dart';
 import 'package:jlpt_practice/core/utils/daily_lesson_readings.dart';
 import 'package:jlpt_practice/data/models/daily_lesson.dart';
 import 'package:jlpt_practice/features/vocabulary/audible_speech.dart';
@@ -26,11 +27,61 @@ Widget _withoutRipples(BuildContext context, Widget child) => Theme(
   child: child,
 );
 
-class LatestExpressionCard extends ConsumerWidget {
+class LatestExpressionCard extends ConsumerStatefulWidget {
   const LatestExpressionCard({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<LatestExpressionCard> createState() =>
+      _LatestExpressionCardState();
+}
+
+class _LatestExpressionCardState extends ConsumerState<LatestExpressionCard>
+    with WidgetsBindingObserver {
+  late final DailyLessonRefresh _refresh;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _refresh = DailyLessonRefresh(
+      now: ref.read(dailyLessonClockProvider),
+      onRefresh: () {
+        if (!mounted) return;
+        setState(() {}); // Update Today/Latest at the calendar boundary too.
+        ref.invalidate(dailyLessonPageProvider(_latestQuery));
+      },
+    );
+    if (WidgetsBinding.instance.lifecycleState case final state?) {
+      if (state != AppLifecycleState.resumed) _refresh.setActive(false);
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) =>
+      _refresh.setActive(state == AppLifecycleState.resumed);
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _refresh.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    ref.listen(dailyLessonPageProvider(_latestQuery), (_, next) {
+      if (next.hasError) {
+        _refresh.received(offline: true);
+        return;
+      }
+      if (next.isLoading) return;
+      if (next.value case final snapshot?) {
+        _refresh.received(
+          publicationDate: snapshot.value.lessons.firstOrNull?.date,
+          offline: snapshot.saved || snapshot.offline,
+        );
+      }
+    });
     final feed = ref.watch(dailyLessonPageProvider(_latestQuery));
     return _withoutRipples(
       context,
@@ -84,7 +135,9 @@ class LatestExpressionCard extends ConsumerWidget {
                             Expanded(
                               child: Text(
                                 context.strings(
-                                  lesson.publishedToday(DateTime.now())
+                                  lesson.publishedToday(
+                                        ref.read(dailyLessonClockProvider)(),
+                                      )
                                       ? 'todayExpression'
                                       : 'latestExpression',
                                 ),

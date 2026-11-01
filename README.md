@@ -54,6 +54,14 @@ shows **Latest expression**. Tap the expression to open its lesson, or use
 **Browse lessons** to search Japanese/Korean text. Scrolling near the bottom
 loads the next ten lessons into the same list. Search and refresh restart from
 the first page; failed additional loads keep existing lessons and offer retry.
+The Home card fetches independently on opening and at each device-local midnight
+while the app is active. After an overnight suspension it refreshes on resume;
+mobile operating systems do not guarantee execution at midnight while suspended
+or closed. Until today's ready lesson arrives (or after a network failure), it
+rechecks every 15 minutes while active. The scraper's ingestion is scheduled at
+01:00 Asia/Seoul, so a midnight request may still return the previous lesson.
+Cached lessons appear immediately and each successful fetch replaces the saved
+Home response in app storage, without requiring a visit to the lesson list.
 Lesson detail separates the main expression from a conversation panel with
 alternating dialogue bubbles. Tap Japanese text to play TTS and tap the same text
 again to stop. It includes Korean notes, furigana where readings align, and **Ask AI Tutor** for

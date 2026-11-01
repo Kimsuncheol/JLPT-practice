@@ -126,7 +126,6 @@ class DailyLessonService {
       final value = parse(jsonDecode(raw) as Map<String, dynamic>);
       if (preferences != null) {
         try {
-          await preferences.remove(key);
           await preferences.setString(key, raw);
           final keys = preferences
               .getKeys()
