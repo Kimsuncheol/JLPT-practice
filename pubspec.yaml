@@ -68,6 +68,7 @@ dependencies:
   flip_card_plus: ^1.0.5
 
 dev_dependencies:
+  fake_cloud_firestore: '>=4.2.0 <4.3.0'
   flutter_test:
     sdk: flutter
 

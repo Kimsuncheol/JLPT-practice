@@ -24,6 +24,11 @@ service cloud.firestore {
       allow create, update, delete: if false;
     }
 
+    match /japanese_lessons/{articleId} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+
     // Only trusted Admin SDK code (for example Cloud Functions) may enqueue or
     // inspect push jobs. Admin SDK requests bypass Firestore Security Rules.
     match /notificationJobs/{jobId} {

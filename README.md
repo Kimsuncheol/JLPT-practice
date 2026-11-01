@@ -47,7 +47,7 @@ mock-test flow.
 
 ## Daily Japanese lessons
 
-Home shows the newest ready expression from the Japanese lesson archive, with
+Home shows every expression in the newest completed Firebase lesson, with
 its publication date and Korean meaning. It is labelled **Today’s expression**
 only when its publication date matches the device’s current date; otherwise it
 shows **Latest expression**. Tap the expression to open its lesson, or use
@@ -73,14 +73,23 @@ dialogue, including saved responses. A/B labels with spaces or colons are separa
 from the spoken Japanese. Unknown invalid readings use the original Japanese for
 TTS and remain unannotated.
 
-The read-only source defaults to `https://japanese-scraper.onrender.com` and can
-be overridden using `--dart-define=JAPANESE_LESSON_API_BASE_URL=https://...`.
-It uses `GET /api/articles?status=ready&page=...&q=...` and
-`GET /api/articles/<id>`. Render cold starts allow a 90-second timeout with
-manual retry. Up to 30 responses are saved locally: saved content appears while
+The app reads `japanese_lessons/{article_id}` in Firebase project
+`jlpt-practice-20a4e`, using the article/lesson schema mirrored by the scraper.
+Signed-in accounts have read access; clients cannot create, edit or delete lessons.
+Lessons are ordered by publication date and document ID, newest first, and
+fetched with cursors in batches of ten with a one-record lookahead. There is no
+historical archive cap. Every expression and meaning in each lesson is displayed
+in Home/the list, and lesson detail retains all examples and notes.
+Japanese/Korean substring search scans Firestore batches on the device until it
+finds the next ten matches or reaches the end; broad or unmatched searches may
+read the whole archive. Internal sync timestamps are excluded from app models.
+The Render scraper HTTP API is no longer the app's default lesson data source.
+
+Firestore persistence is enabled at startup. In addition, up to 30 JSON responses
+are saved locally, preserving the Home response: saved content appears while
 refreshing and remains usable when refresh fails. Browsed list pages also supply
-cached lesson details, including after an app restart. Uncached pages need a
-network connection; TTS availability depends on the configured speech engine.
+cached lesson details after a restart. Uncached pages need Firebase access and
+network connectivity; TTS availability depends on the configured speech engine.
 Source transcription uncertainty and a selectable original article URL are shown.
 These supplementary lessons have no JLPT classification and do not alter SRS,
 XP, ranked practice, or the bundled vocabulary/grammar catalogs.

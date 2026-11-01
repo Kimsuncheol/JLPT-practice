@@ -1,10 +1,12 @@
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:jlpt_practice/data/models/daily_lesson.dart';
+import 'package:jlpt_practice/data/repositories/firestore_daily_lesson_source.dart';
 
 final dailyLessonServiceProvider = Provider((ref) {
   final service = DailyLessonService();
@@ -37,16 +39,24 @@ class LessonSnapshot<T> {
 class DailyLessonService {
   DailyLessonService({
     http.Client? client,
-    this.baseUrl = const String.fromEnvironment(
-      'JAPANESE_LESSON_API_BASE_URL',
-      defaultValue: 'https://japanese-scraper.onrender.com',
-    ),
+    FirebaseFirestore? firestore,
+    String? baseUrl,
     this.timeout = const Duration(seconds: 90),
-  }) : _client = client ?? http.Client();
+  }) : _client = client,
+       _source = client == null
+           ? FirestoreDailyLessonSource(firestore: firestore)
+           : null,
+       baseUrl =
+           baseUrl ??
+           (client == null
+               ? 'https://firestore.googleapis.com/projects/jlpt-practice-20a4e/databases/default/documents/japanese_lessons'
+               : 'https://japanese-scraper.onrender.com');
 
   final String baseUrl;
   final Duration timeout;
-  final http.Client _client;
+  // Explicit HTTP injection is retained for legacy contract tests only.
+  final http.Client? _client;
+  final FirestoreDailyLessonSource? _source;
   Future<SharedPreferences>? _preferences;
   String get _prefix => 'daily_lessons_v1:${Uri.encodeComponent(baseUrl)}:';
 
@@ -115,14 +125,30 @@ class DailyLessonService {
     }
     if (cached != null) yield LessonSnapshot(cached, saved: true);
     try {
-      final response = await _client
-          .get(uri, headers: {'Accept': 'application/json'})
-          .timeout(timeout);
-      // Flask errors are HTML: check status before attempting to decode JSON.
-      if (response.statusCode != 200) {
-        throw const FormatException('Lesson unavailable');
+      final String raw;
+      if (_source case final source?) {
+        final value =
+            await (path == '/api/articles'
+                    ? source.page(
+                        int.parse(parameters['page']!),
+                        parameters['q'] ?? '',
+                      )
+                    : source.lesson(
+                        Uri.decodeComponent(
+                          path.substring('/api/articles/'.length),
+                        ),
+                      ))
+                .timeout(timeout);
+        raw = jsonEncode(value);
+      } else {
+        final response = await _client!
+            .get(uri, headers: {'Accept': 'application/json'})
+            .timeout(timeout);
+        if (response.statusCode != 200) {
+          throw const FormatException('Lesson unavailable');
+        }
+        raw = utf8.decode(response.bodyBytes);
       }
-      final raw = utf8.decode(response.bodyBytes);
       final value = parse(jsonDecode(raw) as Map<String, dynamic>);
       if (preferences != null) {
         try {
@@ -151,5 +177,5 @@ class DailyLessonService {
     }
   }
 
-  void close() => _client.close();
+  void close() => _client?.close();
 }

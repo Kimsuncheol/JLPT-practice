@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:gpt_markdown/gpt_markdown.dart';
 import 'package:jlpt_practice/features/kanji/widgets/dashed_divider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -117,7 +118,6 @@ class _LatestExpressionCardState extends ConsumerState<LatestExpressionCard>
                     return Text(context.strings('noDailyLessons'));
                   }
                   final lesson = lessons.first;
-                  final expression = lesson.expressions.first;
                   return InkWell(
                     onTap: () => context.push(
                       '/daily-lessons/${Uri.encodeComponent(lesson.id)}',
@@ -152,15 +152,17 @@ class _LatestExpressionCardState extends ConsumerState<LatestExpressionCard>
                           lesson.date,
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
-                        const SizedBox(height: 14),
-                        Text(
-                          expression.japanese,
-                          style: Theme.of(context).textTheme.headlineSmall
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ),
-                        if (expression.translation.isNotEmpty) ...[
-                          const SizedBox(height: 8),
-                          Text(expression.translation),
+                        for (final expression in lesson.expressions) ...[
+                          const SizedBox(height: 14),
+                          Text(
+                            expression.japanese,
+                            style: Theme.of(context).textTheme.headlineSmall
+                                ?.copyWith(fontWeight: FontWeight.bold),
+                          ),
+                          if (expression.translation.isNotEmpty) ...[
+                            const SizedBox(height: 8),
+                            Text(expression.translation),
+                          ],
                         ],
                         _SavedNotice(
                           saved: snapshot.saved,
@@ -322,23 +324,30 @@ class _DailyLessonListScreenState extends ConsumerState<DailyLessonListScreen> {
     key: ValueKey('daily_lesson_${lesson.id}'),
     child: ListTile(
       contentPadding: const EdgeInsets.all(16),
-      title: Text(
-        lesson.expressions.first.japanese,
-        style: const TextStyle(fontWeight: FontWeight.bold),
+      title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (final (index, expression) in lesson.expressions.indexed) ...[
+            if (index > 0) const SizedBox(height: 16),
+            Text(
+              expression.japanese,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            if (expression.translation.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Text(
+                expression.translation,
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+              ),
+            ],
+          ],
+        ],
       ),
       subtitle: Padding(
         padding: const EdgeInsets.only(top: 8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (lesson.expressions.first.translation.isNotEmpty)
-              Text(
-                lesson.expressions.first.translation,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-            Text(lesson.date),
-          ],
-        ),
+        child: Text(lesson.date),
       ),
       trailing: const Icon(Icons.chevron_right),
       onTap: () =>
@@ -868,11 +877,26 @@ class _DailyLessonDetailScreenState
                       context.strings('dailyLessonNotes'),
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
-                    for (final note in lesson.notes)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8),
-                        child: Text(note),
+                    const SizedBox(height: 12),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.surfaceContainerLow,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.outlineVariant,
+                        ),
                       ),
+                      child: GptMarkdown(
+                        lesson.notes.map(_noteMarkdown).join('\n\n'),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.bodyLarge?.copyWith(height: 1.7),
+                      ),
+                    ),
                   ],
                   const SizedBox(height: 24),
                   Text(
@@ -904,6 +928,17 @@ class _DailyLessonDetailScreenState
       ),
     );
   }
+}
+
+String _noteMarkdown(String source) {
+  final note = source.trim();
+  if (note.isEmpty ||
+      RegExp(r'^(#{1,6}\s|[-*+]\s|\d+\.\s|>|```)|\*\*').hasMatch(note)) {
+    return note;
+  }
+  final separator = RegExp(r'\s+[—–−-]\s+').firstMatch(note);
+  if (separator == null) return '- $note';
+  return '- **${note.substring(0, separator.start)}** — ${note.substring(separator.end)}';
 }
 
 class _SavedNotice extends StatelessWidget {

@@ -22,7 +22,7 @@ class AppStrings {
     'dailyLessonSaved': 'Saved copy · checking for updates',
     'dailyLessonOffline': 'Couldn’t refresh · showing saved lesson content',
     'dailyLessonUnavailable':
-        'Lessons couldn’t be loaded. The server may take a moment to wake up. Please try again.',
+        'Lessons couldn’t be loaded. Check your connection and sign in, then try again.',
     'dailyLessonAudioError': 'Audio couldn’t be played. Please try again.',
     'stopLessonAudio': 'Stop audio',
     'dailyLessonTutorHint': 'Ask about this expression or example…',
@@ -440,8 +440,7 @@ class AppStrings {
     'dailyLessonLanguageNote': '일본어 표현과 한국어 뜻, 해설을 제공합니다.',
     'dailyLessonSaved': '저장된 내용 · 업데이트 확인 중',
     'dailyLessonOffline': '새로고침 실패 · 저장된 레슨을 표시합니다',
-    'dailyLessonUnavailable':
-        '레슨을 불러올 수 없습니다. 서버가 시작되는 데 시간이 걸릴 수 있습니다. 다시 시도해 주세요.',
+    'dailyLessonUnavailable': '레슨을 불러올 수 없습니다. 인터넷 연결과 로그인을 확인한 뒤 다시 시도해 주세요.',
     'dailyLessonAudioError': '음성을 재생할 수 없습니다. 다시 시도해 주세요.',
     'stopLessonAudio': '음성 정지',
     'dailyLessonTutorHint': '이 표현이나 예문에 대해 질문해 보세요…',
