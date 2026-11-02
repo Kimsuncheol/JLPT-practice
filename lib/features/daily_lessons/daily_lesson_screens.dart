@@ -1,5 +1,8 @@
 import 'dart:async';
 
+import 'package:share_plus/share_plus.dart';
+import 'package:jlpt_practice/core/utils/daily_lesson_share.dart';
+
 import 'package:flutter/material.dart';
 import 'package:gpt_markdown/gpt_markdown.dart';
 import 'package:jlpt_practice/features/kanji/widgets/dashed_divider.dart';
@@ -500,6 +503,55 @@ class _DailyLessonDetailScreenState
     super.dispose();
   }
 
+  Future<void> _shareLesson(DailyLesson lesson, Rect origin) async {
+    final selected = await showModalBottomSheet<int>(
+      context: context,
+      isScrollControlled: true,
+      builder: (sheetContext) => SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: Text(context.strings('shareFullLesson')),
+                leading: const Icon(Icons.article_outlined),
+                onTap: () => Navigator.pop(sheetContext, -1),
+              ),
+              for (final (index, expression) in lesson.expressions.indexed)
+                ListTile(
+                  leading: const Icon(Icons.translate),
+                  title: Text(expression.japanese),
+                  subtitle: Text(expression.translation),
+                  onTap: () => Navigator.pop(sheetContext, index),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+    if (selected == null || !mounted) return;
+    final content = dailyLessonShareText(
+      lesson,
+      expression: selected < 0 ? null : lesson.expressions[selected],
+      korean: Localizations.localeOf(context).languageCode == 'ko',
+    );
+    try {
+      await SharePlus.instance.share(
+        ShareParams(
+          text: content,
+          subject: '${context.strings('dailyJapanese')} · ${lesson.date}',
+          sharePositionOrigin: origin,
+        ),
+      );
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.strings('lessonShareError'))),
+        );
+      }
+    }
+  }
+
   Future<void> _speak(LessonText text) async {
     final request = ++_speechRequest;
     if (_playing == text.japanese) {
@@ -832,6 +884,21 @@ class _DailyLessonDetailScreenState
         appBar: AppBar(
           title: Text(context.strings('dailyJapanese')),
           actions: [
+            if (result.value != null)
+              Builder(
+                builder: (buttonContext) => IconButton(
+                  key: const ValueKey('daily_lesson_share'),
+                  tooltip: context.strings('shareLesson'),
+                  icon: const Icon(Icons.share_outlined),
+                  onPressed: () {
+                    final box = buttonContext.findRenderObject()! as RenderBox;
+                    _shareLesson(
+                      result.value!.value,
+                      box.localToGlobal(Offset.zero) & box.size,
+                    );
+                  },
+                ),
+              ),
             if (_playing != null)
               IconButton(
                 tooltip: context.strings('stopLessonAudio'),

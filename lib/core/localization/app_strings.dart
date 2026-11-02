@@ -7,6 +7,9 @@ class AppStrings {
 
   static const _en = <String, String>{
     'dailyJapanese': 'Daily Japanese',
+    'shareLesson': 'Share lesson',
+    'shareFullLesson': 'Share full lesson',
+    'lessonShareError': 'Couldn’t open sharing. Please try again.',
     'loadingMoreLessons': 'Loading more lessons…',
     'dailyLessonExpression': 'Expression',
     'dailyLessonConversation': 'Conversation',
@@ -427,6 +430,9 @@ class AppStrings {
 
   static const _ko = <String, String>{
     'dailyJapanese': '매일 일본어',
+    'shareLesson': '학습 공유',
+    'shareFullLesson': '전체 학습 공유',
+    'lessonShareError': '공유를 열 수 없습니다. 다시 시도해 주세요.',
     'loadingMoreLessons': '레슨을 더 불러오는 중…',
     'dailyLessonExpression': '표현',
     'dailyLessonConversation': '대화',

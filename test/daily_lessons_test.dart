@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -387,6 +388,34 @@ void main() {
       await tester.tap(find.text('努力する'));
       await tester.pumpAndSettle();
       expect(find.text('꾸준히 힘쓰는 것을 뜻합니다.'), findsOneWidget);
+      final shares = <MethodCall>[];
+      const channel = MethodChannel('dev.fluttercommunity.plus/share');
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(channel, (
+        call,
+      ) async {
+        shares.add(call);
+        return 'selected-app';
+      });
+      addTearDown(
+        () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+          channel,
+          null,
+        ),
+      );
+      await tester.tap(find.byKey(const ValueKey('daily_lesson_share')));
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.text(language == 'en' ? 'Share full lesson' : '전체 학습 공유'),
+      );
+      await tester.pumpAndSettle();
+      expect(shares, hasLength(1));
+      expect(shares.single.arguments['text'], contains('努力する'));
+      expect(
+        shares.single.arguments['text'],
+        contains('https://example.test/source/opaque-123'),
+      );
+      expect(shares.single.arguments['originWidth'], greaterThan(0));
+
       router.pop();
       await tester.pumpAndSettle();
       await tester.tap(
